@@ -396,7 +396,7 @@ void PSOManager::DefaultLoadPSO() {
     gridRootSigBuilder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_ALL);
     gridRootSigBuilder.CreateRootSignature();
     InputLayoutBuilder gridInputLayoutBuilder;
-    gridInputLayoutBuilder.CreateGridElement();
+    gridInputLayoutBuilder.CreateDefaultObjElement();
     RegisterPSO("Grid", grid, &gridRootSigBuilder, &gridInputLayoutBuilder);
 
     // デバックライン描画用のPSO

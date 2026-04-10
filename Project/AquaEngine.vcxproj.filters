@@ -242,6 +242,8 @@
     <ClInclude Include="Application\Scene\Register\SetUpScenes.h" />
     <ClInclude Include="Application\ColorEditor.h" />
     <ClInclude Include="EngineSource\Graphics\GpuResource.h" />
+    <ClInclude Include="EngineSource\Graphics\VertexBuffer.h" />
+    <ClInclude Include="EngineSource\Graphics\IndexBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Externals\imgui\imgui_bezier_math.inl" />
