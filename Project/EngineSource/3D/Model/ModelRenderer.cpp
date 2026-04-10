@@ -65,11 +65,11 @@ void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, con
 		if (material == nullptr) {
 			// マテリアルを設定
 			const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
-			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetResource()->GetGPUVirtualAddress());
 		} else {
-			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootConstantBufferView(0, material->GetResource()->GetGPUVirtualAddress());
 		}
-		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetResource()->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 		commandList_->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
 
@@ -99,11 +99,11 @@ void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, ID3
 		if (material == nullptr) {
 			// マテリアルを設定
 			const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
-			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetResource()->GetGPUVirtualAddress());
 		} else {
-			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootConstantBufferView(0, material->GetResource()->GetGPUVirtualAddress());
 		}
-		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetResource()->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 		commandList_->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootConstantBufferView(4, lightGroupResource->GetGPUVirtualAddress());
@@ -139,10 +139,11 @@ void ModelRenderer::DrawInstancing(const Model* model, const uint32_t& numInstan
 		if (material == nullptr) {
 			// マテリアルを設定
 			const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
-			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetResource()->GetGPUVirtualAddress());
 		} else {
-			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootConstantBufferView(0, material->GetResource()->GetGPUVirtualAddress());
 		}
+
 		commandList_->SetGraphicsRootDescriptorTable(1, *worldTransforms.GetInstancingSrvGPU());
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 		commandList_->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
@@ -175,11 +176,11 @@ void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTrans
 		if (material == nullptr) {
 			// マテリアルを設定
 			const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
-			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetResource()->GetGPUVirtualAddress());
 		} else {
-			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootConstantBufferView(0, material->GetResource()->GetGPUVirtualAddress());
 		}
-		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetResource()->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 
 		commandList_->SetGraphicsRootDescriptorTable(3, model->skinClusterBron_->paletteSrvHandle.second);
@@ -201,7 +202,7 @@ void ModelRenderer::DrawGrid(const Model* model, WorldTransform& worldTransform)
 	commandList_->IASetVertexBuffers(0, 1, &meshes[0]->GetVertexBufferView());
 	commandList_->IASetIndexBuffer(&meshes[0]->GetIndexBufferView());
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	commandList_->SetGraphicsRootConstantBufferView(0, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(0, worldTransform.GetResource()->GetGPUVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(1, cameraResource_->GetGPUVirtualAddress());
 	commandList_->DrawIndexedInstanced(meshes[0]->GetTotalIndices(), 1, 0, 0, 0);
 }
@@ -224,12 +225,12 @@ void ModelRenderer::DrawSkybox(const Model* model, WorldTransform& worldTransfor
 		if (material == nullptr) {
 			// マテリアルを設定
 			const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
-			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetMaterialResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetResource()->GetGPUVirtualAddress());
 		} else {
-			commandList_->SetGraphicsRootConstantBufferView(0, material->GetMaterialResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootConstantBufferView(0, material->GetResource()->GetGPUVirtualAddress());
 		}
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
-		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetResource()->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
 
 		if (meshes[i]->GetTotalIndices() != 0) {
@@ -254,7 +255,7 @@ void ModelRenderer::DrawShadowMap(const Model* model, WorldTransform& worldTrans
 		commandList_->IASetIndexBuffer(&meshes[i]->GetIndexBufferView());
 		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		commandList_->SetGraphicsRootConstantBufferView(0, worldTransform.GetTransformResource()->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(0, worldTransform.GetResource()->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootConstantBufferView(1, cameraResource_->GetGPUVirtualAddress());
 
 		if (meshes[i]->GetTotalIndices() != 0) {

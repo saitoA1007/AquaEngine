@@ -31,7 +31,6 @@
     <ClCompile Include="EngineSource\3D\Model\Model.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ModelManager.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ModelRenderer.cpp" />
-    <ClCompile Include="EngineSource\3D\Model\Particle.cpp" />
     <ClCompile Include="EngineSource\3D\Model\WorldTransform.cpp" />
     <ClCompile Include="EngineSource\3D\Model\WorldTransforms.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ParticleSystem\ParticleBehavior.cpp" />
@@ -98,7 +97,6 @@
     <ClCompile Include="Application\Light\SceneLightingController.cpp" />
     <ClCompile Include="Application\Player\Player.cpp" />
     <ClCompile Include="Application\Scene\GameScene.cpp" />
-    <ClCompile Include="Application\Scene\GEScene.cpp" />
     <ClCompile Include="Application\Scene\TitleScene.cpp" />
     <ClCompile Include="Application\Scene\Transition\Fade.cpp" />
     <ClCompile Include="Application\ColorEditor.cpp" />
@@ -137,7 +135,6 @@
     <ClInclude Include="EngineSource\3D\Model\Model.h" />
     <ClInclude Include="EngineSource\3D\Model\ModelManager.h" />
     <ClInclude Include="EngineSource\3D\Model\ModelRenderer.h" />
-    <ClInclude Include="EngineSource\3D\Model\Particle.h" />
     <ClInclude Include="EngineSource\3D\Model\VertexData.h" />
     <ClInclude Include="EngineSource\3D\Model\WorldTransform.h" />
     <ClInclude Include="EngineSource\3D\Model\WorldTransforms.h" />
@@ -240,11 +237,11 @@
     <ClInclude Include="Application\Light\SceneLightingController.h" />
     <ClInclude Include="Application\Player\Player.h" />
     <ClInclude Include="Application\Scene\GameScene.h" />
-    <ClInclude Include="Application\Scene\GEScene.h" />
     <ClInclude Include="Application\Scene\TitleScene.h" />
     <ClInclude Include="Application\Scene\Transition\Fade.h" />
     <ClInclude Include="Application\Scene\Register\SetUpScenes.h" />
     <ClInclude Include="Application\ColorEditor.h" />
+    <ClInclude Include="EngineSource\Graphics\GpuResource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Externals\imgui\imgui_bezier_math.inl" />

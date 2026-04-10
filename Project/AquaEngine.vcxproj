@@ -156,7 +156,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Light\SceneLightingController.cpp" />
     <ClCompile Include="Application\Player\Player.cpp" />
     <ClCompile Include="Application\Scene\GameScene.cpp" />
-    <ClCompile Include="Application\Scene\GEScene.cpp" />
     <ClCompile Include="Application\Scene\TitleScene.cpp" />
     <ClCompile Include="Application\Scene\Transition\Fade.cpp" />
     <ClCompile Include="EngineSource\2D\ImGuiManager.cpp" />
@@ -176,7 +175,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\3D\Model\Model.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ModelManager.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ModelRenderer.cpp" />
-    <ClCompile Include="EngineSource\3D\Model\Particle.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ParticleSystem\ParticleBehavior.cpp" />
     <ClCompile Include="EngineSource\3D\Model\WorldTransform.cpp" />
     <ClCompile Include="EngineSource\3D\Model\WorldTransforms.cpp" />
@@ -302,7 +300,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Light\SceneLightingController.h" />
     <ClInclude Include="Application\Player\Player.h" />
     <ClInclude Include="Application\Scene\GameScene.h" />
-    <ClInclude Include="Application\Scene\GEScene.h" />
     <ClInclude Include="Application\Scene\Register\SetUpScenes.h" />
     <ClInclude Include="Application\Scene\TitleScene.h" />
     <ClInclude Include="Application\Scene\Transition\Fade.h" />
@@ -324,7 +321,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\3D\Model\Model.h" />
     <ClInclude Include="EngineSource\3D\Model\ModelManager.h" />
     <ClInclude Include="EngineSource\3D\Model\ModelRenderer.h" />
-    <ClInclude Include="EngineSource\3D\Model\Particle.h" />
     <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleBehavior.h" />
     <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleData.h" />
     <ClInclude Include="EngineSource\3D\Model\VertexData.h" />
@@ -383,6 +379,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Graphics\DirectX\Memory\RtvManager.h" />
     <ClInclude Include="EngineSource\Graphics\DirectX\Memory\SrvManager.h" />
     <ClInclude Include="EngineSource\Graphics\FrameRateController.h" />
+    <ClInclude Include="EngineSource\Graphics\GpuResource.h" />
     <ClInclude Include="EngineSource\Graphics\GraphicsDevice.h" />
     <ClInclude Include="EngineSource\Graphics\PostProcess\BasePostEffect.h" />
     <ClInclude Include="EngineSource\Graphics\PostProcess\ParameterResource.h" />

@@ -9,7 +9,7 @@ ID3D12Device* WorldTransform::device_ = nullptr;
 WorldTransform::~WorldTransform() {
 	// マッピングを解除する
 	if (transformationMatrixData_) {
-		transformationMatrixResource_->Unmap(0, nullptr);
+		resource_->Unmap(0, nullptr);
 		transformationMatrixData_ = nullptr;
 	}
 }
@@ -24,10 +24,10 @@ void WorldTransform::Initialize(const Transform& transform) {
 
 	// トランスフォーメーション行列リソースを作成
 	// TransformationMatrix用のリソースを作る。TransformationMatrix 1つ分のサイズを用意する
-	transformationMatrixResource_ = CreateBufferResource(device_, sizeof(TransformationMatrix));
+	resource_ = CreateBufferResource(device_, sizeof(TransformationMatrix));
 	// データを書き込む
 	// 書き込むためのアドレスを取得
-	transformationMatrixResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
+	resource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
 	// 単位行列を書き込んでおく
 	transformationMatrixData_->World = MakeIdentity4x4();
 	transformationMatrixData_->worldInverseTranspose = MakeIdentity4x4();

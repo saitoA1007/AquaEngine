@@ -1,17 +1,16 @@
 #pragma once
-#include"Matrix4x4.h"
-#include"Transform.h"
-#include"TransformationMatrix.h"
-#include"AnimationData.h"
-#include <d3d12.h>
-#include <wrl.h>
+#include "Matrix4x4.h"
+#include "Transform.h"
+#include "TransformationMatrix.h"
+#include "AnimationData.h"
+#include "GpuResource.h"
 
 namespace GameEngine {
 
 	/// <summary>
 	/// 単体描画用のワールド行列
 	/// </summary>
-	class WorldTransform final {
+	class WorldTransform : public GpuResource {
 	public:
 		WorldTransform() = default;
 		~WorldTransform();
@@ -32,9 +31,6 @@ namespace GameEngine {
 		/// SRTを適応
 		/// </summary>
 		void UpdateTransformMatrix();
-
-		// トラスフォームリソースのゲッター
-		const Microsoft::WRL::ComPtr<ID3D12Resource>& GetTransformResource() const { return transformationMatrixResource_; }
 
 	public:
 
@@ -89,7 +85,6 @@ namespace GameEngine {
 		Matrix4x4 worldMatrix_;
 
 		// リソース
-		Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
 		TransformationMatrix* transformationMatrixData_ = nullptr;
 
 		// 親

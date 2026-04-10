@@ -8,7 +8,7 @@ ID3D12Device* Material::device_ = nullptr;
 Material::~Material() {
 	// マッピングを解除する
 	if (materialData_) {
-		materialResource_->Unmap(0, nullptr);
+		resource_->Unmap(0, nullptr);
 		materialData_ = nullptr;
 	}
 }
@@ -20,9 +20,9 @@ void Material::StaticInitialize(ID3D12Device* device) {
 void Material::Initialize(const Vector4& color, const Vector3& specularColor,const float& shininess,const bool& isEnableLighting) {
 	// マテリアルリソースを作成
 	// マテリアル用のリソースを作る。color1つ分のサイズを用意する
-	materialResource_ = CreateBufferResource(device_, sizeof(MaterialData));
+	resource_ = CreateBufferResource(device_, sizeof(MaterialData));
 	// 書き込むためのアドレスを取得
-	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
+	resource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
 	// 白色に設定
 	materialData_->color = color;
 	// Lightingするのでtureに設定する

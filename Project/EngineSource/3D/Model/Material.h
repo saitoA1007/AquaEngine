@@ -1,15 +1,14 @@
 #pragma once
-#include"Vector4.h"
-#include"Vector3.h"
-#include"Matrix4x4.h"
-#include"Transform.h"
-#include<iostream>
-#include <d3d12.h>
-#include <wrl.h>
+#include "Vector4.h"
+#include "Vector3.h"
+#include "Matrix4x4.h"
+#include "Transform.h"
+#include <iostream>
+#include "GpuResource.h"
 
 namespace GameEngine {
 
-	class Material final {
+	class Material : public GpuResource {
 	public:
 		struct alignas(16) MaterialData {
 			Vector4 color;
@@ -42,9 +41,6 @@ namespace GameEngine {
 		/// <param name="shininess">輝度</param>
 		/// <param name="isEnableLighting">ライトを有効化</param>
 		void Initialize(const Vector4& color, const Vector3& specularColor, const float& shininess, const bool& isEnableLighting);
-
-		// マテリアルリソースのゲッター
-		const Microsoft::WRL::ComPtr<ID3D12Resource>& GetMaterialResource() const { return materialResource_; }
 
 	public:
 
@@ -114,7 +110,6 @@ namespace GameEngine {
 
 		static ID3D12Device* device_;
 
-		Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 		// マテリアルにデータを書き込む
 		MaterialData* materialData_ = nullptr;
 
