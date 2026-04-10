@@ -60,7 +60,7 @@ namespace GameEngine {
 		/// 透明度を設定
 		/// </summary>
 		/// <param name="alpha"></param>
-		void SetAplha(const float& alpha) { materialData_->color.w = alpha; }
+		void SetAlpha(const float& alpha) { materialData_->color.w = alpha; }
 
 		/// <summary>
 		/// 輝度を設定

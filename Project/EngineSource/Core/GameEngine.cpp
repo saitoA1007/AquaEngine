@@ -11,7 +11,7 @@ using namespace GameEngine;
 void Engine::RunEngine(HINSTANCE& hInstance) {
 
 	// 初期化
-	Initialize(L"LE2A_07_サイトウ_アオイ", 1280, 720, hInstance);
+	Initialize(L"AquaEngine", 1280, 720, hInstance);
 
 	// 更新処理
 	Update();
@@ -86,7 +86,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	audioManager_->Initialize();
 
 	// テクスチャの初期化
-	textureManager_ = std::make_shared<TextureManager>();
+	textureManager_ = std::make_unique<TextureManager>();
 	textureManager_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager());
 
 	// 入力処理のコマンドシステムを生成

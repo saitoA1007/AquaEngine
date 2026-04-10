@@ -173,6 +173,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\3D\Model\Material.cpp" />
     <ClCompile Include="EngineSource\3D\Model\Mesh.cpp" />
     <ClCompile Include="EngineSource\3D\Model\Model.cpp" />
+    <ClCompile Include="EngineSource\3D\Model\ModelLoader.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ModelManager.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ModelRenderer.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ParticleSystem\ParticleBehavior.cpp" />
@@ -319,6 +320,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\3D\Model\Material.h" />
     <ClInclude Include="EngineSource\3D\Model\Mesh.h" />
     <ClInclude Include="EngineSource\3D\Model\Model.h" />
+    <ClInclude Include="EngineSource\3D\Model\ModelLoader.h" />
     <ClInclude Include="EngineSource\3D\Model\ModelManager.h" />
     <ClInclude Include="EngineSource\3D\Model\ModelRenderer.h" />
     <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleBehavior.h" />

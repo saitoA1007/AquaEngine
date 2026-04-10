@@ -97,7 +97,7 @@ namespace GameEngine {
 		std::unique_ptr<DXC> dxc_;
 
 		// テクスチャの機能
-		std::shared_ptr<TextureManager> textureManager_;
+		std::unique_ptr<TextureManager> textureManager_;
 
 		/// PSO ======================================
 
