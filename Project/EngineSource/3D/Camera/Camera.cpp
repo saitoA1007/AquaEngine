@@ -8,7 +8,7 @@ ID3D12Device* Camera::device_ = nullptr;
 
 Camera::~Camera() {
 	if (cameraForGPU_) {
-		cameraResource_->Unmap(0, nullptr);
+		resource_->Unmap(0, nullptr);
 		cameraForGPU_ = nullptr;
 	}
 }
@@ -27,10 +27,10 @@ void Camera::Initialize(const Transform& transform, int kClientWidth, int kClien
 
 	if (device_) {
 		// カメラリソースを作成
-		cameraResource_ = CreateBufferResource(device_, sizeof(CameraForGPU));
+		resource_ = CreateBufferResource(device_, sizeof(CameraForGPU));
 		// データを書き込む
 		// 書き込むためのアドレスを取得
-		cameraResource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraForGPU_));
+		resource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraForGPU_));
 		// 単位行列を書き込んでおく
 		cameraForGPU_->worldPosition = GetWorldPosition();
 		cameraForGPU_->vpMatrix = MakeIdentity4x4();

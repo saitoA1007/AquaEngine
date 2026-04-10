@@ -5,7 +5,7 @@ using namespace GameEngine;
 
 LightManager::~LightManager() {
     if (lightGroupData_) {
-        lightGroupResource_->Unmap(0, nullptr);
+        resource_->Unmap(0, nullptr);
         lightGroupData_ = nullptr;
     }
 }
@@ -25,9 +25,9 @@ void LightManager::Initialize(ID3D12Device* device, const bool& isDirectionalAct
     spotLight_->SetLightActive(isSpotActive);
 
     // 平行光源のリソースを作る。
-    lightGroupResource_ = CreateBufferResource(device, sizeof(LightGroupData));
+    resource_ = CreateBufferResource(device, sizeof(LightGroupData));
     // 書き込むためのアドレスを取得
-    lightGroupResource_->Map(0, nullptr, reinterpret_cast<void**>(&lightGroupData_));
+    resource_->Map(0, nullptr, reinterpret_cast<void**>(&lightGroupData_));
     // デフォルト値を設定
     lightGroupData_->directionalLightData_ = directionalLight_->GetDirectionalLightData();
     lightGroupData_->pointLightData_ = pointLight_->GetPointLightData();

@@ -1,23 +1,20 @@
 #pragma once
-#pragma once
-#include"Matrix4x4.h"
-#include"Transform.h"
-#include"TransformationMatrix.h"
-#include <d3d12.h>
-#include <wrl.h>
 #include <queue>
 #include <unordered_set>
+#include "Matrix4x4.h"
+#include "Transform.h"
+#include "TransformationMatrix.h"
+#include "GpuResource.h"
+#include "SrvManager.h"
 
-#include"Externals/DirectXTex/d3dx12.h"
-
-#include"SrvManager.h"
+#include "Externals/DirectXTex/d3dx12.h"
 
 namespace GameEngine {
 
 	/// <summary>
 	/// 複数描画用のワールド行列
 	/// </summary>
-	class WorldTransforms final {
+	class WorldTransforms : public GpuResource {
 	public:
 
 		// 1つのパーティクルがもつデータ
@@ -84,7 +81,6 @@ namespace GameEngine {
 		uint32_t numInstance_ = 0;
 
 		// リソース
-		Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource_;
 		ParticleForGPU* instancingData_ = nullptr;
 
 		// シェーダリソースビューのハンドル(CPU)

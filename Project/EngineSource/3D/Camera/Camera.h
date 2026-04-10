@@ -1,16 +1,13 @@
 #pragma once
-#include"Matrix4x4.h"
-#include"Vector3.h"
-#include"Transform.h"
-
-#include"TransformationMatrix.h"
-
-#include <d3d12.h>
-#include <wrl.h>
+#include "Matrix4x4.h"
+#include "Vector3.h"
+#include "Transform.h"
+#include "TransformationMatrix.h"
+#include "GpuResource.h"
 
 namespace GameEngine {
 
-	class Camera {
+	class Camera : public GpuResource {
 	public:
 		Camera() = default;
 		~Camera();
@@ -89,12 +86,6 @@ namespace GameEngine {
 		Matrix4x4 GetVPMatrix() const { return VPMatrix_; }
 
 		/// <summary>
-		/// カメラリソースを取得する
-		/// </summary>
-		/// <returns></returns>
-		inline ID3D12Resource* GetCameraResource() const { return cameraResource_.Get(); }
-
-		/// <summary>
 		/// モデルをカメラ座標に変換する処理
 		/// </summary>
 		/// <param name="worldMatrix"></param>
@@ -124,7 +115,6 @@ namespace GameEngine {
 		Matrix4x4 WVPMatrix_;
 
 		// カメラのリソース
-		Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
 		CameraForGPU* cameraForGPU_ = nullptr;
 
 		static ID3D12Device* device_;

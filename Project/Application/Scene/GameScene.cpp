@@ -152,7 +152,7 @@ void GameScene::Draw(const bool& isDebugView) {
 	auto pass = context_->renderPassController;
 
 	// 太陽の位置のカメラ設定を
-	ModelRenderer::SetCamera(directionLightCamera_->GetVPMatrix(), directionLightCamera_->GetCameraResource());
+	ModelRenderer::SetCamera(directionLightCamera_->GetResource());
 
 	// 影を描画するためのパス
 	pass->PrePass("ShadowPass");
@@ -171,10 +171,10 @@ void GameScene::Draw(const bool& isDebugView) {
 	// 描画に使用するカメラを設定
 	if (isDebugView) {
 		// 描画に使用するカメラを設定
-		ModelRenderer::SetCamera(context_->debugCamera_->GetVPMatrix(), context_->debugCamera_->GetCameraResource());
+		ModelRenderer::SetCamera(context_->debugCamera_->GetCameraResource());
 	} else {
 		// 描画に使用するカメラを設定
-		ModelRenderer::SetCamera(mainCamera_->GetVPMatrix(), mainCamera_->GetCameraResource());
+		ModelRenderer::SetCamera(mainCamera_->GetResource());
 	}
 
 	// 通常描画

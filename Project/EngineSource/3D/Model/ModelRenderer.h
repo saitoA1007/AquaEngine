@@ -35,7 +35,7 @@ namespace GameEngine {
 		/// 静的初期化
 		/// </summary>
 		/// <param name="commandList"></param>
-		static void StaticInitialize(ID3D12GraphicsCommandList* commandList, TextureManager* textureManager,SrvManager* srvManager,PSOManager* psoManager);
+		static void StaticInitialize(ID3D12GraphicsCommandList* commandList,SrvManager* srvManager,PSOManager* psoManager);
 
 		/// <summary>
 		/// 描画前処理
@@ -49,7 +49,7 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="vpMatrix"></param>
 		/// <param name="cameraResource"></param>
-		static void SetCamera(const Matrix4x4& vpMatrix, ID3D12Resource* cameraResource);
+		static void SetCamera(ID3D12Resource* cameraResource);
 
 	public:
 
@@ -122,14 +122,9 @@ namespace GameEngine {
 		// psoデータのリスト
 		static std::unordered_map<RenderMode3D, DrawPsoData> psoList_;
 
-		// テクスチャ
-		static TextureManager* textureManager_;
-
 		// srv
 		static SrvManager* srvManager_;
 
-		// カメラ行列
-		static Matrix4x4 vpMatrix_;
 		// カメラリソース
 		static ID3D12Resource* cameraResource_;
 	};

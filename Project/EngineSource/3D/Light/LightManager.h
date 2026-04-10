@@ -1,14 +1,13 @@
 #pragma once
-#include <d3d12.h>
-#include <wrl.h>
-#include<memory>
-#include"DirectionalLight.h"
-#include"PointLight.h"
-#include"SpotLight.h"
+#include "GpuResource.h"
+#include <memory>
+#include "DirectionalLight.h"
+#include "PointLight.h"
+#include "SpotLight.h"
 
 namespace GameEngine {
 
-    class LightManager {
+    class LightManager : public GpuResource {
     public:
         // 定数バッファ
         struct LightGroupData {
@@ -36,12 +35,6 @@ namespace GameEngine {
         void Update();
 
     public:
-
-        /// <summary>
-        /// リソース
-        /// </summary>
-        /// <returns></returns>
-        ID3D12Resource* GetResource()const {return lightGroupResource_.Get();}
 
         /// <summary>
         /// 平行光源のデータ設定
@@ -113,8 +106,6 @@ namespace GameEngine {
         std::unique_ptr<SpotLight> spotLight_;
 
     private:
-        // リソース
-        Microsoft::WRL::ComPtr<ID3D12Resource> lightGroupResource_;
 
         // 平行光源のデータを作る
         LightGroupData* lightGroupData_ = nullptr;

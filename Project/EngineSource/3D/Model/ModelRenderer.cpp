@@ -4,15 +4,12 @@
 using namespace GameEngine;
 
 ID3D12GraphicsCommandList* ModelRenderer::commandList_ = nullptr;
-TextureManager* ModelRenderer::textureManager_ = nullptr;
 std::unordered_map<RenderMode3D, DrawPsoData> ModelRenderer::psoList_;
-Matrix4x4 ModelRenderer::vpMatrix_ = {};
 ID3D12Resource* ModelRenderer::cameraResource_ = nullptr;
 SrvManager* ModelRenderer::srvManager_ = nullptr;
 
-void ModelRenderer::StaticInitialize(ID3D12GraphicsCommandList* commandList, TextureManager* textureManager, SrvManager* srvManager, PSOManager* psoManager) {
+void ModelRenderer::StaticInitialize(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager, PSOManager* psoManager) {
 	commandList_ = commandList;
-	textureManager_ = textureManager;
 	srvManager_ = srvManager;
 
 	// 通常描画のpsoデータを取得する
@@ -42,8 +39,7 @@ void ModelRenderer::PreDraw(RenderMode3D mode) {
 	commandList_->SetPipelineState(pso->second.graphicsPipelineState);
 }
 
-void ModelRenderer::SetCamera(const Matrix4x4& vpMatrix, ID3D12Resource* cameraResource) {
-	vpMatrix_ = vpMatrix;
+void ModelRenderer::SetCamera(ID3D12Resource* cameraResource) {
 	cameraResource_ = cameraResource;
 }
 

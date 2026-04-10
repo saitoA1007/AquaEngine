@@ -12,12 +12,12 @@ WorldTransforms::~WorldTransforms() {
 	// srvIndexを解放
 	srvManager_->ReleseIndex(srvIndex_);
 
-	if (instancingResource_) {
+	if (resource_) {
 		if (instancingData_) {
-			instancingResource_->Unmap(0, nullptr);
+			resource_->Unmap(0, nullptr);
 			instancingData_ = nullptr;
 		}
-		instancingResource_.Reset();
+		resource_.Reset();
 	}
 
 	transformDatas_.clear();
@@ -43,9 +43,9 @@ void WorldTransforms::Initialize(const uint32_t& kNumInstance, const Transform& 
 	numInstance_ = kNumInstance;
 
 	// Instancing用のTransformationMatrixリソースを作る
-	instancingResource_ = CreateBufferResource(device_, sizeof(ParticleForGPU) * numInstance_);
+	resource_ = CreateBufferResource(device_, sizeof(ParticleForGPU) * numInstance_);
 	// 書き込むためのアドレスを取得
-	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instancingData_));
+	resource_->Map(0, nullptr, reinterpret_cast<void**>(&instancingData_));
 	// 単位行列を書き込んでおく
 	for (uint32_t index = 0; index < numInstance_; ++index) {
 		instancingData_[index].World = MakeIdentity4x4();
@@ -66,7 +66,7 @@ void WorldTransforms::Initialize(const uint32_t& kNumInstance, const Transform& 
 	instancingSrvDesc.Buffer.StructureByteStride = sizeof(ParticleForGPU);
 	instancingSrvHandleCPU_ = srvManager_->GetCPUHandle(srvIndex_);
 	instancingSrvHandleGPU_ = srvManager_->GetGPUHandle(srvIndex_);
-	device_->CreateShaderResourceView(instancingResource_.Get(), &instancingSrvDesc, instancingSrvHandleCPU_);
+	device_->CreateShaderResourceView(resource_.Get(), &instancingSrvDesc, instancingSrvHandleCPU_);
 }
 
 void WorldTransforms::UpdateTransformMatrix(const uint32_t& numInstance) {

@@ -101,7 +101,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	SpriteRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), textureManager_.get(), psoManager_.get());
 	// 3dを描画する処理の初期化
 	Model::StaticInitialize(graphicsDevice_->GetDevice(), textureManager_.get(), graphicsDevice_->GetSrvManager());
-	ModelRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), textureManager_.get(), graphicsDevice_->GetSrvManager(), psoManager_.get());
+	ModelRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager(), psoManager_.get());
 	// ワールドトランスフォームの初期化
 	WorldTransform::StaticInitialize(graphicsDevice_->GetDevice());
 	WorldTransforms::StaticInitialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetSrvManager());
