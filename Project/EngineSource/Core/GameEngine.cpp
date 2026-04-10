@@ -93,14 +93,13 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	inputCommand_ = std::make_unique<InputCommand>(input_.get());
 	// モデルを管理するクラスを生成
 	modelManager_ = std::make_unique<ModelManager>();
+	modelManager_->Initialize(graphicsDevice_->GetDevice(), textureManager_.get(), graphicsDevice_->GetSrvManager());
 	// アニメーションデータを管理するクラスを生成する
 	animationManager_ = std::make_unique<AnimationManager>();
 
 	// 画像の初期化
 	Sprite::StaticInitialize(graphicsDevice_->GetDevice(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
 	SpriteRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), textureManager_.get(), psoManager_.get());
-	// 3dを描画する処理の初期化
-	Model::StaticInitialize(graphicsDevice_->GetDevice(), textureManager_.get(), graphicsDevice_->GetSrvManager());
 	ModelRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager(), psoManager_.get());
 	// ワールドトランスフォームの初期化
 	WorldTransform::StaticInitialize(graphicsDevice_->GetDevice());

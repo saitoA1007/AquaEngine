@@ -1,9 +1,8 @@
 #pragma once
-#include<map>
+#include <map>
 #include <unordered_map>
-#include"Model.h"
 
-#include"AnimationData.h"
+#include "AnimationData.h"
 
 namespace GameEngine {
 

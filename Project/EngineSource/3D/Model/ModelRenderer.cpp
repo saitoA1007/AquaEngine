@@ -161,7 +161,7 @@ void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTrans
 
 		D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
 			meshes[i]->GetVertexBufferView(),
-			model->skinClusterBron_->influenceBufferView
+			model->GetSkinClusterData()->influenceBufferView
 		};
 
 		commandList_->IASetVertexBuffers(0, 2, vbvs);
@@ -179,7 +179,7 @@ void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTrans
 		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetResource()->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 
-		commandList_->SetGraphicsRootDescriptorTable(3, model->skinClusterBron_->paletteSrvHandle.second);
+		commandList_->SetGraphicsRootDescriptorTable(3, model->GetSkinClusterData()->paletteSrvHandle.second);
 		commandList_->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
 
 		if (meshes[i]->GetTotalIndices() != 0) {

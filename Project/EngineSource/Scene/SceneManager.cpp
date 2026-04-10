@@ -128,7 +128,7 @@ void SceneManager::Draw() {
 void SceneManager::LoadModelData() {
 
 	// グリッドモデルをロードと登録
-	context_->modelManager->RegisterMode("Grid", Model::CreateGridPlane({ 200.0f,200.0f }));
+	context_->modelManager->RegisterGridPlaneModel("Grid", { 200.0f,200.0f });
 
 	// モデルリソースを全てロードする
 	context_->modelManager->LoadAllModel();

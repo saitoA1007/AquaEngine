@@ -1,9 +1,10 @@
 #include"Animator.h"
-
-#include"MyMath.h"
-#include<cassert>
-#include"EasingManager.h"
-#include"FPSCounter.h"
+#include <cassert>
+#include <algorithm>
+#include "MyMath.h"
+#include "EasingManager.h"
+#include "FPSCounter.h"
+#include "Model.h"
 using namespace GameEngine;
 
 void Animator::Initialize(Model* model, const AnimationData* animationData) {
@@ -18,7 +19,7 @@ void Animator::Update() {
 	if (isLoop_) {
 		timer_ = std::fmodf(timer_, animationData_->duration);
 	} else {
-		timer_ = std::min(timer_, animationData_->duration);
+		timer_ = (std::min)(timer_, animationData_->duration);
 	}
 
 	// アニメーションの更新処理
@@ -115,10 +116,10 @@ void Animator::SkinClusterUpdate(SkinCluster& skinCluster, const Skeleton& skele
 }
 
 void Animator::SetModelData(Model* model) {
-	if (model->skinClusterBron_.has_value()) {
-		skinCluster_ = &model->skinClusterBron_.value();
-		skeleton_ = &model->skeletonBron_.value();
+	if (model->IsSkeleton()) {
+		skinCluster_ = model->GetSkinCluster();
+		skeleton_ = model->GetSkeleton();
 	} else {
-		assert(0);
+		assert(false && "Not found Model Bone");
 	}
 }

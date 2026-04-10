@@ -1,10 +1,11 @@
 #pragma once
-#include"VertexData.h"
-#include"AnimationData.h"
-
-#include"Model.h"
+#include "VertexData.h"
+#include "AnimationData.h"
 
 namespace GameEngine {
+
+	// モデル
+	class Model;
 
 	class Animator {
 	public:

@@ -1,10 +1,11 @@
 #pragma once
 #include <string>
-#include"SceneContext.h"
-#include"SceneRegistry.h"
-#include"SceneTransition.h"
-#include"BaseScene.h"
-#include"Camera.h"
+#include "SceneContext.h"
+#include "SceneRegistry.h"
+#include "SceneTransition.h"
+#include "BaseScene.h"
+#include "Camera.h"
+#include "WorldTransform.h"
 
 /// <summary>
 /// シーンの管理

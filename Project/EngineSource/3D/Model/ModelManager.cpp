@@ -1,14 +1,21 @@
-#include"ModelManager.h"
+#include "ModelManager.h"
 #include <filesystem>
 #include <iostream>
-#include"LogManager.h"
+#include "LogManager.h"
+
+#include "Model.h"
 using namespace GameEngine;
 
 ModelManager::~ModelManager() {
 	models_.clear();
 }
 
-void ModelManager::RegisterMode(const std::string& modelFile, const std::string& objFileName) {
+void ModelManager::Initialize(ID3D12Device* device, TextureManager* textureManager, SrvManager* srvManager) {
+	// モデル生成システムの初期化
+	loader_.Initialize(device, textureManager, srvManager);
+}
+
+void ModelManager::RegisterModel(const std::string& modelFile, const std::string& objFileName) {
 
 	// 同名のモデルが登録されている場合は早期リターン
 	auto getName = nameToHandles_.find(modelFile);
@@ -22,14 +29,14 @@ void ModelManager::RegisterMode(const std::string& modelFile, const std::string&
 	// 登録データするを作成
 	ModelEntryData entryData;
 	entryData.name = objFileName;
-	entryData.model = Model::CreateModel(objFileName, modelFile);
+	entryData.model = loader_.CreateModel(objFileName, modelFile);
 
 	// 登録する
 	models_[handle] = std::move(entryData);
 	nameToHandles_[modelFile] = handle;
 }
 
-void ModelManager::RegisterMode(const std::string& modelName, std::unique_ptr<Model> model) {
+void ModelManager::RegisterModel(const std::string& modelName, std::unique_ptr<Model> model) {
 	// 同名のモデルが登録されている場合は早期リターン
 	auto getName = nameToHandles_.find(modelName);
 	if (getName != nameToHandles_.end()) {
@@ -43,6 +50,26 @@ void ModelManager::RegisterMode(const std::string& modelName, std::unique_ptr<Mo
 	ModelEntryData entryData;
 	entryData.name = modelName;
 	entryData.model = std::move(model);
+
+	// 登録する
+	models_[handle] = std::move(entryData);
+	nameToHandles_[modelName] = handle;
+}
+
+void  ModelManager::RegisterGridPlaneModel(const std::string& modelName, const Vector2& size) {
+	// 同名のモデルが登録されている場合は早期リターン
+	auto getName = nameToHandles_.find(modelName);
+	if (getName != nameToHandles_.end()) {
+		return;
+	}
+
+	// 新しいハンドルを取得
+	uint32_t handle = nextHandle_++;
+
+	// 登録データするを作成
+	ModelEntryData entryData;
+	entryData.name = modelName;
+	entryData.model = loader_.CreateGridPlane(size);
 
 	// 登録する
 	models_[handle] = std::move(entryData);
@@ -169,7 +196,7 @@ void ModelManager::LoadAllModel() {
 
 			// モデルが存在している場合、登録する
 			if (modelFound) {
-				RegisterMode(folderName, modelFileName);
+				RegisterModel(folderName, modelFileName);
 			}
 		}
 	}

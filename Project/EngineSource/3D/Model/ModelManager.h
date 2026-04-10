@@ -1,8 +1,10 @@
 #pragma once
 #include <unordered_map>
-#include"Model.h"
+#include "ModelLoader.h"
 
 namespace GameEngine {
+
+	class Model;
 
 	class ModelManager final {
 	public:
@@ -18,19 +20,29 @@ namespace GameEngine {
 		ModelManager() = default;
 		~ModelManager();
 
+		void Initialize(ID3D12Device* device, TextureManager* textureManager, SrvManager* srvManager);
+
 		/// <summary>
 		/// モデルデータを登録
 		/// </summary>
 		/// <param name="modelFile">モデルファイル名 : 登録名にもなる</param>
 		/// <param name="modelName">.obj名</param>
-		void RegisterMode(const std::string& modelFile,const std::string& objFileName);
+		void RegisterModel(const std::string& modelFile,const std::string& objFileName);
 
 		/// <summary>
 		/// モデルデータを登録
 		/// </summary>
 		/// <param name="modelName">登録したいモデル名</param>
 		/// <param name="model">モデルデータ</param>
-		void RegisterMode(const std::string& modelName, std::unique_ptr<Model> model);
+		void RegisterModel(const std::string& modelName, std::unique_ptr<Model> model);
+
+		/// <summary>
+		/// 
+		/// 辻褄合わせで作ったので後で削除するように
+		/// 
+		/// </summary>
+		/// <param name="modelName"></param>
+		void RegisterGridPlaneModel(const std::string& modelName,const Vector2& size);
 
 		/// <summary>
 		/// 登録を外す
@@ -76,6 +88,9 @@ namespace GameEngine {
 	private:
 		ModelManager(ModelManager&) = delete;
 		ModelManager& operator=(ModelManager&) = delete;
+
+		// モデル生成
+		ModelLoader loader_;
 
 		// ハンドルからモデルデータを保存
 		std::unordered_map<uint32_t, ModelEntryData> models_;

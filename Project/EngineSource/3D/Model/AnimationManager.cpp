@@ -1,6 +1,6 @@
-#include"AnimationManager.h"
+#include "AnimationManager.h"
 
-#include"Model.h"
+#include "ModelLoader.h"
 using namespace GameEngine;
 
 AnimationManager::~AnimationManager() {
@@ -16,7 +16,7 @@ void AnimationManager::RegisterAnimation(const std::string& filename, const std:
 	}
 
 	// 指定したモデルに存在するアニメーションデータをを全て取得する
-	animations_[filename] = Model::LoadAnimationsFile(objFilename, filename);
+	animations_[filename] = ModelLoader::LoadAnimationsFile(objFilename, filename);
 }
 
 void AnimationManager::UnregisterAnimation(const std::string& name) {
