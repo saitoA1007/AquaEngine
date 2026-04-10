@@ -2,5 +2,45 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Externals\imgui\crude_json.cpp" />
+    <ClCompile Include="Externals\imgui\imgui.cpp" />
+    <ClCompile Include="Externals\imgui\imgui_canvas.cpp" />
+    <ClCompile Include="Externals\imgui\imgui_demo.cpp" />
+    <ClCompile Include="Externals\imgui\imgui_draw.cpp" />
+    <ClCompile Include="Externals\imgui\imgui_impl_dx12.cpp" />
+    <ClCompile Include="Externals\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="Externals\imgui\imgui_node_editor.cpp" />
+    <ClCompile Include="Externals\imgui\imgui_node_editor_api.cpp" />
+    <ClCompile Include="Externals\imgui\imgui_tables.cpp" />
+    <ClCompile Include="Externals\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="Externals\imgui\ImGuizmo.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Externals\imgui\crude_json.h" />
+    <ClInclude Include="Externals\imgui\imconfig.h" />
+    <ClInclude Include="Externals\imgui\imgui.h" />
+    <ClInclude Include="Externals\imgui\imgui_bezier_math.h" />
+    <ClInclude Include="Externals\imgui\imgui_canvas.h" />
+    <ClInclude Include="Externals\imgui\imgui_extra_math.h" />
+    <ClInclude Include="Externals\imgui\imgui_impl_dx12.h" />
+    <ClInclude Include="Externals\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="Externals\imgui\imgui_internal.h" />
+    <ClInclude Include="Externals\imgui\imgui_node_editor.h" />
+    <ClInclude Include="Externals\imgui\imgui_node_editor_internal.h" />
+    <ClInclude Include="Externals\imgui\ImGuizmo.h" />
+    <ClInclude Include="Externals\imgui\imstb_rectpack.h" />
+    <ClInclude Include="Externals\imgui\imstb_textedit.h" />
+    <ClInclude Include="Externals\imgui\imstb_truetype.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Externals\imgui\imgui_bezier_math.inl" />
+    <None Include="Externals\imgui\imgui_extra_math.inl" />
+    <None Include="Externals\imgui\imgui_node_editor_internal.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Externals\imgui\LICENSE.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Externals\imgui\ProggyClean.ttf" />
   </ItemGroup>
 </Project>
