@@ -1,8 +1,8 @@
 #pragma once
-#include<xaudio2.h>
-#include<fstream>
+#include <xaudio2.h>
+#include <fstream>
 #include <wrl.h>
-#include<vector>
+#include <vector>
 #include <unordered_map>
 
 #include <mfapi.h>
@@ -13,6 +13,14 @@ namespace GameEngine {
 
 	class AudioManager {
 	public:
+
+		// シングルトンインスタンスの取得
+		static AudioManager& GetInstance();
+
+		// コピーコンストラクタと代入演算子を無効化
+		AudioManager(const AudioManager&) = delete;
+		AudioManager& operator=(const AudioManager&) = delete;
+
 		// 拡張子の種類
 		enum Type {
 			MP3,
@@ -42,7 +50,7 @@ namespace GameEngine {
 			// 波形フォーマット
 			WAVEFORMATEX wfex;
 			// バッファの先頭アドレス
-			BYTE* pBuffer;
+			std::vector<BYTE> pBuffer;
 			// バッファのサイズ
 			unsigned int bufferSize;
 			// 音声データの名前
@@ -52,8 +60,6 @@ namespace GameEngine {
 		};
 
 	public:
-
-		~AudioManager();
 
 		/// <summary>
 		/// 初期化
@@ -96,7 +102,7 @@ namespace GameEngine {
 		/// 音声を再生
 		/// </summary>
 		/// <param name="soundHandle"></param>
-		void Play(uint32_t soundHandle,float volume,bool isloop);
+		void Play(uint32_t soundHandle, float volume, bool isloop);
 
 		/// <summary>
 		/// 音声を止める
@@ -111,7 +117,14 @@ namespace GameEngine {
 		/// <returns></returns>
 		bool IsPlay(const uint32_t& soundHandle);
 
+		/// <summary>
+		/// 全ての音声を止める
+		/// </summary>
+		void StopAll();
+
 	private:
+		AudioManager() = default;
+		~AudioManager() = default;
 
 		Microsoft::WRL::ComPtr<IXAudio2> xAudio2_;
 		IXAudio2MasteringVoice* masterVoice_;
@@ -131,13 +144,13 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="xAudio2"></param>
 		/// <param name="soundData"></param>
-		void SoundPlayWave(const uint32_t& soundHandle,bool isloop);
+		void SoundPlayWave(const uint32_t& soundHandle, bool isloop);
 
 		/// <summary>
 		/// .mp3音声を再生
 		/// </summary>
 		/// <param name="soundData"></param>
-		void SoundPlayMp3(const uint32_t& soundHandle,bool isloop);
+		void SoundPlayMp3(const uint32_t& soundHandle, bool isloop);
 
 		/// <summary>
 		/// .wavファイルの読み込み

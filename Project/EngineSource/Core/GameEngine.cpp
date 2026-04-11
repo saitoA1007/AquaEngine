@@ -6,6 +6,9 @@
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxguid.lib")
 
+// Audio
+#include"AudioManager.h"
+
 // Collision
 #include "CollisionManager.h"
 #include "Collider.h"
@@ -94,8 +97,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	input_->Initialize(hInstance, windowsApp_->GetHwnd());
 
 	// 音声の初期化
-	audioManager_ = std::make_unique<AudioManager>();
-	audioManager_->Initialize();
+	GameEngine::AudioManager::GetInstance().Initialize();
 
 	// テクスチャの初期化
 	textureManager_ = std::make_unique<TextureManager>();
@@ -149,7 +151,6 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	sceneContext.inputCommand = inputCommand_.get();
 	sceneContext.textureManager = textureManager_.get();
 	sceneContext.modelManager = modelManager_.get();
-	sceneContext.audioManager = audioManager_.get();
 	sceneContext.graphicsDevice = graphicsDevice_.get();
 	sceneContext.animationManager = animationManager_.get();
 	sceneContext.gameObjectManager_ = gameObjectManager_.get();
@@ -292,6 +293,9 @@ void Engine::Finalize() {
 #ifdef USE_IMGUI
 	editorCore_->Finalize();
 #endif
+
+	// 音声の終了処理
+	GameEngine::AudioManager::GetInstance().Finalize();
 	
 	// テクスチャの解放
 	textureManager_->Finalize();

@@ -45,9 +45,6 @@
 // Input
 #include"InPut.h"
 
-// Audio
-#include"AudioManager.h"
-
 // Editor
 #include"EditorCore.h"
 #include"GameParamEditor.h"
@@ -88,11 +85,6 @@ namespace GameEngine {
 
 		// アニメーションのリソースを管理
 		std::unique_ptr<AnimationManager> animationManager_;
-
-		/// Audio ========================================
-
-		// 音声機能
-		std::unique_ptr<AudioManager> audioManager_;
 
 		/// Collision ====================================
 

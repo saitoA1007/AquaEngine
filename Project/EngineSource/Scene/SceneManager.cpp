@@ -1,6 +1,7 @@
-#include"SceneManager.h"
+#include "SceneManager.h"
 
-#include"ImguiManager.h"
+#include "ImguiManager.h"
+#include "AudioManager.h"
 //#include"ModelRenderer.h"
 
 using namespace GameEngine;
@@ -146,7 +147,7 @@ void SceneManager::LoadAnimationData() {
 }
 
 void SceneManager::LoadAudioData() {
-	context_->audioManager->LoadAllAudio();
+	GameEngine::AudioManager::GetInstance().LoadAllAudio();
 }
 
 void SceneManager::ChangeScene(const std::string& sceneName) {

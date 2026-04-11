@@ -1,9 +1,8 @@
-#include"AudioManager.h"
-#include"ConvertString.h"
-#include<cassert>
+#include "AudioManager.h"
+#include <cassert>
 #include <filesystem>
-
-#include"LogManager.h"
+#include "ConvertString.h"
+#include "LogManager.h"
 
 #pragma comment(lib,"xaudio2.lib")
 
@@ -14,7 +13,10 @@
 
 using namespace GameEngine;
 
-AudioManager::~AudioManager() {}
+AudioManager& AudioManager::GetInstance() {
+	static AudioManager instance;
+	return instance;
+}
 
 void AudioManager::Finalize() {
 	xAudio2_.Reset();
@@ -51,7 +53,7 @@ void AudioManager::SoundPlayWave(const uint32_t& soundHandle, bool isloop) {
 
 	// 再生する波形データの設定
 	XAUDIO2_BUFFER buf{};
-	buf.pAudioData = soundData.pBuffer;
+	buf.pAudioData = soundData.pBuffer.data();
 	buf.AudioBytes = soundData.bufferSize;
 	buf.Flags = XAUDIO2_END_OF_STREAM;
 	buf.LoopCount = isloop ? XAUDIO2_LOOP_INFINITE : 0;
@@ -62,7 +64,7 @@ void AudioManager::SoundPlayWave(const uint32_t& soundHandle, bool isloop) {
 }
 
 AudioManager::SoundData AudioManager::SoundLoadWave(const std::string& filename) {
-	
+
 	// ファイル入力ストリームのインスタンス
 	std::ifstream file;
 	// .wavファイルをバイナリモードで開く
@@ -120,15 +122,15 @@ AudioManager::SoundData AudioManager::SoundLoadWave(const std::string& filename)
 		assert(0);
 	}
 	// Dataチャンクのデータ部（波形データ）の読み込み
-	char* pBuffer = new char[data.size];
-	file.read(pBuffer, data.size);
+	std::vector<BYTE> pBuffer(data.size);
+	file.read(reinterpret_cast<char*>(pBuffer.data()), data.size);
 	// Waveファイルを閉じる
 	file.close();
 
 	// returnする為の音声データ
 	SoundData soundData = {};
 	soundData.wfex = format.fmt;
-	soundData.pBuffer = reinterpret_cast<BYTE*>(pBuffer);
+	soundData.pBuffer = std::move(pBuffer);
 	soundData.bufferSize = data.size;
 	soundData.name = filename;
 	soundData.type = WAV;
@@ -137,15 +139,7 @@ AudioManager::SoundData AudioManager::SoundLoadWave(const std::string& filename)
 }
 
 void AudioManager::SoundUnload() {
-
-	for (uint32_t i = 0; i < soundData_.size(); ++i) {
-		// バッファのメモリを解放
-		delete[] soundData_[i].pBuffer;
-
-		soundData_[i].pBuffer = 0;
-		soundData_[i].bufferSize = 0;
-		soundData_[i].wfex = {};
-	}
+	soundData_.clear();
 }
 
 uint32_t AudioManager::Load(const std::string& fileName) {
@@ -235,7 +229,7 @@ AudioManager::SoundData AudioManager::SoundLoadMp3(const std::wstring path) {
 	memcpy(pAudioData, bufferData.data(), bufferData.size());
 
 	soundData.wfex = *waveFormat;
-	soundData.pBuffer = pAudioData;
+	soundData.pBuffer = std::move(bufferData);
 	soundData.bufferSize = static_cast<UINT32>(bufferData.size());
 
 	// 解放処理
@@ -250,7 +244,7 @@ void AudioManager::Play(uint32_t soundHandle, float volume, bool isloop) {
 
 	// 音声を再生
 	if (soundData_[soundHandle].type == MP3) {
-		SoundPlayMp3(soundHandle,isloop);
+		SoundPlayMp3(soundHandle, isloop);
 
 		// 音量を設定
 		auto it = activeVoices_.find(soundHandle);
@@ -259,7 +253,7 @@ void AudioManager::Play(uint32_t soundHandle, float volume, bool isloop) {
 		}
 
 	} else {
-		SoundPlayWave(soundHandle,isloop);
+		SoundPlayWave(soundHandle, isloop);
 	}
 }
 
@@ -276,6 +270,24 @@ void AudioManager::Stop(const uint32_t& soundHandle) {
 	}
 }
 
+void AudioManager::StopAll() {
+	// 管理している全てのボイスを停止・破棄する
+	for (auto& voicePair : activeVoices_) {
+		IXAudio2SourceVoice* pSourceVoice = voicePair.second;
+		if (pSourceVoice) {
+			// 再生停止
+			pSourceVoice->Stop(0);
+			// バッファをフラッシュ（待機中のデータを破棄）
+			pSourceVoice->FlushSourceBuffers();
+			// ボイスを削除
+			pSourceVoice->DestroyVoice();
+		}
+	}
+
+	// マップをクリアして、再生中の情報をリセット
+	activeVoices_.clear();
+}
+
 void AudioManager::SoundPlayMp3(const uint32_t& soundHandle, bool isloop) {
 	HRESULT result;
 
@@ -285,7 +297,7 @@ void AudioManager::SoundPlayMp3(const uint32_t& soundHandle, bool isloop) {
 	xAudio2_->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
 
 	XAUDIO2_BUFFER buffer{ 0 };
-	buffer.pAudioData = soundData.pBuffer;
+	buffer.pAudioData = soundData.pBuffer.data();
 	buffer.Flags = XAUDIO2_END_OF_STREAM;
 	buffer.AudioBytes = sizeof(BYTE) * static_cast<UINT32>(soundData.bufferSize);
 	buffer.LoopCount = isloop ? XAUDIO2_LOOP_INFINITE : 0;
