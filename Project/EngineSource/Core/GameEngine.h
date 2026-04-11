@@ -60,8 +60,13 @@
 
 namespace GameEngine {
 
+	// 前方宣言
+	class CollisionManager;
+
 	class Engine final {
 	public:
+		Engine();
+		~Engine();
 
 		/// <summary>
 		/// エンジンを実行する
@@ -88,6 +93,11 @@ namespace GameEngine {
 
 		// 音声機能
 		std::unique_ptr<AudioManager> audioManager_;
+
+		/// Collision ====================================
+
+		// 当たり判定管理機能
+		std::unique_ptr<CollisionManager> collisionManager_;
 
 		/// Core ========================================
 

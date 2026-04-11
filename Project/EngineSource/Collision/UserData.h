@@ -1,20 +1,17 @@
 #pragma once
-#include<cstdint>
+#include <cstdint>
 
 namespace GameEngine {
 
 	// 基底クラス
-	class GameObject {
-	public:
-		virtual ~GameObject() = default;
-	};
+	class IGameObject;
 
 	// 受け渡すデータ
 	struct UserData {
 		// オブジェクトを識別するID
 		uint32_t typeID = 0;
 		// 基底クラスポインタ
-		GameObject* object = nullptr;
+		IGameObject* object = nullptr;
 
 		// 型安全なキャストヘルパー
 		template<typename T>

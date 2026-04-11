@@ -1,6 +1,6 @@
 #pragma once
-#include"Geometry.h"
-#include"CollisionResult.h"
+#include "Geometry.h"
+#include "CollisionResult.h"
 
 namespace GameEngine {
 

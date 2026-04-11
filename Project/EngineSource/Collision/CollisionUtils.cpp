@@ -1,8 +1,8 @@
-#include"CollisionUtils.h"
+#include "CollisionUtils.h"
 
-#include"MyMath.h"
-#include<cmath>
-#include<algorithm>
+#include "MyMath.h"
+#include <cmath>
+#include <algorithm>
 
 using namespace GameEngine;
 

@@ -1,5 +1,6 @@
-#include"CollisionManager.h"
-#include"CollisionVisitor.h"
+#include "CollisionManager.h"
+#include "CollisionVisitor.h"
+#include "Collider.h"
 using namespace GameEngine;
 
 void CollisionManager::CheckAllCollisions() {
@@ -72,6 +73,9 @@ void  CollisionManager::CheckCollisionPair(Collider* colliderA, Collider* collid
 			colliderA->OnCollision(result);
 			colliderB->OnCollision(resultB);
 		} else {
+			// 衝突している間に呼び出す
+			colliderA->OnCollision(result);
+			colliderB->OnCollision(resultB);
 			// 衝突した瞬間に呼び出す
 			colliderA->OnCollisionEnter(result);
 			colliderB->OnCollisionEnter(resultB);
@@ -100,4 +104,18 @@ std::pair<Collider*, Collider*> CollisionManager::MakeCollisionPair(Collider* a,
 bool CollisionManager::WasCollidingLastFrame(Collider* a, Collider* b) {
 	auto collisionPair = MakeCollisionPair(a, b);
 	return preCollisions_.find(collisionPair) != preCollisions_.end();
+}
+
+void CollisionManager::RemoveCollider(Collider* collider) {
+	// リストからコライダーを削除
+	colliders_.remove(collider);
+
+	// 前フレームの衝突履歴（preCollisions_）から、このコライダーが関わっているペアを探して削除する
+	for (auto it = preCollisions_.begin(); it != preCollisions_.end(); ) {
+		if (it->first == collider || it->second == collider) {
+			it = preCollisions_.erase(it); // 見つけたら消す
+		} else {
+			++it; // 次を見る
+		}
+	}
 }

@@ -102,6 +102,7 @@
     <ClCompile Include="Application\ColorEditor.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ModelLoader.cpp" />
     <ClCompile Include="EngineSource\Core\GameObjectManager.cpp" />
+    <ClCompile Include="EngineSource\Collision\Collider.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\crude_json.h" />
@@ -249,6 +250,7 @@
     <ClInclude Include="EngineSource\3D\Model\ModelLoader.h" />
     <ClInclude Include="EngineSource\Core\IGameObject.h" />
     <ClInclude Include="EngineSource\Core\GameObjectManager.h" />
+    <ClInclude Include="EngineSource\Collision\ColliderInfo.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Externals\imgui\imgui_bezier_math.inl" />

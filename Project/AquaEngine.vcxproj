@@ -180,6 +180,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\3D\Transform\WorldTransform.cpp" />
     <ClCompile Include="EngineSource\3D\Transform\WorldTransforms.cpp" />
     <ClCompile Include="EngineSource\Audio\AudioManager.cpp" />
+    <ClCompile Include="EngineSource\Collision\Collider.cpp" />
     <ClCompile Include="EngineSource\Collision\CollisionManager.cpp" />
     <ClCompile Include="EngineSource\Collision\CollisionUtils.cpp" />
     <ClCompile Include="EngineSource\Common\LogManager.cpp" />
@@ -331,6 +332,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\3D\Transform\WorldTransforms.h" />
     <ClInclude Include="EngineSource\Audio\AudioManager.h" />
     <ClInclude Include="EngineSource\Collision\Collider.h" />
+    <ClInclude Include="EngineSource\Collision\ColliderInfo.h" />
     <ClInclude Include="EngineSource\Collision\CollisionConfig.h" />
     <ClInclude Include="EngineSource\Collision\CollisionManager.h" />
     <ClInclude Include="EngineSource\Collision\CollisionResult.h" />

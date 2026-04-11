@@ -1,7 +1,7 @@
 #pragma once
-#include<variant>
-#include"Geometry.h"
-#include"CollisionUtils.h"
+#include <variant>
+#include "Geometry.h"
+#include "CollisionUtils.h"
 
 namespace GameEngine {
 

@@ -1,25 +1,30 @@
 #pragma once
-#include<list>
-#include<unordered_set>
-
-#include"Collider.h"
-#include"CollisionResult.h"
+#include <list>
+#include <unordered_set>
+#include "ColliderInfo.h"
+#include "CollisionResult.h"
 
 namespace GameEngine {
 
-	// ペアのハッシュ関数
-	struct PairHash {
-		std::size_t operator()(const std::pair<Collider*, Collider*>& p) const {
-			// ポインタのアドレスをハッシュ化
-			auto h1 = std::hash<Collider*>{}(p.first);
-			auto h2 = std::hash<Collider*>{}(p.second);
-			// 2つのハッシュ値を組み合わせる
-			return h1 ^ (h2 << 1);
-		}
-	};
+	// 前方宣言
+	class Collider;
 
 	class CollisionManager {
 	public:
+		// ペアのハッシュ関数
+		struct PairHash {
+			std::size_t operator()(const std::pair<Collider*, Collider*>& p) const {
+				// ポインタのアドレスをハッシュ化
+				auto h1 = std::hash<Collider*>{}(p.first);
+				auto h2 = std::hash<Collider*>{}(p.second);
+				// 2つのハッシュ値を組み合わせる
+				return h1 ^ (h2 << 1);
+			}
+		};
+
+	public:
+		CollisionManager() = default;
+		~CollisionManager() = default;
 
 		/// <summary>
 		/// 全ての当たり判定を行う
@@ -36,6 +41,11 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="collider"></param>
 		void AddCollider(Collider* collider) { colliders_.push_back(collider); }
+
+		/// <summary>
+		/// コライダーをリストと履歴から削除する
+		/// </summary>
+		void RemoveCollider(Collider* collider);
 
 	private:
 		// コライダーリスト

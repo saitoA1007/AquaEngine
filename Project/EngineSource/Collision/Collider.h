@@ -1,32 +1,26 @@
 #pragma once
-#include"Vector3.h"
-#include<cstdint>
-#include"Geometry.h"
-#include<variant>
+#include <cstdint>
 #include <functional>
-#include"CollisionResult.h"
-#include"MyMath.h"
+#include "Vector3.h"
+#include "CollisionResult.h"
+#include "ColliderInfo.h"
+#include "MyMath.h"
+
 namespace GameEngine {
 
-	// 当たり判定の形状
-	struct CollisionType {
-		// 当たり判定の属性
-		std::variant<Sphere, AABB, OBB, Segment> type;
-
-		// 形状を取得する
-		template<typename T>
-		const T* Get() const { return std::get_if<T>(&type); }
-		template<typename T>
-		T* Get() { return std::get_if<T>(&type); }
-	};
+	// 前方宣言
+	class CollisionManager;
 
 	/// <summary>
 	/// 当たり判定が持つ基盤の要素
 	/// </summary>
 	class Collider {
 	public:
-		Collider() = default;
-		virtual ~Collider() = default;
+		Collider();
+		virtual ~Collider();
+
+		// 当たり判定管理クラスを取得
+		static void StaticInitialize(CollisionManager* manager) { collisionManager_ = manager; }
 
 		// 衝突形状を取得
 		virtual CollisionType GetCollisionType() const = 0;
@@ -79,6 +73,9 @@ namespace GameEngine {
 		const UserData& GetUserData() const { return userData_; }
 
 	protected:
+		// 当たり判定管理
+		static CollisionManager* collisionManager_;
+
 		// 衝突属性(自分)
 		uint32_t collisionAttribute_ = 0xffffffff;
 		// 衝突マスク(相手)
