@@ -251,6 +251,7 @@
     <ClInclude Include="EngineSource\Core\IGameObject.h" />
     <ClInclude Include="EngineSource\Core\GameObjectManager.h" />
     <ClInclude Include="EngineSource\Collision\ColliderInfo.h" />
+    <ClInclude Include="EngineSource\Graphics\ConstantBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Externals\imgui\imgui_bezier_math.inl" />
