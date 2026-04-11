@@ -52,6 +52,12 @@ namespace GameEngine {
         AnimationData LoadAnimationFile(const std::string& objFilename,
             const std::string& filename);
 
+        /// <summary>
+        /// アニメーションデータを読み込む
+        /// </summary>
+        /// <param name="objFilename"></param>
+        /// <param name="filename"></param>
+        /// <returns></returns>
         [[nodiscard]]
         static std::map<std::string, AnimationData> LoadAnimationsFile(const std::string& objFilename, const std::string& filename);
 

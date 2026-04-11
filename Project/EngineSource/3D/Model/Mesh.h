@@ -1,6 +1,7 @@
 #pragma once
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "VertexData.h"
 
 namespace GameEngine {
 
@@ -57,7 +58,7 @@ namespace GameEngine {
 		const std::string& GetMaterialName() const { return materialName_; }
 
 	private:
-		VertexBuffer vertexBuffer_;
+		VertexBuffer<VertexData> vertexBuffer_;
 		IndexBuffer indexBuffer_;
 
 		std::string materialName_ = "default";
