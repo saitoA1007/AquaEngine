@@ -6,6 +6,7 @@
 #include "Transform.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "ConstantBuffer.h"
 
 namespace GameEngine {
 
@@ -91,7 +92,7 @@ namespace GameEngine {
 		const D3D12_VERTEX_BUFFER_VIEW& GetVertexBufferView() const { return vertexBuffer_.GetView(); }
 		const D3D12_INDEX_BUFFER_VIEW& GetIndexBufferView() const { return indexBuffer_.GetView(); }
 
-		ID3D12Resource* GetResource() const { return constBufferResource_.Get(); }
+		ID3D12Resource* GetResource() const { return constBuffer_.GetResource(); }
 
 	public: // 変数
 
@@ -127,8 +128,7 @@ namespace GameEngine {
 		IndexBuffer indexBuffer_;
 		VertexPosUv* vertexData_ = nullptr;
 
-		// Sprite用のマテリアルリソース
-		Microsoft::WRL::ComPtr<ID3D12Resource> constBufferResource_;
+		ConstantBuffer<ConstBufferData> constBuffer_;
 		// マテリアルにデータを書き込む
 		ConstBufferData* constBufferData_ = nullptr;
 

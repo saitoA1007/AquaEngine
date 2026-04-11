@@ -13,6 +13,9 @@
 #include "CollisionManager.h"
 #include "Collider.h"
 
+// Graphics
+#include "StructuredBuffer.h"
+
 using namespace GameEngine;
 
 Engine::Engine() {
@@ -66,6 +69,9 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	psoManager_->Initialize(graphicsDevice_->GetDevice(), dxc_.get());
 	psoManager_->DefaultLoadPSO();
 	psoManager_->DeaultLoadPostEffectPSO();
+
+
+	StructuredBuffer<float>::StaticInitialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetSrvManager());
 
 	// レンダーテクスチャ機能を生成
 	renderTextureManager_ = std::make_unique<RenderTextureManager>();

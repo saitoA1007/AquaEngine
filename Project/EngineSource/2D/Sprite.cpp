@@ -8,10 +8,6 @@ Matrix4x4 Sprite::orthoMatrix_;
 
 Sprite::~Sprite() {
 
-	if (constBufferData_) {
-		constBufferResource_->Unmap(0, nullptr);
-		constBufferData_ = nullptr;
-	}
 }
 
 void Sprite::StaticInitialize(ID3D12Device* device, int32_t width, int32_t height) {
@@ -135,10 +131,9 @@ void Sprite::CreateMesh() {
 }
 
 void Sprite::CreateConstBufferData(const Vector4& color) {
-	// Sprite用の定数バッファリソースを作る
-	constBufferResource_ = CreateBufferResource(device_, sizeof(ConstBufferData));
-	// 書き込むためのアドレスを取得
-	constBufferResource_->Map(0, nullptr, reinterpret_cast<void**>(&constBufferData_));
+	// 定数バッファの作成
+	constBuffer_.Create(device_);
+	constBufferData_ = constBuffer_.GetData();
 	// 色の設定
 	constBufferData_->color = color;
 	// UVTransform行列を初期化
