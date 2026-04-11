@@ -4,17 +4,14 @@
 #include "Matrix4x4.h"
 #include "Transform.h"
 #include "TransformationMatrix.h"
-#include "GpuResource.h"
-#include "SrvManager.h"
-
-#include "Externals/DirectXTex/d3dx12.h"
+#include "StructuredBuffer.h"
 
 namespace GameEngine {
 
 	/// <summary>
 	/// 複数描画用のワールド行列
 	/// </summary>
-	class WorldTransforms : public GpuResource {
+	class WorldTransforms {
 	public:
 
 		// 1つのパーティクルがもつデータ
@@ -30,12 +27,6 @@ namespace GameEngine {
 		~WorldTransforms();
 
 		/// <summary>
-		/// 静的初期化
-		/// </summary>
-		/// <param name="device"></param>
-		static void StaticInitialize(ID3D12Device* device,SrvManager* srvManager);
-
-		/// <summary>
 		/// 初期化
 		/// </summary>
 		/// <param name="transform"></param>
@@ -46,7 +37,7 @@ namespace GameEngine {
 		/// </summary>
 		void UpdateTransformMatrix(const uint32_t& numInstance);
 
-		const CD3DX12_GPU_DESCRIPTOR_HANDLE* GetInstancingSrvGPU() const { return &instancingSrvHandleGPU_; }
+		const CD3DX12_GPU_DESCRIPTOR_HANDLE& GetInstancingSrvGPU() const { return buffer_.GetSrvHandleGPU(); }
 
 		/// <summary>
 		/// 描画するモデルの数
@@ -71,9 +62,6 @@ namespace GameEngine {
 		WorldTransforms(const WorldTransforms&) = delete;
 		WorldTransforms& operator=(const WorldTransforms&) = delete;
 
-		static ID3D12Device* device_;
-		static SrvManager* srvManager_;
-
 		// インスタンスが持つsrvインデックス
 		uint32_t srvIndex_ = 0;
 
@@ -81,12 +69,8 @@ namespace GameEngine {
 		uint32_t numInstance_ = 0;
 
 		// リソース
+		StructuredBuffer<ParticleForGPU> buffer_;
 		ParticleForGPU* instancingData_ = nullptr;
-
-		// シェーダリソースビューのハンドル(CPU)
-		CD3DX12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU_;
-		// シェーダリソースビューのハンドル(CPU)
-		CD3DX12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU_;
 	};
 }
 

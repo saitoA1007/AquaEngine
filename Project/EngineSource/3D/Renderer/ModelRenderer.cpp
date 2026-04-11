@@ -140,7 +140,7 @@ void ModelRenderer::DrawInstancing(const Model* model, const uint32_t& numInstan
 			commandList_->SetGraphicsRootConstantBufferView(0, material->GetGpuVirtualAddress());
 		}
 
-		commandList_->SetGraphicsRootDescriptorTable(1, *worldTransforms.GetInstancingSrvGPU());
+		commandList_->SetGraphicsRootDescriptorTable(1, worldTransforms.GetInstancingSrvGPU());
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 		commandList_->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
 

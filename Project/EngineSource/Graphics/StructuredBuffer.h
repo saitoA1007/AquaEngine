@@ -1,7 +1,7 @@
 #pragma once
 #include "SrvResource.h"
 #include "CreateBufferResource.h"
-#include "SrvManager.h"
+#include "Externals/DirectXTex/d3dx12.h"
 
 namespace GameEngine {
 
@@ -49,9 +49,9 @@ namespace GameEngine {
 			device_->CreateShaderResourceView(resource_.Get(), &srvDesc, srvHandleCPU_);
 		}
 
-		T* GetMappedData() const { return data_; }
+		T* GetData() const { return data_; }
 		uint32_t GetNumElements() const { return numElements_; }
-		const D3D12_GPU_DESCRIPTOR_HANDLE& GetSrvHandleGPU() const { return srvHandleGPU_; }
+		const CD3DX12_GPU_DESCRIPTOR_HANDLE& GetSrvHandleGPU() const { return srvHandleGPU_; }
 
 	private:
 
