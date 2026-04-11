@@ -28,12 +28,6 @@ namespace GameEngine {
 		~Material();
 
 		/// <summary>
-		/// 静的初期化
-		/// </summary>
-		/// <param name="device"></param>
-		static void StaticInitialize(ID3D12Device* device);
-
-		/// <summary>
 		/// 初期化
 		/// </summary>
 		/// <param name="color">物体の色</param>
@@ -109,8 +103,6 @@ namespace GameEngine {
 		D3D12_GPU_VIRTUAL_ADDRESS GetGpuVirtualAddress() const { return constBuffer_.GetGpuVirtualAddress(); }
 
 	private:
-
-		static ID3D12Device* device_;
 
 		ConstantBuffer<MaterialData> constBuffer_;
 

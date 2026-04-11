@@ -11,6 +11,13 @@ namespace GameEngine {
     public:
         virtual ~GpuResource() = default;
 
+        /// <summary>
+        /// 静的初期化
+        /// </summary>
+        static void StaticInitialize(ID3D12Device* device) {
+            device_ = device;
+        }
+
         // リソースを取得
         ID3D12Resource* GetResource() const { return resource_.Get(); }
 
@@ -18,6 +25,7 @@ namespace GameEngine {
         D3D12_GPU_VIRTUAL_ADDRESS GetGpuVirtualAddress() const { return resource_->GetGPUVirtualAddress();}
 
     protected:
+        static ID3D12Device* device_;
         // リソース
         Microsoft::WRL::ComPtr<ID3D12Resource> resource_;
     };

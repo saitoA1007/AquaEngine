@@ -12,7 +12,7 @@ public:
 	/// 初期化処理
 	/// </summary>
 	/// <param name="device"></param>
-	void Initialize(ID3D12Device* device);
+	void Initialize();
 
 	/// <summary>
 	/// 更新処理

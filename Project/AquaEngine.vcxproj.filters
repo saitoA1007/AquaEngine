@@ -103,6 +103,7 @@
     <ClCompile Include="EngineSource\3D\Model\ModelLoader.cpp" />
     <ClCompile Include="EngineSource\Core\GameObjectManager.cpp" />
     <ClCompile Include="EngineSource\Collision\Collider.cpp" />
+    <ClCompile Include="EngineSource\Graphics\GpuResource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\crude_json.h" />

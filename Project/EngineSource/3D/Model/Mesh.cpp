@@ -4,7 +4,7 @@
 
 using namespace GameEngine;
 
-void Mesh::CreateTrianglePlaneMesh(ID3D12Device* device) {
+void Mesh::CreateTrianglePlaneMesh() {
 
 	std::vector<VertexData> vertices(3);
 	vertices[0].position = { -0.5f, -0.5f, 0.0f, 1.0f };
@@ -20,10 +20,10 @@ void Mesh::CreateTrianglePlaneMesh(ID3D12Device* device) {
 	vertices[2].normal = { 0.0f, 0.0f, -1.0f };
 
 	// 頂点データを作成
-	vertexBuffer_.Create(device, vertices);
+	vertexBuffer_.Create(vertices);
 }
 
-void Mesh::CreateGridPlaneMesh(ID3D12Device* device, const Vector2& size) {
+void Mesh::CreateGridPlaneMesh(const Vector2& size) {
 	std::vector<VertexData> vertices(4);
 
 	float left = -size.x / 2.0f;
@@ -41,7 +41,7 @@ void Mesh::CreateGridPlaneMesh(ID3D12Device* device, const Vector2& size) {
 	vertices[3].position = { right,0.0f,bottom,1.0f }; // 左上
 
 	// 頂点データを作成
-	vertexBuffer_.Create(device, vertices);
+	vertexBuffer_.Create(vertices);
 
 
 	// インデックスデータを生成
@@ -51,10 +51,10 @@ void Mesh::CreateGridPlaneMesh(ID3D12Device* device, const Vector2& size) {
 	// 三角形2
 	indices[3] = 1;  indices[4] = 3;  indices[5] = 2;
 
-	indexBuffer_.Create(device, indices);
+	indexBuffer_.Create(indices);
 }
 
-void Mesh::CreatePlaneMesh(ID3D12Device* device, const Vector2& size) {
+void Mesh::CreatePlaneMesh(const Vector2& size) {
 
 	std::vector<VertexData> vertices(4);
 
@@ -81,7 +81,7 @@ void Mesh::CreatePlaneMesh(ID3D12Device* device, const Vector2& size) {
 	vertices[3].normal = { 0.0f,0.0f,-1.0f };
 
 	// 頂点データを作成
-	vertexBuffer_.Create(device, vertices);
+	vertexBuffer_.Create(vertices);
 
 	// インデックスデータを生成
 	std::vector<uint32_t> indices(6);
@@ -91,10 +91,10 @@ void Mesh::CreatePlaneMesh(ID3D12Device* device, const Vector2& size) {
 	// 三角形2
 	indices[3] = 1;  indices[4] = 3;  indices[5] = 2;
 
-	indexBuffer_.Create(device, indices);
+	indexBuffer_.Create(indices);
 }
 
-void Mesh::CreateSphereMesh(ID3D12Device* device, uint32_t subdivision) {
+void Mesh::CreateSphereMesh(uint32_t subdivision) {
 	
 	const float kLatEvery = std::numbers::pi_v<float> / static_cast<float>(subdivision);
 	const float kLonEvery = 2.0f * std::numbers::pi_v<float> / static_cast<float>(subdivision);
@@ -116,7 +116,7 @@ void Mesh::CreateSphereMesh(ID3D12Device* device, uint32_t subdivision) {
 		}
 	}
 
-	vertexBuffer_.Create(device, vertices);
+	vertexBuffer_.Create(vertices);
 
 	// インデックス生成
 	std::vector<uint32_t> indices;
@@ -130,10 +130,10 @@ void Mesh::CreateSphereMesh(ID3D12Device* device, uint32_t subdivision) {
 		}
 	}
 
-	indexBuffer_.Create(device, indices);
+	indexBuffer_.Create(indices);
 }
 
-void Mesh::CreateModelMesh(ID3D12Device* device,ModelData modelData, const uint32_t& index) {
+void Mesh::CreateModelMesh(ModelData modelData, const uint32_t& index) {
 
 	// 要素が無ければエラー
 	assert(modelData.meshes.size() > index);
@@ -141,6 +141,6 @@ void Mesh::CreateModelMesh(ID3D12Device* device,ModelData modelData, const uint3
 	const auto& meshData = modelData.meshes[index];
 	materialName_ = meshData.materialName;
 
-	vertexBuffer_.Create(device, meshData.vertices);
-	indexBuffer_.Create(device, meshData.indices);
+	vertexBuffer_.Create(meshData.vertices);
+	indexBuffer_.Create(meshData.indices);
 }

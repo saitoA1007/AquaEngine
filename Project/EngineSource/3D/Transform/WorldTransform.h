@@ -16,12 +16,6 @@ namespace GameEngine {
 		~WorldTransform();
 
 		/// <summary>
-		/// 静的初期化
-		/// </summary>
-		/// <param name="device"></param>
-		static void StaticInitialize(ID3D12Device* device);
-
-		/// <summary>
 		/// 初期化
 		/// </summary>
 		/// <param name="transform">Scale,Rotate,Translate : 各型Vector3</param>
@@ -82,8 +76,6 @@ namespace GameEngine {
 		// コピー禁止
 		WorldTransform(const WorldTransform&) = delete;
 		WorldTransform& operator=(const WorldTransform&) = delete;
-
-		static ID3D12Device* device_;
 
 		ConstantBuffer<TransformationMatrix> constBuffer_;
 

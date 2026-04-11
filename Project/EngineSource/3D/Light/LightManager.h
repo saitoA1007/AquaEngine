@@ -27,7 +27,7 @@ namespace GameEngine {
         /// 初期化
         /// </summary>
         /// <param name="device"></param>
-        void Initialize(ID3D12Device* device,const bool& isDirectionalActive,const bool& isPointActive,const bool& isSpotActive);
+        void Initialize(const bool& isDirectionalActive,const bool& isPointActive,const bool& isSpotActive);
 
         /// <summary>
         /// 更新処理

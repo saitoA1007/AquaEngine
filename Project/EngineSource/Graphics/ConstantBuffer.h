@@ -18,8 +18,8 @@ namespace GameEngine {
 			}
 		}
 
-		void Create(ID3D12Device* device) {
-			resource_ = CreateBufferResource(device, sizeof(T));
+		void Create() {
+			resource_ = CreateBufferResource(device_, sizeof(T));
 
 			// データを書き込むためのポインタを取得し、保持し続ける
 			resource_->Map(0, nullptr, reinterpret_cast<void**>(&data_));

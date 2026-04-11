@@ -12,8 +12,6 @@ namespace GameEngine {
 		Camera() = default;
 		~Camera();
 
-		static void StaticInitialize(ID3D12Device* device);
-
 		/// <summary>
 		/// 初期化
 		/// </summary>
@@ -119,7 +117,5 @@ namespace GameEngine {
 		// カメラのリソース
 		ConstantBuffer<CameraForGPU> constBuffer_;
 		CameraForGPU* cameraForGPU_ = nullptr;
-
-		static ID3D12Device* device_;
 	};
 }

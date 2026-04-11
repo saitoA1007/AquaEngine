@@ -13,36 +13,31 @@ namespace GameEngine {
 		/// <summary>
 		/// 三角形の平面メッシュを作成
 		/// </summary>
-		/// <param name="device">デバイス</param>
-		void CreateTrianglePlaneMesh(ID3D12Device* device);
+		void CreateTrianglePlaneMesh();
 
 		/// <summary>
 		/// グリッド平面のメッシュを作成
 		/// </summary>
-		/// <param name="device">デバイス</param>
 		/// <param name="size">x:横幅,y:縦幅</param>
-		void CreateGridPlaneMesh(ID3D12Device* device, const Vector2& size);
+		void CreateGridPlaneMesh(const Vector2& size);
 
 		/// <summary>
 		/// 平面のメッシュを作成
 		/// </summary>
-		/// <param name="device"></param>
 		/// <param name="size"></param>
-		void CreatePlaneMesh(ID3D12Device* device, const Vector2& size);
+		void CreatePlaneMesh(const Vector2& size);
 
 		/// <summary>
 		/// 球のメッシュを作成
 		/// </summary>
-		/// <param name="device">デバイス</param>
 		/// <param name="subdivision">分割数</param>
-		void CreateSphereMesh(ID3D12Device* device, uint32_t subdivision);
+		void CreateSphereMesh(uint32_t subdivision);
 
 		/// <summary>
 		/// モデルデータを読み込んでメッシュを作成する
 		/// </summary>
-		/// <param name="device">デバイス</param>
 		/// <param name="modelData">読み込んだモデルデータ</param>
-		void CreateModelMesh(ID3D12Device* device,ModelData modelData,const uint32_t& index);
+		void CreateModelMesh(ModelData modelData,const uint32_t& index);
 
 	public: // ゲッター
 

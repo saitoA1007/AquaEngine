@@ -3,15 +3,13 @@
 #include "MyMath.h"
 using namespace GameEngine;
 
-ID3D12Device* Sprite::device_ = nullptr;
 Matrix4x4 Sprite::orthoMatrix_;
 
 Sprite::~Sprite() {
 
 }
 
-void Sprite::StaticInitialize(ID3D12Device* device, int32_t width, int32_t height) {
-	device_ = device;
+void Sprite::StaticInitialize(int32_t width, int32_t height) {
 	orthoMatrix_ = Multiply(MakeIdentity4x4(), MakeOrthographicMatrix(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, 100.0f));
 }
 
@@ -120,19 +118,19 @@ void Sprite::CreateMesh() {
 	vertices[2].texcoord = { rightTex,bottomTex };
 	vertices[3].texcoord = { rightTex,topTex };
 
-	vertexBuffer_.Create(device_, vertices);
+	vertexBuffer_.Create(vertices);
 
 	// データを取得
 	vertexData_ = vertexBuffer_.GetVertexData();
 
 	// インデックスバッファを作成
 	std::vector<uint32_t> indices = { 0, 1, 2, 1, 3, 2 };
-	indexBuffer_.Create(device_, indices);
+	indexBuffer_.Create(indices);
 }
 
 void Sprite::CreateConstBufferData(const Vector4& color) {
 	// 定数バッファの作成
-	constBuffer_.Create(device_);
+	constBuffer_.Create();
 	constBufferData_ = constBuffer_.GetData();
 	// 色の設定
 	constBufferData_->color = color;

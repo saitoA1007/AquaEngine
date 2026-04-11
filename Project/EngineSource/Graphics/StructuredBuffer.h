@@ -26,8 +26,7 @@ namespace GameEngine {
 		/// <summary>
 		/// 静的初期化
 		/// </summary>
-		static void StaticInitialize(ID3D12Device* device, SrvManager* srvManager) {
-			device_ = device;
+		static void StaticInitialize(SrvManager* srvManager) {
 			srvManager_ = srvManager;
 		}
 
@@ -62,7 +61,6 @@ namespace GameEngine {
 		const D3D12_GPU_DESCRIPTOR_HANDLE& GetSrvHandleGPU() const { return srvHandleGPU_; }
 
 	private:
-		static ID3D12Device* device_;
 		static SrvManager* srvManager_;
 
 		T* data_ = nullptr;
@@ -76,6 +74,5 @@ namespace GameEngine {
 	};
 
 	// static変数の実体定義
-	template <typename T> ID3D12Device* StructuredBuffer<T>::device_ = nullptr;
 	template <typename T> SrvManager* StructuredBuffer<T>::srvManager_ = nullptr;
 }

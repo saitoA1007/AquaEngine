@@ -4,14 +4,8 @@
 
 using namespace GameEngine;
 
-ID3D12Device* Camera::device_ = nullptr;
-
 Camera::~Camera() {
 	
-}
-
-void Camera::StaticInitialize(ID3D12Device* device) {
-	device_ = device;
 }
 
 void Camera::Initialize(const Transform& transform, int kClientWidth, int kClientHeight) {
@@ -22,14 +16,13 @@ void Camera::Initialize(const Transform& transform, int kClientWidth, int kClien
 	projectionMatrix_ = MakePerspectiveFovMatrix(0.45f, static_cast<float>(kClientWidth) / static_cast<float>(kClientHeight), 0.1f, 200.0f);
 	VPMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
 
-	if (device_) {
-		// 定数バッファの作成
-		constBuffer_.Create(device_);
-		cameraForGPU_ = constBuffer_.GetData();
-		// 単位行列を書き込んでおく
-		cameraForGPU_->worldPosition = GetWorldPosition();
-		cameraForGPU_->vpMatrix = MakeIdentity4x4();
-	}
+
+	// 定数バッファの作成
+	constBuffer_.Create();
+	cameraForGPU_ = constBuffer_.GetData();
+	// 単位行列を書き込んでおく
+	cameraForGPU_->worldPosition = GetWorldPosition();
+	cameraForGPU_->vpMatrix = MakeIdentity4x4();
 }
 
 void Camera::Update() {

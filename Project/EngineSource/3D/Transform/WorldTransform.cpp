@@ -4,14 +4,8 @@
 #include"FPSCounter.h"
 using namespace GameEngine;
 
-ID3D12Device* WorldTransform::device_ = nullptr;
-
 WorldTransform::~WorldTransform() {
 
-}
-
-void WorldTransform::StaticInitialize(ID3D12Device* device) {
-	device_ = device;
 }
 
 void WorldTransform::Initialize(const Transform& transform) {
@@ -19,7 +13,7 @@ void WorldTransform::Initialize(const Transform& transform) {
 	worldMatrix_ = MakeWorldMatrixFromEulerRotation(transform_.translate, transform_.rotate, transform_.scale);
 
 	// 定数バッファの作成
-	constBuffer_.Create(device_);
+	constBuffer_.Create();
 	transformationMatrixData_ = constBuffer_.GetData();
 
 	// 単位行列を書き込んでおく

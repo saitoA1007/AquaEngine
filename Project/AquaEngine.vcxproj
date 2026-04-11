@@ -220,6 +220,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Graphics\DirectX\Memory\RtvManager.cpp" />
     <ClCompile Include="EngineSource\Graphics\DirectX\Memory\SrvManager.cpp" />
     <ClCompile Include="EngineSource\Graphics\FrameRateController.cpp" />
+    <ClCompile Include="EngineSource\Graphics\GpuResource.cpp" />
     <ClCompile Include="EngineSource\Graphics\GraphicsDevice.cpp" />
     <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectManager.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Core\BlendBuilder.cpp" />

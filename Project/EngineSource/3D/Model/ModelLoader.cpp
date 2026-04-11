@@ -24,7 +24,7 @@ std::unique_ptr<Model> ModelLoader::CreateSphere(uint32_t subdivision) {
 
 	// メッシュを作成
 	auto tmpMesh = std::make_unique<Mesh>();
-	tmpMesh->CreateSphereMesh(device_, subdivision);
+	tmpMesh->CreateSphereMesh(subdivision);
 	model->AddMesh(std::move(tmpMesh));
 
 	// マテリアルを作成
@@ -43,7 +43,7 @@ std::unique_ptr<Model> ModelLoader::CreatePlane(const Vector2& size) {
 	std::unique_ptr<Model> model = std::make_unique<Model>();
 	// メッシュを作成
 	auto tmpMesh = std::make_unique<Mesh>();
-	tmpMesh->CreatePlaneMesh(device_, size);
+	tmpMesh->CreatePlaneMesh(size);
 	model->AddMesh(std::move(tmpMesh));
 
 	// マテリアルを作成
@@ -63,7 +63,7 @@ std::unique_ptr<Model> ModelLoader::CreateGridPlane(const Vector2& size) {
 
 	// メッシュを作成
 	std::unique_ptr<Mesh> tmpMesh = std::make_unique<Mesh>();
-	tmpMesh->CreateGridPlaneMesh(device_, size);
+	tmpMesh->CreateGridPlaneMesh(size);
 	model->AddMesh(std::move(tmpMesh));
 
 	return model;
@@ -91,7 +91,7 @@ std::unique_ptr<Model> ModelLoader::CreateModel(const std::string& objFilename, 
 	// メッシュを作成
 	for (uint32_t index = 0; index < modelData.meshes.size(); ++index) {
 		std::unique_ptr<Mesh> tmpMesh = std::make_unique<Mesh>();
-		tmpMesh->CreateModelMesh(device_, modelData, index);
+		tmpMesh->CreateModelMesh(modelData, index);
 
 		model->AddMesh(std::move(tmpMesh));
 	}

@@ -11,12 +11,12 @@ namespace GameEngine {
 	class IndexBuffer : public GpuResource {
 	public:
 
-		void Create(ID3D12Device* device, const std::vector<uint32_t>& indices) {
+		void Create(const std::vector<uint32_t>& indices) {
 			// インデックス数を取得
 			totalIndices_ = static_cast<uint32_t>(indices.size());
 
 			// インデックスバッファを作成
-			resource_ = CreateBufferResource(device, sizeof(uint32_t) * totalIndices_);
+			resource_ = CreateBufferResource(device_, sizeof(uint32_t) * totalIndices_);
 			// リソースの先頭のアドレスから使う
 			indexBufferView_.BufferLocation = resource_->GetGPUVirtualAddress();
 			// 使用するリソースのサイズはインデックス6つ分のサイズ

@@ -41,7 +41,7 @@ void GameScene::Initialize(SceneContext* context) {
 
 	// 平行光源ライト
 	lightManager_ = std::make_unique<LightManager>();
-	lightManager_->Initialize(context_->graphicsDevice->GetDevice(), true, false, false);
+	lightManager_->Initialize(true, false, false);
 	directionalData_.active = true;
 	directionalData_.color = { 1.0f,1.0f,1.0f,1.0f };
 	directionalData_.direction = { 0.0,-1.0f,0.0f };

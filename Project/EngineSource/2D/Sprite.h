@@ -36,7 +36,7 @@ namespace GameEngine {
 		/// <param name="device">デバイス</param>
 		/// <param name="window_width">画面幅</param>
 		/// <param name="window_height">画面高さ</param>
-		static void StaticInitialize(ID3D12Device* device, int32_t width, int32_t height);
+		static void StaticInitialize(int32_t width, int32_t height);
 
 		/// <summary>
 		/// スプライト生成
@@ -114,8 +114,6 @@ namespace GameEngine {
 
 	private:
 
-		// デバイス
-		static ID3D12Device* device_;
 		// 射影行列
 		static Matrix4x4 orthoMatrix_;
 		

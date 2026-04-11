@@ -19,12 +19,12 @@ namespace GameEngine {
 			}
 		}
 
-		void Create(ID3D12Device* device, const std::vector<T>& vertices) {
+		void Create(const std::vector<T>& vertices) {
 			// 頂点数を取得
 			totalVertices_ = static_cast<uint32_t>(vertices.size());
 
 			// 頂点バッファを作成
-			resource_ = CreateBufferResource(device, sizeof(T) * totalVertices_);
+			resource_ = CreateBufferResource(device_, sizeof(T) * totalVertices_);
 			// リソースの先頭のアドレスから使う
 			vertexBufferView_.BufferLocation = resource_->GetGPUVirtualAddress();
 			// 使用するリソースのサイズは頂点3つ分のサイズ

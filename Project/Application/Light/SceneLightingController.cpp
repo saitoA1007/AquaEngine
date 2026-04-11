@@ -2,7 +2,7 @@
 #include"GameParamEditor.h"
 using namespace GameEngine;
 
-void SceneLightingController::Initialize(ID3D12Device* device) {
+void SceneLightingController::Initialize() {
 
 	// 平行光源ライト
 	directionalData_.active = true;
@@ -12,7 +12,7 @@ void SceneLightingController::Initialize(ID3D12Device* device) {
 
 	// ライトの設定
 	lightManager_ = std::make_unique<LightManager>();
-	lightManager_->Initialize(device, true, false, false);
+	lightManager_->Initialize(true, false, false);
 	lightManager_->SetDirectionalData(directionalData_);
 
 #ifdef _DEBUG

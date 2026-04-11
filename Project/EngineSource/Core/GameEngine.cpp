@@ -14,6 +14,7 @@
 #include "Collider.h"
 
 // Graphics
+#include "ConstantBuffer.h"
 #include "StructuredBuffer.h"
 
 using namespace GameEngine;
@@ -70,8 +71,8 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	psoManager_->DefaultLoadPSO();
 	psoManager_->DeaultLoadPostEffectPSO();
 
-
-	StructuredBuffer<float>::StaticInitialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetSrvManager());
+	GpuResource::StaticInitialize(graphicsDevice_->GetDevice());
+	StructuredBuffer<float>::StaticInitialize(graphicsDevice_->GetSrvManager());
 
 	// レンダーテクスチャ機能を生成
 	renderTextureManager_ = std::make_unique<RenderTextureManager>();
@@ -118,17 +119,12 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	animationManager_ = std::make_unique<AnimationManager>();
 
 	// 画像の初期化
-	Sprite::StaticInitialize(graphicsDevice_->GetDevice(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
+	Sprite::StaticInitialize(windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
 	SpriteRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), textureManager_.get(), psoManager_.get());
 	ModelRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager(), psoManager_.get());
-	// ワールドトランスフォームの初期化
-	WorldTransform::StaticInitialize(graphicsDevice_->GetDevice());
 	WorldTransforms::StaticInitialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetSrvManager());
-	// マテリアルの初期化
-	Material::StaticInitialize(graphicsDevice_->GetDevice());
 	// デバック描画用
 	DebugRenderer::StaticInitialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetCommandList(), psoManager_.get());
-	Camera::StaticInitialize(graphicsDevice_->GetDevice());
 
 	// fpsを計測する
 	fpsCounter_ = std::make_unique<FpsCounter>();

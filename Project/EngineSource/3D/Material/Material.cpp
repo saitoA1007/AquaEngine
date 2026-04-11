@@ -1,21 +1,15 @@
-#include"Material.h"
-#include"MyMath.h"
-#include"CreateBufferResource.h"
+#include "Material.h"
+#include "MyMath.h"
+#include "CreateBufferResource.h"
 using namespace GameEngine;
-
-ID3D12Device* Material::device_ = nullptr;
 
 Material::~Material() {
 	
 }
 
-void Material::StaticInitialize(ID3D12Device* device) {
-	device_ = device;
-}
-
 void Material::Initialize(const Vector4& color, const Vector3& specularColor,const float& shininess,const bool& isEnableLighting) {
 	// 定数バッファの作成
-	constBuffer_.Create(device_);
+	constBuffer_.Create();
 	materialData_ = constBuffer_.GetData();
 
 	// 白色に設定

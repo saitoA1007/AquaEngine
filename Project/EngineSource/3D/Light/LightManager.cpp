@@ -7,7 +7,7 @@ LightManager::~LightManager() {
 
 }
 
-void LightManager::Initialize(ID3D12Device* device, const bool& isDirectionalActive, const bool& isPointActive, const bool& isSpotActive) {
+void LightManager::Initialize(const bool& isDirectionalActive, const bool& isPointActive, const bool& isSpotActive) {
     // 平行光源
     directionalLight_ = std::make_unique<DirectionalLight>();
     directionalLight_->Initialize({ 1,1,1,1 }, { 0,-1,0 }, 1.0f);
@@ -22,7 +22,7 @@ void LightManager::Initialize(ID3D12Device* device, const bool& isDirectionalAct
     spotLight_->SetLightActive(isSpotActive);
 
     // 定数バッファの作成
-    constBuffer_.Create(device);
+    constBuffer_.Create();
     lightGroupData_ = constBuffer_.GetData();
     // デフォルト値を設定
     lightGroupData_->directionalLightData_ = directionalLight_->GetDirectionalLightData();
