@@ -7,10 +7,7 @@ using namespace GameEngine;
 ID3D12Device* Camera::device_ = nullptr;
 
 Camera::~Camera() {
-	if (cameraForGPU_) {
-		resource_->Unmap(0, nullptr);
-		cameraForGPU_ = nullptr;
-	}
+	
 }
 
 void Camera::StaticInitialize(ID3D12Device* device) {
@@ -26,11 +23,9 @@ void Camera::Initialize(const Transform& transform, int kClientWidth, int kClien
 	VPMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
 
 	if (device_) {
-		// カメラリソースを作成
-		resource_ = CreateBufferResource(device_, sizeof(CameraForGPU));
-		// データを書き込む
-		// 書き込むためのアドレスを取得
-		resource_->Map(0, nullptr, reinterpret_cast<void**>(&cameraForGPU_));
+		// 定数バッファの作成
+		constBuffer_.Create(device_);
+		cameraForGPU_ = constBuffer_.GetData();
 		// 単位行列を書き込んでおく
 		cameraForGPU_->worldPosition = GetWorldPosition();
 		cameraForGPU_->vpMatrix = MakeIdentity4x4();

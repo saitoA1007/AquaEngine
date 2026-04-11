@@ -61,9 +61,9 @@ void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, con
 		if (material == nullptr) {
 			// マテリアルを設定
 			const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
-			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetGpuVirtualAddress());
 		} else {
-			commandList_->SetGraphicsRootConstantBufferView(0, material->GetResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootConstantBufferView(0, material->GetGpuVirtualAddress());
 		}
 		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetGpuVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
@@ -95,9 +95,9 @@ void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, ID3
 		if (material == nullptr) {
 			// マテリアルを設定
 			const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
-			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetGpuVirtualAddress());
 		} else {
-			commandList_->SetGraphicsRootConstantBufferView(0, material->GetResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootConstantBufferView(0, material->GetGpuVirtualAddress());
 		}
 		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetGpuVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
@@ -135,9 +135,9 @@ void ModelRenderer::DrawInstancing(const Model* model, const uint32_t& numInstan
 		if (material == nullptr) {
 			// マテリアルを設定
 			const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
-			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetGpuVirtualAddress());
 		} else {
-			commandList_->SetGraphicsRootConstantBufferView(0, material->GetResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootConstantBufferView(0, material->GetGpuVirtualAddress());
 		}
 
 		commandList_->SetGraphicsRootDescriptorTable(1, *worldTransforms.GetInstancingSrvGPU());
@@ -172,9 +172,9 @@ void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTrans
 		if (material == nullptr) {
 			// マテリアルを設定
 			const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
-			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetGpuVirtualAddress());
 		} else {
-			commandList_->SetGraphicsRootConstantBufferView(0, material->GetResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootConstantBufferView(0, material->GetGpuVirtualAddress());
 		}
 		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetGpuVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
@@ -221,9 +221,9 @@ void ModelRenderer::DrawSkybox(const Model* model, WorldTransform& worldTransfor
 		if (material == nullptr) {
 			// マテリアルを設定
 			const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
-			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetGpuVirtualAddress());
 		} else {
-			commandList_->SetGraphicsRootConstantBufferView(0, material->GetResource()->GetGPUVirtualAddress());
+			commandList_->SetGraphicsRootConstantBufferView(0, material->GetGpuVirtualAddress());
 		}
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetGpuVirtualAddress());

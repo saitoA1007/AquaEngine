@@ -3,11 +3,11 @@
 #include "Vector3.h"
 #include "Transform.h"
 #include "TransformationMatrix.h"
-#include "GpuResource.h"
+#include "ConstantBuffer.h"
 
 namespace GameEngine {
 
-	class Camera : public GpuResource {
+	class Camera {
 	public:
 		Camera() = default;
 		~Camera();
@@ -98,6 +98,8 @@ namespace GameEngine {
 		/// <param name="camera">別のカメラ</param>
 		void SetCamera(const Camera& camera);
 
+		ID3D12Resource* GetResource() const { return constBuffer_.GetResource(); }
+
 	public:
 
 		// カメラのトランスフォーム
@@ -115,6 +117,7 @@ namespace GameEngine {
 		Matrix4x4 WVPMatrix_;
 
 		// カメラのリソース
+		ConstantBuffer<CameraForGPU> constBuffer_;
 		CameraForGPU* cameraForGPU_ = nullptr;
 
 		static ID3D12Device* device_;

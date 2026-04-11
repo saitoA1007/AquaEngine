@@ -1,5 +1,5 @@
 #pragma once
-#include "GpuResource.h"
+#include "ConstantBuffer.h"
 #include <memory>
 #include "DirectionalLight.h"
 #include "PointLight.h"
@@ -7,7 +7,7 @@
 
 namespace GameEngine {
 
-    class LightManager : public GpuResource {
+    class LightManager {
     public:
         // 定数バッファ
         struct LightGroupData {
@@ -101,12 +101,14 @@ namespace GameEngine {
             lightGroupData_->isActiveEnvironment = true;
         }
 
+        ID3D12Resource* GetResource() const { return constBuffer_.GetResource(); }
+
         std::unique_ptr<DirectionalLight> directionalLight_;
         std::unique_ptr<PointLight> pointLight_;
         std::unique_ptr<SpotLight> spotLight_;
 
     private:
-
+        ConstantBuffer<LightGroupData> constBuffer_;
         // 平行光源のデータを作る
         LightGroupData* lightGroupData_ = nullptr;
     };

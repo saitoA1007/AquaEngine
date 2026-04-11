@@ -4,11 +4,11 @@
 #include "Matrix4x4.h"
 #include "Transform.h"
 #include <iostream>
-#include "GpuResource.h"
+#include "ConstantBuffer.h"
 
 namespace GameEngine {
 
-	class Material : public GpuResource {
+	class Material {
 	public:
 		struct alignas(16) MaterialData {
 			Vector4 color;
@@ -106,9 +106,13 @@ namespace GameEngine {
 
 		void AdaptDefaultTexture() { materialData_->textureHandle = defaultTextureHandle_; }
 
+		D3D12_GPU_VIRTUAL_ADDRESS GetGpuVirtualAddress() const { return constBuffer_.GetGpuVirtualAddress(); }
+
 	private:
 
 		static ID3D12Device* device_;
+
+		ConstantBuffer<MaterialData> constBuffer_;
 
 		// マテリアルにデータを書き込む
 		MaterialData* materialData_ = nullptr;
