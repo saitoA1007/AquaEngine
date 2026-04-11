@@ -59,8 +59,8 @@
     <ClCompile Include="EngineSource\Editor\EditorMenu\EditorWindowManager.cpp" />
     <ClCompile Include="EngineSource\Editor\EditorMenu\SceneMenuBar.cpp" />
     <ClCompile Include="EngineSource\Graphics\FrameRateController.cpp" />
-    <ClCompile Include="EngineSource\Graphics\GraphicsDevice.cpp" />
-    <ClCompile Include="EngineSource\Graphics\RenderPipeline.cpp" />
+    <ClCompile Include="EngineSource\Graphics\Core\GraphicsDevice.cpp" />
+    <ClCompile Include="EngineSource\Graphics\Core\RenderPipeline.cpp" />
     <ClCompile Include="EngineSource\Graphics\RenderPass\RenderPass.cpp" />
     <ClCompile Include="EngineSource\Graphics\RenderPass\RenderPassController.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\BloomPSO.cpp" />
@@ -103,8 +103,8 @@
     <ClCompile Include="EngineSource\3D\Model\ModelLoader.cpp" />
     <ClCompile Include="EngineSource\Core\GameObjectManager.cpp" />
     <ClCompile Include="EngineSource\Collision\Collider.cpp" />
-    <ClCompile Include="EngineSource\Graphics\GpuResource.cpp" />
-    <ClCompile Include="EngineSource\Graphics\SrvResource.cpp" />
+    <ClCompile Include="EngineSource\Graphics\Resources\GpuResource.cpp" />
+    <ClCompile Include="EngineSource\Graphics\Resources\SrvResource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\crude_json.h" />
@@ -182,10 +182,10 @@
     <ClInclude Include="EngineSource\Editor\EditorMenu\EditorToolBar.h" />
     <ClInclude Include="EngineSource\Editor\EditorMenu\EditorWindowManager.h" />
     <ClInclude Include="EngineSource\Editor\EditorMenu\SceneMenuBar.h" />
-    <ClInclude Include="EngineSource\Graphics\DescriptorCounts.h" />
+    <ClInclude Include="EngineSource\Graphics\Core\DescriptorCounts.h" />
     <ClInclude Include="EngineSource\Graphics\FrameRateController.h" />
-    <ClInclude Include="EngineSource\Graphics\GraphicsDevice.h" />
-    <ClInclude Include="EngineSource\Graphics\RenderPipeline.h" />
+    <ClInclude Include="EngineSource\Graphics\Core\GraphicsDevice.h" />
+    <ClInclude Include="EngineSource\Graphics\Core\RenderPipeline.h" />
     <ClInclude Include="EngineSource\Graphics\RenderPass\RenderPass.h" />
     <ClInclude Include="EngineSource\Graphics\RenderPass\RenderPassController.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\BloomPSO.h" />
@@ -246,16 +246,16 @@
     <ClInclude Include="Application\Scene\Transition\Fade.h" />
     <ClInclude Include="Application\Scene\Register\SetUpScenes.h" />
     <ClInclude Include="Application\ColorEditor.h" />
-    <ClInclude Include="EngineSource\Graphics\GpuResource.h" />
-    <ClInclude Include="EngineSource\Graphics\VertexBuffer.h" />
-    <ClInclude Include="EngineSource\Graphics\IndexBuffer.h" />
+    <ClInclude Include="EngineSource\Graphics\Resources\GpuResource.h" />
+    <ClInclude Include="EngineSource\Graphics\Buffers\VertexBuffer.h" />
+    <ClInclude Include="EngineSource\Graphics\Buffers\IndexBuffer.h" />
     <ClInclude Include="EngineSource\3D\Model\ModelLoader.h" />
     <ClInclude Include="EngineSource\Core\IGameObject.h" />
     <ClInclude Include="EngineSource\Core\GameObjectManager.h" />
     <ClInclude Include="EngineSource\Collision\ColliderInfo.h" />
-    <ClInclude Include="EngineSource\Graphics\ConstantBuffer.h" />
-    <ClInclude Include="EngineSource\Graphics\StructuredBuffer.h" />
-    <ClInclude Include="EngineSource\Graphics\SrvResource.h" />
+    <ClInclude Include="EngineSource\Graphics\Buffers\ConstantBuffer.h" />
+    <ClInclude Include="EngineSource\Graphics\Buffers\StructuredBuffer.h" />
+    <ClInclude Include="EngineSource\Graphics\Resources\SrvResource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Externals\imgui\imgui_bezier_math.inl" />
