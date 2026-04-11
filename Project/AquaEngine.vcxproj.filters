@@ -104,6 +104,7 @@
     <ClCompile Include="EngineSource\Core\GameObjectManager.cpp" />
     <ClCompile Include="EngineSource\Collision\Collider.cpp" />
     <ClCompile Include="EngineSource\Graphics\GpuResource.cpp" />
+    <ClCompile Include="EngineSource\Graphics\SrvResource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\crude_json.h" />
@@ -254,6 +255,7 @@
     <ClInclude Include="EngineSource\Collision\ColliderInfo.h" />
     <ClInclude Include="EngineSource\Graphics\ConstantBuffer.h" />
     <ClInclude Include="EngineSource\Graphics\StructuredBuffer.h" />
+    <ClInclude Include="EngineSource\Graphics\SrvResource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Externals\imgui\imgui_bezier_math.inl" />

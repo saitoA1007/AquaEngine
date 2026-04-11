@@ -235,6 +235,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Graphics\RenderPass\RenderPass.cpp" />
     <ClCompile Include="EngineSource\Graphics\RenderPass\RenderPassController.cpp" />
     <ClCompile Include="EngineSource\Graphics\RenderPipeline.cpp" />
+    <ClCompile Include="EngineSource\Graphics\SrvResource.cpp" />
     <ClCompile Include="EngineSource\Input\InPut.cpp" />
     <ClCompile Include="EngineSource\Input\InputCommand.cpp" />
     <ClCompile Include="EngineSource\Math\EasingManager.cpp" />
@@ -410,6 +411,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Graphics\RenderPass\RenderPass.h" />
     <ClInclude Include="EngineSource\Graphics\RenderPass\RenderPassController.h" />
     <ClInclude Include="EngineSource\Graphics\RenderPipeline.h" />
+    <ClInclude Include="EngineSource\Graphics\SrvResource.h" />
     <ClInclude Include="EngineSource\Graphics\StructuredBuffer.h" />
     <ClInclude Include="EngineSource\Graphics\VertexBuffer.h" />
     <ClInclude Include="EngineSource\Input\InPut.h" />

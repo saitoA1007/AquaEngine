@@ -1,5 +1,5 @@
 #pragma once
-#include "GpuResource.h"
+#include "SrvResource.h"
 #include "CreateBufferResource.h"
 #include "SrvManager.h"
 
@@ -9,7 +9,7 @@ namespace GameEngine {
 	/// 構造化バッファ用
 	/// </summary>
 	template <typename T>
-	class StructuredBuffer : public GpuResource {
+	class StructuredBuffer : public SrvResource {
 	public:
 		~StructuredBuffer() {
 			// Unmap
@@ -21,13 +21,6 @@ namespace GameEngine {
 			if (srvManager_) {
 				srvManager_->ReleseIndex(srvIndex_);
 			}
-		}
-
-		/// <summary>
-		/// 静的初期化
-		/// </summary>
-		static void StaticInitialize(SrvManager* srvManager) {
-			srvManager_ = srvManager;
 		}
 
 		/// <summary>
@@ -61,7 +54,6 @@ namespace GameEngine {
 		const D3D12_GPU_DESCRIPTOR_HANDLE& GetSrvHandleGPU() const { return srvHandleGPU_; }
 
 	private:
-		static SrvManager* srvManager_;
 
 		T* data_ = nullptr;
 		uint32_t numElements_ = 0;
@@ -72,7 +64,4 @@ namespace GameEngine {
 		// GPUのシェーダリソースビューのハンドル
 		CD3DX12_GPU_DESCRIPTOR_HANDLE srvHandleGPU_;
 	};
-
-	// static変数の実体定義
-	template <typename T> SrvManager* StructuredBuffer<T>::srvManager_ = nullptr;
 }

@@ -14,8 +14,8 @@
 #include "Collider.h"
 
 // Graphics
-#include "ConstantBuffer.h"
-#include "StructuredBuffer.h"
+#include "GpuResource.h"
+#include "SrvResource.h"
 
 using namespace GameEngine;
 
@@ -72,7 +72,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	psoManager_->DeaultLoadPostEffectPSO();
 
 	GpuResource::StaticInitialize(graphicsDevice_->GetDevice());
-	StructuredBuffer<float>::StaticInitialize(graphicsDevice_->GetSrvManager());
+	SrvResource::StaticInitialize(graphicsDevice_->GetSrvManager());
 
 	// レンダーテクスチャ機能を生成
 	renderTextureManager_ = std::make_unique<RenderTextureManager>();
