@@ -11,8 +11,11 @@ namespace GameEngine {
     public:
         virtual ~GpuResource() = default;
 
-        // リソースのゲッター
+        // リソースを取得
         ID3D12Resource* GetResource() const { return resource_.Get(); }
+
+        // アドレスを取得
+        D3D12_GPU_VIRTUAL_ADDRESS GetGpuVirtualAddress() const { return resource_->GetGPUVirtualAddress();}
 
     protected:
         // リソース

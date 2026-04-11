@@ -7,11 +7,7 @@ using namespace GameEngine;
 ID3D12Device* WorldTransform::device_ = nullptr;
 
 WorldTransform::~WorldTransform() {
-	// マッピングを解除する
-	if (transformationMatrixData_) {
-		resource_->Unmap(0, nullptr);
-		transformationMatrixData_ = nullptr;
-	}
+
 }
 
 void WorldTransform::StaticInitialize(ID3D12Device* device) {
@@ -22,12 +18,10 @@ void WorldTransform::Initialize(const Transform& transform) {
 	transform_ = transform;
 	worldMatrix_ = MakeWorldMatrixFromEulerRotation(transform_.translate, transform_.rotate, transform_.scale);
 
-	// トランスフォーメーション行列リソースを作成
-	// TransformationMatrix用のリソースを作る。TransformationMatrix 1つ分のサイズを用意する
-	resource_ = CreateBufferResource(device_, sizeof(TransformationMatrix));
-	// データを書き込む
-	// 書き込むためのアドレスを取得
-	resource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
+	// 定数バッファの作成
+	constBuffer_.Create(device_);
+	transformationMatrixData_ = constBuffer_.GetData();
+
 	// 単位行列を書き込んでおく
 	transformationMatrixData_->World = MakeIdentity4x4();
 	transformationMatrixData_->worldInverseTranspose = MakeIdentity4x4();

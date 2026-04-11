@@ -12,9 +12,9 @@ namespace GameEngine {
 	public:
 		~ConstantBuffer() {
 			// デストラクタで自動的にUnmapを実行
-			if (mappedData_) {
+			if (data_) {
 				resource_->Unmap(0, nullptr);
-				mappedData_ = nullptr;
+				data_ = nullptr;
 			}
 		}
 
@@ -26,7 +26,7 @@ namespace GameEngine {
 		}
 
 		// データを取得する
-		T* GetMappedData() const { return mappedData_; }
+		T* GetData() const { return data_; }
 
 	private:
 		// データのポインタ

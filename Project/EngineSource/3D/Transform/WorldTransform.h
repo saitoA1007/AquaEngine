@@ -3,14 +3,14 @@
 #include "Transform.h"
 #include "TransformationMatrix.h"
 #include "AnimationData.h"
-#include "GpuResource.h"
+#include "ConstantBuffer.h"
 
 namespace GameEngine {
 
 	/// <summary>
 	/// 単体描画用のワールド行列
 	/// </summary>
-	class WorldTransform : public GpuResource {
+	class WorldTransform {
 	public:
 		WorldTransform() = default;
 		~WorldTransform();
@@ -70,6 +70,9 @@ namespace GameEngine {
 		/// <param name="VPMatrix"></param>
 		void SetWVPMatrix(const Matrix4x4& localMatrix);
 
+		// リソースのアドレスを取得
+		D3D12_GPU_VIRTUAL_ADDRESS GetGpuVirtualAddress() const { return constBuffer_.GetGpuVirtualAddress(); }
+
 	public:
 
 		// SRT要素
@@ -82,10 +85,12 @@ namespace GameEngine {
 
 		static ID3D12Device* device_;
 
-		Matrix4x4 worldMatrix_;
+		ConstantBuffer<TransformationMatrix> constBuffer_;
 
 		// リソース
 		TransformationMatrix* transformationMatrixData_ = nullptr;
+
+		Matrix4x4 worldMatrix_;
 
 		// 親
 		WorldTransform* parent_ = nullptr;

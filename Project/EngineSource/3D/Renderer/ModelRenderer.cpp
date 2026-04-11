@@ -65,7 +65,7 @@ void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, con
 		} else {
 			commandList_->SetGraphicsRootConstantBufferView(0, material->GetResource()->GetGPUVirtualAddress());
 		}
-		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetResource()->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetGpuVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 		commandList_->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
 
@@ -99,7 +99,7 @@ void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, ID3
 		} else {
 			commandList_->SetGraphicsRootConstantBufferView(0, material->GetResource()->GetGPUVirtualAddress());
 		}
-		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetResource()->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetGpuVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 		commandList_->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
 		commandList_->SetGraphicsRootConstantBufferView(4, lightGroupResource->GetGPUVirtualAddress());
@@ -176,7 +176,7 @@ void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTrans
 		} else {
 			commandList_->SetGraphicsRootConstantBufferView(0, material->GetResource()->GetGPUVirtualAddress());
 		}
-		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetResource()->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetGpuVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 
 		commandList_->SetGraphicsRootDescriptorTable(3, model->GetSkinClusterData()->paletteSrvHandle.second);
@@ -198,7 +198,7 @@ void ModelRenderer::DrawGrid(const Model* model, WorldTransform& worldTransform)
 	commandList_->IASetVertexBuffers(0, 1, &meshes[0]->GetVertexBufferView());
 	commandList_->IASetIndexBuffer(&meshes[0]->GetIndexBufferView());
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	commandList_->SetGraphicsRootConstantBufferView(0, worldTransform.GetResource()->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(0, worldTransform.GetGpuVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(1, cameraResource_->GetGPUVirtualAddress());
 	commandList_->DrawIndexedInstanced(meshes[0]->GetTotalIndices(), 1, 0, 0, 0);
 }
@@ -226,7 +226,7 @@ void ModelRenderer::DrawSkybox(const Model* model, WorldTransform& worldTransfor
 			commandList_->SetGraphicsRootConstantBufferView(0, material->GetResource()->GetGPUVirtualAddress());
 		}
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
-		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetResource()->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetGpuVirtualAddress());
 		commandList_->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
 
 		if (meshes[i]->GetTotalIndices() != 0) {
@@ -251,7 +251,7 @@ void ModelRenderer::DrawShadowMap(const Model* model, WorldTransform& worldTrans
 		commandList_->IASetIndexBuffer(&meshes[i]->GetIndexBufferView());
 		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		commandList_->SetGraphicsRootConstantBufferView(0, worldTransform.GetResource()->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(0, worldTransform.GetGpuVirtualAddress());
 		commandList_->SetGraphicsRootConstantBufferView(1, cameraResource_->GetGPUVirtualAddress());
 
 		if (meshes[i]->GetTotalIndices() != 0) {
