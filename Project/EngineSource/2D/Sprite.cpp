@@ -1,17 +1,12 @@
-#include"Sprite.h"
-#include"CreateBufferResource.h"
-#include"MyMath.h"
+#include "Sprite.h"
+#include "CreateBufferResource.h"
+#include "MyMath.h"
 using namespace GameEngine;
 
 ID3D12Device* Sprite::device_ = nullptr;
 Matrix4x4 Sprite::orthoMatrix_;
 
 Sprite::~Sprite() {
-	// マッピングを解除する
-	if (vertexData_) {
-		vertexResource_->Unmap(0, nullptr);
-		vertexData_ = nullptr;
-	}
 
 	if (constBufferData_) {
 		constBufferResource_->Unmap(0, nullptr);
@@ -103,17 +98,8 @@ void Sprite::SetUvMatrix(const Transform& transform) {
 }
 
 void Sprite::CreateMesh() {
-	// Sprite用の頂点リソースを作る
-	vertexResource_ = CreateBufferResource(device_, sizeof(VertexPosUv) * 4);
 
-	// リソースの先頭のアドレスから使う
-	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	// 使用するリソースのサイズは頂点4つ分のサイズ
-	vertexBufferView_.SizeInBytes = sizeof(VertexPosUv) * 4;
-	// 1頂点当たりのサイズ
-	vertexBufferView_.StrideInBytes = sizeof(VertexPosUv);
-	// 書き込むためのアドレスを取得
-	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
+	std::vector<VertexPosUv> vertices(4);
 
 	// 画像のサイズを決める	
 	float left = -anchorPoint_.x * size_.x;
@@ -122,10 +108,10 @@ void Sprite::CreateMesh() {
 	float bottom = (1.0f - anchorPoint_.y) * size_.y;
 
 	// 頂点インデックス
-	vertexData_[0].position = { left,bottom,0.0f,1.0f }; // 左下
-	vertexData_[1].position = { left,top,0.0f,1.0f }; // 左上
-	vertexData_[2].position = { right,bottom,0.0f,1.0f }; // 右下
-	vertexData_[3].position = { right,top,0.0f,1.0f }; // 右上
+	vertices[0].position = { left,  bottom, 0.0f, 1.0f }; // 左下
+	vertices[1].position = { left,  top,    0.0f, 1.0f }; // 左上
+	vertices[2].position = { right, bottom, 0.0f, 1.0f }; // 右下
+	vertices[3].position = { right, top,    0.0f, 1.0f }; // 右上
 
 	// uv座標指定
 	float leftTex = textureLeftTop_.x / textureMaxeSize_.x;
@@ -133,30 +119,19 @@ void Sprite::CreateMesh() {
 	float topTex = textureLeftTop_.y / textureMaxeSize_.y;
 	float bottomTex = (textureLeftTop_.y + textureSize_.y) / textureMaxeSize_.y;
 
-	vertexData_[0].texcoord = { leftTex,bottomTex };
-	vertexData_[1].texcoord = { leftTex,topTex };
-	vertexData_[2].texcoord = { rightTex,bottomTex };
-	vertexData_[3].texcoord = { rightTex,topTex };
+	vertices[0].texcoord = { leftTex,bottomTex };
+	vertices[1].texcoord = { leftTex,topTex };
+	vertices[2].texcoord = { rightTex,bottomTex };
+	vertices[3].texcoord = { rightTex,topTex };
 
-	// Sprite用の頂点インデックスのリソースを作る
-	indexResource_ = CreateBufferResource(device_, sizeof(uint32_t) * 6);
-	// リソースの先頭のアドレスから使う
-	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
-	// 使用するリソースのサイズはインデックス6つ分のサイズ
-	indexBufferView_.SizeInBytes = sizeof(uint32_t) * 6;
-	// インデックスはuint32_tとする
-	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
-	// インデックスリソースにデータを書き込む
-	uint32_t* indexDataSprite = nullptr;
-	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSprite));
-	// 三角形
-	indexDataSprite[0] = 0;  indexDataSprite[1] = 1;  indexDataSprite[2] = 2;
-	// 三角形2
-	indexDataSprite[3] = 1;  indexDataSprite[4] = 3;  indexDataSprite[5] = 2;
+	vertexBuffer_.Create(device_, vertices);
 
-	// マッピングを解除する
-	indexResource_->Unmap(0, nullptr);
-	indexDataSprite = nullptr;
+	// データを取得
+	vertexData_ = vertexBuffer_.GetVertexData();
+
+	// インデックスバッファを作成
+	std::vector<uint32_t> indices = { 0, 1, 2, 1, 3, 2 };
+	indexBuffer_.Create(device_, indices);
 }
 
 void Sprite::CreateConstBufferData(const Vector4& color) {

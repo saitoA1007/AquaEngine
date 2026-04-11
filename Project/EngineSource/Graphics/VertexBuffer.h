@@ -41,6 +41,9 @@ namespace GameEngine {
 		// ビューを取得
 		const D3D12_VERTEX_BUFFER_VIEW& GetView() const { return vertexBufferView_; }
 
+		// 頂点データを取得
+		T* GetVertexData() { return vertexData_; }
+
 		// 頂点数
 		uint32_t GetTotalVertices() const { return totalVertices_; }
 	private:

@@ -1,11 +1,11 @@
 #pragma once
-#include <d3d12.h>
-#include<iostream>
-#include <wrl.h>
-#include"Matrix4x4.h"
-#include"Vector2.h"
-#include"Vector4.h"
-#include"Transform.h"
+#include <iostream>
+#include "Vector4.h"
+#include "Vector2.h"
+#include "Matrix4x4.h"
+#include "Transform.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
 
 namespace GameEngine {
 
@@ -88,8 +88,8 @@ namespace GameEngine {
 		/// <param name="transform"></param>
 		void SetUvMatrix(const Transform& transform);
 
-		const D3D12_VERTEX_BUFFER_VIEW& GetVertexBufferView() const { return vertexBufferView_; }
-		const D3D12_INDEX_BUFFER_VIEW& GetIndexBufferView() const { return indexBufferView_; }
+		const D3D12_VERTEX_BUFFER_VIEW& GetVertexBufferView() const { return vertexBuffer_.GetView(); }
+		const D3D12_INDEX_BUFFER_VIEW& GetIndexBufferView() const { return indexBuffer_.GetView(); }
 
 		ID3D12Resource* GetResource() const { return constBufferResource_.Get(); }
 
@@ -123,16 +123,9 @@ namespace GameEngine {
 		// ワールド行列
 		Matrix4x4 worldMatrix_;
 
-		// 頂点バッファビューを作成する
-		D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
-		// Sprite用の頂点リソース
-		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
+		VertexBuffer<VertexPosUv> vertexBuffer_;
+		IndexBuffer indexBuffer_;
 		VertexPosUv* vertexData_ = nullptr;
-
-		// 頂点バッファビューを作成する
-		D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
-		// Sprite用の頂点インデックスのリソース
-		Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
 
 		// Sprite用のマテリアルリソース
 		Microsoft::WRL::ComPtr<ID3D12Resource> constBufferResource_;
