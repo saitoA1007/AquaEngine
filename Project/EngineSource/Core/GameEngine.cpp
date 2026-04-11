@@ -125,6 +125,9 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	// シーンを登録する
 	SetupScenes(*sceneRegistry_);
 
+	// ゲームオブジェクト管理機能を初期化
+	gameObjectManager_ = std::make_unique<GameObjectManager>();
+
 	// ゲームシーンで使用するエンジン機能を取得
 	sceneContext.input = input_.get();
 	sceneContext.inputCommand = inputCommand_.get();
@@ -133,6 +136,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	sceneContext.audioManager = audioManager_.get();
 	sceneContext.graphicsDevice = graphicsDevice_.get();
 	sceneContext.animationManager = animationManager_.get();
+	sceneContext.gameObjectManager_ = gameObjectManager_.get();
 	sceneContext.renderPassController = renderPassController_.get();
 
 	// シーンの初期化
@@ -167,6 +171,8 @@ void Engine::Update() {
 
 		// シーンの更新処理
 		if (isActiveUpdate_ && !isPause_) {
+			// ゲームオブジェクトでおこなわれる更新処理
+			gameObjectManager_->UpdateAll();
 			sceneManager_->Update();
 		} else {
 			sceneManager_->DebugSceneUpdate();
@@ -184,6 +190,8 @@ void Engine::Update() {
 
 		// シーンの描画処理
 		sceneManager_->Draw();
+		// ゲームオブジェクトでおこなわれる描画処理
+		gameObjectManager_->DrawAll();
 
 		// 描画後処理
 		PostDraw();
@@ -238,6 +246,9 @@ void Engine::PreUpdate() {
 
 	// シーンのデバックに必要な処理を更新する
 	sceneManager_->DebugUpdate();
+
+	// ゲームオブジェクトのデバック処理を更新する
+	gameObjectManager_->DebugUpdateAll();
 #endif
 }
 

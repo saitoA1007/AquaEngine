@@ -9,6 +9,7 @@
 #include"PostProcess/OutLinePSO.h"
 #include"PSO/Core/PSOManager.h"
 #include"PostProcess/PostEffectManager.h"
+#include"GameObjectManager.h"
 
 // Graphics
 #include"GraphicsDevice.h"
@@ -98,6 +99,9 @@ namespace GameEngine {
 
 		// テクスチャの機能
 		std::unique_ptr<TextureManager> textureManager_;
+
+		// ゲームオブジェクト管理
+		std::unique_ptr<GameObjectManager> gameObjectManager_;
 
 		/// PSO ======================================
 

@@ -1,14 +1,14 @@
 #pragma once
 #include <d3d12.h>
-#include<vector>
+#include <vector>
 #include <unordered_map>
 #include <wrl.h>
 
-#include"TextureManager.h"
-#include"SrvManager.h"
+#include "TextureManager.h"
+#include "SrvManager.h"
 
-#include"PSO/Core/PSOManager.h"
-#include"PSO/Core/DrawPSOData.h"
+#include "PSO/Core/PSOManager.h"
+#include "PSO/Core/DrawPSOData.h"
 
 #include "Model.h"
 #include "WorldTransform.h"
