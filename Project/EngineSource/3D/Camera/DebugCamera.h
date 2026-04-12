@@ -1,12 +1,9 @@
 #pragma once
-#include"Vector3.h"
-#include"Matrix4x4.h"
-#include"InPut.h"
-
-#include"EngineSource/Math/TransformationMatrix.h"
-
-#include <d3d12.h>
-#include <wrl.h>
+#include "Vector3.h"
+#include "Matrix4x4.h"
+#include "TransformationMatrix.h"
+#include "ConstantBuffer.h"
+#include "InPut.h"
 
 namespace GameEngine {
 
@@ -21,7 +18,7 @@ namespace GameEngine {
 		/// <param name="translate">カメラ座標</param>
 		/// <param name="width">画面横幅</param>
 		/// <param name="height">画面縦幅</param>
-		void Initialize(const Vector3& translate, int width, int height, ID3D12Device* device);
+		void Initialize(const Vector3& translate, int width, int height);
 
 		/// <summary>
 		/// 更新処理
@@ -36,7 +33,7 @@ namespace GameEngine {
 
 		Matrix4x4 GetWorldMatrix() const { return worldMatrix_; }
 
-		inline ID3D12Resource* GetCameraResource() const { return cameraResource_.Get(); }
+		ID3D12Resource* GetResource() const { return constBuffer_.GetResource(); }
 
 		Vector3 GetWorldPosition();
 
@@ -85,7 +82,7 @@ namespace GameEngine {
 		static inline const float kTargetSpeed = 0.5f;
 
 		// GPUにカメラの位置を送る用のリソース
-		Microsoft::WRL::ComPtr<ID3D12Resource> cameraResource_;
+		ConstantBuffer<CameraForGPU> constBuffer_;
 		CameraForGPU* cameraForGPU_ = nullptr;
 	};
 }

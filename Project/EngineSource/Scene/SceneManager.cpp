@@ -33,7 +33,7 @@ void SceneManager::Initialize(SceneContext* context, SceneRegistry* sceneRegistr
 
 	// デバックカメラを生成
 	debugCamera_ = std::make_unique<DebugCamera>();
-	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720, context_->graphicsDevice->GetDevice());
+	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720);
 	context_->debugCamera_ = debugCamera_.get();
 	// グリッドの初期化
 	gridModel_ = context_->modelManager->GetNameByModel("Grid");

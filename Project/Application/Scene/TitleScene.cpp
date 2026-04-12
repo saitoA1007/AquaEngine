@@ -42,7 +42,7 @@ void TitleScene::Draw(const bool& isDebugView) {
 	// 描画に使用するカメラを設定
 	if (isDebugView) {
 		// 描画に使用するカメラを設定
-		ModelRenderer::SetCamera(context_->debugCamera_->GetCameraResource());
+		ModelRenderer::SetCamera(context_->debugCamera_->GetResource());
 	} else {
 		// 描画に使用するカメラを設定
 		ModelRenderer::SetCamera(mainCamera_->GetResource());
