@@ -3,9 +3,7 @@
 using namespace GameEngine;
 
 void RenderPassController::Initialize(RenderTextureManager* renderTextureManager, ID3D12GraphicsCommandList* commandList) {
-
 	commandList_ = commandList;
-
 	// レンダーを取得する
 	renderTextureManager_ = renderTextureManager;
 }

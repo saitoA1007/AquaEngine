@@ -5,12 +5,10 @@
 using namespace GameEngine;
 
 BloomPSO* PostEffectManager::bloomPSO_ = nullptr;
-OutLinePSO* PostEffectManager::outLinePSO_ = nullptr;
 std::array<DrawPsoData, static_cast<size_t>(PostEffectManager::PSOType::MaxCount)> PostEffectManager::psoList_;
 
-void PostEffectManager::StaticInitialize(BloomPSO* bloomPSO, OutLinePSO* outLinePSO, PSOManager* psoManager) {
+void PostEffectManager::StaticInitialize(BloomPSO* bloomPSO,PSOManager* psoManager) {
     bloomPSO_ = bloomPSO;
-    outLinePSO_ = outLinePSO;
 
     psoList_[static_cast<size_t>(PSOType::Vignetting)] = psoManager->GetDrawPsoData("Vignetting");
     psoList_[static_cast<size_t>(PSOType::ScanLine)] = psoManager->GetDrawPsoData("ScanLine");
@@ -492,45 +490,6 @@ void PostEffectManager::InitializePostEffectData(uint32_t width, uint32_t height
     radialBlurResource_.GetData()->textureHandle = vignettingData_.srvIndex;
 
     LogManager::GetInstance().Log("End Create RadialBlurRenderTargets");
-
-    // アウトラインの生成
-    LogManager::GetInstance().Log("Start Create OutLineRenderTargets");
-
-    // アウトラインのポストエフェクトのリソースを作成する
-    CreatePostEffectResources(
-        postProcessRTVHeap_.Get(), rtvIndex_, descriptorSizeRTV,
-        width, height,
-        outLineData_.resource,
-        outLineData_.rtvHandle,
-        outLineData_.srvHandle,
-        outLineData_.srvIndex
-    );
-    LogManager::GetInstance().Log("End Create OutLineRenderTargets");
-}
-
-void  PostEffectManager::DrawOutLine(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE depthSRV, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv) {
-    D3D12_RESOURCE_BARRIER barrier{};
-    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-    barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-    // バリアを張る対象のリソース
-    barrier.Transition.pResource = outLineData_.resource.Get();
-    // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
-    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-    commandList->ResourceBarrier(1, &barrier);
-
-    // レンダーターゲット設定
-    commandList->SetGraphicsRootSignature(outLinePSO_->GetRootSignature());
-    commandList->SetPipelineState(outLinePSO_->GetPipelineState());
-    commandList->OMSetRenderTargets(1, &outLineData_.rtvHandle, false, nullptr);
-
-    // アウトラインを描画
-    outLinePSO_->Draw(commandList, currentSrv, depthSRV);
-
-    // 画面に描く処理はすべて終わり、画面に映すので、状態を遷移
-    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-    commandList->ResourceBarrier(1, &barrier);
 }
 
 void PostEffectManager::DrawEffect(ID3D12GraphicsCommandList* commandList, EffectData data, ID3D12Resource* resource) {

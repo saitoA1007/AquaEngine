@@ -6,7 +6,6 @@
 #include"Externals/DirectXTex/d3dx12.h"
 
 #include"PostProcess/BloomPSO.h"
-#include"PostProcess/OutLinePSO.h"
 
 #include"PSO/Core/PSOManager.h"
 #include"PSO/Core/DrawPSOData.h"
@@ -54,7 +53,7 @@ namespace GameEngine {
         /// </summary>
         /// <param name="bloomPSO"></param>
         /// <param name="logManager"></param>
-        static void StaticInitialize(BloomPSO* bloomPSO, OutLinePSO* outLinePSO, PSOManager* psoManager);
+        static void StaticInitialize(BloomPSO* bloomPSO,PSOManager* psoManager);
 
         /// <summary>
         /// 初期化
@@ -109,9 +108,6 @@ namespace GameEngine {
         // ブルーム用PSO
         static BloomPSO* bloomPSO_;
         uint32_t bloomIndex_ = 0;
-
-        // アウトライン用のPSO
-        static OutLinePSO* outLinePSO_;
 
         // psoデータのリスト
         static std::array<DrawPsoData, static_cast<size_t>(PSOType::MaxCount)> psoList_;
@@ -180,9 +176,6 @@ namespace GameEngine {
         // ラジアルブラーのデータ
         EffectData radialBlurData_;
 
-        // アウトラインのデータ
-        EffectData outLineData_;
-
     private:
 
         /// <summary>
@@ -209,13 +202,6 @@ namespace GameEngine {
         /// <param name="height"></param>
         /// <param name="descriptorSizeRTV"></param>
         void InitializePostEffectData(uint32_t width, uint32_t height, uint32_t descriptorSizeRTV);
-
-        /// <summary>
-        /// アウトラインの描画
-        /// </summary>
-        /// <param name="commandList"></param>
-        /// <param name="depthSRV"></param>
-        void DrawOutLine(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE depthSRV, D3D12_GPU_DESCRIPTOR_HANDLE currentSrv);
 
         /// <summary>
         /// エフェクトを描画する

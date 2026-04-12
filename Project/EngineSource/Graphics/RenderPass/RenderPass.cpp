@@ -17,7 +17,7 @@ RenderPass::RenderPass(const std::string& name, ID3D12GraphicsCommandList* comma
 	viewport_.Height = static_cast<FLOAT>(height);
 	viewport_.MinDepth = 0.0f;
 	viewport_.MaxDepth = 1.0f;
-	// Scirssorを作成
+	// Scissorを作成
 	scissorRect_.left = 0;
 	scissorRect_.right = static_cast<LONG>(viewport_.Width);
 	scissorRect_.top = 0;

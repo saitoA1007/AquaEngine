@@ -65,7 +65,6 @@
     <ClCompile Include="EngineSource\Graphics\RenderPass\RenderPassController.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\BloomPSO.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\CopyPSO.cpp" />
-    <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\OutLinePSO.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Core\BlendBuilder.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Core\InputLayoutBuilder.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Core\PSOManager.cpp" />
@@ -193,7 +192,6 @@
     <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\BloomPSO.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\CopyPSO.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\IPostEffect.h" />
-    <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\OutLinePSO.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Core\BlendBuilder.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Core\BlendMode.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Core\DrawPSOData.h" />

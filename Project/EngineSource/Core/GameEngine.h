@@ -6,7 +6,6 @@
 // Core/PSO
 #include"PostProcess/CopyPSO.h"
 #include"PostProcess/BloomPSO.h"
-#include"PostProcess/OutLinePSO.h"
 #include"PSO/Core/PSOManager.h"
 #include"PostProcess/PostEffectManager.h"
 #include"GameObjectManager.h"
@@ -114,9 +113,6 @@ namespace GameEngine {
 
 		// ブルーム用のPSO設定
 		std::unique_ptr<BloomPSO> bloomPSO_;
-
-		// アウトライン用のPSO設定
-		std::unique_ptr<OutLinePSO> outLinePSO_;
 
 		std::unique_ptr<PSOManager> psoManager_;
 
