@@ -189,6 +189,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Core\GameEngine.cpp" />
     <ClCompile Include="EngineSource\Core\GameObjectManager.cpp" />
     <ClCompile Include="EngineSource\Core\RandomGenerator.cpp" />
+    <ClCompile Include="EngineSource\Core\Texture.cpp" />
+    <ClCompile Include="EngineSource\Core\TextureLoader.cpp" />
     <ClCompile Include="EngineSource\Core\TextureManager.cpp" />
     <ClCompile Include="EngineSource\Core\WindowsApp.cpp" />
     <ClCompile Include="EngineSource\Editor\EditorCore.cpp" />
@@ -355,6 +357,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Core\GameObjectManager.h" />
     <ClInclude Include="EngineSource\Core\IGameObject.h" />
     <ClInclude Include="EngineSource\Core\RandomGenerator.h" />
+    <ClInclude Include="EngineSource\Core\Texture.h" />
+    <ClInclude Include="EngineSource\Core\TextureLoader.h" />
     <ClInclude Include="EngineSource\Core\TextureManager.h" />
     <ClInclude Include="EngineSource\Core\WindowsApp.h" />
     <ClInclude Include="EngineSource\Editor\EditorCore.h" />

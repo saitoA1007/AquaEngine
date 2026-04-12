@@ -108,7 +108,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 
 	// テクスチャの初期化
 	textureManager_ = std::make_unique<TextureManager>();
-	textureManager_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager());
+	textureManager_->Initialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager());
 
 	// 入力処理のコマンドシステムを生成
 	inputCommand_ = std::make_unique<InputCommand>(input_.get());
