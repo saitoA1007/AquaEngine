@@ -15,7 +15,7 @@ void SceneLightingController::Initialize() {
 	lightManager_->Initialize(true, false, false);
 	lightManager_->SetDirectionalData(directionalData_);
 
-#ifdef _DEBUG
+#ifdef USE_IMGUI
 	// 値を登録する
 	RegisterBebugParam();
 #else
@@ -25,7 +25,7 @@ void SceneLightingController::Initialize() {
 }
 
 void SceneLightingController::Update() {
-#ifdef _DEBUG
+#ifdef USE_IMGUI
 	// 値を適応
 	ApplyDebugParam();
 #endif

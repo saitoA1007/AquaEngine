@@ -118,7 +118,7 @@ void GameScene::Update() {
 
 	//directionLightCamera_->Update();
 
-#ifdef _DEBUG
+#ifdef USE_IMGUI
 
 	// 光源をデバック
 	ImGui::Begin("DebugWindow");

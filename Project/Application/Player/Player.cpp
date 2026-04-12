@@ -11,7 +11,7 @@ void Player::Initialize() {
 	// ワールド行列を初期化
 	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-2.0f,1.0f,0.0f} });
 
-#ifdef _DEBUG
+#ifdef USE_IMGUI
 	//===========================================================
 	// 
 	// 現在、saveを押していないので、Playerのjsonファイルは存在していません
@@ -28,7 +28,7 @@ void Player::Initialize() {
 }
 
 void Player::Update(GameEngine::InputCommand* inputCommand) {
-#ifdef _DEBUG
+#ifdef USE_IMGUI
 	// 値を適応
 	ApplyDebugParam();
 #endif

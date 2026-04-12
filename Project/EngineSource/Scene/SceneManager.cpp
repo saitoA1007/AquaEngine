@@ -44,7 +44,7 @@ void SceneManager::Initialize(SceneContext* context, SceneRegistry* sceneRegistr
 	sceneTransition_->Initialize();
 
 	// 使用するカメラのフラグ
-#ifdef _DEBUG
+#ifdef USE_IMGUI
 	isDebugView_ = true;
 #else
 	isDebugView_ = false;
@@ -110,7 +110,7 @@ void SceneManager::DebugSceneUpdate() {
 
 void SceneManager::Draw() {
 	// デバック用のグリッドを描画
-#ifdef _DEBUG
+#ifdef USE_IMGUI
 	//if (isDebugView_) {
 	//	// モデルの単体描画前処理
 	//	ModelRenderer::PreDraw(RenderMode3D::Grid);
