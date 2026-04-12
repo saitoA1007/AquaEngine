@@ -12,15 +12,9 @@ namespace GameEngine {
     class Texture : public SrvResource {
     public:
         Texture() = default;
-        ~Texture() {
-            resource_.Reset();
-            intermediateResources_.Reset();
-            // srvの解放
-            if (srvManager_) {
-                srvManager_->ReleseIndex(srvIndex_);
-            }
-        }
+        ~Texture();
 
+        // テクスチャの作成
         void Create(const std::string& filePath, ID3D12GraphicsCommandList* cmdList);
        
         // ゲッター
@@ -37,7 +31,7 @@ namespace GameEngine {
         std::string fileName_;
         DirectX::ScratchImage mipImage_;
 
-        // 中間リソース
+        // 中間リソース(後で削除するようなシステムを作る)
         Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResources_;
 
         uint32_t srvIndex_ = 0;

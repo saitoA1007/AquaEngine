@@ -1,7 +1,6 @@
 #include "TextureLoader.h"
 #include "ConvertString.h"
 #include "CreateBufferResource.h"
-#include "Externals/DirectXTex/d3dx12.h"
 using namespace GameEngine;
 
 [[nodiscard]]

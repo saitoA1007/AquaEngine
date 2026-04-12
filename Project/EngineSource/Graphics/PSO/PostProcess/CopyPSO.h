@@ -2,9 +2,9 @@
 #include <d3d12.h>
 #include <wrl.h>
 #include <string>
-#include"EngineSource/Core/DXC.h"
-#include"EngineSource/Math/Vector4.h"
-#include"EngineSource/Math/Vector2.h"
+#include"DXC.h"
+#include"Vector4.h"
+#include"Vector2.h"
 
 namespace GameEngine {
 

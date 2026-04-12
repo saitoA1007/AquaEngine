@@ -4,6 +4,15 @@
 #include "LogManager.h"
 using namespace GameEngine;
 
+Texture::~Texture() {
+	resource_.Reset();
+	intermediateResources_.Reset();
+	// srvの解放
+	if (srvManager_) {
+		srvManager_->ReleseIndex(srvIndex_);
+	}
+}
+
 void Texture::Create(const std::string& filePath, ID3D12GraphicsCommandList* cmdList) {
 	// テクスチャ名を記録
 	fileName_ = filePath;

@@ -38,11 +38,11 @@
     <ClCompile Include="EngineSource\Collision\CollisionManager.cpp" />
     <ClCompile Include="EngineSource\Collision\CollisionUtils.cpp" />
     <ClCompile Include="EngineSource\Common\LogManager.cpp" />
-    <ClCompile Include="EngineSource\Core\DXC.cpp" />
+    <ClCompile Include="EngineSource\Graphics\Core\DXC.cpp" />
     <ClCompile Include="EngineSource\Core\FPSCounter.cpp" />
     <ClCompile Include="EngineSource\Core\GameEngine.cpp" />
-    <ClCompile Include="EngineSource\Core\RandomGenerator.cpp" />
-    <ClCompile Include="EngineSource\Core\TextureManager.cpp" />
+    <ClCompile Include="EngineSource\Math\RandomGenerator.cpp" />
+    <ClCompile Include="EngineSource\Graphics\Texture\TextureManager.cpp" />
     <ClCompile Include="EngineSource\Core\WindowsApp.cpp" />
     <ClCompile Include="EngineSource\Editor\EditorCore.cpp" />
     <ClCompile Include="EngineSource\Editor\GameParamEditor.cpp" />
@@ -105,8 +105,8 @@
     <ClCompile Include="EngineSource\Collision\Collider.cpp" />
     <ClCompile Include="EngineSource\Graphics\Resources\GpuResource.cpp" />
     <ClCompile Include="EngineSource\Graphics\Resources\SrvResource.cpp" />
-    <ClCompile Include="EngineSource\Core\TextureLoader.cpp" />
-    <ClCompile Include="EngineSource\Core\Texture.cpp" />
+    <ClCompile Include="EngineSource\Graphics\Texture\TextureLoader.cpp" />
+    <ClCompile Include="EngineSource\Graphics\Texture\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Externals\imgui\crude_json.h" />
@@ -163,11 +163,11 @@
     <ClInclude Include="EngineSource\Common\DescriptorHeap.h" />
     <ClInclude Include="EngineSource\Common\LogManager.h" />
     <ClInclude Include="EngineSource\Common\ResourceLeakChecker.h" />
-    <ClInclude Include="EngineSource\Core\DXC.h" />
+    <ClInclude Include="EngineSource\Graphics\Core\DXC.h" />
     <ClInclude Include="EngineSource\Core\FPSCounter.h" />
     <ClInclude Include="EngineSource\Core\GameEngine.h" />
-    <ClInclude Include="EngineSource\Core\RandomGenerator.h" />
-    <ClInclude Include="EngineSource\Core\TextureManager.h" />
+    <ClInclude Include="EngineSource\Math\RandomGenerator.h" />
+    <ClInclude Include="EngineSource\Graphics\Texture\TextureManager.h" />
     <ClInclude Include="EngineSource\Core\WindowsApp.h" />
     <ClInclude Include="EngineSource\Editor\EditorCore.h" />
     <ClInclude Include="EngineSource\Editor\GameParamEditor.h" />
@@ -258,8 +258,8 @@
     <ClInclude Include="EngineSource\Graphics\Buffers\ConstantBuffer.h" />
     <ClInclude Include="EngineSource\Graphics\Buffers\StructuredBuffer.h" />
     <ClInclude Include="EngineSource\Graphics\Resources\SrvResource.h" />
-    <ClInclude Include="EngineSource\Core\Texture.h" />
-    <ClInclude Include="EngineSource\Core\TextureLoader.h" />
+    <ClInclude Include="EngineSource\Graphics\Texture\Texture.h" />
+    <ClInclude Include="EngineSource\Graphics\Texture\TextureLoader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Externals\imgui\imgui_bezier_math.inl" />

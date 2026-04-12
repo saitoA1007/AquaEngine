@@ -2,6 +2,7 @@
 #include <d3d12.h>
 #include <string>
 #include "Externals/DirectXTex/DirectXTex.h"
+#include "Externals/DirectXTex/d3dx12.h"
 
 namespace GameEngine {
 
