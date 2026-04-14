@@ -22,14 +22,6 @@ void GameScene::Initialize(SceneContext* context) {
 
 	// 登録するパラメータを設定
 	GameParamEditor::GetInstance()->SetActiveScene("GameScene");
-
-	// 影を描画するパス
-	context->renderPassController->AddPass("ShadowPass",RenderTextureMode::DsvOnly,2048,2048);
-
-	// デフォルトで描画するパス
-	context->renderPassController->AddPass("DefaultPass");
-	// 最終的な描画先を設定
-	context_->renderPassController->SetEndPass("DefaultPass");
 #pragma endregion
 
 	InputRegisterCommand();

@@ -15,11 +15,6 @@ void TitleScene::Initialize(SceneContext* context) {
 
 	// 登録するパラメータを設定
 	GameParamEditor::GetInstance()->SetActiveScene("TitleScene");
-
-	// デフォルトで描画するパス
-	context_->renderPassController->AddPass("DefaultPass");
-	// 最終的な描画先を設定
-	context_->renderPassController->SetEndPass("DefaultPass");
 #pragma endregion
 
 	// グリッドの初期化
