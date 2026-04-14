@@ -79,17 +79,17 @@ void GameScene::Initialize(SceneContext* context) {
 	planeWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,1.0f,0.0f} });
 
 	// ボーンアニメーションを生成する
-	bronAnimationModel_ = context_->modelManager->GetNameByModel("Walk");
-	bronAnimationWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
+	boneAnimationModel_ = context_->modelManager->GetNameByModel("Walk");
+	boneAnimationWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 
 	// 歩くアニメーションデータを取得する
 	walkAnimationData_ = context_->animationManager->GetNameByAnimations("Walk");
 	// 歩くアニメーションの再生を管理する
 	walkAnimator_ = std::make_unique<Animator>();
-	walkAnimator_->Initialize(bronAnimationModel_, &walkAnimationData_["Armature|mixamo.com|Layer0"]);
+	walkAnimator_->Initialize(boneAnimationModel_, &walkAnimationData_["Armature|mixamo.com|Layer0"]);
 	
 	// 値の保存の登録と適応(テスト)
-	RegisterBebugParam();
+	RegisterDebugParam();
 	ApplyDebugParam();
 }
 
@@ -201,7 +201,7 @@ void GameScene::Draw(const bool& isDebugView) {
 	////ModelRenderer::PreDraw(RenderMode3D::AnimationModel);
 	//
 	//// アニメーションしているモデルを描画
-	////ModelRenderer::DrawAnimation(bronAnimationModel_, bronAnimationWorldTransform_);
+	////ModelRenderer::DrawAnimation(boneAnimationModel_, boneAnimationWorldTransform_);
 	//
 	//pass->PostPass("DefaultPass");
 }
@@ -221,7 +221,7 @@ void GameScene::InputRegisterCommand() {
 }
 
 
-void GameScene::RegisterBebugParam() {
+void GameScene::RegisterDebugParam() {
 	GameParamEditor::GetInstance()->AddItem("Test1", "testNum", testNumber);
 	GameParamEditor::GetInstance()->AddItem("Test2", "testVec", testVector);
 }

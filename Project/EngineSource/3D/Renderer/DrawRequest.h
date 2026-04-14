@@ -34,10 +34,11 @@ namespace GameEngine {
     struct DrawRequest {
         DrawType type = DrawType::Default;
         RenderLayer layer = RenderLayer::Opaque;
-        std::string name_ = "No";
+        std::string passName = "DefaultPass";
 
         const Model* model = nullptr;
         WorldTransform* worldTransform = nullptr;
+        // インスタンシング描画
         uint32_t numInstances = 1;
         WorldTransforms* worldTransforms = nullptr;
 

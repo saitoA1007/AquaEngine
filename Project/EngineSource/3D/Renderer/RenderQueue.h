@@ -49,31 +49,31 @@ namespace GameEngine {
     public:
 
         /// 通常モデル（ライトあり）
-        void SubmitModel(const Model* model,WorldTransform& worldTransform,const float& alpha = 1.0f, const GpuResource* material = nullptr);
+        void SubmitModel(const Model* model,WorldTransform& worldTransform,const float& alpha = 1.0f, const GpuResource* material = nullptr, const std::string& passName = "DefaultPass");
 
         /// インスタンシング描画
-        void SubmitInstancing(const Model* model,uint32_t numInstances, WorldTransforms& worldTransforms, const float& alpha = 1.0f, const GpuResource* material = nullptr);
+        void SubmitInstancing(const Model* model,uint32_t numInstances, WorldTransforms& worldTransforms, const float& alpha = 1.0f, const GpuResource* material = nullptr, const std::string& passName = "DefaultPass");
 
         /// スケルタルアニメーション
-        void SubmitAnimation(const Model* model, WorldTransform& worldTransform, const float& alpha = 1.0f, const GpuResource* material = nullptr);
+        void SubmitAnimation(const Model* model, WorldTransform& worldTransform, const float& alpha = 1.0f, const GpuResource* material = nullptr, const std::string& passName = "DefaultPass");
 
         /// スカイボックス
-        void SubmitSkybox(const Model* model, WorldTransform& worldTransform, const GpuResource* material = nullptr);
+        void SubmitSkybox(const Model* model, WorldTransform& worldTransform, const GpuResource* material = nullptr, const std::string& passName = "DefaultPass");
 
         /// シャドウマップ
-        void SubmitShadowMap(const Model* model, WorldTransform& worldTransform);
+        void SubmitShadowMap(const Model* model, WorldTransform& worldTransform, const std::string& passName = "ShadowPass");
 
         /// グリッド
-        void SubmitGrid(const Model* model,WorldTransform& worldTransform);
+        void SubmitGrid(const Model* model,WorldTransform& worldTransform, const std::string& passName = "DefaultPass");
 
     private:
         ID3D12GraphicsCommandList* commandList_ = nullptr;
         RenderPassController* renderPassController_ = nullptr;
 
-        // 描画コマンドのスタックメモリ
-        std::map<RenderLayer, std::unordered_map<std::string, std::vector<DrawRequest>>> drawQueueList_;
+        // 描画コマンドのスタックメモリ [描画パス]->[PSO]->[描画コマンド]
+        std::map<std::string, std::map<RenderLayer, std::unordered_map<std::string, std::vector<DrawRequest>>>> drawQueueList_;
         // 半透明の描画コマンドのスタックメモリ
-        std::vector<DrawRequest> translucentDrawQueueList_;
+        std::map<std::string, std::vector<DrawRequest>> translucentDrawQueueList_;
 
         // psoのリスト
         std::unordered_map<std::string, DrawPsoData> psoList_;
@@ -84,6 +84,10 @@ namespace GameEngine {
 
         // 現在のpso
         std::string currentPsoName_;
+
+        // 描画パスの実行順
+        std::vector<std::string> passExecuteOrder_;
+
     private:
         /// <summary>
         /// PSOManagerから名前を指定して動的に登録する。
@@ -92,6 +96,11 @@ namespace GameEngine {
 
         // 文字列キーでPSOをセット
         void PreDraw(const std::string& psoName);
+
+        // パスの実行順を登録（Initialize時に呼ぶ）
+        void RegisterPassOrder(const std::vector<std::string>& order) {
+            passExecuteOrder_ = order;
+        }
 
         // 描画コマンドのクリア
         void Clear() {

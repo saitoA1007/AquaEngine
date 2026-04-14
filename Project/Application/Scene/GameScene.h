@@ -102,8 +102,8 @@ private: // シーン機能
 	Vector3 testVector{};
 
 	// アニメーションモデル
-	GameEngine::Model* bronAnimationModel_;
-	GameEngine::WorldTransform bronAnimationWorldTransform_;
+	GameEngine::Model* boneAnimationModel_;
+	GameEngine::WorldTransform boneAnimationWorldTransform_;
 	// 歩くアニメーションデータ
 	std::map<std::string, AnimationData> walkAnimationData_;
 	// アニメーションを再生するクラス
@@ -122,7 +122,7 @@ private:
 	/// <summary>
 	/// デバックした値を登録
 	/// </summary>
-	void RegisterBebugParam();
+	void RegisterDebugParam();
 
 	/// <summary>
 	/// デバックした値を取得

@@ -19,6 +19,9 @@ void RenderQueue::Initialize(ID3D12GraphicsCommandList* commandList, PSOManager*
     // 最終的な描画先を設定
     renderPassController_->SetEndPass("DefaultPass");
 
+    // 実行順序を設定
+    RegisterPassOrder({ "ShadowPass", "DefaultPass" });
+
     // 文字列キーでそのまま登録。PSOManager側の名前と一致させる
     RegisterPSO("Default3D", psoManager);
     RegisterPSO("Additive3D", psoManager);
@@ -37,39 +40,51 @@ void RenderQueue::Begin() {
 
 void RenderQueue::Execute() {
 
-    // 通常描画
-    renderPassController_->PrePass("DefaultPass");
+    for (const auto& passName : passExecuteOrder_) {
 
-    // 通常描画コマンドを解放
-    for (auto& [layer, psoMap] : drawQueueList_) {
-        for (auto& [psoName, requests] : psoMap) {
-            if (requests.empty()) { continue; }
-            // 描画前処理
-            PreDraw(psoName.c_str());
-            // 描画コマンド解放
-            for (const auto& request : requests) {
+        // 不透明、半透明ともにコマンドがなければ飛ばす
+        bool hasOpaque = drawQueueList_.count(passName) > 0;
+        bool hasTranslucent = translucentDrawQueueList_.count(passName) > 0;
+        if (!hasOpaque && !hasTranslucent) { continue; }
+
+        renderPassController_->PrePass(passName);
+        currentPsoName_.clear();
+
+        // 不透明描画コマンドを解放
+        if (hasOpaque) {
+            for (auto& [layer, psoMap] : drawQueueList_[passName]) {
+                for (auto& [psoName, requests] : psoMap) {
+                    if (requests.empty()) { continue; }
+                    // 描画前処理
+                    PreDraw(psoName);
+                    for (const auto& request : requests) {
+                        // 描画コマンド解放
+                        ExecuteRequest(request);
+                    }
+                }
+            }
+        }
+
+        // 半透明描画コマンドを解放
+        if (hasTranslucent) {
+            auto& translucentList = translucentDrawQueueList_[passName];
+
+            // カメラの距離でソートをおこなう
+            // std::sort(translucentList.begin(), translucentList.end(),
+            //     [](const DrawRequest& a, const DrawRequest& b) {
+            //         return a.sortKey > b.sortKey;
+            //     });
+
+            for (const auto& request : translucentList) {
+                // 描画前処理
+                PreDraw(GetPsoName(request.type));
+                // 描画コマンド解放
                 ExecuteRequest(request);
             }
         }
+
+        renderPassController_->PostPass(passName);
     }
-
-    // 半透明描画コマンドを解放
-    if (!translucentDrawQueueList_.empty()) {
-       // カメラの距離でソートをおこなう
-       // std::sort(translucentDrawQueueList_.begin(), translucentDrawQueueList_.end(),
-       //     [](const DrawRequest& a, const DrawRequest& b) {
-       //         return a.sortKey > b.sortKey;
-       //     });
-
-        for (const auto& request : translucentDrawQueueList_) {
-            // 描画前処理
-            PreDraw(GetPsoName(request.type));
-            // 描画コマンド解放
-            ExecuteRequest(request);
-        }
-    }
-
-    renderPassController_->PostPass("DefaultPass");
 }
 
 const char* RenderQueue::GetPsoName(DrawType type) {
@@ -109,27 +124,29 @@ void RenderQueue::PreDraw(const std::string& psoName) {
     } 
 }
 
-void RenderQueue::SubmitModel(const Model* model, WorldTransform& worldTransform, const float& alpha, const GpuResource* material) {
+void RenderQueue::SubmitModel(const Model* model, WorldTransform& worldTransform, const float& alpha, const GpuResource* material, const std::string& passName) {
     DrawRequest request;
     request.type = DrawType::Default;
     request.layer = RenderLayer::Opaque;
+    request.passName = passName;
     request.model = model;
     request.worldTransform = &worldTransform;
     request.material = material;
 
     if (alpha == 1.0f) {
         // 不透明描画に登録
-        drawQueueList_[request.layer][GetPsoName(request.type)].push_back(request);
+        drawQueueList_[passName][request.layer][GetPsoName(request.type)].push_back(request);
     } else {
         // 半透明描画に登録
-        translucentDrawQueueList_.push_back(request);
+        translucentDrawQueueList_[passName].push_back(request);
     }
 }
 
-void RenderQueue::SubmitInstancing(const Model* model, uint32_t numInstances, WorldTransforms& worldTransforms, const float& alpha, const GpuResource* material) {
+void RenderQueue::SubmitInstancing(const Model* model, uint32_t numInstances, WorldTransforms& worldTransforms, const float& alpha, const GpuResource* material, const std::string& passName) {
     DrawRequest request;
     request.type = DrawType::Instancing;
     request.layer = RenderLayer::Opaque;
+    request.passName = passName;
     request.model = model;
     request.numInstances = numInstances;
     request.worldTransforms = &worldTransforms;
@@ -137,62 +154,66 @@ void RenderQueue::SubmitInstancing(const Model* model, uint32_t numInstances, Wo
 
     if (alpha == 1.0f) {
         // 不透明描画に登録
-        drawQueueList_[request.layer][GetPsoName(request.type)].push_back(request);
+        drawQueueList_[passName][request.layer][GetPsoName(request.type)].push_back(request);
     } else {
         // 半透明描画に登録
-        translucentDrawQueueList_.push_back(request);
+        translucentDrawQueueList_[passName].push_back(request);
     }
 }
 
-void RenderQueue::SubmitAnimation(const Model* model, WorldTransform& worldTransform, const float& alpha, const GpuResource* material) {
+void RenderQueue::SubmitAnimation(const Model* model, WorldTransform& worldTransform, const float& alpha, const GpuResource* material, const std::string& passName) {
     DrawRequest request;
     request.type = DrawType::Animation;
     request.layer = RenderLayer::Animation;
+    request.passName = passName;
     request.model = model;
     request.worldTransform = &worldTransform;
     request.material = material;
 
     if (alpha == 1.0f) {
         // 不透明描画に登録
-        drawQueueList_[request.layer][GetPsoName(request.type)].push_back(request);
+        drawQueueList_[passName][request.layer][GetPsoName(request.type)].push_back(request);
     } else {
         // 半透明描画に登録
-        translucentDrawQueueList_.push_back(request);
+        translucentDrawQueueList_[passName].push_back(request);
     }
 }
 
-void RenderQueue::SubmitSkybox(const Model* model, WorldTransform& worldTransform, const GpuResource* material) {
+void RenderQueue::SubmitSkybox(const Model* model, WorldTransform& worldTransform, const GpuResource* material, const std::string& passName) {
     DrawRequest request;
     request.type = DrawType::Skybox;
     request.layer = RenderLayer::Skybox;
+    request.passName = passName;
     request.model = model;
     request.worldTransform = &worldTransform;
     request.material = material;
 
     // 不透明描画に登録
-    drawQueueList_[request.layer][GetPsoName(request.type)].push_back(request);
+    drawQueueList_[passName][request.layer][GetPsoName(request.type)].push_back(request);
 }
 
-void RenderQueue::SubmitShadowMap(const Model* model, WorldTransform& worldTransform) {
+void RenderQueue::SubmitShadowMap(const Model* model, WorldTransform& worldTransform, const std::string& passName) {
     DrawRequest request;
     request.type = DrawType::ShadowMap;
     request.layer = RenderLayer::Shadow;
+    request.passName = passName;
     request.model = model;
     request.worldTransform = &worldTransform;
 
     // 不透明描画に登録
-    drawQueueList_[request.layer][GetPsoName(request.type)].push_back(request);
+    drawQueueList_[passName][request.layer][GetPsoName(request.type)].push_back(request);
 }
 
-void RenderQueue::SubmitGrid(const Model* model, WorldTransform& worldTransform) {
+void RenderQueue::SubmitGrid(const Model* model, WorldTransform& worldTransform, const std::string& passName) {
     DrawRequest request;
     request.type = DrawType::Grid;
     request.layer = RenderLayer::Grid;
+    request.passName = passName;
     request.model = model;
     request.worldTransform = &worldTransform;
 
     // 不透明描画に登録
-    drawQueueList_[request.layer][GetPsoName(request.type)].push_back(request);
+    drawQueueList_[passName][request.layer][GetPsoName(request.type)].push_back(request);
 }
 
 void RenderQueue::ExecuteRequest(const DrawRequest& request) {
