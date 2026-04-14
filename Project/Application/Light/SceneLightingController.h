@@ -41,7 +41,7 @@ private:
 	/// <summary>
 	/// 値を登録する
 	/// </summary>
-	void RegisterBebugParam();
+	void RegisterDebugParam();
 
 	/// <summary>
 	/// 値を適応する

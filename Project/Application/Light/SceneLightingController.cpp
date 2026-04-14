@@ -17,7 +17,7 @@ void SceneLightingController::Initialize() {
 
 #ifdef USE_IMGUI
 	// 値を登録する
-	RegisterBebugParam();
+	RegisterDebugParam();
 #else
 	// 値を適応させる
 	ApplyDebugParam();
@@ -33,7 +33,7 @@ void SceneLightingController::Update() {
 	lightManager_->Update();
 }
 
-void SceneLightingController::RegisterBebugParam() {
+void SceneLightingController::RegisterDebugParam() {
 	// 登録
 	GameParamEditor::GetInstance()->AddItem("GameSceneLight", "Direction", directionalData_.direction);
 	GameParamEditor::GetInstance()->AddItem("GameSceneLight", "Intensity", directionalData_.intensity);
@@ -42,8 +42,8 @@ void SceneLightingController::RegisterBebugParam() {
 
 void SceneLightingController::ApplyDebugParam(){
 	// 適応
-	Vector3 tmpDireciton = GameParamEditor::GetInstance()->GetValue<Vector3>("GameSceneLight", "Direction");
-	directionalData_.direction = Normalize(tmpDireciton);
+	Vector3 tmpDirection = GameParamEditor::GetInstance()->GetValue<Vector3>("GameSceneLight", "Direction");
+	directionalData_.direction = Normalize(tmpDirection);
 	directionalData_.intensity = GameParamEditor::GetInstance()->GetValue<float>("GameSceneLight", "Intensity");
 	directionalData_.color = GameParamEditor::GetInstance()->GetValue<Vector4>("GameSceneLight", "Color");
 

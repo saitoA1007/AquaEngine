@@ -31,6 +31,8 @@ void GameScene::Initialize(SceneContext* context) {
 
 	InputRegisterCommand();
 
+	auto& objectManager = context_->gameObjectManager_;
+
 	// メインカメラの初期化
 	mainCamera_ = std::make_unique<Camera>();
 	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720);
@@ -69,12 +71,11 @@ void GameScene::Initialize(SceneContext* context) {
 	lightManager_->SetEnvironmentTexture(skyboxGH_);
 
 	// プレイヤーモデルを生成
-	playerModel_ = context_->modelManager->GetNameByModel("Cube");
+	auto playerModel_ = context_->modelManager->GetNameByModel("Cube");
 	playerModel_->SetDefaultIsEnableLight(true);
 	playerModel_->SetDefaultIsEnableShadow(true);
 	// プレイヤークラスを初期化
-	player_ = std::make_unique<Player>();
-	player_->Initialize();
+	objectManager->AddObject<Player>(context_->inputCommand, playerModel_);
 
 	// 平面モデルを生成
 	planeModel_ = context_->modelManager->GetNameByModel("Plane");
@@ -100,9 +101,6 @@ void GameScene::Initialize(SceneContext* context) {
 void GameScene::Update() {
 
 	ApplyDebugParam();
-
-	// プレイヤーの更新処理
-	player_->Update(context_->inputCommand);
 
 	// 地面の更新処理
 	terrainWorldTransform_.UpdateTransformMatrix();

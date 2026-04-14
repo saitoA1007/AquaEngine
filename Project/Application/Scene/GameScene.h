@@ -92,10 +92,8 @@ private: // シーン機能
 	uint32_t uvCheckerGH_ = 0u;
 	GameEngine::WorldTransform planeWorldTransform_;
 
-	// 自キャラのモデル
-	GameEngine::Model* playerModel_;
 	// プレイヤー
-	std::unique_ptr<Player> player_;
+	Player* player_;
 
 	// デバック機能をテストする用の変数
 	float testNumber = 0;

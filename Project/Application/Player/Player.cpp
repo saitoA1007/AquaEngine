@@ -1,12 +1,15 @@
-#include"Player.h"
-#include<algorithm>
-#include"GameParamEditor.h"
-#include"EasingManager.h"
-#include"MyMath.h"
-#include"FPSCounter.h"
+#include "Player.h"
+#include <algorithm>
+#include "GameParamEditor.h"
+#include "EasingManager.h"
+#include "MyMath.h"
+#include "FPSCounter.h"
+#include "Model.h"
 using namespace GameEngine;
 
-void Player::Initialize() {
+Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model) {
+	inputCommand_ = inputCommand;
+	model_ = model;
 
 	// ワールド行列を初期化
 	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-2.0f,1.0f,0.0f} });
@@ -19,7 +22,7 @@ void Player::Initialize() {
 	//===========================================================
 
 	// 値を登録する
-	RegisterBebugParam();
+	RegisterDebugParam();
 #else
 	// jsonファイルが作られていない状態で値の適応をおこなうとリリース版でバクります
 	// 値を適応させる
@@ -27,24 +30,34 @@ void Player::Initialize() {
 #endif
 }
 
-void Player::Update(GameEngine::InputCommand* inputCommand) {
+void Player::Initialize() {
+	ApplyDebugParam();
+}
+
+void Player::Update() {
 #ifdef USE_IMGUI
 	// 値を適応
 	ApplyDebugParam();
 #endif
 
 	// プレイヤーの入力処理
-	ProcessMoveInput(inputCommand);
+	ProcessMoveInput(inputCommand_);
 
 	// プレイヤーのジャンプ処理
 	JumpUpdate();
 
 	// プレイヤーを移動範囲に制限
-	worldTransform_.transform_.translate.x = std::clamp(worldTransform_.transform_.translate.x,-9.0f,9.0f);
+	worldTransform_.transform_.translate.x = std::clamp(worldTransform_.transform_.translate.x, -9.0f, 9.0f);
 	worldTransform_.transform_.translate.z = std::clamp(worldTransform_.transform_.translate.z, -9.0f, 9.0f);
 
 	// 行列の更新
 	worldTransform_.UpdateTransformMatrix();
+}
+
+void Player::Draw() {
+
+	// モデル描画
+	renderQueue_->SubmitModel(model_, worldTransform_);
 }
 
 void Player::ProcessMoveInput(GameEngine::InputCommand* inputCommand) {
@@ -97,7 +110,7 @@ void Player::JumpUpdate() {
 	}
 }
 
-void Player::RegisterBebugParam() {
+void Player::RegisterDebugParam() {
 	// 値の登録
 	GameParamEditor::GetInstance()->AddItem("Player", "JumpMaxHeight", kJumpHeight_);
 	GameParamEditor::GetInstance()->AddItem("Player", "JumpMaxTime", kJumpMaxTime_);

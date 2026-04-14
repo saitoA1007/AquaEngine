@@ -1,21 +1,22 @@
 #pragma once
-#include"WorldTransform.h"
-#include"InputCommand.h"
+#include "IGameObject.h"
+#include "WorldTransform.h"
+#include "InputCommand.h"
 
-class Player {
+class Player : public GameEngine::IGameObject {
 public:
+	Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model);
+	~Player() = default;
 
-	/// <summary>
-	/// 初期化処理
-	/// </summary>
-	/// <param name="model"></param>
-	void Initialize();
+	// 初期化処理
+	void Initialize() override;
 
-	/// <summary>
-	/// 更新処理
-	/// </summary>
-	/// <param name="inputCommand"></param>
-	void Update(GameEngine::InputCommand* inputCommand);
+	// 更新処理
+	void Update() override;
+
+	// 描画処理
+	void Draw() override;
+
 
 	/// <summary>
 	/// ワールド行列を取得
@@ -40,6 +41,10 @@ private:
 	float kMoveSpeed_ = 0.2f;
 
 private:
+	GameEngine::InputCommand* inputCommand_ = nullptr;
+
+	// モデル
+	GameEngine::Model* model_ = nullptr;
 
 	// ワールド行列
 	GameEngine::WorldTransform worldTransform_;
@@ -66,7 +71,7 @@ private:
 	/// <summary>
 	/// 値を登録する
 	/// </summary>
-	void RegisterBebugParam();
+	void RegisterDebugParam();
 
 	/// <summary>
 	/// 値を適応する

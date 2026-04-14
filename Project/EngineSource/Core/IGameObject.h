@@ -1,10 +1,8 @@
 #pragma once
 #include <cstdint>
+#include "RenderQueue.h"
 
 namespace GameEngine {
-
-	// 前方宣言
-	class RenderQueue;
 
 	/// <summary>
 	/// ゲームオブジェクトの基底クラス
@@ -18,11 +16,11 @@ namespace GameEngine {
 			renderQueue_ = renderQueue;
 		}
 
-		virtual void Initialize() = 0;
-		virtual void Update() = 0;
-		virtual void Draw() = 0;
+		virtual void Initialize() {};
+		virtual void Update() {};
+		virtual void Draw() {};
 
-		virtual void DebugUpdate() = 0;
+		virtual void DebugUpdate() {};
 
 	public:
 

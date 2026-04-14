@@ -2,4 +2,4 @@
 
 rem FilterAdjustment.ps1の起動
 cd AquaEngine
-powershell -ExecutionPolicy Bypass -NoProfile -File "FilterAdjust.ps1"
+powershell -ExecutionPolicy Bypass -NoProfile -File "EngineSource/Resources/Scripts/FilterAdjust.ps1"

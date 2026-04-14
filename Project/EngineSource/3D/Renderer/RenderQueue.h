@@ -85,13 +85,6 @@ namespace GameEngine {
         // 現在のpso
         std::string currentPsoName_;
     private:
-       /* /// <summary>
-        /// PSOを動的に登録する。
-        /// </summary>
-        void RegisterPSO(const std::string& name, const DrawPsoData& psoData) {
-            psoList_[name] = psoData;
-        }*/
-
         /// <summary>
         /// PSOManagerから名前を指定して動的に登録する。
         /// </summary>
