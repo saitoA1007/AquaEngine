@@ -11,7 +11,9 @@
 #include"Animator.h"
 
 #include"Application/Scene/Transition/Fade.h"
-#include"Application/Player/Player.h"
+
+// 前方宣言
+class Player;
 
 class GameScene : public BaseScene {
 public:

@@ -6,6 +6,9 @@
 #include"FPSCounter.h"
 #include"LogManager.h"
 
+// アプリ機能
+#include"Application/Player/Player.h"
+
 using namespace GameEngine;
 
 GameScene::~GameScene() {

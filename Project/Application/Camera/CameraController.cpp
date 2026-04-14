@@ -1,6 +1,11 @@
-#include"CameraController.h"
-#include"MyMath.h"
+#include "CameraController.h"
+#include "MyMath.h"
 using namespace GameEngine;
+
+CameraController::CameraController(GameEngine::InputCommand* inputCommand, const Vector3* targetPos) {
+	inputCommand_ = inputCommand;
+	targetPos_ = targetPos;
+}
 
 void CameraController::Initialize() {
 	// カメラの初期化
@@ -8,18 +13,18 @@ void CameraController::Initialize() {
 	camera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},position_ }, 1280, 720);
 }
 
-void CameraController::Update(GameEngine::InputCommand* inputCommand, const Vector3& targetPos) {
+void CameraController::Update() {
 
 	// 注目する位置を取得
-	Vector3 target = targetPos;
+	Vector3 target = *targetPos_;
 	target.y = 1.0f;
 
 	// カメラ操作
-	if (inputCommand->IsCommandAcitve("CameraMoveLeft")) {
+	if (inputCommand_->IsCommandAcitve("CameraMoveLeft")) {
 		rotateMove_.x += 0.02f;
 	}
 
-	if (inputCommand->IsCommandAcitve("CameraMoveRight")) {
+	if (inputCommand_->IsCommandAcitve("CameraMoveRight")) {
 		rotateMove_.x -= 0.02f;
 	}
 

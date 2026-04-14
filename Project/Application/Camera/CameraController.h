@@ -1,21 +1,18 @@
 #pragma once
-#include"Camera.h"
-#include"InputCommand.h"
+#include "IGameObject.h"
+#include "Camera.h"
+#include "InputCommand.h"
 
-class CameraController {
+class CameraController : public GameEngine::IGameObject {
 public:
+	CameraController(GameEngine::InputCommand* inputCommand, const Vector3* targetPos);
+	~CameraController() = default;
 
-	/// <summary>
-	/// 初期化
-	/// </summary>
-	void Initialize();
+	// 初期化処理
+	void Initialize() override;
 
-	/// <summary>
-	/// 更新処理
-	/// </summary>
-	/// <param name="inputCommand"></param>
-	/// <param name="targetPos"></param>
-	void Update(GameEngine::InputCommand* inputCommand,const Vector3& targetPos);
+	// 更新処理
+	void Update() override;
 
 	/// <summary>
 	/// カメラデータ
@@ -24,6 +21,8 @@ public:
 	GameEngine::Camera& GetCamera() const { return *camera_.get(); }
 
 private:
+	const Vector3* targetPos_ = nullptr;
+	GameEngine::InputCommand* inputCommand_ = nullptr;
 
 	// カメラ
 	std::unique_ptr<GameEngine::Camera> camera_;
