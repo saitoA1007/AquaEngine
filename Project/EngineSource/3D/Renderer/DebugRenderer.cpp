@@ -1,7 +1,7 @@
-#include"DebugRenderer.h"
-#include"CreateBufferResource.h"
-#include"MyMath.h"
-#include"LogManager.h"
+#include "DebugRenderer.h"
+#include "CreateBufferResource.h"
+#include "MyMath.h"
+#include "LogManager.h"
 using namespace GameEngine;
 
 ID3D12Device* DebugRenderer::device_ = nullptr;

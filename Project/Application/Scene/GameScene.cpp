@@ -148,65 +148,69 @@ void GameScene::Update() {
 
 void GameScene::Draw(const bool& isDebugView) {
 
-	// 描画パスの管理を取得
-	auto pass = context_->renderPassController;
+	context_->renderQueue->SetLightCamera(directionLightCamera_->GetResource());
 
-	// 太陽の位置のカメラ設定を
-	ModelRenderer::SetCamera(directionLightCamera_->GetResource());
-
-	// 影を描画するためのパス
-	pass->PrePass("ShadowPass");
-
-	// shadowMapの描画
-	ModelRenderer::PreDraw(RenderMode3D::ShadowMap);
-
-	// 地面を描画
-	ModelRenderer::DrawShadowMap(terrainModel_, terrainWorldTransform_);
-
-	// プレイヤーを描画
-	ModelRenderer::DrawShadowMap(playerModel_, player_->GetWorldTransform());
-
-	pass->PostPass("ShadowPass");
+	//// 描画パスの管理を取得
+	//auto pass = context_->renderPassController;
+	//
+	//// 太陽の位置のカメラ設定を
+	//ModelRenderer::SetCamera(directionLightCamera_->GetResource());
+	//
+	//// 影を描画するためのパス
+	//pass->PrePass("ShadowPass");
+	//
+	//// shadowMapの描画
+	//ModelRenderer::PreDraw(RenderMode3D::ShadowMap);
+	//
+	//// 地面を描画
+	//ModelRenderer::DrawShadowMap(terrainModel_, terrainWorldTransform_);
+	//
+	//// プレイヤーを描画
+	//ModelRenderer::DrawShadowMap(playerModel_, player_->GetWorldTransform());
+	//
+	//pass->PostPass("ShadowPass");
 
 	// 描画に使用するカメラを設定
 	if (isDebugView) {
 		// 描画に使用するカメラを設定
-		ModelRenderer::SetCamera(context_->debugCamera_->GetResource());
+		//ModelRenderer::SetCamera(context_->debugCamera_->GetResource());
+		context_->renderQueue->SetCamera(context_->debugCamera_->GetConstantBuffer());
 	} else {
 		// 描画に使用するカメラを設定
-		ModelRenderer::SetCamera(mainCamera_->GetResource());
+		//ModelRenderer::SetCamera(mainCamera_->GetResource());
+		context_->renderQueue->SetCamera(mainCamera_->GetConstantBuffer());
 	}
 
-	// 通常描画
-	pass->PrePass("DefaultPass");
-
-	//===========================================================
-	// 3D描画
-	//===========================================================
-
-	// スカイボックスの描画前処理
-	ModelRenderer::PreDraw(RenderMode3D::Skybox);
-
-	ModelRenderer::DrawSkybox(skyboxModel_, skyboxWorldTransform_);
-
-	// 3Dモデルの描画前処理
-	ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
-
-	// 地面を描画
-	ModelRenderer::DrawLight(lightManager_->GetResource());
-	ModelRenderer::Draw(terrainModel_, terrainWorldTransform_);
-
-	// プレイヤーを描画
-	ModelRenderer::DrawLight(lightManager_->GetResource());
-	ModelRenderer::Draw(playerModel_, player_->GetWorldTransform());
-
-	// アニメーションの描画前処理
-	//ModelRenderer::PreDraw(RenderMode3D::AnimationModel);
-
-	// アニメーションしているモデルを描画
-	//ModelRenderer::DrawAnimation(bronAnimationModel_, bronAnimationWorldTransform_);
-
-	pass->PostPass("DefaultPass");
+	//// 通常描画
+	//pass->PrePass("DefaultPass");
+	//
+	////===========================================================
+	//// 3D描画
+	////===========================================================
+	//
+	//// スカイボックスの描画前処理
+	//ModelRenderer::PreDraw(RenderMode3D::Skybox);
+	//
+	//ModelRenderer::DrawSkybox(skyboxModel_, skyboxWorldTransform_);
+	//
+	//// 3Dモデルの描画前処理
+	//ModelRenderer::PreDraw(RenderMode3D::DefaultModel);
+	//
+	//// 地面を描画
+	//ModelRenderer::DrawLight(lightManager_->GetConstantBuffer());
+	//ModelRenderer::Draw(terrainModel_, terrainWorldTransform_);
+	//
+	//// プレイヤーを描画
+	//ModelRenderer::DrawLight(lightManager_->GetConstantBuffer());
+	//ModelRenderer::Draw(playerModel_, player_->GetWorldTransform());
+	//
+	//// アニメーションの描画前処理
+	////ModelRenderer::PreDraw(RenderMode3D::AnimationModel);
+	//
+	//// アニメーションしているモデルを描画
+	////ModelRenderer::DrawAnimation(bronAnimationModel_, bronAnimationWorldTransform_);
+	//
+	//pass->PostPass("DefaultPass");
 }
 
 void GameScene::InputRegisterCommand() {

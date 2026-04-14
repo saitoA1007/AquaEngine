@@ -33,8 +33,6 @@ namespace GameEngine {
 
 		Matrix4x4 GetWorldMatrix() const { return worldMatrix_; }
 
-		ID3D12Resource* GetResource() const { return constBuffer_.GetResource(); }
-
 		Vector3 GetWorldPosition();
 
 		/// <summary>
@@ -51,6 +49,9 @@ namespace GameEngine {
 		/// <param name="up">向き</param>
 		/// <returns></returns>
 		Matrix4x4 LookAt(const Vector3& eye, const Vector3& center, const Vector3& up);
+
+		ID3D12Resource* GetResource() const { return constBuffer_.GetResource(); }
+		ConstantBuffer<CameraForGPU>* GetConstantBuffer() { return &constBuffer_; }
 
 	private:
 		// 拡縮

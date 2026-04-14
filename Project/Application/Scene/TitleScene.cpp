@@ -39,27 +39,33 @@ void TitleScene::Update() {
 
 void TitleScene::Draw(const bool& isDebugView) {
 
+	//context_->renderQueue->SetLightCamera(directionLightCamera_->GetResource());
+
 	// 描画に使用するカメラを設定
 	if (isDebugView) {
 		// 描画に使用するカメラを設定
-		ModelRenderer::SetCamera(context_->debugCamera_->GetResource());
+		//ModelRenderer::SetCamera(context_->debugCamera_->GetResource());
+		context_->renderQueue->SetCamera(context_->debugCamera_->GetConstantBuffer());
 	} else {
 		// 描画に使用するカメラを設定
-		ModelRenderer::SetCamera(mainCamera_->GetResource());
+		//ModelRenderer::SetCamera(mainCamera_->GetResource());
+		context_->renderQueue->SetCamera(mainCamera_->GetConstantBuffer());
 	}
 
-	// 描画パスの管理を取得
-	auto pass = context_->renderPassController;
+	context_->renderQueue->SubmitGrid(gridModel_, gridWorldTransform_);
 
-	// 通常描画
-	pass->PrePass("DefaultPass");
-
-	// モデルの単体描画前処理
-	ModelRenderer::PreDraw(RenderMode3D::Grid);
-	// グリッドを描画
-	ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_);
-
-	pass->PostPass("DefaultPass");
+	//// 描画パスの管理を取得
+	//auto pass = context_->renderPassController;
+	//
+	//// 通常描画
+	//pass->PrePass("DefaultPass");
+	//
+	//// モデルの単体描画前処理
+	//ModelRenderer::PreDraw(RenderMode3D::Grid);
+	//// グリッドを描画
+	//ModelRenderer::DrawGrid(gridModel_, gridWorldTransform_);
+	//
+	//pass->PostPass("DefaultPass");
 
 	//===========================================================
 	// 3D描画

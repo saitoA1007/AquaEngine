@@ -169,6 +169,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\3D\Light\SpotLight.cpp" />
     <ClCompile Include="EngineSource\3D\Animation\AnimationManager.cpp" />
     <ClCompile Include="EngineSource\3D\Animation\Animator.cpp" />
+    <ClCompile Include="EngineSource\3D\Model\ModelComponent.cpp" />
     <ClCompile Include="EngineSource\3D\Renderer\DebugRenderer.cpp" />
     <ClCompile Include="EngineSource\3D\Material\Material.cpp" />
     <ClCompile Include="EngineSource\3D\Model\Mesh.cpp" />
@@ -177,6 +178,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\3D\Model\ModelManager.cpp" />
     <ClCompile Include="EngineSource\3D\Renderer\ModelRenderer.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ParticleSystem\ParticleBehavior.cpp" />
+    <ClCompile Include="EngineSource\3D\Renderer\RenderQueue.cpp" />
     <ClCompile Include="EngineSource\3D\Transform\WorldTransform.cpp" />
     <ClCompile Include="EngineSource\3D\Transform\WorldTransforms.cpp" />
     <ClCompile Include="EngineSource\Audio\AudioManager.cpp" />
@@ -184,6 +186,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Collision\CollisionManager.cpp" />
     <ClCompile Include="EngineSource\Collision\CollisionUtils.cpp" />
     <ClCompile Include="EngineSource\Common\LogManager.cpp" />
+    <ClCompile Include="EngineSource\Core\IGameObject.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\DXC.cpp" />
     <ClCompile Include="EngineSource\Core\FPSCounter.cpp" />
     <ClCompile Include="EngineSource\Core\GameEngine.cpp" />
@@ -357,16 +360,19 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\3D\Animation\AnimationData.h" />
     <ClInclude Include="EngineSource\3D\Animation\AnimationManager.h" />
     <ClInclude Include="EngineSource\3D\Animation\Animator.h" />
+    <ClInclude Include="EngineSource\3D\Model\ModelComponent.h" />
     <ClInclude Include="EngineSource\3D\Renderer\DebugRenderer.h" />
     <ClInclude Include="EngineSource\3D\Material\Material.h" />
     <ClInclude Include="EngineSource\3D\Model\Mesh.h" />
     <ClInclude Include="EngineSource\3D\Model\Model.h" />
     <ClInclude Include="EngineSource\3D\Model\ModelLoader.h" />
     <ClInclude Include="EngineSource\3D\Model\ModelManager.h" />
+    <ClInclude Include="EngineSource\3D\Renderer\DrawRequest.h" />
     <ClInclude Include="EngineSource\3D\Renderer\ModelRenderer.h" />
     <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleBehavior.h" />
     <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleData.h" />
     <ClInclude Include="EngineSource\3D\Model\VertexData.h" />
+    <ClInclude Include="EngineSource\3D\Renderer\RenderQueue.h" />
     <ClInclude Include="EngineSource\3D\Transform\WorldTransform.h" />
     <ClInclude Include="EngineSource\3D\Transform\WorldTransforms.h" />
     <ClInclude Include="EngineSource\Audio\AudioManager.h" />

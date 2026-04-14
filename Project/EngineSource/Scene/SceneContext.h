@@ -1,14 +1,15 @@
 #pragma once
-#include"GraphicsDevice.h"
-#include"Input.h"
-#include"TextureManager.h"
-#include"InputCommand.h"
-#include"ModelManager.h"
-#include"DebugCamera.h"
-#include"AnimationManager.h"
-#include"GameObjectManager.h"
+#include "GraphicsDevice.h"
+#include "Input.h"
+#include "TextureManager.h"
+#include "InputCommand.h"
+#include "ModelManager.h"
+#include "DebugCamera.h"
+#include "AnimationManager.h"
+#include "GameObjectManager.h"
+#include "RenderQueue.h"
 
-#include"RenderPass/RenderPassController.h"
+#include "RenderPass/RenderPassController.h"
 
 // シーンで使用するエンジン機能
 struct SceneContext {
@@ -25,4 +26,5 @@ struct SceneContext {
 	
 	GameEngine::GameObjectManager* gameObjectManager_ = nullptr; // ゲームオブジェクト監理
 	GameEngine::RenderPassController* renderPassController = nullptr; // 描画パスを管理する
+	GameEngine::RenderQueue* renderQueue = nullptr; // 描画コマンドを管理
 };

@@ -1,58 +1,59 @@
 #pragma once
 // Core
-#include"WindowsApp.h"
-#include"TextureManager.h"
+#include "WindowsApp.h"
+#include "TextureManager.h"
 
 // Core/PSO
-#include"PostProcess/CopyPSO.h"
-#include"PostProcess/BloomPSO.h"
-#include"PSO/Core/PSOManager.h"
-#include"PostProcess/PostEffectManager.h"
-#include"GameObjectManager.h"
+#include "PostProcess/CopyPSO.h"
+#include "PostProcess/BloomPSO.h"
+#include "PSO/Core/PSOManager.h"
+#include "PostProcess/PostEffectManager.h"
+#include "GameObjectManager.h"
 
 // Graphics
-#include"GraphicsDevice.h"
-#include"RenderPipeline.h"
-#include"RenderTextureManager.h"
-#include"RenderPass/RenderPassController.h"
+#include "GraphicsDevice.h"
+#include "RenderPipeline.h"
+#include "RenderTextureManager.h"
+#include "RenderPass/RenderPassController.h"
 
 // Common
-#include"LogManager.h"
-#include"ResourceLeakChecker.h"
-#include"CrashHandle.h"
-#include"FPSCounter.h"
-#include"RandomGenerator.h"
+#include "LogManager.h"
+#include "ResourceLeakChecker.h"
+#include "CrashHandle.h"
+#include "FPSCounter.h"
+#include "RandomGenerator.h"
 
 // 3D
-#include"Camera.h"
-#include"DebugCamera.h"
-#include"LightManager.h"
-#include"Model.h"
-#include"WorldTransform.h"
-#include"WorldTransforms.h"
-#include"ModelRenderer.h"
-#include"DebugRenderer.h"
-#include"AnimationManager.h"
+#include "Camera.h"
+#include "DebugCamera.h"
+#include "LightManager.h"
+#include "Model.h"
+#include "WorldTransform.h"
+#include "WorldTransforms.h"
+#include "ModelRenderer.h"
+#include "DebugRenderer.h"
+#include "AnimationManager.h"
+#include "RenderQueue.h"
 
 // 2D
-#include"ImGuiManager.h"
-#include"Sprite.h"
-#include"SpriteRenderer.h"
+#include "ImGuiManager.h"
+#include "Sprite.h"
+#include "SpriteRenderer.h"
 
-#include"TransformationMatrix.h"
+#include "TransformationMatrix.h"
 
 // Input
-#include"InPut.h"
+#include "InPut.h"
 
 // Editor
-#include"EditorCore.h"
-#include"GameParamEditor.h"
+#include "EditorCore.h"
+#include "GameParamEditor.h"
 
 // Scene
-#include"SceneContext.h"
-#include"SceneChangeRequest.h"
-#include"SceneManager.h"
-#include"SceneRegistry.h"
+#include "SceneContext.h"
+#include "SceneChangeRequest.h"
+#include "SceneManager.h"
+#include "SceneRegistry.h"
 
 namespace GameEngine {
 
@@ -84,6 +85,9 @@ namespace GameEngine {
 
 		// アニメーションのリソースを管理
 		std::unique_ptr<AnimationManager> animationManager_;
+
+		// 描画処理
+		std::unique_ptr<RenderQueue> renderQueue_;
 
 		/// Collision ====================================
 

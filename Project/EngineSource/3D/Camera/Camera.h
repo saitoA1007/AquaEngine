@@ -97,7 +97,7 @@ namespace GameEngine {
 		void SetCamera(const Camera& camera);
 
 		ID3D12Resource* GetResource() const { return constBuffer_.GetResource(); }
-
+		ConstantBuffer<CameraForGPU>* GetConstantBuffer() { return &constBuffer_; }
 	public:
 
 		// カメラのトランスフォーム

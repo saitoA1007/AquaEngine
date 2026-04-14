@@ -101,7 +101,7 @@ namespace GameEngine {
 		void AdaptDefaultTexture() { materialData_->textureHandle = defaultTextureHandle_; }
 
 		D3D12_GPU_VIRTUAL_ADDRESS GetGpuVirtualAddress() const { return constBuffer_.GetGpuVirtualAddress(); }
-
+		ConstantBuffer<MaterialData>* GetConstantBuffer() { return &constBuffer_; }
 	private:
 
 		ConstantBuffer<MaterialData> constBuffer_;

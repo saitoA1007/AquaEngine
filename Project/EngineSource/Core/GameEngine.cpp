@@ -124,6 +124,10 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	ModelRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager(), psoManager_.get());
 	DebugRenderer::StaticInitialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetCommandList(), psoManager_.get());
 
+	// 描画コマンド管理
+	renderQueue_ = std::make_unique<RenderQueue>();
+	renderQueue_->Initialize(graphicsDevice_->GetCommandList(), psoManager_.get(), renderPassController_.get());
+
 	// fpsを計測する
 	fpsCounter_ = std::make_unique<FpsCounter>();
 	fpsCounter_->Initialize();
@@ -155,6 +159,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	sceneContext.animationManager = animationManager_.get();
 	sceneContext.gameObjectManager_ = gameObjectManager_.get();
 	sceneContext.renderPassController = renderPassController_.get();
+	sceneContext.renderQueue = renderQueue_.get();
 
 	// シーンの初期化
 	sceneManager_ = std::make_unique<SceneManager>();
@@ -212,6 +217,9 @@ void Engine::Update() {
 		sceneManager_->Draw();
 		// ゲームオブジェクトでおこなわれる描画処理
 		gameObjectManager_->DrawAll();
+
+		// 積まれた描画コマンドを解放する
+		renderQueue_->Execute();
 
 		// 描画後処理
 		PostDraw();
@@ -278,6 +286,8 @@ void Engine::PostUpdate() {
 }
 
 void Engine::PreDraw() {
+	// 描画開始前処理
+	renderQueue_->Begin();
 	// 描画前処理
 	renderPipeline_->BeginFrame();
 }

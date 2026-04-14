@@ -468,6 +468,9 @@
     <ClCompile Include="Externals\imgui\imgui_widgets.cpp">
       <Filter>Externals\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="EngineSource\3D\Renderer\RenderQueue.cpp" />
+    <ClCompile Include="EngineSource\3D\Model\ModelComponent.cpp" />
+    <ClCompile Include="EngineSource\Core\IGameObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -920,6 +923,9 @@
     <ClInclude Include="Externals\imgui\imstb_truetype.h">
       <Filter>Externals\imgui</Filter>
     </ClInclude>
+    <ClInclude Include="EngineSource\3D\Renderer\RenderQueue.h" />
+    <ClInclude Include="EngineSource\3D\Model\ModelComponent.h" />
+    <ClInclude Include="EngineSource\3D\Renderer\DrawRequest.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Externals\imgui\ProggyClean.ttf" />

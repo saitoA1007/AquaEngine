@@ -43,7 +43,7 @@ void ModelRenderer::SetCamera(ID3D12Resource* cameraResource) {
 	cameraResource_ = cameraResource;
 }
 
-void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, const Material* material) {
+void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, const GpuResource* material) {
 	// カメラ座標に変換
 	if (model->IsLoad()) {
 		worldTransform.SetWVPMatrix(model->GetLocalMatrix());
@@ -77,7 +77,7 @@ void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, con
 	}
 }
 
-void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, ID3D12Resource* lightGroupResource, const Material* material) {
+void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, GpuResource* lightGroupResource, const GpuResource* material) {
 	// カメラ座標に変換
 	if (model->IsLoad()) {
 		worldTransform.SetWVPMatrix(model->GetLocalMatrix());
@@ -102,7 +102,7 @@ void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, ID3
 		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetGpuVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 		commandList_->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
-		commandList_->SetGraphicsRootConstantBufferView(4, lightGroupResource->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(4, lightGroupResource->GetGpuVirtualAddress());
 		if (meshes[i]->GetTotalIndices() != 0) {
 			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), 1, 0, 0, 0);
 		} else {
@@ -111,7 +111,7 @@ void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, ID3
 	}
 }
 
-void ModelRenderer::DrawInstancing(const Model* model, const uint32_t& numInstance, WorldTransforms& worldTransforms, const Material* material) {
+void ModelRenderer::DrawInstancing(const Model* model, const uint32_t& numInstance, WorldTransforms& worldTransforms, const GpuResource* material) {
 
 	// 描画するのが0以下の場合は早期リターン
 	if (numInstance <= 0) { return; }
@@ -152,7 +152,7 @@ void ModelRenderer::DrawInstancing(const Model* model, const uint32_t& numInstan
 	}
 }
 
-void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTransform, const Material* material) {
+void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTransform, const GpuResource* material) {
 	
 	// メッシュを取得
 	const std::vector<std::unique_ptr<Mesh>>& meshes = model->GetMeshes();
@@ -203,7 +203,7 @@ void ModelRenderer::DrawGrid(const Model* model, WorldTransform& worldTransform)
 	commandList_->DrawIndexedInstanced(meshes[0]->GetTotalIndices(), 1, 0, 0, 0);
 }
 
-void ModelRenderer::DrawSkybox(const Model* model, WorldTransform& worldTransform, const Material* material) {
+void ModelRenderer::DrawSkybox(const Model* model, WorldTransform& worldTransform, const GpuResource* material) {
 	// カメラ座標に変換
 	if (model->IsLoad()) {
 		worldTransform.SetWVPMatrix(model->GetLocalMatrix());
@@ -262,8 +262,8 @@ void ModelRenderer::DrawShadowMap(const Model* model, WorldTransform& worldTrans
 	}
 }
 
-void ModelRenderer::DrawLight(ID3D12Resource* lightGroupResource) {
-	commandList_->SetGraphicsRootConstantBufferView(4, lightGroupResource->GetGPUVirtualAddress());
+void ModelRenderer::DrawLight(GpuResource* lightGroupResource) {
+	commandList_->SetGraphicsRootConstantBufferView(4, lightGroupResource->GetGpuVirtualAddress());
 	commandList_->SetGraphicsRootDescriptorTable(5, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 	commandList_->SetGraphicsRootDescriptorTable(6, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 }

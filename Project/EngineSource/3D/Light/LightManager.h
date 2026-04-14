@@ -102,6 +102,7 @@ namespace GameEngine {
         }
 
         ID3D12Resource* GetResource() const { return constBuffer_.GetResource(); }
+        ConstantBuffer<LightGroupData>* GetConstantBuffer() { return &constBuffer_; }
 
         std::unique_ptr<DirectionalLight> directionalLight_;
         std::unique_ptr<PointLight> pointLight_;

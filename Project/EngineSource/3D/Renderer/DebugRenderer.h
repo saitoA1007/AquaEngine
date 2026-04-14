@@ -1,14 +1,14 @@
 #pragma once
 #include <d3d12.h>
-#include<vector>
+#include <vector>
 
-#include"Vector3.h"
-#include"Vector4.h"
-#include"Matrix4x4.h"
-#include"PSO/Core/PSOManager.h"
-#include"PSO/Core/DrawPSOData.h"
+#include "Vector3.h"
+#include "Vector4.h"
+#include "Matrix4x4.h"
+#include "PSO/Core/PSOManager.h"
+#include "PSO/Core/DrawPSOData.h"
 
-#include"Geometry.h"
+#include "Geometry.h"
 
 namespace GameEngine {
 
