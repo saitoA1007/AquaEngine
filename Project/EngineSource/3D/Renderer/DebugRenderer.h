@@ -1,14 +1,13 @@
 #pragma once
-#include <d3d12.h>
 #include <vector>
-
 #include "Vector3.h"
 #include "Vector4.h"
 #include "Matrix4x4.h"
-#include "PSO/Core/PSOManager.h"
-#include "PSO/Core/DrawPSOData.h"
-
 #include "Geometry.h"
+#include "VertexBuffer.h"
+#include "ConstantBuffer.h"
+#include "PSO/Core/DrawPSOData.h"
+#include "PSO/Core/PSOManager.h"
 
 namespace GameEngine {
 
@@ -21,10 +20,16 @@ namespace GameEngine {
 	class DebugRenderer final {
 	public:
 
+		// 線のデータ
 		struct LineData {
 			Vector3 start;
 			Vector3 end;
 			Vector4 color;
+		};
+
+		// ワールドデータ
+		struct TransformMatrix {
+			Matrix4x4 VP;
 		};
 
 	public:
@@ -34,7 +39,10 @@ namespace GameEngine {
 		/// <summary>
 		/// 静的初期化
 		/// </summary>
-		static void StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, PSOManager* psoManager);
+		static void StaticInitialize(ID3D12GraphicsCommandList* commandList, PSOManager* psoManager);
+
+		// 初期化
+		void Initialize();
 
 		/// <summary>
 		/// インスタンス作成
@@ -97,30 +105,23 @@ namespace GameEngine {
 		DebugRenderer& operator=(const DebugRenderer&) = delete;
 
 		// 静的メンバー
-		static ID3D12Device* device_;
 		static ID3D12GraphicsCommandList* commandList_;
 		static DrawPsoData pso_;
 
+		// 最大の頂点数
+		uint32_t maxVertices_ = 10000;
 		bool isEnabled_ = true;
 
 		// ラインの数を保持
 		std::vector<LineData> lines_;
 		
 		// 頂点情報
-		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
-		D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
+		VertexBuffer<VertexPosColor> vertexBuffer_;
 		VertexPosColor* vertexData_ = nullptr;
 
-		// 最大の頂点数
-		uint32_t maxVertices_ = 10000;
-
 		// トランスフォーム行列用
-		Microsoft::WRL::ComPtr<ID3D12Resource> transformMatrixResource_;
-		struct TransformMatrix {
-			Matrix4x4 VP;
-		};
+		ConstantBuffer<TransformMatrix> constBuffer_;
 		TransformMatrix* transformMatrixData_ = nullptr;
-
 	private:
 		/// <summary>
 	    /// 描画前処理

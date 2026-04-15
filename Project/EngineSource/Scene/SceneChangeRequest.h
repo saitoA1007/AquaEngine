@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <optional>
-#include<vector>
+#include <vector>
 
 class SceneChangeRequest {
 public:

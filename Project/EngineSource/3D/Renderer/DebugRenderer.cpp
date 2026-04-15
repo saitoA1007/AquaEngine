@@ -4,33 +4,24 @@
 #include "LogManager.h"
 using namespace GameEngine;
 
-ID3D12Device* DebugRenderer::device_ = nullptr;
 ID3D12GraphicsCommandList* DebugRenderer::commandList_ = nullptr;
 DrawPsoData DebugRenderer::pso_;
 
-void DebugRenderer::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, PSOManager* psoManager) {
-    device_ = device;
+void DebugRenderer::StaticInitialize(ID3D12GraphicsCommandList* commandList, PSOManager* psoManager) {
     commandList_ = commandList;
     pso_ = psoManager->GetDrawPsoData("Line");
 }
 
-std::unique_ptr<DebugRenderer> DebugRenderer::Create() {
-    // インスタンスを生成
-    std::unique_ptr<DebugRenderer> renderer = std::make_unique<DebugRenderer>();
+void DebugRenderer::Initialize() {
 
-    // 大きな頂点バッファを事前に確保（すべての線を1つのバッファに格納）
-    renderer->vertexResource_ = CreateBufferResource(device_, sizeof(VertexPosColor) * renderer->maxVertices_);
-    renderer->vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&renderer->vertexData_));
-    // 頂点バッファビューの設定
-    renderer->vertexBufferView_.BufferLocation = renderer->vertexResource_->GetGPUVirtualAddress();
-    renderer->vertexBufferView_.SizeInBytes = sizeof(VertexPosColor) * renderer->maxVertices_;
-    renderer->vertexBufferView_.StrideInBytes = sizeof(VertexPosColor);
+    // 大きな頂点バッファを事前に確保
+    std::vector<VertexPosColor> vertices(maxVertices_);
+    vertexBuffer_.Create(vertices);
 
-    // トランスフォーメーション行列リソースを作成
-    renderer->transformMatrixResource_ = CreateBufferResource(device_, sizeof(TransformMatrix));
-    renderer->transformMatrixResource_->Map(0, nullptr, reinterpret_cast<void**>(&renderer->transformMatrixData_));
-    renderer->transformMatrixData_->VP = MakeIdentity4x4();
-    return renderer;
+    // 定数バッファの作成
+    constBuffer_.Create();
+    transformMatrixData_ = constBuffer_.GetData();
+    transformMatrixData_->VP = MakeIdentity4x4();
 }
 
 void DebugRenderer::Clear() {
@@ -274,9 +265,9 @@ void DebugRenderer::DrawAll(const Matrix4x4& VPMatrix) {
     transformMatrixData_->VP = VPMatrix;
 
     // 頂点バッファを設定
-    commandList_->IASetVertexBuffers(0, 1, &vertexBufferView_);
+    commandList_->IASetVertexBuffers(0, 1, &vertexBuffer_.GetView());
     commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
-    commandList_->SetGraphicsRootConstantBufferView(0, transformMatrixResource_->GetGPUVirtualAddress());
+    commandList_->SetGraphicsRootConstantBufferView(0, constBuffer_.GetGpuVirtualAddress());
 
     // 1回のDrawCallですべての線を描画
     uint32_t totalVertices = static_cast<uint32_t>(lines_.size() * 2);

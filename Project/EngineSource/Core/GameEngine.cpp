@@ -1,6 +1,5 @@
-#include"GameEngine.h"
-
-#include"Application/Scene/Register/SetUpScenes.h"
+#include "GameEngine.h"
+#include "Application/Scene/Register/SetUpScenes.h"
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
@@ -122,7 +121,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	Sprite::StaticInitialize(windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
 	SpriteRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), textureManager_.get(), psoManager_.get());
 	ModelRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager(), psoManager_.get());
-	DebugRenderer::StaticInitialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetCommandList(), psoManager_.get());
+	DebugRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), psoManager_.get());
 
 	// 描画コマンド管理
 	renderQueue_ = std::make_unique<RenderQueue>();

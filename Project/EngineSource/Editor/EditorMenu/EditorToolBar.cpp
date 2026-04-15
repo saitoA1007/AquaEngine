@@ -1,5 +1,5 @@
-#include"EditorToolBar.h"
-#include"ImGuiManager.h"
+#include "EditorToolBar.h"
+#include "ImGuiManager.h"
 
 using namespace GameEngine;
 
@@ -15,6 +15,8 @@ EditorToolBar::EditorToolBar(GameEngine::TextureManager* textureManager) {
 	pauseImagesrvHandle_ = textureManager->GetTextureSrvHandlesGPU(textureManager->GetHandleByName("debugPause.png"));
 	stopImagesrvHandle_ = textureManager->GetTextureSrvHandlesGPU(textureManager->GetHandleByName("debugStop.png"));
 }
+
+EditorToolBar::~EditorToolBar() {}
 
 void EditorToolBar::Initialize() {
 

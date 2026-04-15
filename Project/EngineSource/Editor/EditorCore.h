@@ -1,25 +1,23 @@
 #pragma once
-#include"TextureManager.h"
+#include "TextureManager.h"
 
-#include"EditorMenu/EditorWindowManager.h"
-#include"EditorMenu/EditorMenuBar.h"
-#include"EditorMenu/EditorLayout.h"
-#include"EditorMenu/EditorToolBar.h"
-#include"EditorMenu/SceneMenuBar.h"
-
-#ifdef USE_IMGUI
-#include"Windows/SceneWIndow.h"
-#include"Windows/AssetWindow.h"
-#include"Windows/ConsoleWindow.h"
-#include"Windows/HierarchyWindow.h"
-#include"Windows/InspectorWindow.h"
-#include"Windows/PerformanceWindow.h"
-#endif
+class SceneChangeRequest;
 
 namespace GameEngine {
 
+	// 前方宣言
+	class EditorWindowManager;
+	class EditorMenuBar;
+	class SceneMenuBar;
+	class EditorLayout;
+	class EditorToolBar;
+
+	class RenderPassController;
+
 	class EditorCore {
 	public:
+		EditorCore();
+		~EditorCore();
 
 		void Initialize(TextureManager* textureManager, SceneChangeRequest* sceneChangeRequest, RenderPassController* renderPassController);
 

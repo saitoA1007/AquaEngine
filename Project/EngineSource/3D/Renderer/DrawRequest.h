@@ -16,6 +16,7 @@ namespace GameEngine {
         Opaque = 30,
         Animation = 40,
         Translucent = 100,
+        Debug = 200,
     };
 
     // モデルを描画するモード
@@ -24,10 +25,11 @@ namespace GameEngine {
         DefaultAdd,
         Instancing,     // インスタンシング描画用
         InstancingAdd,
-        Grid,           // グリッド描画用
         Animation,      // アニメーション描画用
         Skybox,         // スカイボックスの描画用
         ShadowMap,      // シャドウマップ用
+        Grid,           // デバックのグリッド描画用
+        DebugLine,      // デバックのライン描画用
     };
 
     // 描画に使用するリソース

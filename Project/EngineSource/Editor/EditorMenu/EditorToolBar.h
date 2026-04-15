@@ -1,5 +1,5 @@
 #pragma once
-#include"TextureManager.h"
+#include "TextureManager.h"
 
 namespace GameEngine {
 
@@ -12,6 +12,7 @@ namespace GameEngine {
 	public:
 
 		EditorToolBar(GameEngine::TextureManager* textureManager);
+		~EditorToolBar();
 
 		void Initialize();
 

@@ -1,7 +1,28 @@
-#include"EditorCore.h"
-#include"ImGuiManager.h"
+#include "EditorCore.h"
+#include "ImGuiManager.h"
+#include "SceneChangeRequest.h"
+
+// デバック機能
+#include "EditorMenu/EditorWindowManager.h"
+#include "EditorMenu/EditorMenuBar.h"
+#include "EditorMenu/EditorLayout.h"
+#include "EditorMenu/EditorToolBar.h"
+#include "EditorMenu/SceneMenuBar.h"
+
+// デバックウィンドウ
+#ifdef USE_IMGUI
+#include "Windows/SceneWIndow.h"
+#include "Windows/AssetWindow.h"
+#include "Windows/ConsoleWindow.h"
+#include "Windows/HierarchyWindow.h"
+#include "Windows/InspectorWindow.h"
+#include "Windows/PerformanceWindow.h"
+#endif
 
 using namespace GameEngine;
+
+EditorCore::EditorCore() {}
+EditorCore::~EditorCore() {}
 
 void EditorCore::Initialize(TextureManager* textureManager, SceneChangeRequest* sceneChangeRequest, RenderPassController* renderPassController) {
 	windowManager_ = std::make_unique<EditorWindowManager>();
