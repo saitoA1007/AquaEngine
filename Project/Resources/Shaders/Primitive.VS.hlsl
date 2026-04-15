@@ -1,10 +1,11 @@
 #include"Primitive.hlsli"
 
-struct TransformationMatrix
+struct Camera
 {
-    float32_t4x4 VP;
+    float32_t3 worldPosition;
+    float32_t4x4 vpMatrix;
 };
-ConstantBuffer<TransformationMatrix> gTransformationMatrix : register(b0);
+ConstantBuffer<Camera> gCamera : register(b0);
 
 struct VertexShaderInput
 {
@@ -15,7 +16,7 @@ struct VertexShaderInput
 VertexShaderOutput main(VertexShaderInput input)
 {
     VertexShaderOutput output;
-    output.position = mul(input.position, gTransformationMatrix.VP);
+    output.position = mul(input.position, gCamera.vpMatrix);
     output.color = input.color;
     return output;
 }

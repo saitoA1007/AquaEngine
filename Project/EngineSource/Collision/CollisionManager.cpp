@@ -1,6 +1,7 @@
 #include "CollisionManager.h"
 #include "CollisionVisitor.h"
 #include "Collider.h"
+#include "DebugRenderer.h"
 using namespace GameEngine;
 
 void CollisionManager::CheckAllCollisions() {
@@ -82,6 +83,10 @@ void  CollisionManager::CheckCollisionPair(Collider* colliderA, Collider* collid
 		}
 	}
 }
+
+//void CollisionManager::DebugDraw(DebugRenderer* debugRenderer) {
+//
+//}
 
 bool CollisionManager::IsActiveCollision(Collider* a, Collider* b) {
 	return (a->GetCollisionAttribute() & b->GetCollisionMask()) != 0 && (b->GetCollisionAttribute() & a->GetCollisionMask()) != 0;

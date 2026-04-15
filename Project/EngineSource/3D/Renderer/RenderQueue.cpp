@@ -1,6 +1,7 @@
 #include "RenderQueue.h"
 #include "PSO/Core/PSOManager.h"
 #include "ModelRenderer.h"
+#include "DebugRenderer.h"
 
 using namespace GameEngine;
 
@@ -27,10 +28,11 @@ void RenderQueue::Initialize(ID3D12GraphicsCommandList* commandList, PSOManager*
     RegisterPSO("Additive3D", psoManager);
     RegisterPSO("Instancing3D", psoManager);
     RegisterPSO("AdditiveInstancing3D", psoManager);
-    RegisterPSO("Grid", psoManager);
     RegisterPSO("Animation", psoManager);
     RegisterPSO("Skybox", psoManager);
     RegisterPSO("ShadowMap", psoManager);
+    RegisterPSO("Grid", psoManager);
+    RegisterPSO("Line", psoManager);
 }
 
 void RenderQueue::Begin() {
@@ -97,6 +99,7 @@ const char* RenderQueue::GetPsoName(DrawType type) {
         case DrawType::Skybox:          { return "Skybox"; }
         case DrawType::ShadowMap:       { return "ShadowMap"; }
         case DrawType::Grid:            { return "Grid"; }
+        case DrawType::DebugLine:       { return "Line"; }
         default:                        { return "Default3D"; }
     }
 }
@@ -216,6 +219,17 @@ void RenderQueue::SubmitGrid(const Model* model, WorldTransform& worldTransform,
     drawQueueList_[passName][request.layer][GetPsoName(request.type)].push_back(request);
 }
 
+void RenderQueue::SubmitDebugLine(const DebugRenderer* debugRenderer, const std::string& passName) {
+    DrawRequest request;
+    request.type = DrawType::DebugLine;
+    request.layer = RenderLayer::Debug;
+    request.passName = passName;
+    request.debugRenderer_ = debugRenderer;
+
+    // 不透明描画に登録
+    drawQueueList_[passName][request.layer][GetPsoName(request.type)].push_back(request);
+}
+
 void RenderQueue::ExecuteRequest(const DrawRequest& request) {
     switch (request.type) {
 
@@ -245,6 +259,10 @@ void RenderQueue::ExecuteRequest(const DrawRequest& request) {
 
     case DrawType::Grid:
         ModelRenderer::DrawGrid(request.model, *request.worldTransform);
+        break;
+
+    case DrawType::DebugLine:
+        ModelRenderer::DrawDebugLine(request.debugRenderer_->GetVertexBufferView(), request.debugRenderer_->GetTotalVertices());
         break;
 
     default:

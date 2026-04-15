@@ -4,39 +4,12 @@
 using namespace GameEngine;
 
 ID3D12GraphicsCommandList* ModelRenderer::commandList_ = nullptr;
-std::unordered_map<RenderMode3D, DrawPsoData> ModelRenderer::psoList_;
 ID3D12Resource* ModelRenderer::cameraResource_ = nullptr;
 SrvManager* ModelRenderer::srvManager_ = nullptr;
 
-void ModelRenderer::StaticInitialize(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager, PSOManager* psoManager) {
+void ModelRenderer::StaticInitialize(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
 	commandList_ = commandList;
 	srvManager_ = srvManager;
-
-	// 通常描画のpsoデータを取得する
-	psoList_[RenderMode3D::DefaultModel] = psoManager->GetDrawPsoData("Default3D");
-	psoList_[RenderMode3D::DefaultModelAdd] = psoManager->GetDrawPsoData("Additive3D");
-	// インスタンシング描画用のデータを取得する
-	psoList_[RenderMode3D::Instancing] = psoManager->GetDrawPsoData("Instancing3D");
-	psoList_[RenderMode3D::InstancingAdd] = psoManager->GetDrawPsoData("AdditiveInstancing3D");
-	// グリッド描画用のデータを取得する
-	psoList_[RenderMode3D::Grid] = psoManager->GetDrawPsoData("Grid");
-	// アニメーション描画用のデータを取得する
-	psoList_[RenderMode3D::AnimationModel] = psoManager->GetDrawPsoData("Animation");
-	// スカイボックス描画用のデータを取得
-	psoList_[RenderMode3D::Skybox] = psoManager->GetDrawPsoData("Skybox");
-	// シャドウマップ用
-	psoList_[RenderMode3D::ShadowMap] = psoManager->GetDrawPsoData("ShadowMap");
-}
-
-void ModelRenderer::PreDraw(RenderMode3D mode) {
-	auto pso = psoList_.find(mode);
-	if (pso == psoList_.end()) {
-		assert(0);
-		return;
-	}
-
-	commandList_->SetGraphicsRootSignature(pso->second.rootSignature);
-	commandList_->SetPipelineState(pso->second.graphicsPipelineState);
 }
 
 void ModelRenderer::SetCamera(ID3D12Resource* cameraResource) {
@@ -201,6 +174,15 @@ void ModelRenderer::DrawGrid(const Model* model, WorldTransform& worldTransform)
 	commandList_->SetGraphicsRootConstantBufferView(0, worldTransform.GetGpuVirtualAddress());
 	commandList_->SetGraphicsRootConstantBufferView(1, cameraResource_->GetGPUVirtualAddress());
 	commandList_->DrawIndexedInstanced(meshes[0]->GetTotalIndices(), 1, 0, 0, 0);
+}
+
+void ModelRenderer::DrawDebugLine(const D3D12_VERTEX_BUFFER_VIEW& vertexView, const uint32_t& totalVertices) {
+	if (totalVertices < 2) { return; }
+	// 頂点バッファを設定
+	commandList_->IASetVertexBuffers(0, 1, &vertexView);
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+	commandList_->SetGraphicsRootConstantBufferView(0, cameraResource_->GetGPUVirtualAddress());
+	commandList_->DrawInstanced(totalVertices, 1, 0, 0);
 }
 
 void ModelRenderer::DrawSkybox(const Model* model, WorldTransform& worldTransform, const GpuResource* material) {

@@ -4,24 +4,12 @@
 #include "LogManager.h"
 using namespace GameEngine;
 
-ID3D12GraphicsCommandList* DebugRenderer::commandList_ = nullptr;
-DrawPsoData DebugRenderer::pso_;
-
-void DebugRenderer::StaticInitialize(ID3D12GraphicsCommandList* commandList, PSOManager* psoManager) {
-    commandList_ = commandList;
-    pso_ = psoManager->GetDrawPsoData("Line");
-}
-
-void DebugRenderer::Initialize() {
+DebugRenderer::DebugRenderer() {
+    Clear();
 
     // 大きな頂点バッファを事前に確保
     std::vector<VertexPosColor> vertices(maxVertices_);
     vertexBuffer_.Create(vertices);
-
-    // 定数バッファの作成
-    constBuffer_.Create();
-    transformMatrixData_ = constBuffer_.GetData();
-    transformMatrixData_->VP = MakeIdentity4x4();
 }
 
 void DebugRenderer::Clear() {
@@ -249,40 +237,11 @@ void DebugRenderer::AddCircle(const Vector3& centerPos, const Vector3& normal, f
     }
 }
 
-void DebugRenderer::DrawAll(const Matrix4x4& VPMatrix) {
+void DebugRenderer::Update() {
     // 何も無ければ早期リターン
     if (!isEnabled_ || lines_.empty()) {
         return;
     }
-
-    // 頂点バッファを更新
-    UpdateLineMeshes();
-
-    // 描画前処理
-    PreDraw();
-
-    // カメラ座標を適応
-    transformMatrixData_->VP = VPMatrix;
-
-    // 頂点バッファを設定
-    commandList_->IASetVertexBuffers(0, 1, &vertexBuffer_.GetView());
-    commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
-    commandList_->SetGraphicsRootConstantBufferView(0, constBuffer_.GetGpuVirtualAddress());
-
-    // 1回のDrawCallですべての線を描画
-    uint32_t totalVertices = static_cast<uint32_t>(lines_.size() * 2);
-    if (totalVertices > maxVertices_) {
-        totalVertices = maxVertices_;
-    }
-    commandList_->DrawInstanced(totalVertices, 1, 0, 0);
-}
-
-void DebugRenderer::PreDraw() {
-    commandList_->SetGraphicsRootSignature(pso_.rootSignature);
-    commandList_->SetPipelineState(pso_.graphicsPipelineState);
-}
-
-void DebugRenderer::UpdateLineMeshes() {
     // すべての線の頂点データを1つのバッファにまとめる
     uint32_t vertexIndex = 0;
     uint32_t totalVertices = static_cast<uint32_t>(lines_.size() * 2); // 各線は2頂点
@@ -308,5 +267,11 @@ void DebugRenderer::UpdateLineMeshes() {
         vertexData_[vertexIndex].pos = { line.end.x, line.end.y, line.end.z, 1.0f };
         vertexData_[vertexIndex].color = line.color;
         vertexIndex++;
+    }
+
+    // 1回のDrawCallですべての線を描画
+    totalVertices_ = static_cast<uint32_t>(lines_.size() * 2);
+    if (totalVertices_ > maxVertices_) {
+        totalVertices_ = maxVertices_;
     }
 }

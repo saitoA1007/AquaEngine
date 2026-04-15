@@ -8,6 +8,7 @@ namespace GameEngine {
 
 	// 前方宣言
 	class Collider;
+	class DebugRenderer;
 
 	class CollisionManager {
 	public:
@@ -46,6 +47,9 @@ namespace GameEngine {
 		/// コライダーをリストと履歴から削除する
 		/// </summary>
 		void RemoveCollider(Collider* collider);
+
+		// デバック描画
+		//void DebugDraw(DebugRenderer* debugRenderer);
 
 	private:
 		// コライダーリスト

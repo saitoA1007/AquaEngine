@@ -7,6 +7,7 @@ namespace GameEngine {
     class WorldTransform;
     class WorldTransforms;
     class GpuResource;
+    class DebugRenderer;
 
     // 描画レイヤー（実行優先順位。数値が小さいほど先に描画）
     enum class RenderLayer : uint32_t {
@@ -46,6 +47,9 @@ namespace GameEngine {
 
         // マテリアル
         const GpuResource* material = nullptr;
+
+        // デバック用のラインデータ
+        const DebugRenderer* debugRenderer_ = nullptr;
     };
 }
 

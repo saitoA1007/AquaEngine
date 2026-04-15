@@ -66,6 +66,9 @@ namespace GameEngine {
         /// グリッド
         void SubmitGrid(const Model* model,WorldTransform& worldTransform, const std::string& passName = "DefaultPass");
 
+        // デバック用ライン
+        void SubmitDebugLine(const DebugRenderer* debugRenderer, const std::string& passName = "DefaultPass");
+
     private:
         ID3D12GraphicsCommandList* commandList_ = nullptr;
         RenderPassController* renderPassController_ = nullptr;
@@ -78,7 +81,9 @@ namespace GameEngine {
         // psoのリスト
         std::unordered_map<std::string, DrawPsoData> psoList_;
 
+        // カメラリソース
         GpuResource* cameraResource_ = nullptr;
+        // ライトリソース
         GpuResource* lightResource_ = nullptr;
         ID3D12Resource* lightCameraResource_ = nullptr;
 

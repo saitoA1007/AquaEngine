@@ -120,8 +120,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	// 画像の初期化
 	Sprite::StaticInitialize(windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
 	SpriteRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), textureManager_.get(), psoManager_.get());
-	ModelRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager(), psoManager_.get());
-	DebugRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), psoManager_.get());
+	ModelRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager());
 
 	// 描画コマンド管理
 	renderQueue_ = std::make_unique<RenderQueue>();
@@ -217,10 +216,10 @@ void Engine::Update() {
 		sceneManager_->Draw();
 		// ゲームオブジェクトでおこなわれる描画処理
 		gameObjectManager_->DrawAll();
-
+#ifdef USE_IMGUI
 		// デバック描画
 		editorCore_->DebugDraw(renderQueue_.get());
-
+#endif
 		// 積まれた描画コマンドを解放する
 		renderQueue_->Execute();
 

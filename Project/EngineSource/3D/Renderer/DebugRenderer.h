@@ -5,9 +5,6 @@
 #include "Matrix4x4.h"
 #include "Geometry.h"
 #include "VertexBuffer.h"
-#include "ConstantBuffer.h"
-#include "PSO/Core/DrawPSOData.h"
-#include "PSO/Core/PSOManager.h"
 
 namespace GameEngine {
 
@@ -17,6 +14,9 @@ namespace GameEngine {
 		Vector4 color; // RGBA
 	};
 
+	/// <summary>
+	/// デバック用描画リソース
+	/// </summary>
 	class DebugRenderer final {
 	public:
 
@@ -27,27 +27,14 @@ namespace GameEngine {
 			Vector4 color;
 		};
 
-		// ワールドデータ
-		struct TransformMatrix {
-			Matrix4x4 VP;
-		};
-
 	public:
-		DebugRenderer() = default;
+		DebugRenderer();
 		~DebugRenderer() = default;
 
 		/// <summary>
-		/// 静的初期化
+		/// 更新処理
 		/// </summary>
-		static void StaticInitialize(ID3D12GraphicsCommandList* commandList, PSOManager* psoManager);
-
-		// 初期化
-		void Initialize();
-
-		/// <summary>
-		/// インスタンス作成
-		/// </summary>
-		static std::unique_ptr<DebugRenderer> Create();
+		void Update();
 
 		/// <summary>
 		/// クリアする
@@ -90,26 +77,22 @@ namespace GameEngine {
 		void AddCircle(const Vector3& centerPos, const Vector3& normal, float radius, const Vector4& color = { 0,1,1,1 }, int segments = 16);
 
 		/// <summary>
-		/// すべての線を描画
-		/// </summary>
-		void DrawAll(const Matrix4x4& VPMatrix);
-
-		/// <summary>
 		/// デバッグ描画の有効化を設定
 		/// </summary>
 		void SetEnabled(bool enabled) { isEnabled_ = enabled; }
 		bool IsEnabled() const { return isEnabled_; }
 
+		// 頂点バッファビューを取得
+		const D3D12_VERTEX_BUFFER_VIEW& GetVertexBufferView() const { return vertexBuffer_.GetView(); }
+		const uint32_t& GetTotalVertices() const { return totalVertices_; }
 	private:
 		DebugRenderer(const DebugRenderer&) = delete;
 		DebugRenderer& operator=(const DebugRenderer&) = delete;
 
-		// 静的メンバー
-		static ID3D12GraphicsCommandList* commandList_;
-		static DrawPsoData pso_;
-
 		// 最大の頂点数
 		uint32_t maxVertices_ = 10000;
+		// 現在の頂点数
+		uint32_t totalVertices_ = 0;
 		bool isEnabled_ = true;
 
 		// ラインの数を保持
@@ -118,20 +101,5 @@ namespace GameEngine {
 		// 頂点情報
 		VertexBuffer<VertexPosColor> vertexBuffer_;
 		VertexPosColor* vertexData_ = nullptr;
-
-		// トランスフォーム行列用
-		ConstantBuffer<TransformMatrix> constBuffer_;
-		TransformMatrix* transformMatrixData_ = nullptr;
-	private:
-		/// <summary>
-	    /// 描画前処理
-	    /// </summary>
-		void PreDraw();
-
-		/// <summary>
-		/// LineMeshを作成または更新
-		/// </summary>
-		void UpdateLineMeshes();
 	};
-
 }
