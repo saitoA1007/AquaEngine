@@ -10,10 +10,7 @@ SceneManager::~SceneManager() {
 	currentScene_.release();
 }
 
-void SceneManager::Initialize(SceneContext* context, SceneRegistry* sceneRegistry) {
-
-	// エンジン機能を取得する
-	context_ = context;
+void SceneManager::Initialize(SceneRegistry* sceneRegistry) {
 
 	// 画像を読み込む
 	LoadSpriteData();
@@ -33,7 +30,8 @@ void SceneManager::Initialize(SceneContext* context, SceneRegistry* sceneRegistr
 	// デバックカメラを生成
 	debugCamera_ = std::make_unique<DebugCamera>();
 	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720);
-	context_->debugCamera_ = debugCamera_.get();
+	// シーンにカメラを設定
+	IScene::SetMainCamera(debugCamera_.get());
 
 	//　シーン遷移システムを初期化
 	sceneTransition_ = std::make_unique<SceneTransition>();
@@ -80,20 +78,20 @@ void SceneManager::Update() {
 
 void SceneManager::DebugUpdate() {
 
-	// デバック状態を切り替える
-	if (context_->input->TriggerKey(DIK_F)) {
-		if (isDebugView_) {
-			isDebugView_ = false;
-		} else {
-			isDebugView_ = true;
-		}
-	}
+	//// デバック状態を切り替える
+	//if (input->TriggerKey(DIK_F)) {
+	//	if (isDebugView_) {
+	//		isDebugView_ = false;
+	//	} else {
+	//		isDebugView_ = true;
+	//	}
+	//}
 
 	// デバック状態で無ければ早期リターン
 	if (!isDebugView_) { return; }
 
 	// デバックカメラを操作
-	debugCamera_->Update(context_->input);
+	//debugCamera_->Update(context_->input);
 }
 
 void SceneManager::DebugSceneUpdate() {
@@ -113,21 +111,21 @@ void SceneManager::Draw() {
 void SceneManager::LoadModelData() {
 
 	// グリッドモデルをロードと登録
-	context_->modelManager->RegisterGridPlaneModel("Grid", { 200.0f,200.0f });
-
-	// モデルリソースを全てロードする
-	context_->modelManager->LoadAllModel();
+	//context_->modelManager->RegisterGridPlaneModel("Grid", { 200.0f,200.0f });
+	//
+	//// モデルリソースを全てロードする
+	//context_->modelManager->LoadAllModel();
 }
 
 void SceneManager::LoadSpriteData() {
 
 	// テクスチャのリソースを全てロードする
-	context_->textureManager->LoadAllTexture();
+	//context_->textureManager->LoadAllTexture();
 }
 
 void SceneManager::LoadAnimationData() {
 	// 歩くアニメーションデータを登録する
-	context_->animationManager->RegisterAnimation("Walk", "walk.gltf");
+	//context_->animationManager->RegisterAnimation("Walk", "walk.gltf");
 }
 
 void SceneManager::LoadAudioData() {
@@ -147,7 +145,7 @@ void SceneManager::ChangeScene(const std::string& sceneName) {
 
 	if (currentScene_) {
 		// 新しく作ったシーンを初期化
-		currentScene_->Initialize(context_);
+		currentScene_->Initialize();
 		// 1回だけ更新処理を挟む
 		currentScene_->Update();
 	} else {

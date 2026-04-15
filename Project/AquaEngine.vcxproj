@@ -280,6 +280,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Input\InputCommand.cpp" />
     <ClCompile Include="EngineSource\Math\EasingManager.cpp" />
     <ClCompile Include="EngineSource\Math\MyMath.cpp" />
+    <ClCompile Include="EngineSource\Scene\IScene.cpp" />
     <ClCompile Include="EngineSource\Scene\SceneManager.cpp" />
     <ClCompile Include="EngineSource\Scene\SceneTransition.cpp" />
     <ClCompile Include="Externals\imgui\crude_json.cpp">
@@ -507,10 +508,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Math\Vector2.h" />
     <ClInclude Include="EngineSource\Math\Vector3.h" />
     <ClInclude Include="EngineSource\Math\Vector4.h" />
-    <ClInclude Include="EngineSource\Scene\BaseScene.h" />
+    <ClInclude Include="EngineSource\Scene\IScene.h" />
     <ClInclude Include="EngineSource\Scene\ITransitionEffect.h" />
     <ClInclude Include="EngineSource\Scene\SceneChangeRequest.h" />
-    <ClInclude Include="EngineSource\Scene\SceneContext.h" />
     <ClInclude Include="EngineSource\Scene\SceneManager.h" />
     <ClInclude Include="EngineSource\Scene\SceneRegistry.h" />
     <ClInclude Include="EngineSource\Scene\SceneTransition.h" />

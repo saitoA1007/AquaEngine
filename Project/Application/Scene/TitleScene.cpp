@@ -7,11 +7,9 @@ using namespace GameEngine;
 TitleScene::~TitleScene() {
 }
 
-void TitleScene::Initialize(SceneContext* context) {
+void TitleScene::Initialize() {
 	// ゲームシーンに必要な低レイヤー機能
 #pragma region SceneSystem 
-	// エンジン機能を取得
-	context_ = context;
 
 	// 登録するパラメータを設定
 	GameParamEditor::GetInstance()->SetActiveScene("TitleScene");
@@ -34,10 +32,10 @@ void TitleScene::Draw(const bool& isDebugView) {
 	if (isDebugView) {
 		// 描画に使用するカメラを設定
 		//ModelRenderer::SetCamera(context_->debugCamera_->GetResource());
-		context_->renderQueue->SetCamera(context_->debugCamera_->GetConstantBuffer());
+		renderQueue_->SetCamera(debugCamera_->GetConstantBuffer());
 	} else {
 		// 描画に使用するカメラを設定
 		//ModelRenderer::SetCamera(mainCamera_->GetResource());
-		context_->renderQueue->SetCamera(mainCamera_->GetConstantBuffer());
+		renderQueue_->SetCamera(mainCamera_->GetConstantBuffer());
 	}
 }

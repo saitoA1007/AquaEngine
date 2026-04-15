@@ -1,9 +1,8 @@
 #pragma once
 #include <string>
-#include "SceneContext.h"
 #include "SceneRegistry.h"
 #include "SceneTransition.h"
-#include "BaseScene.h"
+#include "IScene.h"
 #include "Camera.h"
 
 namespace GameEngine {
@@ -20,7 +19,7 @@ namespace GameEngine {
 		/// 初期化処理
 		/// </summary>
 		/// <param name="context"></param>
-		void Initialize(SceneContext* context, SceneRegistry* sceneRegistry);
+		void Initialize(SceneRegistry* sceneRegistry);
 
 		/// <summary>
 		/// 更新処理
@@ -61,16 +60,13 @@ namespace GameEngine {
 
 	private: // エンジン機能
 
-		// エンジン機能群
-		SceneContext* context_ = nullptr;
-
 		// シーン機能
 		SceneRegistry* sceneRegistry_ = nullptr;
 
 	private: // シーン機能
 
 		// 現在のシーン
-		std::unique_ptr<BaseScene> currentScene_;
+		std::unique_ptr<IScene> currentScene_;
 
 		// シーンの切り替え処理をしているか判断する
 		bool isChangeScene_ = false;

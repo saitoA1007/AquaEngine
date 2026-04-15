@@ -50,7 +50,6 @@
 #include "GameParamEditor.h"
 
 // Scene
-#include "SceneContext.h"
 #include "SceneChangeRequest.h"
 #include "SceneManager.h"
 #include "SceneRegistry.h"
@@ -156,9 +155,6 @@ namespace GameEngine {
 		bool isPause_ = false;
 
 		// Scene ============================================
-
-		// ゲームシーンで使用するエンジン機能まとめ
-		SceneContext sceneContext;
 
 		// ゲームシーンを管理
 		std::unique_ptr<SceneManager> sceneManager_;

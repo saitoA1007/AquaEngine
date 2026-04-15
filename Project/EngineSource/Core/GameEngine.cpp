@@ -16,6 +16,9 @@
 #include "GpuResource.h"
 #include "SrvResource.h"
 
+// Scene
+#include "IScene.h"
+
 using namespace GameEngine;
 
 Engine::Engine() {
@@ -148,20 +151,28 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	// ゲームオブジェクト管理機能を初期化
 	gameObjectManager_ = std::make_unique<GameObjectManager>();
 
-	// ゲームシーンで使用するエンジン機能を取得
-	sceneContext.input = input_.get();
-	sceneContext.inputCommand = inputCommand_.get();
-	sceneContext.textureManager = textureManager_.get();
-	sceneContext.modelManager = modelManager_.get();
-	sceneContext.graphicsDevice = graphicsDevice_.get();
-	sceneContext.animationManager = animationManager_.get();
-	sceneContext.gameObjectManager_ = gameObjectManager_.get();
-	sceneContext.renderPassController = renderPassController_.get();
-	sceneContext.renderQueue = renderQueue_.get();
+	//==========================================================
+	// リソースの取得
+	//==========================================================
+	// テクスチャのリソースを全てロードする
+	textureManager_->LoadAllTexture();
+	// グリッドモデルをロードと登録
+	modelManager_->RegisterGridPlaneModel("Grid", { 200.0f,200.0f });
+	// モデルリソースを全てロードする
+	modelManager_->LoadAllModel();
+	// 歩くアニメーションデータを登録する
+	animationManager_->RegisterAnimation("Walk", "walk.gltf");
+
+	// シーンに入力機能を設定
+	IScene::SetInput(input_.get(), inputCommand_.get());
+	// シーンにリソース管理機能を設定
+	IScene::SetResourceManager(textureManager_.get(), modelManager_.get(), animationManager_.get(), gameObjectManager_.get());
+	// シーンに描画機能を設定
+	IScene::SetRender(renderPassController_.get(), renderQueue_.get());
 
 	// シーンの初期化
 	sceneManager_ = std::make_unique<SceneManager>();
-	sceneManager_->Initialize(&sceneContext, sceneRegistry_.get());
+	sceneManager_->Initialize(sceneRegistry_.get());
 	
 	// エディターの初期化
 #ifdef USE_IMGUI
@@ -246,7 +257,8 @@ void Engine::PreUpdate() {
 
 	// エディターの処理
 	editorCore_->Run();
-	editorCore_->DebugUpdate(Vector3(sceneContext.debugCamera_->GetTargetPosition().x, -0.1f, sceneContext.debugCamera_->GetTargetPosition().z));
+	//editorCore_->DebugUpdate(Vector3(debugCamera_->GetTargetPosition().x, -0.1f, sceneContext.debugCamera_->GetTargetPosition().z));
+	editorCore_->DebugUpdate(Vector3(0.0f,0.0f,0.0f));
 
 	// 更新処理の実行状態を取得する
 	isActiveUpdate_ = editorCore_->IsActiveUpdate();

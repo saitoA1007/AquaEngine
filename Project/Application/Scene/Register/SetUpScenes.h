@@ -1,5 +1,5 @@
 #pragma once
-#include"SceneRegistry.h"
+#include "SceneRegistry.h"
 
 // 各シーン
 #include "Application/Scene/TitleScene.h"

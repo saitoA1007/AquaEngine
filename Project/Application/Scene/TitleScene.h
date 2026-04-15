@@ -1,5 +1,5 @@
 #pragma once
-#include"BaseScene.h"
+#include"IScene.h"
 
 // エンジン機能をインクルード
 #include"Camera.h"
@@ -9,16 +9,15 @@
 
 #include"Application/Scene/Transition/Fade.h"
 
-class TitleScene : public BaseScene {
+class TitleScene : public GameEngine::IScene {
 public:
-
 	~TitleScene();
 
 	/// <summary>
 	/// 初期化
 	/// </summary>
 	/// <param name="input"></param>
-	void Initialize(SceneContext* context) override;
+	void Initialize() override;
 
 	/// <summary>
 	/// 更新処理

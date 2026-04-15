@@ -1,21 +1,21 @@
 #pragma once
-#include"BaseScene.h"
+#include "IScene.h"
 
 // エンジン機能をインクルード
-#include"Camera.h"
-#include"DebugCamera.h"
-#include"Model.h"
-#include"WorldTransform.h"
-#include"LightManager.h"
-#include"DirectionalLight.h"
-#include"Animator.h"
+#include "Camera.h"
+#include "DebugCamera.h"
+#include "Model.h"
+#include "WorldTransform.h"
+#include "LightManager.h"
+#include "DirectionalLight.h"
+#include "Animator.h"
 
-#include"Application/Scene/Transition/Fade.h"
+#include "Application/Scene/Transition/Fade.h"
 
 // 前方宣言
 class Player;
 
-class GameScene : public BaseScene {
+class GameScene : public GameEngine::IScene {
 public:
 
 	~GameScene();
@@ -24,7 +24,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="input"></param>
-	void Initialize(SceneContext* context) override;
+	void Initialize() override;
 
 	/// <summary>
 	/// 更新処理
