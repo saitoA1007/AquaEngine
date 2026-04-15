@@ -173,6 +173,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 
 	editorCore_ = std::make_unique<EditorCore>();
 	editorCore_->Initialize(textureManager_.get(), sceneChangeRequest_.get(), renderPassController_.get());
+	editorCore_->SetGridModel(modelManager_->GetNameByModel("Grid"));
 #endif
 }
 
@@ -217,6 +218,9 @@ void Engine::Update() {
 		// ゲームオブジェクトでおこなわれる描画処理
 		gameObjectManager_->DrawAll();
 
+		// デバック描画
+		editorCore_->DebugDraw(renderQueue_.get());
+
 		// 積まれた描画コマンドを解放する
 		renderQueue_->Execute();
 
@@ -243,6 +247,8 @@ void Engine::PreUpdate() {
 
 	// エディターの処理
 	editorCore_->Run();
+	editorCore_->DebugUpdate(Vector3(sceneContext.debugCamera_->GetTargetPosition().x, -0.1f, sceneContext.debugCamera_->GetTargetPosition().z));
+
 	// 更新処理の実行状態を取得する
 	isActiveUpdate_ = editorCore_->IsActiveUpdate();
 

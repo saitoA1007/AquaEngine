@@ -5,110 +5,108 @@
 #include "SceneTransition.h"
 #include "BaseScene.h"
 #include "Camera.h"
-#include "WorldTransform.h"
 
-/// <summary>
-/// シーンの管理
-/// </summary>
-class SceneManager {
-public:
-	SceneManager() = default;
-	~SceneManager();
+namespace GameEngine {
 
 	/// <summary>
-	/// 初期化処理
+	/// シーンの管理
 	/// </summary>
-	/// <param name="context"></param>
-	void Initialize(SceneContext* context, SceneRegistry* sceneRegistry);
+	class SceneManager {
+	public:
+		SceneManager() = default;
+		~SceneManager();
 
-	/// <summary>
-	/// 更新処理
-	/// </summary>
-	void Update();
+		/// <summary>
+		/// 初期化処理
+		/// </summary>
+		/// <param name="context"></param>
+		void Initialize(SceneContext* context, SceneRegistry* sceneRegistry);
 
-	/// <summary>
-	/// デバック中でも動かせるようにするシーンの更新処理
-	/// </summary>
-	void DebugSceneUpdate();
+		/// <summary>
+		/// 更新処理
+		/// </summary>
+		void Update();
 
-	/// <summary>
-	/// デバック時の更新処理
-	/// </summary>
-	void DebugUpdate();
+		/// <summary>
+		/// デバック中でも動かせるようにするシーンの更新処理
+		/// </summary>
+		void DebugSceneUpdate();
 
-	/// <summary>
-	/// 描画処理
-	/// </summary>
-	void Draw();
+		/// <summary>
+		/// デバック時の更新処理
+		/// </summary>
+		void DebugUpdate();
 
-	/// <summary>
-	/// シーンの切り替え処理
-	/// </summary>
-	/// <param name="sceneName">切り替え先のシーン名</param>
-	void ChangeScene(const std::string& sceneName);
+		/// <summary>
+		/// 描画処理
+		/// </summary>
+		void Draw();
 
-	/// <summary>
-	/// 現在のシーンをリセットする
-	/// </summary>
-	void ResetCurrentScene();
+		/// <summary>
+		/// シーンの切り替え処理
+		/// </summary>
+		/// <param name="sceneName">切り替え先のシーン名</param>
+		void ChangeScene(const std::string& sceneName);
 
-	/// <summary>
-	/// 現在のシーン名を取得する
-	/// </summary>
-	/// <returns></returns>
-	const std::string& GetCurrentSceneName() const { return currentSceneName_; }
+		/// <summary>
+		/// 現在のシーンをリセットする
+		/// </summary>
+		void ResetCurrentScene();
 
-private: // エンジン機能
+		/// <summary>
+		/// 現在のシーン名を取得する
+		/// </summary>
+		/// <returns></returns>
+		const std::string& GetCurrentSceneName() const { return currentSceneName_; }
 
-	// エンジン機能群
-	SceneContext* context_ = nullptr;
+	private: // エンジン機能
 
-	// シーン機能
-	SceneRegistry* sceneRegistry_ = nullptr;
+		// エンジン機能群
+		SceneContext* context_ = nullptr;
 
-private: // シーン機能
+		// シーン機能
+		SceneRegistry* sceneRegistry_ = nullptr;
 
-	// 現在のシーン
-	std::unique_ptr<BaseScene> currentScene_;
+	private: // シーン機能
 
-	// シーンの切り替え処理をしているか判断する
-	bool isChangeScene_ = false;
+		// 現在のシーン
+		std::unique_ptr<BaseScene> currentScene_;
 
-	// 現在のシーン名
-	std::string currentSceneName_;
+		// シーンの切り替え処理をしているか判断する
+		bool isChangeScene_ = false;
 
-	// デバックカメラ
-	std::unique_ptr<GameEngine::DebugCamera> debugCamera_;
+		// 現在のシーン名
+		std::string currentSceneName_;
 
-	// グリッドを描画するためのモデル
-	GameEngine::Model* gridModel_;
-	GameEngine::WorldTransform gridWorldTransform_;
+		// デバックカメラ
+		std::unique_ptr<GameEngine::DebugCamera> debugCamera_;
 
-	// デバックカメラとの切り替えを管理
-	bool isDebugView_ = true;
+		// デバックカメラとの切り替えを管理
+		bool isDebugView_ = true;
 
-	// シーン遷移
-	std::unique_ptr<SceneTransition> sceneTransition_;
+		// シーン遷移
+		std::unique_ptr<SceneTransition> sceneTransition_;
 
-private:
+	private:
 
-	/// <summary>
-	/// 使用するモデルデータを読み込む
-	/// </summary>
-	void LoadModelData();
+		/// <summary>
+		/// 使用するモデルデータを読み込む
+		/// </summary>
+		void LoadModelData();
 
-	/// <summary>
-	/// 使用する画像データを読み込む
-	/// </summary>
-	void LoadSpriteData();
+		/// <summary>
+		/// 使用する画像データを読み込む
+		/// </summary>
+		void LoadSpriteData();
 
-	/// <summary>
-	/// 使用するアニメーションデータを読み込む
-	/// </summary>
-	void LoadAnimationData();
+		/// <summary>
+		/// 使用するアニメーションデータを読み込む
+		/// </summary>
+		void LoadAnimationData();
 
-	/// <summary>
-	/// 使用する音声データを読み込む
-	/// </summary>
-	void LoadAudioData();
-};
+		/// <summary>
+		/// 使用する音声データを読み込む
+		/// </summary>
+		void LoadAudioData();
+	};
+}

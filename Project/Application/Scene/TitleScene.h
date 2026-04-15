@@ -60,8 +60,4 @@ private: // シーン機能
 
 	// メインカメラ
 	std::unique_ptr<GameEngine::Camera> mainCamera_;
-
-	// グリッドを描画するためのモデル
-	GameEngine::Model* gridModel_;
-	GameEngine::WorldTransform gridWorldTransform_;
 };

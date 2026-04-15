@@ -1,6 +1,8 @@
 #include "EditorCore.h"
 #include "ImGuiManager.h"
 #include "SceneChangeRequest.h"
+#include "Model.h"
+#include "RenderQueue.h"
 
 // デバック機能
 #include "EditorMenu/EditorWindowManager.h"
@@ -41,6 +43,9 @@ void EditorCore::Initialize(TextureManager* textureManager, SceneChangeRequest* 
 
 	// レイアウトのデータを取得する
 	editorLayout_->LoadLayout(windowManager_->GetWindows());
+
+	// デバック用グリッドのワールド行列を初期化
+	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 }
 
 void EditorCore::Run() {
@@ -71,6 +76,19 @@ void EditorCore::BeginDockSpace() {
 	ImGui::End();
 }
 
+void EditorCore::DebugUpdate(const Vector3& debugCameraPos) {
+	// グリッドの更新処理
+	gridWorldTransform_.transform_.translate = debugCameraPos;
+	gridWorldTransform_.UpdateTransformMatrix();
+}
+
+void EditorCore::DebugDraw(RenderQueue* renderQueue) {
+#ifdef USE_IMGUI
+	// グリッドを描画
+	renderQueue->SubmitGrid(gridModel_, gridWorldTransform_);
+#endif
+}
+
 void EditorCore::Finalize() {
 	// レイアウトデータを保存する
 	editorLayout_->SaveLayout(windowManager_->GetWindows());
@@ -82,4 +100,8 @@ bool EditorCore::IsActiveUpdate() const {
 
 bool EditorCore::IsPause() const {
 	return editorToolBar_->GetIsPauce();
+}
+
+void EditorCore::SetGridModel(Model* model) {
+	gridModel_ = model;
 }

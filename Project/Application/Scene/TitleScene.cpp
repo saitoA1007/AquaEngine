@@ -17,10 +17,6 @@ void TitleScene::Initialize(SceneContext* context) {
 	GameParamEditor::GetInstance()->SetActiveScene("TitleScene");
 #pragma endregion
 
-	// グリッドの初期化
-	gridModel_ = context_->modelManager->GetNameByModel("Grid");
-	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
-
 	// メインカメラの初期化
 	mainCamera_ = std::make_unique<Camera>();
 	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720);
@@ -44,6 +40,4 @@ void TitleScene::Draw(const bool& isDebugView) {
 		//ModelRenderer::SetCamera(mainCamera_->GetResource());
 		context_->renderQueue->SetCamera(mainCamera_->GetConstantBuffer());
 	}
-
-	context_->renderQueue->SubmitGrid(gridModel_, gridWorldTransform_);
 }
