@@ -60,7 +60,7 @@ namespace GameEngine {
 		/// 輝度を設定
 		/// </summary>
 		/// <param name="shininess"></param>
-		void SetShiness(const float& shininess) { materialData_->shininess = shininess; }
+		void SetShininess(const float& shininess) { materialData_->shininess = shininess; }
 
 		/// <summary>
 		/// ライトを適応させるかを設定
@@ -99,6 +99,8 @@ namespace GameEngine {
 		void SetDefaultTexture(const uint32_t& handle) { defaultTextureHandle_ = handle; }
 
 		void AdaptDefaultTexture() { materialData_->textureHandle = defaultTextureHandle_; }
+
+		MaterialData* GetMaterialData() { return materialData_; }
 
 		D3D12_GPU_VIRTUAL_ADDRESS GetGpuVirtualAddress() const { return constBuffer_.GetGpuVirtualAddress(); }
 		ConstantBuffer<MaterialData>* GetConstantBuffer() { return &constBuffer_; }

@@ -20,13 +20,13 @@ void Model::SetDefaultSpecularColor(const Vector3& specularColor, const std::str
 	material->SetSpecularColor(specularColor);
 }
 
-void Model::SetDefaultShiness(const float& shininess, const std::string& materialName) {
+void Model::SetDefaultShininess(const float& shininess, const std::string& materialName) {
 
 	auto it = materialName == "default" ? materials_.begin() : materials_.find(materialName);
 
 	assert(it != materials_.end() && "Material not found");
 	Material* material = it->second.get();
-	material->SetShiness(shininess);
+	material->SetShininess(shininess);
 }
 
 void  Model::SetDefaultIsEnableLight(const bool& isEnableLight, const std::string& materialName) {

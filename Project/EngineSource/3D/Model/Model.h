@@ -57,7 +57,7 @@ namespace GameEngine {
 		/// 輝度の設定
 		/// </summary>
 		/// <param name="shininess"></param>
-		void SetDefaultShiness(const float& shininess, const std::string& materialName = "default");
+		void SetDefaultShininess(const float& shininess, const std::string& materialName = "default");
 
 		/// <summary>
 		/// デフォオルトの光源の有無を設定
