@@ -82,27 +82,5 @@ namespace GameEngine {
 
 		// シーン遷移
 		std::unique_ptr<SceneTransition> sceneTransition_;
-
-	private:
-
-		/// <summary>
-		/// 使用するモデルデータを読み込む
-		/// </summary>
-		void LoadModelData();
-
-		/// <summary>
-		/// 使用する画像データを読み込む
-		/// </summary>
-		void LoadSpriteData();
-
-		/// <summary>
-		/// 使用するアニメーションデータを読み込む
-		/// </summary>
-		void LoadAnimationData();
-
-		/// <summary>
-		/// 使用する音声データを読み込む
-		/// </summary>
-		void LoadAudioData();
 	};
 }

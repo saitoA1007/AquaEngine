@@ -162,6 +162,8 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	modelManager_->LoadAllModel();
 	// 歩くアニメーションデータを登録する
 	animationManager_->RegisterAnimation("Walk", "walk.gltf");
+	// 音声データを取得
+	AudioManager::GetInstance().LoadAllAudio();
 
 	// シーンに入力機能を設定
 	IScene::SetInput(input_.get(), inputCommand_.get());

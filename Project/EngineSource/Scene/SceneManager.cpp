@@ -1,7 +1,6 @@
 #include "SceneManager.h"
 
 #include "ImguiManager.h"
-#include "AudioManager.h"
 
 using namespace GameEngine;
 
@@ -11,18 +10,6 @@ SceneManager::~SceneManager() {
 }
 
 void SceneManager::Initialize(SceneRegistry* sceneRegistry) {
-
-	// 画像を読み込む
-	LoadSpriteData();
-
-	// モデルを読み込む
-	LoadModelData();
-
-	// アニメーションデータを読み込む
-	LoadAnimationData();
-
-	// 音声データを読み込む
-	LoadAudioData();
 
 	// シーンの生成機能を初期化
 	sceneRegistry_ = sceneRegistry;
@@ -106,30 +93,6 @@ void SceneManager::Draw() {
 
 	// シーン遷移演出を描画
 	//sceneTransition_->Draw();
-}
-
-void SceneManager::LoadModelData() {
-
-	// グリッドモデルをロードと登録
-	//context_->modelManager->RegisterGridPlaneModel("Grid", { 200.0f,200.0f });
-	//
-	//// モデルリソースを全てロードする
-	//context_->modelManager->LoadAllModel();
-}
-
-void SceneManager::LoadSpriteData() {
-
-	// テクスチャのリソースを全てロードする
-	//context_->textureManager->LoadAllTexture();
-}
-
-void SceneManager::LoadAnimationData() {
-	// 歩くアニメーションデータを登録する
-	//context_->animationManager->RegisterAnimation("Walk", "walk.gltf");
-}
-
-void SceneManager::LoadAudioData() {
-	GameEngine::AudioManager::GetInstance().LoadAllAudio();
 }
 
 void SceneManager::ChangeScene(const std::string& sceneName) {
