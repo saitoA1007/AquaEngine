@@ -47,11 +47,11 @@ void  CollisionManager::CheckCollisionPair(Collider* colliderA, Collider* collid
 	}
 
 	// 形状を取得
-	CollisionType typeA = colliderA->GetCollisionType();
-	CollisionType typeB = colliderB->GetCollisionType();
+	CollisionData typeA = colliderA->GetCollisionData();
+	CollisionData typeB = colliderB->GetCollisionData();
 
 	// 各形状に応じた当たり判定を取得
-	CollisionResult result = CheckCollisionType(typeA, typeB);
+	CollisionResult result = CheckCollisionData(typeA, typeB);
 
 	if (result.isHit) {
 
@@ -84,17 +84,51 @@ void  CollisionManager::CheckCollisionPair(Collider* colliderA, Collider* collid
 	}
 }
 
-//void CollisionManager::DebugDraw(DebugRenderer* debugRenderer) {
-//
-//}
+void CollisionManager::DebugDraw(DebugRenderer* debugRenderer) {
+	if (colliders_.empty() || !debugRenderer->IsEnabled()) { return; }
+	for (auto collider : colliders_) {
+		CollisionData type = collider->GetCollisionData();
+
+		switch (type.shapeType)
+		{
+		case GameEngine::kSphere: {
+			if (const Sphere* sphere = type.Get<Sphere>()) {
+				debugRenderer->AddSphere(*sphere);
+			}
+			break;
+		}
+		case GameEngine::kAABB: {
+			if (const AABB* aabb = type.Get<AABB>()) {
+				debugRenderer->AddAABB(*aabb);
+			}
+			break;
+		}
+		case GameEngine::kOBB: {
+			if (const OBB* obb = type.Get<OBB>()) {
+				debugRenderer->AddOBB(*obb);
+			}
+			break;
+		}
+		case GameEngine::kSegment: {
+			if (const Segment* segment = type.Get<Segment>()) {
+				debugRenderer->AddRay(*segment);
+			}
+			break;
+		}
+		case GameEngine::kMaxCount:
+		default:
+			break;
+		}		
+	}
+}
 
 bool CollisionManager::IsActiveCollision(Collider* a, Collider* b) {
 	return (a->GetCollisionAttribute() & b->GetCollisionMask()) != 0 && (b->GetCollisionAttribute() & a->GetCollisionMask()) != 0;
 }
 
-CollisionResult CollisionManager::CheckCollisionType(const CollisionType& typeA, const CollisionType& typeB) {
+CollisionResult CollisionManager::CheckCollisionData(const CollisionData& dataA, const CollisionData& dataB) {
 	// 各形状の当たり判定を取得する
-	return std::visit(CollisionVisitor{}, typeA.type, typeB.type);
+	return std::visit(CollisionVisitor{}, dataA.data, dataB.data);
 }
 
 std::pair<Collider*, Collider*> CollisionManager::MakeCollisionPair(Collider* a, Collider* b) {

@@ -20,7 +20,7 @@ void DebugRenderer::AddLine(const Vector3& start, const Vector3& end, const Vect
     lines_.push_back({ start, end, color });
 }
 
-void DebugRenderer::AddBox(const AABB& aabb, const Vector4& color) {
+void DebugRenderer::AddAABB(const AABB& aabb, const Vector4& color) {
     // 下面
     AddLine({ aabb.min.x, aabb.min.y, aabb.min.z }, { aabb.max.x, aabb.min.y, aabb.min.z }, color);
     AddLine({ aabb.max.x, aabb.min.y, aabb.min.z }, { aabb.max.x, aabb.min.y, aabb.max.z }, color);
@@ -43,10 +43,10 @@ void DebugRenderer::AddBox(const Vector3& centerPos, const Vector3& size, const 
     AABB resultAABB;
     resultAABB.min = { centerPos.x - halfSize.x, centerPos.y - halfSize.y, centerPos.z - halfSize.z };
     resultAABB.max = { centerPos.x + halfSize.x, centerPos.y + halfSize.y, centerPos.z + halfSize.z };
-    AddBox(resultAABB, color);
+    AddAABB(resultAABB, color);
 }
 
-void DebugRenderer::AddBox(const OBB& obb, const Vector4& color) {
+void DebugRenderer::AddOBB(const OBB& obb, const Vector4& color) {
     // スケールを適応した軸のベクトル
     Vector3 scaledX = {
         obb.orientations[0].x * obb.size.x,

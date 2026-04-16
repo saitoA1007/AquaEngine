@@ -1,7 +1,6 @@
 #pragma once
 // Core
 #include "WindowsApp.h"
-#include "TextureManager.h"
 
 // Core/PSO
 #include "PostProcess/CopyPSO.h"
@@ -15,6 +14,7 @@
 #include "RenderPipeline.h"
 #include "RenderTextureManager.h"
 #include "RenderPass/RenderPassController.h"
+#include "TextureManager.h"
 
 // Common
 #include "LogManager.h"
@@ -24,17 +24,12 @@
 #include "RandomGenerator.h"
 
 // 3D
-#include "ModelRenderer.h"
 #include "DebugRenderer.h"
-#include "AnimationManager.h"
 #include "RenderQueue.h"
+#include "TransformationMatrix.h"
 
 // 2D
 #include "ImGuiManager.h"
-#include "Sprite.h"
-#include "SpriteRenderer.h"
-
-#include "TransformationMatrix.h"
 
 // Input
 #include "InPut.h"
@@ -72,6 +67,9 @@ namespace GameEngine {
 		std::unique_ptr<ImGuiManager> imGuiManager_;
 
 		// 3D ===============================================
+
+		// デバック描画
+		std::unique_ptr<DebugRenderer> debugRenderer_;
 
 		// モデルのリソースを管理
 		std::unique_ptr<GameEngine::ModelManager> modelManager_;

@@ -49,7 +49,7 @@ namespace GameEngine {
 		/// <summary>
 		/// AABBボックスを追加
 		/// </summary>
-		void AddBox(const AABB& aabb, const Vector4& color = { 0,1,1,1 });
+		void AddAABB(const AABB& aabb, const Vector4& color = { 0,1,1,1 });
 
 		/// <summary>
 		/// AABBボックスを追加
@@ -59,7 +59,7 @@ namespace GameEngine {
 		/// <summary>
 		/// OBBボックスを追加
 		/// </summary>
-		void AddBox(const OBB& obb, const Vector4& color);
+		void AddOBB(const OBB& obb, const Vector4& color = { 0,1,1,1 });
 
 		/// <summary>
 		/// 球を追加

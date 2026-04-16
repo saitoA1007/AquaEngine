@@ -5,6 +5,14 @@
 #pragma comment(lib,"dxgi.lib")
 #pragma comment(lib,"dxguid.lib")
 
+// 2D
+#include "Sprite.h"
+#include "SpriteRenderer.h"
+
+// 3D
+#include "ModelRenderer.h"
+#include "AnimationManager.h"
+
 // Audio
 #include"AudioManager.h"
 
@@ -143,6 +151,9 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	collisionManager_ = std::make_unique<CollisionManager>();
 	Collider::StaticInitialize(collisionManager_.get());
 
+	// デバック描画の初期化
+	debugRenderer_ = std::make_unique<DebugRenderer>();
+
 	// シーンの生成機能を初期化
 	sceneRegistry_ = std::make_unique<SceneRegistry>();
 	// シーンを登録する
@@ -171,6 +182,8 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	IScene::SetResourceManager(textureManager_.get(), modelManager_.get(), animationManager_.get(), gameObjectManager_.get());
 	// シーンに描画機能を設定
 	IScene::SetRender(renderPassController_.get(), renderQueue_.get());
+	// デバック描画機能を設定
+	IScene::SetDebug(debugRenderer_.get());
 
 	// シーンの初期化
 	sceneManager_ = std::make_unique<SceneManager>();
@@ -187,7 +200,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 
 	editorCore_ = std::make_unique<EditorCore>();
 	editorCore_->Initialize(textureManager_.get(), sceneChangeRequest_.get(), renderPassController_.get(),
-		input_.get(),renderQueue_.get(),gridModel);
+		input_.get(),renderQueue_.get(), debugRenderer_.get(), gridModel);
 #endif
 }
 
@@ -217,6 +230,9 @@ void Engine::Update() {
 			// シーンのデバック用更新処理
 			sceneManager_->DebugSceneUpdate();
 		}
+
+		// 当たり判定のデバック表示をおこなう
+		collisionManager_->DebugDraw(debugRenderer_.get());
 
 		// 更新後処理
 		PostUpdate();
@@ -260,6 +276,9 @@ void Engine::PreUpdate() {
 
 #ifdef USE_IMGUI
 
+	// 登録されたデバックをクリア
+	debugRenderer_->Clear();
+
 	// エディターの処理
 	editorCore_->Run();
 
@@ -300,6 +319,9 @@ void Engine::PreUpdate() {
 }
 
 void Engine::PostUpdate() {
+	// デバック描画の更新処理
+	debugRenderer_->Update();
+
 	// ImGuiの受付終了
 	imGuiManager_->EndFrame();
 }

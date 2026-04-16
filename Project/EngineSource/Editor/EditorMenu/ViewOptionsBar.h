@@ -7,10 +7,11 @@ namespace GameEngine {
 	class RenderQueue;
 	class Model;
 	class DebugCamera;
+	class DebugRenderer;
 
 	class ViewOptionsBar {
 	public:
-		ViewOptionsBar(Input* input, RenderQueue* renderQueue, Model* gridModel);
+		ViewOptionsBar(Input* input, RenderQueue* renderQueue, DebugRenderer* debugRenderer, Model* gridModel);
 
 		void Run();
 
@@ -21,7 +22,10 @@ namespace GameEngine {
 		// デバック描画を表示
 		bool isDebugDraw_ = true;
 
+		// 描画コマンド
 		RenderQueue* renderQueue_ = nullptr;
+		// デバック描画機能
+		DebugRenderer* debugRenderer_ = nullptr;
 
 		// グリッドを描画するためのモデル
 		Model* gridModel_;

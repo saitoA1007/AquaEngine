@@ -23,7 +23,7 @@ namespace GameEngine {
 		static void StaticInitialize(CollisionManager* manager) { collisionManager_ = manager; }
 
 		// 衝突形状を取得
-		virtual CollisionType GetCollisionType() const = 0;
+		virtual CollisionData GetCollisionData() const = 0;
 
 		// ワールド座標を取得
 		Vector3 GetWorldPosition() const { return worldPosition_; }
@@ -99,10 +99,11 @@ namespace GameEngine {
 	public:
 
 		// 球の当たり判定を登録
-		CollisionType GetCollisionType() const override {
-			CollisionType collisiontype;
-			collisiontype.type = Sphere{ worldPosition_,radius_ };
-			return collisiontype;
+		CollisionData GetCollisionData() const override {
+			CollisionData collisionData;
+			collisionData.data = Sphere{ worldPosition_,radius_ };
+			collisionData.shapeType = ShapeType::kSphere;
+			return collisionData;
 		}
 
 		const float GetRadius() const { return radius_; }
@@ -120,12 +121,13 @@ namespace GameEngine {
 	public:
 
 		// AABBの当たり判定を登録する
-		CollisionType GetCollisionType() const override {
-			CollisionType collisiontype;
+		CollisionData GetCollisionData() const override {
+			CollisionData collisionData;
 			Vector3 pos = worldPosition_;
 			Vector3 halfSize = size_ * 0.5f;
-			collisiontype.type = AABB{ pos - halfSize,pos + halfSize };
-			return collisiontype;
+			collisionData.data = AABB{ pos - halfSize,pos + halfSize };
+			collisionData.shapeType = ShapeType::kAABB;
+			return collisionData;
 		}
 
 		// サイズを取得する
@@ -144,11 +146,12 @@ namespace GameEngine {
 	class SegmentCollider : public Collider {
 	public:
 		// 線分の当たり判定を登録する
-		CollisionType GetCollisionType() const override {
-			CollisionType collisiontype;
+		CollisionData GetCollisionData() const override {
+			CollisionData collisionData;
 			Vector3 pos = worldPosition_;
-			collisiontype.type = Segment{ pos,diff_ };
-			return collisiontype;
+			collisionData.data = Segment{ pos,diff_ };
+			collisionData.shapeType = ShapeType::kSegment;
+			return collisionData;
 		}
 
 		// 線の方向
@@ -165,14 +168,15 @@ namespace GameEngine {
 	class OBBCollider : public Collider {
 	public:
 		// obbの当たり判定を登録する
-		CollisionType GetCollisionType() const override {
-			CollisionType collisiontype;
+		CollisionData GetCollisionData() const override {
+			CollisionData collisionData;
 			OBB tmpOBB;
 			tmpOBB.center = worldPosition_;
 			tmpOBB.size = size_;
 			std::memcpy(tmpOBB.orientations, orientations_, sizeof(Vector3) * 3);
-			collisiontype.type = tmpOBB;
-			return collisiontype;
+			collisionData.data = tmpOBB;
+			collisionData.shapeType = ShapeType::kOBB;
+			return collisionData;
 		}
 
 		// 座標軸

@@ -30,13 +30,13 @@ EditorCore::EditorCore() {}
 EditorCore::~EditorCore() {}
 
 void EditorCore::Initialize(TextureManager* textureManager, SceneChangeRequest* sceneChangeRequest, RenderPassController* renderPassController,
-	Input* input, RenderQueue* renderQueue, Model* gridModel) {
+	Input* input, RenderQueue* renderQueue, DebugRenderer* debugRenderer, Model* gridModel) {
 	windowManager_ = std::make_unique<EditorWindowManager>();
 	menuBar_ = std::make_unique<EditorMenuBar>();
 	editorLayout_ = std::make_unique<EditorLayout>();
 	editorToolBar_ = std::make_unique<EditorToolBar>(textureManager);
 	sceneMenuBar_ = std::make_unique<SceneMenuBar>(sceneChangeRequest);
-	viewOptionsBar_ = std::make_unique<ViewOptionsBar>(input, renderQueue, gridModel);
+	viewOptionsBar_ = std::make_unique<ViewOptionsBar>(input, renderQueue, debugRenderer, gridModel);
 
 	// ウィンドウの内容を登録する
 	windowManager_->RegisterWindow(std::make_unique<SceneWindow>(renderPassController));

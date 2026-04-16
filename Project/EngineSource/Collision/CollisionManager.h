@@ -49,7 +49,7 @@ namespace GameEngine {
 		void RemoveCollider(Collider* collider);
 
 		// デバック描画
-		//void DebugDraw(DebugRenderer* debugRenderer);
+		void DebugDraw(DebugRenderer* debugRenderer);
 
 	private:
 		// コライダーリスト
@@ -82,7 +82,7 @@ namespace GameEngine {
 		/// <param name="typeA"></param>
 		/// <param name="typeB"></param>
 		/// <returns></returns>
-		CollisionResult CheckCollisionType(const CollisionType& typeA, const CollisionType& typeB);
+		CollisionResult CheckCollisionData(const CollisionData& dataA, const CollisionData& dataB);
 
 		/// <summary>
 		/// 衝突ペアを作成
