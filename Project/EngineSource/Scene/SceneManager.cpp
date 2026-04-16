@@ -14,22 +14,9 @@ void SceneManager::Initialize(SceneRegistry* sceneRegistry) {
 	// シーンの生成機能を初期化
 	sceneRegistry_ = sceneRegistry;
 
-	// デバックカメラを生成
-	debugCamera_ = std::make_unique<DebugCamera>();
-	debugCamera_->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720);
-	// シーンにカメラを設定
-	IScene::SetMainCamera(debugCamera_.get());
-
 	//　シーン遷移システムを初期化
 	sceneTransition_ = std::make_unique<SceneTransition>();
 	sceneTransition_->Initialize();
-
-	// 使用するカメラのフラグ
-#ifdef USE_IMGUI
-	isDebugView_ = true;
-#else
-	isDebugView_ = false;
-#endif
 	
 	// デフォルトシーンで初期化
 	ChangeScene(sceneRegistry_->GetDefaultScene());
@@ -65,20 +52,6 @@ void SceneManager::Update() {
 
 void SceneManager::DebugUpdate() {
 
-	//// デバック状態を切り替える
-	//if (input->TriggerKey(DIK_F)) {
-	//	if (isDebugView_) {
-	//		isDebugView_ = false;
-	//	} else {
-	//		isDebugView_ = true;
-	//	}
-	//}
-
-	// デバック状態で無ければ早期リターン
-	if (!isDebugView_) { return; }
-
-	// デバックカメラを操作
-	//debugCamera_->Update(context_->input);
 }
 
 void SceneManager::DebugSceneUpdate() {
@@ -89,7 +62,7 @@ void SceneManager::DebugSceneUpdate() {
 void SceneManager::Draw() {
 
 	// 現在シーンの描画処理
-	currentScene_->Draw(isDebugView_);
+	currentScene_->Draw();
 
 	// シーン遷移演出を描画
 	//sceneTransition_->Draw();

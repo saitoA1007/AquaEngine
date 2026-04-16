@@ -10,9 +10,6 @@
 #include "RenderQueue.h"
 #include "RenderPass/RenderPassController.h"
 
-// 消す予定
-#include "DebugCamera.h"
-
 namespace GameEngine {
 
 	/// <summary>
@@ -41,11 +38,6 @@ namespace GameEngine {
 			renderQueue_ = renderQueue;
 		}
 
-		// カメラ機能を取得
-		static void SetMainCamera(DebugCamera* debugCamera) {
-			debugCamera_ = debugCamera;
-		}
-
 		/// <summary>
 		/// デストラクタ
 		/// </summary>
@@ -69,7 +61,7 @@ namespace GameEngine {
 		/// <summary>
 		/// 描画処理
 		/// </summary>
-		virtual void Draw(const bool& isDebugView) = 0;
+		virtual void Draw() = 0;
 
 		/// <summary>
 		/// 終了したことを伝える
@@ -97,7 +89,5 @@ namespace GameEngine {
 
 		static RenderPassController* renderPassController_; // 描画パスを管理する
 		static RenderQueue* renderQueue_; // 描画コマンドを管理
-
-		static DebugCamera* debugCamera_; // デバック描画機能
 	};
 }

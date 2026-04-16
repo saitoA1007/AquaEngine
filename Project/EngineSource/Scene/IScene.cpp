@@ -11,5 +11,3 @@ GameObjectManager* IScene::gameObjectManager_ = nullptr;
 
 RenderPassController* IScene::renderPassController_ = nullptr;
 RenderQueue* IScene::renderQueue_ = nullptr;
-
-DebugCamera* IScene::debugCamera_ = nullptr;

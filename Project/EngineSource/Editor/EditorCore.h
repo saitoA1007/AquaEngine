@@ -1,6 +1,5 @@
 #pragma once
 #include "TextureManager.h"
-#include "WorldTransform.h"
 
 class SceneChangeRequest;
 
@@ -12,8 +11,11 @@ namespace GameEngine {
 	class SceneMenuBar;
 	class EditorLayout;
 	class EditorToolBar;
+	class ViewOptionsBar;
 
+	class Input;
 	class Model;
+	class DebugCamera;
 	class RenderPassController;
 	class RenderQueue;
 
@@ -23,16 +25,11 @@ namespace GameEngine {
 		~EditorCore();
 
 		// 初期化処理
-		void Initialize(TextureManager* textureManager, SceneChangeRequest* sceneChangeRequest, RenderPassController* renderPassController);
+		void Initialize(TextureManager* textureManager, SceneChangeRequest* sceneChangeRequest, RenderPassController* renderPassController, 
+			Input* input, RenderQueue* renderQueue, Model* gridModel);
 
 		// 実行
 		void Run();
-
-		// 更新処理
-		void DebugUpdate(const Vector3& debugCameraPos);
-
-		// 描画
-		void DebugDraw(RenderQueue* renderQueue);
 
 		// 終了処理
 		void Finalize();
@@ -41,11 +38,6 @@ namespace GameEngine {
 		bool IsActiveUpdate() const;
 
 		bool IsPause() const;
-
-	public:
-
-		// グリッドモデルを取得
-		void SetGridModel(Model* model);
 
 	private:
 
@@ -64,9 +56,8 @@ namespace GameEngine {
 		// シーンの操作などをおこなう
 		std::unique_ptr<EditorToolBar> editorToolBar_;
 
-		// グリッドを描画するためのモデル
-		GameEngine::Model* gridModel_;
-		GameEngine::WorldTransform gridWorldTransform_;
+		// ビュー
+		std::unique_ptr<ViewOptionsBar> viewOptionsBar_;
 
 	private:
 

@@ -2,7 +2,9 @@
 #include "ImGuiManager.h"
 #include "SceneChangeRequest.h"
 #include "Model.h"
+#include "DebugCamera.h"
 #include "RenderQueue.h"
+#include "InPut.h"
 
 // デバック機能
 #include "EditorMenu/EditorWindowManager.h"
@@ -10,6 +12,7 @@
 #include "EditorMenu/EditorLayout.h"
 #include "EditorMenu/EditorToolBar.h"
 #include "EditorMenu/SceneMenuBar.h"
+#include "EditorMenu/ViewOptionsBar.h"
 
 // デバックウィンドウ
 #ifdef USE_IMGUI
@@ -26,12 +29,14 @@ using namespace GameEngine;
 EditorCore::EditorCore() {}
 EditorCore::~EditorCore() {}
 
-void EditorCore::Initialize(TextureManager* textureManager, SceneChangeRequest* sceneChangeRequest, RenderPassController* renderPassController) {
+void EditorCore::Initialize(TextureManager* textureManager, SceneChangeRequest* sceneChangeRequest, RenderPassController* renderPassController,
+	Input* input, RenderQueue* renderQueue, Model* gridModel) {
 	windowManager_ = std::make_unique<EditorWindowManager>();
 	menuBar_ = std::make_unique<EditorMenuBar>();
 	editorLayout_ = std::make_unique<EditorLayout>();
 	editorToolBar_ = std::make_unique<EditorToolBar>(textureManager);
 	sceneMenuBar_ = std::make_unique<SceneMenuBar>(sceneChangeRequest);
+	viewOptionsBar_ = std::make_unique<ViewOptionsBar>(input, renderQueue, gridModel);
 
 	// ウィンドウの内容を登録する
 	windowManager_->RegisterWindow(std::make_unique<SceneWindow>(renderPassController));
@@ -43,9 +48,6 @@ void EditorCore::Initialize(TextureManager* textureManager, SceneChangeRequest* 
 
 	// レイアウトのデータを取得する
 	editorLayout_->LoadLayout(windowManager_->GetWindows());
-
-	// デバック用グリッドのワールド行列を初期化
-	gridWorldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 }
 
 void EditorCore::Run() {
@@ -53,6 +55,7 @@ void EditorCore::Run() {
 	BeginDockSpace();
 
 	sceneMenuBar_->Run();
+	viewOptionsBar_->Run();
 	menuBar_->Run(windowManager_.get());
 	editorToolBar_->Run();
 	windowManager_->DrawAllWindows();
@@ -76,19 +79,6 @@ void EditorCore::BeginDockSpace() {
 	ImGui::End();
 }
 
-void EditorCore::DebugUpdate(const Vector3& debugCameraPos) {
-	// グリッドの更新処理
-	gridWorldTransform_.transform_.translate = debugCameraPos;
-	gridWorldTransform_.UpdateTransformMatrix();
-}
-
-void EditorCore::DebugDraw(RenderQueue* renderQueue) {
-#ifdef USE_IMGUI
-	// グリッドを描画
-	renderQueue->SubmitGrid(gridModel_, gridWorldTransform_);
-#endif
-}
-
 void EditorCore::Finalize() {
 	// レイアウトデータを保存する
 	editorLayout_->SaveLayout(windowManager_->GetWindows());
@@ -100,8 +90,4 @@ bool EditorCore::IsActiveUpdate() const {
 
 bool EditorCore::IsPause() const {
 	return editorToolBar_->GetIsPauce();
-}
-
-void EditorCore::SetGridModel(Model* model) {
-	gridModel_ = model;
 }

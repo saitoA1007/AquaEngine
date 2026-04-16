@@ -38,6 +38,12 @@ namespace GameEngine {
             cameraResource_ = cameraResource;
         }
 
+        void SetDebugCamera(GpuResource* cameraResource) {
+            debugCameraResource_ = cameraResource;
+            useDebugCamera_ = true;
+            
+        }
+
         void SetLight(GpuResource* lightResource) {
             lightResource_ = lightResource;
         }
@@ -78,20 +84,24 @@ namespace GameEngine {
         // 半透明の描画コマンドのスタックメモリ
         std::map<std::string, std::vector<DrawRequest>> translucentDrawQueueList_;
 
-        // psoのリスト
-        std::unordered_map<std::string, DrawPsoData> psoList_;
-
         // カメラリソース
         GpuResource* cameraResource_ = nullptr;
+        GpuResource* debugCameraResource_ = nullptr;
         // ライトリソース
         GpuResource* lightResource_ = nullptr;
         ID3D12Resource* lightCameraResource_ = nullptr;
 
-        // 現在のpso
-        std::string currentPsoName_;
+        // デバックカメラを使用するか
+        bool useDebugCamera_ = false;
 
         // 描画パスの実行順
         std::vector<std::string> passExecuteOrder_;
+
+        // 現在のpso
+        std::string currentPsoName_;
+
+        // psoのリスト
+        std::unordered_map<std::string, DrawPsoData> psoList_;
 
     private:
         /// <summary>
@@ -112,6 +122,7 @@ namespace GameEngine {
             drawQueueList_.clear();
             translucentDrawQueueList_.clear();
             currentPsoName_.clear();
+            useDebugCamera_ = false;
         }
 
         // psoの名前を取得

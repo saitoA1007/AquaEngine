@@ -135,9 +135,12 @@ void GameScene::Update() {
 	directionLightCamera_->SetVPMatrix(lightManager_->directionalLight_->directionalLightData_.vpMatrix);
 }
 
-void GameScene::Draw(const bool& isDebugView) {
+void GameScene::Draw() {
 
+	// 太陽の位置のカメラを設定
 	renderQueue_->SetLightCamera(directionLightCamera_->GetResource());
+	// 描画に使用するカメラを設定
+	renderQueue_->SetCamera(mainCamera_->GetConstantBuffer());
 
 	//// 描画パスの管理を取得
 	//auto pass = context_->renderPassController;
@@ -158,17 +161,6 @@ void GameScene::Draw(const bool& isDebugView) {
 	//ModelRenderer::DrawShadowMap(playerModel_, player_->GetWorldTransform());
 	//
 	//pass->PostPass("ShadowPass");
-
-	// 描画に使用するカメラを設定
-	if (isDebugView) {
-		// 描画に使用するカメラを設定
-		//ModelRenderer::SetCamera(context_->debugCamera_->GetResource());
-		renderQueue_->SetCamera(debugCamera_->GetConstantBuffer());
-	} else {
-		// 描画に使用するカメラを設定
-		//ModelRenderer::SetCamera(mainCamera_->GetResource());
-		renderQueue_->SetCamera(mainCamera_->GetConstantBuffer());
-	}
 
 	//// 通常描画
 	//pass->PrePass("DefaultPass");

@@ -9,7 +9,7 @@ namespace GameEngine {
 
 	class DebugCamera {
 	public:
-		DebugCamera() = default;
+		DebugCamera(Input* input);
 		~DebugCamera();
 
 		/// <summary>
@@ -23,7 +23,7 @@ namespace GameEngine {
 		/// <summary>
 		/// 更新処理
 		/// </summary>
-		void Update(Input* input);
+		void Update();
 
 	public:
 
@@ -54,6 +54,8 @@ namespace GameEngine {
 		ConstantBuffer<CameraForGPU>* GetConstantBuffer() { return &constBuffer_; }
 
 	private:
+		Input* input_ = nullptr;
+
 		// 拡縮
 		Vector3 scale_ = { 1.0f,1.0f,1.0f };
 		// X,Y,Z軸回りのローカル座標角

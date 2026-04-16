@@ -183,9 +183,11 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	sceneChangeRequest_->SetCurrentSceneName(sceneManager_->GetCurrentSceneName());
 	sceneChangeRequest_->SetSceneNames(sceneRegistry_->GetSceneNames());
 
+	auto gridModel = modelManager_->GetNameByModel("Grid");
+
 	editorCore_ = std::make_unique<EditorCore>();
-	editorCore_->Initialize(textureManager_.get(), sceneChangeRequest_.get(), renderPassController_.get());
-	editorCore_->SetGridModel(modelManager_->GetNameByModel("Grid"));
+	editorCore_->Initialize(textureManager_.get(), sceneChangeRequest_.get(), renderPassController_.get(),
+		input_.get(),renderQueue_.get(),gridModel);
 #endif
 }
 
@@ -207,11 +209,12 @@ void Engine::Update() {
 		if (isActiveUpdate_ && !isPause_) {
 			// ゲームオブジェクトでおこなわれる更新処理
 			gameObjectManager_->UpdateAll();
+			// シーンの更新処理
 			sceneManager_->Update();
-
 			// 当たり判定を計算
 			collisionManager_->CheckAllCollisions();
 		} else {
+			// シーンのデバック用更新処理
 			sceneManager_->DebugSceneUpdate();
 		}
 
@@ -229,10 +232,7 @@ void Engine::Update() {
 		sceneManager_->Draw();
 		// ゲームオブジェクトでおこなわれる描画処理
 		gameObjectManager_->DrawAll();
-#ifdef USE_IMGUI
-		// デバック描画
-		editorCore_->DebugDraw(renderQueue_.get());
-#endif
+
 		// 積まれた描画コマンドを解放する
 		renderQueue_->Execute();
 
@@ -255,12 +255,13 @@ void Engine::PreUpdate() {
 	// ImGuiにフレームが始まる旨を伝える
 	imGuiManager_->BeginFrame();
 
+	// 描画開始前処理
+	renderQueue_->Begin();
+
 #ifdef USE_IMGUI
 
 	// エディターの処理
 	editorCore_->Run();
-	//editorCore_->DebugUpdate(Vector3(debugCamera_->GetTargetPosition().x, -0.1f, sceneContext.debugCamera_->GetTargetPosition().z));
-	editorCore_->DebugUpdate(Vector3(0.0f,0.0f,0.0f));
 
 	// 更新処理の実行状態を取得する
 	isActiveUpdate_ = editorCore_->IsActiveUpdate();
@@ -304,8 +305,6 @@ void Engine::PostUpdate() {
 }
 
 void Engine::PreDraw() {
-	// 描画開始前処理
-	renderQueue_->Begin();
 	// 描画前処理
 	renderPipeline_->BeginFrame();
 }

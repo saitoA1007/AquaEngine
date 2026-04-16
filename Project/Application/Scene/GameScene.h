@@ -39,7 +39,7 @@ public:
 	/// <summary>
 	/// 描画処理
 	/// </summary>
-	void Draw(const bool& isDebugView) override;
+	void Draw() override;
 
 	/// <summary>
 	/// 終了したことを伝える

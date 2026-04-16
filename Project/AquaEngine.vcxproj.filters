@@ -478,6 +478,7 @@
       <Filter>Externals\imgui</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\Scene\IScene.cpp" />
+    <ClCompile Include="EngineSource\Editor\EditorMenu\ViewOptionsBar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -934,6 +935,7 @@
       <Filter>Externals\imgui</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Scene\IScene.h" />
+    <ClInclude Include="EngineSource\Editor\EditorMenu\ViewOptionsBar.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Externals\imgui\ProggyClean.ttf" />

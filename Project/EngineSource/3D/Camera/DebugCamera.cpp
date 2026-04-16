@@ -5,6 +5,10 @@
 
 using namespace GameEngine;
 
+DebugCamera::DebugCamera(Input* input) {
+	input_ = input;
+}
+
 DebugCamera::~DebugCamera() {
 	
 }
@@ -40,20 +44,20 @@ void DebugCamera::Initialize(const Vector3& translate,int width, int height) {
 	viewMatrix_ = InverseMatrix(worldMatrix_);
 }
 
-void DebugCamera::Update(Input* input) {
+void DebugCamera::Update() {
 
 	// 中クリックで移動
-	if (input->PushMouse(2)) {
+	if (input_->PushMouse(2)) {
 
 		// ターゲットの移動量
 		Vector3 targetMove{0.0f,0.0f,0.0f};
 
 		// X軸の移動
-		if (input->GetMouseDelta().x > 0.0f) { targetMove.x = -1.0f; }
-		if (input->GetMouseDelta().x < 0.0f) { targetMove.x = 1.0f; }
+		if (input_->GetMouseDelta().x > 0.0f) { targetMove.x = -1.0f; }
+		if (input_->GetMouseDelta().x < 0.0f) { targetMove.x = 1.0f; }
 		// Y軸の移動
-		if (input->GetMouseDelta().y < 0.0f) { targetMove.y = -1.0f; }
-		if (input->GetMouseDelta().y > 0.0f) { targetMove.y = 1.0f; }
+		if (input_->GetMouseDelta().y < 0.0f) { targetMove.y = -1.0f; }
+		if (input_->GetMouseDelta().y > 0.0f) { targetMove.y = 1.0f; }
 
 		// カメラの向き
 		Vector3 forward = Normalize(targetPos_ - translate_);  
@@ -68,12 +72,12 @@ void DebugCamera::Update(Input* input) {
 	} else {
 
 		// ホイールで距離を調整する
-		distance_ -= input->GetWheel() * 0.05f;
+		distance_ -= input_->GetWheel() * 0.05f;
 		distance_ = std::clamp(distance_, 2.0f, 100.0f);
 
 		// 右クリックで回転する処理
-		if (input->PushMouse(1)) {
-			mouseMove_ += input->GetMouseDelta() * 0.05f;
+		if (input_->PushMouse(1)) {
+			mouseMove_ += input_->GetMouseDelta() * 0.05f;
 		}
 	}
 	
@@ -97,7 +101,7 @@ void DebugCamera::Update(Input* input) {
 	cameraForGPU_->vpMatrix = GetVPMatrix();
 
 	// 初期位置にリセットする
-	if (input->PushKey(DIK_G) && input->PushKey(DIK_LCONTROL)) {
+	if (input_->PushKey(DIK_G) && input_->PushKey(DIK_LCONTROL)) {
 		targetPos_ = { 0.0f,0.0f,0.0f };
 		mouseMove_ = { 3.1f,1.0f };
 		distance_ = 40.0f;

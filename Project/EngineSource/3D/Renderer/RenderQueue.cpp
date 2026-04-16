@@ -36,7 +36,7 @@ void RenderQueue::Initialize(ID3D12GraphicsCommandList* commandList, PSOManager*
 }
 
 void RenderQueue::Begin() {
-    // 描画コマンドのクリア
+    // クリア
     Clear();
 }
 
@@ -47,7 +47,11 @@ void RenderQueue::Execute() {
         // 不透明、半透明ともにコマンドがなければ飛ばす
         bool hasOpaque = drawQueueList_.count(passName) > 0;
         bool hasTranslucent = translucentDrawQueueList_.count(passName) > 0;
-        if (!hasOpaque && !hasTranslucent) { continue; }
+        if (!hasOpaque && !hasTranslucent) {
+            renderPassController_->PrePass(passName);
+            renderPassController_->PostPass(passName);
+            continue;
+        }
 
         renderPassController_->PrePass(passName);
         currentPsoName_.clear();
@@ -110,6 +114,18 @@ void RenderQueue::RegisterPSO(const std::string& name, PSOManager* psoManager) {
 
 // 戻り値で登録済みかどうかを返す
 void RenderQueue::PreDraw(const std::string& psoName) {
+
+    if (psoName == "ShadowMap") {
+        ModelRenderer::SetCamera(lightCameraResource_);
+    } else {
+        if (useDebugCamera_) {
+            // デバック用のカメラを設定
+            ModelRenderer::SetCamera(debugCameraResource_->GetResource());
+        } else {
+            ModelRenderer::SetCamera(cameraResource_->GetResource());
+        }
+    }
+
     // 前回と同じPSOなら切り替え不要
     if (currentPsoName_ == psoName) { return; }
 
@@ -119,12 +135,6 @@ void RenderQueue::PreDraw(const std::string& psoName) {
     commandList_->SetGraphicsRootSignature(it->second.rootSignature);
     commandList_->SetPipelineState(it->second.graphicsPipelineState);
     currentPsoName_ = psoName;
-
-    if (psoName == "ShadowMap") {
-        ModelRenderer::SetCamera(lightCameraResource_);
-    } else {
-        ModelRenderer::SetCamera(cameraResource_->GetResource());
-    } 
 }
 
 void RenderQueue::SubmitModel(const Model* model, WorldTransform& worldTransform, const float& alpha, const GpuResource* material, const std::string& passName) {

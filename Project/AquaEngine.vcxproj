@@ -187,6 +187,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Collision\CollisionUtils.cpp" />
     <ClCompile Include="EngineSource\Common\LogManager.cpp" />
     <ClCompile Include="EngineSource\Core\IGameObject.cpp" />
+    <ClCompile Include="EngineSource\Editor\EditorMenu\ViewOptionsBar.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\DXC.cpp" />
     <ClCompile Include="EngineSource\Core\FPSCounter.cpp" />
     <ClCompile Include="EngineSource\Core\GameEngine.cpp" />
@@ -393,6 +394,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Common\DescriptorHeap.h" />
     <ClInclude Include="EngineSource\Common\LogManager.h" />
     <ClInclude Include="EngineSource\Common\ResourceLeakChecker.h" />
+    <ClInclude Include="EngineSource\Editor\EditorMenu\ViewOptionsBar.h" />
     <ClInclude Include="EngineSource\Graphics\Core\DXC.h" />
     <ClInclude Include="EngineSource\Core\FPSCounter.h" />
     <ClInclude Include="EngineSource\Core\GameEngine.h" />

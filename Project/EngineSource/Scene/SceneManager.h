@@ -74,12 +74,6 @@ namespace GameEngine {
 		// 現在のシーン名
 		std::string currentSceneName_;
 
-		// デバックカメラ
-		std::unique_ptr<GameEngine::DebugCamera> debugCamera_;
-
-		// デバックカメラとの切り替えを管理
-		bool isDebugView_ = true;
-
 		// シーン遷移
 		std::unique_ptr<SceneTransition> sceneTransition_;
 	};

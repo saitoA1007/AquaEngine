@@ -24,12 +24,6 @@
 #include "RandomGenerator.h"
 
 // 3D
-#include "Camera.h"
-#include "DebugCamera.h"
-#include "LightManager.h"
-#include "Model.h"
-#include "WorldTransform.h"
-#include "WorldTransforms.h"
 #include "ModelRenderer.h"
 #include "DebugRenderer.h"
 #include "AnimationManager.h"
