@@ -15,14 +15,12 @@
 #include "EditorMenu/ViewOptionsBar.h"
 
 // デバックウィンドウ
-#ifdef USE_IMGUI
 #include "Windows/SceneWIndow.h"
 #include "Windows/AssetWindow.h"
 #include "Windows/ConsoleWindow.h"
 #include "Windows/HierarchyWindow.h"
 #include "Windows/InspectorWindow.h"
 #include "Windows/PerformanceWindow.h"
-#endif
 
 using namespace GameEngine;
 
@@ -51,7 +49,6 @@ void EditorCore::Initialize(TextureManager* textureManager, SceneChangeRequest* 
 }
 
 void EditorCore::Run() {
-
 	BeginDockSpace();
 
 	sceneMenuBar_->Run();

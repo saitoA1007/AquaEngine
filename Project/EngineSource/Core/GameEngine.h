@@ -35,7 +35,9 @@
 #include "InPut.h"
 
 // Editor
+#ifdef USE_IMGUI
 #include "EditorCore.h"
+#endif
 #include "GameParamEditor.h"
 
 // Scene
@@ -137,9 +139,10 @@ namespace GameEngine {
 		std::unique_ptr<GameEngine::InputCommand> inputCommand_;
 
 		// Editor =======================================
-
+#ifdef USE_IMGUI
 		// エディター
 		std::unique_ptr<EditorCore> editorCore_;
+#endif
 
 		// 更新状態を管理
 		bool isActiveUpdate_ = true;
