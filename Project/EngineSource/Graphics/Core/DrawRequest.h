@@ -4,6 +4,7 @@
 namespace GameEngine {
 
     class Model;
+    class Sprite;
     class WorldTransform;
     class WorldTransforms;
     class GpuResource;
@@ -18,10 +19,11 @@ namespace GameEngine {
         Animation = 40,
         Translucent = 100,
         Debug = 200,
+        Sprite = 250,
     };
 
-    // モデルを描画するモード
-    enum class DrawType {
+    // 3D描画のモード
+    enum class Draw3dType {
         Default,        // 通常モデルを描画用
         DefaultAdd,
         Instancing,     // インスタンシング描画用
@@ -33,9 +35,14 @@ namespace GameEngine {
         DebugLine,      // デバックのライン描画用
     };
 
+    enum class Draw2dType {
+        Normal,
+        Add,
+    };
+
     // 描画に使用するリソース
-    struct DrawRequest {
-        DrawType type = DrawType::Default;
+    struct Draw3dRequest {
+        Draw3dType type = Draw3dType::Default;
         RenderLayer layer = RenderLayer::Opaque;
         std::string passName = "DefaultPass";
 
@@ -50,6 +57,15 @@ namespace GameEngine {
 
         // デバック用のラインデータ
         const DebugRenderer* debugRenderer_ = nullptr;
+    };
+
+    // 2D描画に使用するリソース
+    struct Draw2dRequest {
+        Draw2dType type = Draw2dType::Normal;
+        RenderLayer layer = RenderLayer::Sprite;
+        std::string passName = "DefaultPass";
+
+        const Sprite* sprite = nullptr;
     };
 }
 

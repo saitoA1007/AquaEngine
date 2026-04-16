@@ -54,6 +54,9 @@ namespace GameEngine {
 
     public:
 
+        // 画像描画
+        void SubmitSprite(const Sprite* sprite, const std::string& passName = "DefaultPass");
+
         /// 通常モデル（ライトあり）
         void SubmitModel(const Model* model,WorldTransform& worldTransform,const float& alpha = 1.0f, const GpuResource* material = nullptr, const std::string& passName = "DefaultPass");
 
@@ -79,10 +82,12 @@ namespace GameEngine {
         ID3D12GraphicsCommandList* commandList_ = nullptr;
         RenderPassController* renderPassController_ = nullptr;
 
-        // 描画コマンドのスタックメモリ [描画パス]->[PSO]->[描画コマンド]
-        std::map<std::string, std::map<RenderLayer, std::unordered_map<std::string, std::vector<DrawRequest>>>> drawQueueList_;
+        // 2D描画コマンドのスタックメモリ [描画パス]->[PSO]->[描画コマンド]
+        std::map<std::string, std::map<RenderLayer, std::unordered_map<std::string, std::vector<Draw2dRequest>>>> draw2dQueueList_;
+        // 3D描画コマンドのスタックメモリ [描画パス]->[PSO]->[描画コマンド]
+        std::map<std::string, std::map<RenderLayer, std::unordered_map<std::string, std::vector<Draw3dRequest>>>> draw3dQueueList_;
         // 半透明の描画コマンドのスタックメモリ
-        std::map<std::string, std::vector<DrawRequest>> translucentDrawQueueList_;
+        std::map<std::string, std::vector<Draw3dRequest>> translucentDrawQueueList_;
 
         // カメラリソース
         GpuResource* cameraResource_ = nullptr;
@@ -119,16 +124,18 @@ namespace GameEngine {
 
         // 描画コマンドのクリア
         void Clear() {
-            drawQueueList_.clear();
+            draw3dQueueList_.clear();
             translucentDrawQueueList_.clear();
             currentPsoName_.clear();
             useDebugCamera_ = false;
         }
 
         // psoの名前を取得
-        const char* GetPsoName(DrawType type);
+        const char* Get3dPsoName(Draw3dType type);
+        const char* Get2dPsoName(Draw2dType type);
 
-        // 描画
-        void ExecuteRequest(const DrawRequest& request);
+        // 描画コマンドを解放
+        void Execute3dRequest(const Draw3dRequest& request);
+        void Execute2dRequest(const Draw2dRequest& request);
     };
 }

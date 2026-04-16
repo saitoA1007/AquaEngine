@@ -237,7 +237,7 @@
     <ClCompile Include="EngineSource\3D\Renderer\ModelRenderer.cpp">
       <Filter>EngineSource\3D\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\3D\Renderer\RenderQueue.cpp">
+    <ClCompile Include="EngineSource\Graphics\Core\RenderQueue.cpp">
       <Filter>EngineSource\3D\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\3D\Transform\WorldTransform.cpp">
@@ -571,13 +571,13 @@
     <ClInclude Include="EngineSource\3D\Renderer\DebugRenderer.h">
       <Filter>EngineSource\3D\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\3D\Renderer\DrawRequest.h">
+    <ClInclude Include="EngineSource\Graphics\Core\DrawRequest.h">
       <Filter>EngineSource\3D\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\3D\Renderer\ModelRenderer.h">
       <Filter>EngineSource\3D\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\3D\Renderer\RenderQueue.h">
+    <ClInclude Include="EngineSource\Graphics\Core\RenderQueue.h">
       <Filter>EngineSource\3D\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\3D\Transform\WorldTransform.h">

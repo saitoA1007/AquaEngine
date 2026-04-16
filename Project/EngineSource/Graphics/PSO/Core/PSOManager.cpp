@@ -356,9 +356,17 @@ void PSOManager::DefaultLoadPSO() {
     defaultSprite.drawMode = DrawModel::None;
     defaultSprite.blendMode = BlendMode::kBlendModeNormal;
     defaultSprite.isDepthEnable = false;
-    RegisterPSO("DefaultSprite", defaultSprite);
+    RootSignatureBuilder spriteRoot;
+    spriteRoot.Initialize(device_);
+    spriteRoot.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_ALL);
+    spriteRoot.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 0, D3D12_SHADER_VISIBILITY_PIXEL);
+    spriteRoot.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
+    spriteRoot.CreateRootSignature();
+    InputLayoutBuilder spriteInput;
+    spriteInput.CreateDefaultSpriteElement();
+    RegisterPSO("DefaultSprite", defaultSprite,&spriteRoot,&spriteInput);
     defaultSprite.blendMode = BlendMode::kBlendModeAdd;
-    RegisterPSO("AdditiveSprite", defaultSprite);
+    RegisterPSO("AdditiveSprite", defaultSprite, &spriteRoot,&spriteInput);
 
     // インスタンシング描画用PSO
     CreatePSOData instancing3D;

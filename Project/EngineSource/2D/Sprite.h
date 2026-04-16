@@ -24,6 +24,7 @@ namespace GameEngine {
 			Vector4 color;
 			Matrix4x4 uvTransform;
 			Matrix4x4 WVP;
+			uint32_t textureHandle;
 		};
 
 	public:
@@ -111,6 +112,9 @@ namespace GameEngine {
 		Vector2 textureLeftTop_ = { 0.0f,0.0f };
 		Vector2 textureSize_ = { 100.0f,100.0f };
 		Vector2 textureMaxeSize_ = {};
+
+		// テクスチャハンドル
+		uint32_t textureHandle_ = 0;
 
 	private:
 

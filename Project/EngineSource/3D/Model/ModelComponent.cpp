@@ -31,30 +31,30 @@ void ModelComponent::Update() {
 	defaultMaterial_.SetTextureHandle(texture_);
 }
 
-void ModelComponent::Draw(RenderQueue* renderQueue, const DrawType& drawType, const std::string& passName) {
+void ModelComponent::Draw(RenderQueue* renderQueue, const Draw3dType& drawType, const std::string& passName) {
 
 	switch (drawType)
 	{
-	case GameEngine::DrawType::Default:
+	case GameEngine::Draw3dType::Default:
 		renderQueue->SubmitModel(model_, worldTransform_,color_.w, defaultMaterial_.GetConstantBuffer(), passName);
 		break;
 
-	case GameEngine::DrawType::DefaultAdd:
+	case GameEngine::Draw3dType::DefaultAdd:
 		renderQueue->SubmitModel(model_, worldTransform_, color_.w, defaultMaterial_.GetConstantBuffer(), passName);
 		break;
 
-	case GameEngine::DrawType::Animation:
+	case GameEngine::Draw3dType::Animation:
 		renderQueue->SubmitAnimation(model_, worldTransform_, color_.w, defaultMaterial_.GetConstantBuffer(), passName);
 		break;
 
-	case GameEngine::DrawType::ShadowMap:
+	case GameEngine::Draw3dType::ShadowMap:
 		renderQueue->SubmitShadowMap(model_, worldTransform_);
 		break;
 
-	case GameEngine::DrawType::Instancing:
-	case GameEngine::DrawType::InstancingAdd:
-	case GameEngine::DrawType::Grid:
-	case GameEngine::DrawType::Skybox:
+	case GameEngine::Draw3dType::Instancing:
+	case GameEngine::Draw3dType::InstancingAdd:
+	case GameEngine::Draw3dType::Grid:
+	case GameEngine::Draw3dType::Skybox:
 	default:
 		break;
 	}

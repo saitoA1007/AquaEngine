@@ -2,7 +2,7 @@
 #include "PSO/Core/PSOManager.h"
 #include "ModelRenderer.h"
 #include "DebugRenderer.h"
-
+#include "SpriteRenderer.h"
 using namespace GameEngine;
 
 RenderQueue::RenderQueue() {
@@ -23,7 +23,7 @@ void RenderQueue::Initialize(ID3D12GraphicsCommandList* commandList, PSOManager*
     // 実行順序を設定
     RegisterPassOrder({ "ShadowPass", "DefaultPass" });
 
-    // 文字列キーでそのまま登録。PSOManager側の名前と一致させる
+    // PSOを登録
     RegisterPSO("Default3D", psoManager);
     RegisterPSO("Additive3D", psoManager);
     RegisterPSO("Instancing3D", psoManager);
@@ -33,6 +33,9 @@ void RenderQueue::Initialize(ID3D12GraphicsCommandList* commandList, PSOManager*
     RegisterPSO("ShadowMap", psoManager);
     RegisterPSO("Grid", psoManager);
     RegisterPSO("Line", psoManager);
+
+    RegisterPSO("DefaultSprite", psoManager);
+    RegisterPSO("AdditiveSprite", psoManager);
 }
 
 void RenderQueue::Begin() {
@@ -45,9 +48,10 @@ void RenderQueue::Execute() {
     for (const auto& passName : passExecuteOrder_) {
 
         // 不透明、半透明ともにコマンドがなければ飛ばす
-        bool hasOpaque = drawQueueList_.count(passName) > 0;
+        bool hasOpaque = draw3dQueueList_.count(passName) > 0;
         bool hasTranslucent = translucentDrawQueueList_.count(passName) > 0;
-        if (!hasOpaque && !hasTranslucent) {
+        bool has2d = draw2dQueueList_.count(passName) > 0;
+        if (!hasOpaque && !hasTranslucent && !has2d) {
             renderPassController_->PrePass(passName);
             renderPassController_->PostPass(passName);
             continue;
@@ -58,14 +62,14 @@ void RenderQueue::Execute() {
 
         // 不透明描画コマンドを解放
         if (hasOpaque) {
-            for (auto& [layer, psoMap] : drawQueueList_[passName]) {
+            for (auto& [layer, psoMap] : draw3dQueueList_[passName]) {
                 for (auto& [psoName, requests] : psoMap) {
                     if (requests.empty()) { continue; }
                     // 描画前処理
                     PreDraw(psoName);
                     for (const auto& request : requests) {
                         // 描画コマンド解放
-                        ExecuteRequest(request);
+                        Execute3dRequest(request);
                     }
                 }
             }
@@ -83,9 +87,24 @@ void RenderQueue::Execute() {
 
             for (const auto& request : translucentList) {
                 // 描画前処理
-                PreDraw(GetPsoName(request.type));
+                PreDraw(Get3dPsoName(request.type));
                 // 描画コマンド解放
-                ExecuteRequest(request);
+                Execute3dRequest(request);
+            }
+        }
+
+        // 2D描画コマンドを解放
+        if (has2d) {
+            for (auto& [layer, psoMap] : draw2dQueueList_[passName]) {
+                for (auto& [psoName, requests] : psoMap) {
+                    if (requests.empty()) { continue; }
+                    // 描画前処理
+                    PreDraw(psoName);
+                    for (const auto& request : requests) {
+                        // 描画コマンド解放
+                        Execute2dRequest(request);
+                    }
+                }
             }
         }
 
@@ -93,18 +112,27 @@ void RenderQueue::Execute() {
     }
 }
 
-const char* RenderQueue::GetPsoName(DrawType type) {
+const char* RenderQueue::Get3dPsoName(Draw3dType type) {
     switch (type) {
-        case DrawType::Default:         { return "Default3D"; }
-        case DrawType::DefaultAdd:      { return "Default3D"; }
-        case DrawType::Instancing:      { return "Instancing3D"; }
-        case DrawType::InstancingAdd:   { return "AdditiveInstancing3D"; }
-        case DrawType::Animation:       { return "Animation"; }
-        case DrawType::Skybox:          { return "Skybox"; }
-        case DrawType::ShadowMap:       { return "ShadowMap"; }
-        case DrawType::Grid:            { return "Grid"; }
-        case DrawType::DebugLine:       { return "Line"; }
-        default:                        { return "Default3D"; }
+        case Draw3dType::Default:         { return "Default3D"; }
+        case Draw3dType::DefaultAdd:      { return "Default3D"; }
+        case Draw3dType::Instancing:      { return "Instancing3D"; }
+        case Draw3dType::InstancingAdd:   { return "AdditiveInstancing3D"; }
+        case Draw3dType::Animation:       { return "Animation"; }
+        case Draw3dType::Skybox:          { return "Skybox"; }
+        case Draw3dType::ShadowMap:       { return "ShadowMap"; }
+        case Draw3dType::Grid:            { return "Grid"; }
+        case Draw3dType::DebugLine:       { return "Line"; }
+        default:                          { return "Default3D"; }
+    }
+}
+
+const char* RenderQueue::Get2dPsoName(Draw2dType type) {
+    switch (type)
+    {
+    case GameEngine::Draw2dType::Normal: { return "DefaultSprite"; }
+    case GameEngine::Draw2dType::Add:    { return "AdditiveSprite"; }
+    default:                             { return "DefaultSprite"; }
     }
 }
 
@@ -137,9 +165,19 @@ void RenderQueue::PreDraw(const std::string& psoName) {
     currentPsoName_ = psoName;
 }
 
+void RenderQueue::SubmitSprite(const Sprite* sprite, const std::string& passName) {
+
+    Draw2dRequest request;
+    request.type = Draw2dType::Normal;
+    request.layer = RenderLayer::Sprite;
+    request.sprite = sprite;
+    // 登録
+    draw2dQueueList_[passName][request.layer][Get2dPsoName(request.type)].push_back(request);
+}
+
 void RenderQueue::SubmitModel(const Model* model, WorldTransform& worldTransform, const float& alpha, const GpuResource* material, const std::string& passName) {
-    DrawRequest request;
-    request.type = DrawType::Default;
+    Draw3dRequest request;
+    request.type = Draw3dType::Default;
     request.layer = RenderLayer::Opaque;
     request.passName = passName;
     request.model = model;
@@ -148,7 +186,7 @@ void RenderQueue::SubmitModel(const Model* model, WorldTransform& worldTransform
 
     if (alpha == 1.0f) {
         // 不透明描画に登録
-        drawQueueList_[passName][request.layer][GetPsoName(request.type)].push_back(request);
+        draw3dQueueList_[passName][request.layer][Get3dPsoName(request.type)].push_back(request);
     } else {
         // 半透明描画に登録
         translucentDrawQueueList_[passName].push_back(request);
@@ -156,8 +194,8 @@ void RenderQueue::SubmitModel(const Model* model, WorldTransform& worldTransform
 }
 
 void RenderQueue::SubmitInstancing(const Model* model, uint32_t numInstances, WorldTransforms& worldTransforms, const float& alpha, const GpuResource* material, const std::string& passName) {
-    DrawRequest request;
-    request.type = DrawType::Instancing;
+    Draw3dRequest request;
+    request.type = Draw3dType::Instancing;
     request.layer = RenderLayer::Opaque;
     request.passName = passName;
     request.model = model;
@@ -167,7 +205,7 @@ void RenderQueue::SubmitInstancing(const Model* model, uint32_t numInstances, Wo
 
     if (alpha == 1.0f) {
         // 不透明描画に登録
-        drawQueueList_[passName][request.layer][GetPsoName(request.type)].push_back(request);
+        draw3dQueueList_[passName][request.layer][Get3dPsoName(request.type)].push_back(request);
     } else {
         // 半透明描画に登録
         translucentDrawQueueList_[passName].push_back(request);
@@ -175,8 +213,8 @@ void RenderQueue::SubmitInstancing(const Model* model, uint32_t numInstances, Wo
 }
 
 void RenderQueue::SubmitAnimation(const Model* model, WorldTransform& worldTransform, const float& alpha, const GpuResource* material, const std::string& passName) {
-    DrawRequest request;
-    request.type = DrawType::Animation;
+    Draw3dRequest request;
+    request.type = Draw3dType::Animation;
     request.layer = RenderLayer::Animation;
     request.passName = passName;
     request.model = model;
@@ -185,7 +223,7 @@ void RenderQueue::SubmitAnimation(const Model* model, WorldTransform& worldTrans
 
     if (alpha == 1.0f) {
         // 不透明描画に登録
-        drawQueueList_[passName][request.layer][GetPsoName(request.type)].push_back(request);
+        draw3dQueueList_[passName][request.layer][Get3dPsoName(request.type)].push_back(request);
     } else {
         // 半透明描画に登録
         translucentDrawQueueList_[passName].push_back(request);
@@ -193,8 +231,8 @@ void RenderQueue::SubmitAnimation(const Model* model, WorldTransform& worldTrans
 }
 
 void RenderQueue::SubmitSkybox(const Model* model, WorldTransform& worldTransform, const GpuResource* material, const std::string& passName) {
-    DrawRequest request;
-    request.type = DrawType::Skybox;
+    Draw3dRequest request;
+    request.type = Draw3dType::Skybox;
     request.layer = RenderLayer::Skybox;
     request.passName = passName;
     request.model = model;
@@ -202,81 +240,99 @@ void RenderQueue::SubmitSkybox(const Model* model, WorldTransform& worldTransfor
     request.material = material;
 
     // 不透明描画に登録
-    drawQueueList_[passName][request.layer][GetPsoName(request.type)].push_back(request);
+    draw3dQueueList_[passName][request.layer][Get3dPsoName(request.type)].push_back(request);
 }
 
 void RenderQueue::SubmitShadowMap(const Model* model, WorldTransform& worldTransform, const std::string& passName) {
-    DrawRequest request;
-    request.type = DrawType::ShadowMap;
+    Draw3dRequest request;
+    request.type = Draw3dType::ShadowMap;
     request.layer = RenderLayer::Shadow;
     request.passName = passName;
     request.model = model;
     request.worldTransform = &worldTransform;
 
     // 不透明描画に登録
-    drawQueueList_[passName][request.layer][GetPsoName(request.type)].push_back(request);
+    draw3dQueueList_[passName][request.layer][Get3dPsoName(request.type)].push_back(request);
 }
 
 void RenderQueue::SubmitGrid(const Model* model, WorldTransform& worldTransform, const std::string& passName) {
-    DrawRequest request;
-    request.type = DrawType::Grid;
+    Draw3dRequest request;
+    request.type = Draw3dType::Grid;
     request.layer = RenderLayer::Grid;
     request.passName = passName;
     request.model = model;
     request.worldTransform = &worldTransform;
 
     // 不透明描画に登録
-    drawQueueList_[passName][request.layer][GetPsoName(request.type)].push_back(request);
+    draw3dQueueList_[passName][request.layer][Get3dPsoName(request.type)].push_back(request);
 }
 
 void RenderQueue::SubmitDebugLine(const DebugRenderer* debugRenderer, const std::string& passName) {
-    DrawRequest request;
-    request.type = DrawType::DebugLine;
+    Draw3dRequest request;
+    request.type = Draw3dType::DebugLine;
     request.layer = RenderLayer::Debug;
     request.passName = passName;
     request.debugRenderer_ = debugRenderer;
 
     // 不透明描画に登録
-    drawQueueList_[passName][request.layer][GetPsoName(request.type)].push_back(request);
+    draw3dQueueList_[passName][request.layer][Get3dPsoName(request.type)].push_back(request);
 }
 
-void RenderQueue::ExecuteRequest(const DrawRequest& request) {
+void RenderQueue::Execute3dRequest(const Draw3dRequest& request) {
     switch (request.type) {
 
-    case DrawType::Default:
-    case DrawType::DefaultAdd:
+    case Draw3dType::Default:
+    case Draw3dType::DefaultAdd:
         ModelRenderer::DrawLight(lightResource_);
         ModelRenderer::Draw(request.model, *request.worldTransform, request.material);
         break;
 
-    case DrawType::Instancing:
-    case DrawType::InstancingAdd:
+    case Draw3dType::Instancing:
+    case Draw3dType::InstancingAdd:
         ModelRenderer::DrawInstancing(
             request.model, request.numInstances, *request.worldTransforms, request.material);
         break;
 
-    case DrawType::Animation:
+    case Draw3dType::Animation:
         ModelRenderer::DrawAnimation(request.model, *request.worldTransform, request.material);
         break;
-
-    case DrawType::Skybox:
+        
+    case Draw3dType::Skybox:
         ModelRenderer::DrawSkybox(request.model, *request.worldTransform, request.material);
         break;
 
-    case DrawType::ShadowMap:
+    case Draw3dType::ShadowMap:
         ModelRenderer::DrawShadowMap(request.model, *request.worldTransform);
         break;
 
-    case DrawType::Grid:
+    case Draw3dType::Grid:
         ModelRenderer::DrawGrid(request.model, *request.worldTransform);
         break;
 
-    case DrawType::DebugLine:
+    case Draw3dType::DebugLine:
         ModelRenderer::DrawDebugLine(request.debugRenderer_->GetVertexBufferView(), request.debugRenderer_->GetTotalVertices());
         break;
 
     default:
-        assert(false && "未対応のDrawTypeです");
+        assert(false && "未対応のDraw3dTypeです");
+        break;
+    }
+}
+
+void RenderQueue::Execute2dRequest(const Draw2dRequest& request) {
+   
+    switch (request.type)
+    {
+    case Draw2dType::Normal:
+        SpriteRenderer::Draw(request.sprite);
+        break;
+
+    case Draw2dType::Add:
+        SpriteRenderer::Draw(request.sprite);
+        break;
+
+    default:
+        assert(false && "未対応のDraw2dTypeです");
         break;
     }
 }

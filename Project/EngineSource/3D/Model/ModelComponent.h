@@ -21,7 +21,7 @@ namespace GameEngine {
 		void Update();
 
 		// 描画処理
-		void Draw(RenderQueue* renderQueue, const DrawType& drawType = DrawType::Default,const std::string& passName = "DefaultPass");
+		void Draw(RenderQueue* renderQueue, const Draw3dType& drawType = Draw3dType::Default,const std::string& passName = "DefaultPass");
 
 	public:
 

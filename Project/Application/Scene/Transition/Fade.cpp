@@ -24,10 +24,10 @@ void Fade::Update(float timer) {
 
 void Fade::Draw() {
 	// 画像の描画前処理
-	SpriteRenderer::PreDraw(RenderMode2D::Normal);
+	//SpriteRenderer::PreDraw(RenderMode2D::Normal);
 
 	// 遷移画像を表示
-	SpriteRenderer::Draw(sprite_.get(), 0);
+	//SpriteRenderer::Draw(sprite_.get(), 0);
 }
 
 bool Fade::IsMidTransition(float timer) const {

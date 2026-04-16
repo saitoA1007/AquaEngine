@@ -130,7 +130,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 
 	// 画像の初期化
 	Sprite::StaticInitialize(windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
-	SpriteRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), textureManager_.get(), psoManager_.get());
+	SpriteRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager());
 	ModelRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager());
 
 	// 描画コマンド管理

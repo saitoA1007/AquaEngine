@@ -50,6 +50,7 @@ void Sprite::Update() {
 	SetSize(size_);
 
 	constBufferData_->color = color_;
+	constBufferData_->textureHandle = textureHandle_;
 
 	// 座標を元にワールド行列の生成
 	worldMatrix_ = MakeAffineMatrix(Vector3(scale_.x, scale_.y, 0.0f), Vector3(0.0f,0.0f,rotate_), Vector3(position_.x, position_.y, 0.0f));
@@ -138,4 +139,6 @@ void Sprite::CreateConstBufferData(const Vector4& color) {
 	constBufferData_->uvTransform = MakeIdentity4x4();
 	// wvp行列を初期化
 	constBufferData_->WVP = Multiply(worldMatrix_, orthoMatrix_);
+	// テクスチャ
+	constBufferData_->textureHandle = 0;
 }
