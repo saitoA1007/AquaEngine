@@ -1,5 +1,5 @@
-#include"RenderPassController.h"
-#include<cassert>
+#include "RenderPassController.h"
+#include <cassert>
 using namespace GameEngine;
 
 void RenderPassController::Initialize(RenderTextureManager* renderTextureManager, ID3D12GraphicsCommandList* commandList) {
@@ -51,18 +51,6 @@ void RenderPassController::PostPass(const std::string& name) {
 	render->second->PostPass();
 }
 
-void RenderPassController::SetEndPass(const std::string& name) {
-	// 登録されていなければエラー
-	auto render = renderPassList_.find(name);
-	if (render == renderPassList_.end()) {
-		assert(false && "Not found RenderPass");
-	}
-
-	// 最終的な描画先を設定
-	resultPassName_ = name;
-	resultSrvHandle_ = render->second->GetSrvHandle();
-}
-
 CD3DX12_GPU_DESCRIPTOR_HANDLE RenderPassController::GetSrvHandle(const std::string& name) {
 	// 登録されていなければエラー
 	auto render = renderPassList_.find(name);
@@ -81,4 +69,37 @@ uint32_t RenderPassController::GetSrvIndex(const std::string& name) {
 	}
 
 	return render->second->GetSrvIndex();
+}
+
+void RenderPassController::SetSceneFinalPass(const std::string& name) {
+	// 登録されていなければエラー
+	auto render = renderPassList_.find(name);
+	if (render == renderPassList_.end()) {
+		assert(false && "Not found RenderPass");
+	}
+
+	sceneFinalPassName_ = name;
+	sceneFinalPassSrvHandle_ = render->second->GetSrvHandle();
+}
+
+void RenderPassController::SetPostProcessFinalPass(const std::string& name) {
+	// 登録されていなければエラー
+	auto render = renderPassList_.find(name);
+	if (render == renderPassList_.end()) {
+		assert(false && "Not found RenderPass");
+	}
+
+	postProcessFinalPassName_ = name;
+	postProcessFinalPassSrvHandle_ = render->second->GetSrvHandle();
+}
+
+void RenderPassController::SetPresentPass(const std::string& name) {
+	// 登録されていなければエラー
+	auto render = renderPassList_.find(name);
+	if (render == renderPassList_.end()) {
+		assert(false && "Not found RenderPass");
+	}
+
+	presentPassName_ = name;
+	presentPassSrvHandle_ = render->second->GetSrvHandle();
 }

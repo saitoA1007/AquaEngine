@@ -479,6 +479,7 @@
     </ClCompile>
     <ClCompile Include="EngineSource\Scene\IScene.cpp" />
     <ClCompile Include="EngineSource\Editor\EditorMenu\ViewOptionsBar.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -766,12 +767,6 @@
     <ClInclude Include="EngineSource\Graphics\DirectX\Memory\SrvManager.h">
       <Filter>EngineSource\Graphics\DirectX\Memory</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Graphics\PostProcess\BasePostEffect.h">
-      <Filter>EngineSource\Graphics\PostProcess</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineSource\Graphics\PostProcess\ParameterResource.h">
-      <Filter>EngineSource\Graphics\PostProcess</Filter>
-    </ClInclude>
     <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectData.h">
       <Filter>EngineSource\Graphics\PostProcess</Filter>
     </ClInclude>
@@ -806,9 +801,6 @@
       <Filter>EngineSource\Graphics\PSO\PostProcess</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\CopyPSO.h">
-      <Filter>EngineSource\Graphics\PSO\PostProcess</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\IPostEffect.h">
       <Filter>EngineSource\Graphics\PSO\PostProcess</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Graphics\RenderPass\RenderPass.h">
@@ -936,6 +928,7 @@
     </ClInclude>
     <ClInclude Include="EngineSource\Scene\IScene.h" />
     <ClInclude Include="EngineSource\Editor\EditorMenu\ViewOptionsBar.h" />
+    <ClInclude Include="EngineSource\Graphics\PostProcess\IPostEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Externals\imgui\ProggyClean.ttf" />

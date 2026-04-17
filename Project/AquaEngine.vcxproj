@@ -194,6 +194,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Core\FPSCounter.cpp" />
     <ClCompile Include="EngineSource\Core\GameEngine.cpp" />
     <ClCompile Include="EngineSource\Core\GameObjectManager.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectData.cpp" />
     <ClCompile Include="EngineSource\Math\RandomGenerator.cpp" />
     <ClCompile Include="EngineSource\Graphics\Texture\Texture.cpp" />
     <ClCompile Include="EngineSource\Graphics\Texture\TextureLoader.cpp" />
@@ -404,6 +405,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Core\GameEngine.h" />
     <ClInclude Include="EngineSource\Core\GameObjectManager.h" />
     <ClInclude Include="EngineSource\Core\IGameObject.h" />
+    <ClInclude Include="EngineSource\Graphics\PostProcess\IPostEffect.h" />
     <ClInclude Include="EngineSource\Math\RandomGenerator.h" />
     <ClInclude Include="EngineSource\Graphics\Texture\Texture.h" />
     <ClInclude Include="EngineSource\Graphics\Texture\TextureLoader.h" />
@@ -482,8 +484,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Graphics\Resources\GpuResource.h" />
     <ClInclude Include="EngineSource\Graphics\Core\GraphicsDevice.h" />
     <ClInclude Include="EngineSource\Graphics\Buffers\IndexBuffer.h" />
-    <ClInclude Include="EngineSource\Graphics\PostProcess\BasePostEffect.h" />
-    <ClInclude Include="EngineSource\Graphics\PostProcess\ParameterResource.h" />
     <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectData.h" />
     <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectManager.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Core\BlendBuilder.h" />
@@ -496,7 +496,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Graphics\PSO\Core\ShaderCompiler.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\BloomPSO.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\CopyPSO.h" />
-    <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\IPostEffect.h" />
     <ClInclude Include="EngineSource\Graphics\RenderPass\RenderPass.h" />
     <ClInclude Include="EngineSource\Graphics\RenderPass\RenderPassController.h" />
     <ClInclude Include="EngineSource\Graphics\Core\RenderPipeline.h" />

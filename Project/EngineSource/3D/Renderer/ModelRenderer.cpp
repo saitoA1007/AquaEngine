@@ -1,5 +1,5 @@
-#include"ModelRenderer.h"
-#include<cassert>
+#include "ModelRenderer.h"
+#include <cassert>
 
 using namespace GameEngine;
 

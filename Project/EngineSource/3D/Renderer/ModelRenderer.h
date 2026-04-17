@@ -1,10 +1,7 @@
 #pragma once
 #include <d3d12.h>
-#include <vector>
-#include <unordered_map>
 #include <wrl.h>
 
-#include "TextureManager.h"
 #include "SrvManager.h"
 
 #include "Model.h"

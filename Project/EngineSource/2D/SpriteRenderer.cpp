@@ -1,5 +1,5 @@
-#include"SpriteRenderer.h"
-#include<cassert>
+#include "SpriteRenderer.h"
+#include <cassert>
 
 using namespace GameEngine;
 

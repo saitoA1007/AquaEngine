@@ -29,9 +29,6 @@ namespace GameEngine {
         // 描画コマンドを解放する
         void Execute();
 
-        // 更新処理
-        void Update();
-
     public:
 
         void SetCamera(GpuResource* cameraResource) {

@@ -68,6 +68,9 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	graphicsDevice_ = std::make_unique<GraphicsDevice>();
 	graphicsDevice_->Initialize(windowsApp_->GetHwnd(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
 
+	GpuResource::StaticInitialize(graphicsDevice_->GetDevice());
+	SrvResource::StaticInitialize(graphicsDevice_->GetSrvManager());
+
 	// dxcCompilerの初期化
 	dxc_ = std::make_unique<DXC>();
 	dxc_->Initialize();
@@ -81,9 +84,6 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	psoManager_->DefaultLoadPSO();
 	psoManager_->DeaultLoadPostEffectPSO();
 
-	GpuResource::StaticInitialize(graphicsDevice_->GetDevice());
-	SrvResource::StaticInitialize(graphicsDevice_->GetSrvManager());
-
 	// レンダーテクスチャ機能を生成
 	renderTextureManager_ = std::make_unique<RenderTextureManager>();
 	renderTextureManager_->Initialize(graphicsDevice_->GetRtvManager(), graphicsDevice_->GetSrvManager(), graphicsDevice_->GetDsvManager(), graphicsDevice_->GetDevice());
@@ -92,12 +92,13 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	renderPassController_ = std::make_unique<RenderPassController>();
 	renderPassController_->Initialize(renderTextureManager_.get(), graphicsDevice_->GetCommandList());
 
-	// ポストエフェクトの初期化
-	PostEffectManager::StaticInitialize(bloomPSO_.get(), psoManager_.get());
+	// 描画コマンド管理
+	renderQueue_ = std::make_unique<RenderQueue>();
+	renderQueue_->Initialize(graphicsDevice_->GetCommandList(), psoManager_.get(), renderPassController_.get());
+
 	// ポストエフェクトマネージャーの初期化
 	postEffectManager_ = std::make_unique<PostEffectManager>();
-	float clearColor_[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
-	postEffectManager_->Initialize(graphicsDevice_->GetDevice(), clearColor_, windowsApp_->kWindowWidth, windowsApp_->kWindowHeight, graphicsDevice_->GetRTVDescriptorSize(), graphicsDevice_->GetSrvManager());
+	postEffectManager_->Initialize(graphicsDevice_->GetCommandList(),graphicsDevice_->GetSrvManager(), psoManager_.get(), renderPassController_.get());
 
 	// 描画の流れを管理するクラスを初期化
 	renderPipeline_ = std::make_unique<RenderPipeline>();
@@ -132,10 +133,6 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	Sprite::StaticInitialize(windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
 	SpriteRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager());
 	ModelRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager());
-
-	// 描画コマンド管理
-	renderQueue_ = std::make_unique<RenderQueue>();
-	renderQueue_->Initialize(graphicsDevice_->GetCommandList(), psoManager_.get(), renderPassController_.get());
 
 	// fpsを計測する
 	fpsCounter_ = std::make_unique<FpsCounter>();
@@ -251,6 +248,9 @@ void Engine::Update() {
 
 		// 積まれた描画コマンドを解放する
 		renderQueue_->Execute();
+
+		// ポストエフェクトを実行
+		postEffectManager_->Execute();
 
 		// 描画後処理
 		PostDraw();

@@ -1,11 +1,9 @@
 #pragma once
 #include <memory>
-#include <vector>
-#include<unordered_map>
+#include <unordered_map>
 #include <string>
-#include"RenderPass.h"
-
-#include"RenderTextureManager.h"
+#include "RenderPass.h"
+#include "RenderTextureManager.h"
 
 namespace GameEngine {
 
@@ -14,6 +12,7 @@ namespace GameEngine {
 		RenderPassController() = default;
 		~RenderPassController() = default;
 
+		// 初期化処理
 		void Initialize(RenderTextureManager* renderTextureManager, ID3D12GraphicsCommandList* commandList);
 
 		// パスを作成する
@@ -23,28 +22,38 @@ namespace GameEngine {
 		void PrePass(const std::string& name);
 		void PostPass(const std::string& name);
 
-		// 最後に描画するパスを設定する
-		void SetEndPass(const std::string& name);
+		// 描画の最終パスの設定
+		void SetSceneFinalPass(const std::string& name);
+		const std::string& GetSceneFinalPass() const { return sceneFinalPassName_; }
 
-		// 最終敵な描画先
-		CD3DX12_GPU_DESCRIPTOR_HANDLE GetFinalOutputSRV() { return resultSrvHandle_; }
+		// ポストエフェクトの最終パスの設定
+		void SetPostProcessFinalPass(const std::string& name);
+		const std::string& GetPostProcessFinalPass() const { return postProcessFinalPassName_; }
+
+		// 最終的に画面に出すためのパスの設定
+		void SetPresentPass(const std::string& name);
+		const std::string& GetPresentPass() const { return presentPassName_; }
 
 		CD3DX12_GPU_DESCRIPTOR_HANDLE GetSrvHandle(const std::string& name);
-
 		uint32_t GetSrvIndex(const std::string& name);
-
 	private:
 		RenderPassController(const RenderPassController&) = delete;
 		RenderPassController& operator=(const RenderPassController&) = delete;
 
 		RenderTextureManager* renderTextureManager_ = nullptr;
-		
-		std::unordered_map<std::string, std::unique_ptr<RenderPass>> renderPassList_;
-
 		ID3D12GraphicsCommandList* commandList_ = nullptr;
 
-		std::string resultPassName_ = "";
-		CD3DX12_GPU_DESCRIPTOR_HANDLE resultSrvHandle_;
+		std::unordered_map<std::string, std::unique_ptr<RenderPass>> renderPassList_;
+
+		// 描画の最終パス
+		std::string sceneFinalPassName_ = "";
+		CD3DX12_GPU_DESCRIPTOR_HANDLE sceneFinalPassSrvHandle_;
+		// ポストエフェクトの最終パス
+		std::string postProcessFinalPassName_ = "";
+		CD3DX12_GPU_DESCRIPTOR_HANDLE postProcessFinalPassSrvHandle_;
+		// 最終的に画面に出すためのパス
+		std::string presentPassName_ = "";
+		CD3DX12_GPU_DESCRIPTOR_HANDLE presentPassSrvHandle_;
 
 		uint32_t width_ = 0;
 		uint32_t height_ = 0;

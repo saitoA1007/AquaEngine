@@ -18,7 +18,8 @@ void RenderQueue::Initialize(ID3D12GraphicsCommandList* commandList, PSOManager*
     // デフォルトで描画するパス
     renderPassController_->AddPass("DefaultPass");
     // 最終的な描画先を設定
-    renderPassController_->SetEndPass("DefaultPass");
+    renderPassController_->SetSceneFinalPass("DefaultPass");
+    renderPassController_->SetPresentPass("DefaultPass");
 
     // 実行順序を設定
     RegisterPassOrder({ "ShadowPass", "DefaultPass" });

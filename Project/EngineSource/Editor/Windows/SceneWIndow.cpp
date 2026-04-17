@@ -11,7 +11,7 @@ void SceneWindow::Draw() {
     ImGui::Begin("GameScene", &isActive);
 	// 描画した結果を移す
 	ImVec2 sceneWindowSize = ImGui::GetContentRegionAvail();
-	D3D12_GPU_DESCRIPTOR_HANDLE srvHandle = renderPassController_->GetFinalOutputSRV();
+	D3D12_GPU_DESCRIPTOR_HANDLE srvHandle = renderPassController_->GetSrvHandle(renderPassController_->GetPresentPass());
 
 	// 実際に使うサイズ
 	ImVec2 imageSize = sceneWindowSize;

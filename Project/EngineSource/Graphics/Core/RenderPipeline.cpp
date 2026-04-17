@@ -49,7 +49,7 @@ void RenderPipeline::EndFrame(ImGuiManager* imGuiManager) {
     imGuiManager->Draw();
 #else
     // ポストプロセス結果を描画
-    copyPSO_->Draw(graphicsDevice_->GetCommandList(), renderPassController_->GetFinalOutputSRV());
+    copyPSO_->Draw(graphicsDevice_->GetCommandList(), renderPassController_->GetSrvHandle(renderPassController_->GetPresentPass()));
 #endif
 
     // バックバッファをPresentに遷移
