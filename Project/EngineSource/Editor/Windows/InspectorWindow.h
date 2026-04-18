@@ -10,6 +10,12 @@ namespace GameEngine {
 		void Draw() override;
 		std::string GetName() const override { return "ParameterInspector"; }
 
+	private:
+
+		void DrawGroup(GameParamEditor::Group& group);
+
+		void DrawItems(GameParamEditor::Group& group);
+
 	};
 
 	// ImGuiで表示する用のパラメータを管理する

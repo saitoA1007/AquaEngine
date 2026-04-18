@@ -111,6 +111,9 @@ void RenderQueue::Execute() {
 
         renderPassController_->PostPass(passName);
     }
+
+    // 最終的に画面に出すためのパスの設定
+    renderPassController_->SetPresentPass("DefaultPass");
 }
 
 const char* RenderQueue::Get3dPsoName(Draw3dType type) {

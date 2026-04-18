@@ -105,6 +105,11 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	renderPipeline_->Initialize(graphicsDevice_.get(), postEffectManager_.get(), renderPassController_.get());
 	renderPipeline_->SetCopyPSO(copyPSO_.get());
 
+	// 画像の初期化
+	Sprite::StaticInitialize(windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
+	SpriteRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager());
+	ModelRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager());
+
 	// ImGuiの初期化
 	imGuiManager_ = std::make_unique<ImGuiManager>();
 	imGuiManager_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetCommandList(), graphicsDevice_->GetSwapChainDesc(),
@@ -113,6 +118,8 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	// 入力処理を初期化
 	input_ = std::make_unique<Input>();
 	input_->Initialize(hInstance, windowsApp_->GetHwnd());
+	// 入力処理のコマンドシステムを生成
+	inputCommand_ = std::make_unique<InputCommand>(input_.get());
 
 	// 音声の初期化
 	GameEngine::AudioManager::GetInstance().Initialize();
@@ -121,18 +128,11 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	textureManager_ = std::make_unique<TextureManager>();
 	textureManager_->Initialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager());
 
-	// 入力処理のコマンドシステムを生成
-	inputCommand_ = std::make_unique<InputCommand>(input_.get());
 	// モデルを管理するクラスを生成
 	modelManager_ = std::make_unique<ModelManager>();
 	modelManager_->Initialize(graphicsDevice_->GetDevice(), textureManager_.get(), graphicsDevice_->GetSrvManager());
 	// アニメーションデータを管理するクラスを生成する
 	animationManager_ = std::make_unique<AnimationManager>();
-
-	// 画像の初期化
-	Sprite::StaticInitialize(windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
-	SpriteRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager());
-	ModelRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager());
 
 	// fpsを計測する
 	fpsCounter_ = std::make_unique<FpsCounter>();

@@ -10,34 +10,36 @@ void InspectorWindow::Draw() {
         return;
     }
 
-    const std::string& selectedGroupName = GameParamEditor::GetInstance()->GetSelectGroup();
+    const std::string& selectedPath = GameParamEditor::GetInstance()->GetRootGroupName();
 
     // グループが選択されていない場合の表示
-    if (selectedGroupName.empty()) {
+    if (selectedPath.empty()) {
         ImGui::TextDisabled("No group selected");
-        ImGui::TextWrapped("No select");
         ImGui::End();
         return;
     }
 
-    // 選択されたグループが存在するかチェック
+    // パスからルートグループ名を取得
+    const std::string rootGroupName = selectedPath.substr(0, selectedPath.find('/'));
+
+    // ルートグループが存在するかチェック
     auto& allGroups = GameParamEditor::GetInstance()->GetAllGroups();
-    auto itGroup = allGroups.find(selectedGroupName);
-    if (itGroup == allGroups.end()) {
-        ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "Group not found");
-        GameParamEditor::GetInstance()->SelectGroup("");
+    auto itRoot = allGroups.find(rootGroupName);
+    if (itRoot == allGroups.end()) {
+        ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "Group not found: %s", rootGroupName.c_str());
+        GameParamEditor::GetInstance()->SetRootGroupName("");
         ImGui::End();
         return;
     }
 
-    // グループ名をヘッダーに表示
-    ImGui::TextColored(ImVec4(0.4f, 1.0f, 0.4f, 1.0f), "Group: %s", selectedGroupName.c_str());
+    // 選択したパスをヘッダーに表示
+    ImGui::TextColored(ImVec4(0.4f, 1.0f, 0.4f, 1.0f), "Group: %s", selectedPath.c_str());
     ImGui::Separator();
 
     // 保存ボタン
     if (ImGui::Button("Save")) {
-        GameParamEditor::GetInstance()->SaveFile(selectedGroupName);
-        std::string message = std::format("{}.json saved.", selectedGroupName);
+        GameParamEditor::GetInstance()->SaveFile(rootGroupName);
+        std::string message = std::format("{}.json saved.", rootGroupName);
         MessageBoxA(nullptr, message.c_str(), "GameParamEditor", 0);
     }
 
@@ -45,30 +47,46 @@ void InspectorWindow::Draw() {
 
     // 読み込みボタン
     if (ImGui::Button("Load")) {
-        GameParamEditor::GetInstance()->LoadFile(selectedGroupName);
+        GameParamEditor::GetInstance()->LoadFile(rootGroupName);
     }
 
     ImGui::Spacing();
     ImGui::Separator();
     ImGui::Spacing();
 
-    // グループの参照を取得
-    GameParamEditor::Group& group = itGroup->second;
+    // ルートグループ全体を再帰的に描画
+    DrawGroup(itRoot->second);
 
-    // パラメータが無い場合
-    if (group.items.empty()) {
-        ImGui::TextDisabled("No parameters in this group");
-        ImGui::TextWrapped("None parameter");
-        ImGui::End();
-        return;
+    ImGui::End();
+}
+
+void InspectorWindow::DrawGroup(GameParamEditor::Group& group) {
+
+    // このグループのアイテムを描画
+    DrawItems(group);
+
+    // サブグループを再帰的に
+    for (auto& [childName, childGroup] : group.children) {
+        ImGui::PushID(childName.c_str());
+
+        if (ImGui::TreeNode(childName.c_str())) {
+            // 再帰
+            DrawGroup(childGroup);
+            ImGui::TreePop();
+        }
+
+        ImGui::PopID();
     }
+}
 
-    // 優先順位でソートする
+void InspectorWindow::DrawItems(GameParamEditor::Group& group) {
+    if (group.items.empty()) { return; }
+
+    // 優先順位でソート
     std::vector<std::pair<std::string, GameParamEditor::Item*>> sortedItems;
     for (auto& [itemName, item] : group.items) {
         sortedItems.push_back({ itemName, &item });
     }
-    // 優先順位でソート。小さい順で並べる
     std::sort(sortedItems.begin(), sortedItems.end(),
         [](const auto& a, const auto& b) {
             if (a.second->priority != b.second->priority) {
@@ -78,15 +96,10 @@ void InspectorWindow::Draw() {
         }
     );
 
-    // ソート済みの順序で表示
+    // ソート済みの順序で描画
     for (auto& [itemName, itemPtr] : sortedItems) {
         ImGui::PushID(itemName.c_str());
-
-        // 型に応じて編集UI表示
         std::visit(DebugParameterVisitor{ itemName }, itemPtr->value);
-
         ImGui::PopID();
     }
-
-    ImGui::End();
 }

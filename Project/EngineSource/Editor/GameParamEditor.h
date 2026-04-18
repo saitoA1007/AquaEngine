@@ -1,18 +1,16 @@
 #pragma once
-#include<iostream>
-#include<variant>
-#include<map>
-#include<string>
+#include <iostream>
+#include <variant>
+#include <map>
+#include <string>
 
-#include"Vector4.h"
-#include"Vector3.h"
-#include"Vector2.h"
-#include"Range.h"
+#include "Vector4.h"
+#include "Vector3.h"
+#include "Vector2.h"
+#include "Range.h"
 
-#include<json.hpp>
-#include"MyMath.h"
-
-using json = nlohmann::json;
+#include <json.hpp>
+#include "MyMath.h"
 
 class GameParamEditor final {
 public:
@@ -26,19 +24,14 @@ public:
 	// グループ
 	struct Group {
 		std::map<std::string, Item> items;
-		std::string sceneName; // シーンの名前
+		std::map<std::string, Group> children;
+		std::string sceneName; // 保存しているシーンの名前
 	};
 
 public:
 
 	// シングルトン
 	static GameParamEditor* GetInstance();
-
-	/// <summary>
-	/// グループ作成
-	/// </summary>
-	/// <param name="groupName"></param>
-	void CreateGroup(const std::string& groupName,const std::string& sceneName = "none");
 
 	/// <summary>
 	/// ディレクトリの全ファイル読み込み
@@ -49,25 +42,25 @@ public:
 	/// ファイルから読み込む
 	/// </summary>
 	/// <param name="groupName"></param>
-	void LoadFile(const std::string& groupName);
+	void LoadFile(const std::string& rootGroupName);
 
 	/// <summary>
 	/// jsonファイルに保存する
 	/// </summary>
 	/// <param name="groupName"></param>
-	void SaveFile(const std::string& groupName);
+	void SaveFile(const std::string& rootGroupName);
 
 	/// <summary>
-	/// グループを選択
+	/// ルートを選択
 	/// </summary>
 	/// <param name="groupName"></param>
-	void SelectGroup(const std::string& groupName);
+	void SetRootGroupName(const std::string& rootGroupName);
 
 	/// <summary>
 	/// 選択中のグループを取得
 	/// </summary>
 	/// <returns></returns>
-	const std::string& GetSelectGroup() const { return selectedGroupName_; }
+	const std::string& GetRootGroupName() const { return rootGroupName_; }
 
 	/// <summary>
 	/// シーンを選択
@@ -91,23 +84,25 @@ public:
 	/// 値を登録する
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	/// <param name="groupName"></param>
+	/// <param name="path"></param>
 	/// <param name="key"></param>
 	/// <param name="value"></param>
 	template<typename T>
-	void AddItem(const std::string& groupName, const std::string& key, const T& value, int priority = INT_MAX) {
+	void AddItem(const std::string& path, const std::string& key, const T& value, int priority = INT_MAX) {
 		// グループの参照を取得
-		Group& group = datas_[groupName];
+		Group& group = ResolveOrCreateGroup(path);
 
-		// すでに登録されていれば何もしない
+		// すでに登録されていれば優先順位だけ更新
 		if (group.items.find(key) != group.items.end()) {
-			group.items[key].priority = priority; // 優先順位は別なので取得する
+			group.items[key].priority = priority;
 			return;
 		}
 
-		// アクティブなシーンを登録
-		if (group.sceneName.empty()) {
-			group.sceneName = activeSceneName_;
+		// ルートグループにシーン名を設定
+		const std::string rootName = SplitPath(path)[0];
+		Group& rootGroup = datas_[rootName];
+		if (rootGroup.sceneName.empty()) {
+			rootGroup.sceneName = activeSceneName_;
 		}
 
 		// 新しい項目のデータを設定
@@ -122,23 +117,20 @@ public:
 	/// 登録した値を取得する
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	/// <param name="groupName"></param>
+	/// <param name="path"></param>
 	/// <param name="key"></param>
 	/// <returns></returns>
 	template<typename T>
-	T GetValue(const std::string& groupName, const std::string& key) const {
+	T GetValue(const std::string& path, const std::string& key) const {
 		// 指定グループが存在するかチェック
-		assert(datas_.find(groupName) != datas_.end());
-
+		const Group* group = FindGroup(path);
+		assert(group != nullptr);
 		// 指定キーが存在するかチェック
-		const Group& group = datas_.at(groupName);
-		assert(group.items.find(key) != group.items.end());
+		assert(group->items.find(key) != group->items.end());
 
-		auto itItem = group.items.find(key);
-
+		auto itItem = group->items.find(key);
 		// 型があるかを確認する
 		assert(std::holds_alternative<T>(itItem->second.value));
-
 		// グループの参照を取得
 		return std::get<T>(itItem->second.value);
 	}
@@ -150,6 +142,8 @@ public:
 	/// <param name="key"></param>
 	void RemoveItem(const std::string& groupName, const std::string& key);
 
+	void ParseGroupJson(const std::string& rootGroupName, const nlohmann::json& root);
+
 private:
 	GameParamEditor() = default;
 	~GameParamEditor() = default;
@@ -160,7 +154,7 @@ private:
 	std::map<std::string, Group> datas_;
 
 	// 選択中のグループ名
-	std::string selectedGroupName_;
+	std::string rootGroupName_;
 
 	// 現在アクティブなシーン名
 	std::string activeSceneName_ = "None";
@@ -172,33 +166,33 @@ private:
 
 	// jsonファイルに値を保存するためのビジター
 	struct JsonSaveVisitor {
-		json& jsonData;
-		explicit JsonSaveVisitor(json& jsonNode) : jsonData(jsonNode){}
+		nlohmann::json& jsonData;
+		explicit JsonSaveVisitor(nlohmann::json& jsonNode) : jsonData(jsonNode){}
 
 		void operator()(const Range3& value) const {
-			jsonData = json::object({
-				{ "Min", json::array({ value.min.x, value.min.y, value.min.z }) },
-				{ "Max", json::array({ value.max.x, value.max.y, value.max.z }) }
+			jsonData = nlohmann::json::object({
+				{ "Min", nlohmann::json::array({ value.min.x, value.min.y, value.min.z }) },
+				{ "Max", nlohmann::json::array({ value.max.x, value.max.y, value.max.z }) }
 			});
 		}
 
 		void operator()(const Range4& value) const {
-			jsonData = json::object({
-				{ "Min", json::array({ value.min.x, value.min.y, value.min.z, value.min.w}) },
-				{ "Max", json::array({ value.max.x, value.max.y, value.max.z, value.max.w}) }
+			jsonData = nlohmann::json::object({
+				{ "Min", nlohmann::json::array({ value.min.x, value.min.y, value.min.z, value.min.w}) },
+				{ "Max", nlohmann::json::array({ value.max.x, value.max.y, value.max.z, value.max.w}) }
 				});
 		}
 
 		void operator()(const Vector4& value) const {
-			jsonData = json::array({ value.x, value.y, value.z,value.w });
+			jsonData = nlohmann::json::array({ value.x, value.y, value.z,value.w });
 		}
 		
 		void operator()(const Vector3& value) const {
-			jsonData = json::array({ value.x, value.y, value.z });
+			jsonData = nlohmann::json::array({ value.x, value.y, value.z });
 		}
 
 		void operator()(const Vector2& value) const {
-			jsonData = json::array({ value.x, value.y });
+			jsonData = nlohmann::json::array({ value.x, value.y });
 		}
 
 		template<typename T>
@@ -208,6 +202,50 @@ private:
 	};
 
 private:
+
+	/// グループを分ける
+	static std::vector<std::string> SplitPath(const std::string& path) {
+		std::vector<std::string> segments;
+		std::stringstream ss(path);
+		std::string segment;
+		while (std::getline(ss, segment, '/')) {
+			if (!segment.empty()) {
+				segments.push_back(segment);
+			}
+		}
+		return segments;
+	}
+
+	/// パスをたどってGroupを取得する。存在しなければ作成する
+	Group& ResolveOrCreateGroup(const std::string& path) {
+		auto segments = SplitPath(path);
+		Group* current = &datas_[segments[0]];
+		for (size_t i = 1; i < segments.size(); ++i) {
+			current = &current->children[segments[i]];
+		}
+		return *current;
+	}
+
+	/// パスをたどってGroupを検索する。存在しなければnullptrを返す
+	const Group* FindGroup(const std::string& path) const {
+		auto segments = SplitPath(path);
+		auto it = datas_.find(segments[0]);
+		if (it == datas_.end()) return nullptr;
+
+		const Group* current = &it->second;
+		for (size_t i = 1; i < segments.size(); ++i) {
+			auto itChild = current->children.find(segments[i]);
+			if (itChild == current->children.end()) return nullptr;
+			current = &itChild->second;
+		}
+		return current;
+	}
+
+	/// GroupをJSON化する
+	void SerializeGroupToJson(nlohmann::json& node, const Group& group) const;
+
+	/// JSONからGroupを復元する
+	void DeserializeGroupFromJson(Group& group, const nlohmann::json& node);
 
 	/// <summary>
 	/// 外部ファイルから値を取得する
@@ -219,7 +257,7 @@ private:
 	template<typename T>
 	void SetValue(const std::string& groupName, const std::string& key, T value) {
 		// グループの参照を取得
-		Group& group = datas_[groupName];
+		Group& group = ResolveOrCreateGroup(groupName);
 		// 新しい項目のデータを設定
 		Item newItem{};
 		newItem.value = value;

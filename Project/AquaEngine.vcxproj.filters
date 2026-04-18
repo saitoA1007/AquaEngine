@@ -282,9 +282,6 @@
     <ClCompile Include="EngineSource\Editor\GameParamEditor.cpp">
       <Filter>EngineSource\Editor</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Editor\ParamEditorManager.cpp">
-      <Filter>EngineSource\Editor</Filter>
-    </ClCompile>
     <ClCompile Include="EngineSource\Editor\EditorMenu\EditorLayout.cpp">
       <Filter>EngineSource\Editor\EditorMenu</Filter>
     </ClCompile>
@@ -480,6 +477,7 @@
     <ClCompile Include="EngineSource\Scene\IScene.cpp" />
     <ClCompile Include="EngineSource\Editor\EditorMenu\ViewOptionsBar.cpp" />
     <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectData.cpp" />
+    <ClCompile Include="EngineSource\Editor\JsonSerializer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -657,9 +655,6 @@
       <Filter>EngineSource\Editor</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Editor\GameParamEditor.h">
-      <Filter>EngineSource\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineSource\Editor\ParamEditorManager.h">
       <Filter>EngineSource\Editor</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Editor\EditorMenu\EditorLayout.h">
@@ -929,6 +924,7 @@
     <ClInclude Include="EngineSource\Scene\IScene.h" />
     <ClInclude Include="EngineSource\Editor\EditorMenu\ViewOptionsBar.h" />
     <ClInclude Include="EngineSource\Graphics\PostProcess\IPostEffect.h" />
+    <ClInclude Include="EngineSource\Editor\JsonSerializer.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Externals\imgui\ProggyClean.ttf" />

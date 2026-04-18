@@ -1,213 +1,60 @@
-#include"GameParamEditor.h"
-#include<cassert>
-#include<algorithm>
-#include <fstream>
-#include<Windows.h>
+#include "GameParamEditor.h"
+#include <cassert>
+#include <algorithm>
+#include "JsonSerializer.h"
+using json = nlohmann::json;
+using namespace GameEngine;
 
 GameParamEditor* GameParamEditor::GetInstance() {
 	static GameParamEditor instance;
 	return &instance;
 }
 
-void GameParamEditor::CreateGroup(const std::string& groupName, const std::string& sceneName) {
-	// 指定名のオブジェクトが無ければ追加する
-	datas_[groupName].sceneName = sceneName;
-}
-
-void GameParamEditor::SaveFile(const std::string& groupName) {
+void GameParamEditor::SaveFile(const std::string& rootGroupName) {
 
 	// グループを検索
-	std::map<std::string, Group>::iterator itGroup = datas_.find(groupName);
-
+	std::map<std::string, Group>::iterator itGroup = datas_.find(rootGroupName);
 	// 未登録チェック
 	assert(itGroup != datas_.end());
 
-	json root;
-	root = json::object();
+	json root = json::object();
 	// jsonオブジェクト登録
-	root[groupName] = json::object();
-
+	root[rootGroupName] = json::object();
 	// シーン名を保存
-	root[groupName]["SceneName"] = activeSceneName_;
+	root[rootGroupName]["SceneName"] = activeSceneName_;
+
+	// シーン名はルートグループに保存
+	root[rootGroupName]["SceneName"] = activeSceneName_;
+
+	// グループツリーをシリアライズ
+	SerializeGroupToJson(root[rootGroupName], itGroup->second);
 
 	// 各項目について
-	for (std::map<std::string, Item>::iterator itItem = itGroup->second.items.begin(); itItem != itGroup->second.items.end(); ++itItem) {
-
-		// 項目名を取得
-		const std::string& itemName = itItem->first;
-		// 項目の参照を取得
-		Item& item = itItem->second;
-
+	for (auto& [itemName, item] : itGroup->second.items) {
+		json& jsonNode = root[rootGroupName][itemName];
 		// jsonに値を保存する
-		json & jsonNode = root[groupName][itemName];
 		std::visit(JsonSaveVisitor{ jsonNode }, item.value);
 	}
 
-	// ディレクトリがなければ作成する
-	std::filesystem::path dir(kDirectoryPath);
-	if (!std::filesystem::exists(kDirectoryPath)) {
-		std::filesystem::create_directory(kDirectoryPath);
-	}
-
-	// 書き込むJSONファイルのフルパスを合成する
-	std::string filePath = kDirectoryPath + groupName + ".json";
-	// 書き込み用ファイルストリーム
-	std::ofstream ofs;
-	// ファイルを書き込み用に開く
-	ofs.open(filePath);
-
-	// ファイルオープン失敗
-	if (ofs.fail()) {
-		std::string message = "Failed open data file for write.";
-		MessageBoxA(nullptr, message.c_str(), "GameParamEditor", 0);
-		assert(0);
-		return;
-	}
-
-	// ファイルにjson文字列を書き込む(インデント幅4)
-	ofs << std::setw(4) << root << std::endl;
-	// ファイルを閉じる
-	ofs.close();
+	// 保存する
+	const std::string filePath = kDirectoryPath + rootGroupName + ".json";
+	JsonSerializer::SaveToFile(filePath, root);
 }
 
 void GameParamEditor::LoadFiles() {
-
-	// ディレクトリがなければスキップする
-	std::filesystem::path dir(kDirectoryPath);
-	if (!std::filesystem::exists(kDirectoryPath)) {
-		return;
-	}
-
-	std::filesystem::directory_iterator dir_it(kDirectoryPath);
-	for (const std::filesystem::directory_entry& entry : dir_it) {
-
-		// ファイルパスを取得
-		const std::filesystem::path& filePath = entry.path();
-
-		// ファイル拡張子を取得
-		std::string extension = filePath.extension().string();
-		// .jsonファイル以外はスキップ
-		if (extension.compare(".json") != 0) {
-			continue;
+	// ディレクトリ内の全ファイルを取得
+	JsonSerializer::LoadDirectory(kDirectoryPath,
+		[this](const std::string& stem, const json& root) {
+			ParseGroupJson(stem, root);
 		}
-
-		// ファイル読み込み
-		LoadFile(filePath.stem().string());
-	}
-
+	);
 }
 
-void GameParamEditor::LoadFile(const std::string& groupName) {
-
+void GameParamEditor::LoadFile(const std::string& rootGroupName) {
 	// 読み込みJSONファイルのフルパスを合成する
-	std::string filePath = kDirectoryPath + groupName + ".json";
-	// 読み込み用ファイルストリーム
-	std::ifstream ifs;
-	// ファイルを読み込み用に開く
-	ifs.open(filePath);
-
-	// ファイルオープン失敗
-	if (ifs.fail()) {
-		std::string message = "Failed open data file for load.";
-		MessageBoxA(nullptr, message.c_str(), "GameParamEditor", 0);
-		assert(0);
-	}
-
-	
-	json root;
-
-	// json文字列からjsonのデータ構造に展開
-	ifs >> root;
-	// ファイルを閉じる
-	ifs.close();
-
-	// シーン名を読み込み
-	std::string sceneName = root[groupName]["SceneName"].get<std::string>();
-	datas_[groupName].sceneName = sceneName;
-
-	// グループを検索
-	json::iterator itGroup = root.find(groupName);
-	// 未登録チェック
-	assert(itGroup != root.end());
-
-	// 各アイテムについて
-	for (json::iterator itItem = itGroup->begin(); itItem != itGroup->end(); ++itItem) {
-		// アイテム名を取得
-		const std::string& itemName = itItem.key();
-		if (itemName == "SceneName") {
-			continue;
-		}
-
-		// パラメータの型を取得
-		const auto itemType = itItem->type();
-
-		switch (itemType)
-		{
-			// bool型を取得
-		case json::value_t::boolean:
-			SetValue(groupName, itemName, itItem->get<bool>());
-			break;
-
-			// int32_t型を取得
-		case json::value_t::number_integer:
-			SetValue(groupName, itemName, itItem->get<int32_t>());
-			break;
-
-			// uint32_t型を取得
-		case json::value_t::number_unsigned:
-			SetValue(groupName, itemName, itItem->get<uint32_t>());
-			break;
-
-			// float型を取得
-		case json::value_t::number_float:
-			SetValue(groupName, itemName, itItem->get<float>());
-			break;
-
-			// Vector型を取得
-		case json::value_t::array:
-			if (itItem->size() == 3) {
-				Vector3 value = { itItem->at(0), itItem->at(1), itItem->at(2) };
-				SetValue(groupName, itemName, value);
-			} else if (itItem->size() == 2) {
-				Vector2 value = { itItem->at(0), itItem->at(1) };
-				SetValue(groupName, itemName, value);
-			} else if (itItem->size() == 4) {
-				Vector4 value = { itItem->at(0), itItem->at(1), itItem->at(2),itItem->at(3) };
-				SetValue(groupName, itemName, value);
-			}
-			break;
-
-		case json::value_t::object:
-			if (itItem->contains("Min") && itItem->contains("Max")) {
-				const auto& minArray = itItem->at("Min");
-				const auto& maxArray = itItem->at("Max");
-
-				if (minArray.is_array() && maxArray.is_array() &&
-					minArray.size() == 3 && maxArray.size() == 3) {
-					Range3 value = {
-						{ minArray[0], minArray[1], minArray[2] },
-						{ maxArray[0], maxArray[1], maxArray[2] }
-					};
-					SetValue(groupName, itemName, value);
-				} else if (minArray.size() == 4 && maxArray.size() == 4) {
-					Range4 value = {
-						{ minArray[0], minArray[1], minArray[2], minArray[3] },
-						{ maxArray[0], maxArray[1], maxArray[2], maxArray[3] }
-					};
-					SetValue(groupName, itemName, value);
-				}
-			}
-			break;
-
-			// std::string型を取得
-		case json::value_t::string:
-			SetValue(groupName, itemName, itItem->get<std::string>());
-			break;
-
-		default:
-			break;
-		}
-	}
+	const std::string filePath = kDirectoryPath + rootGroupName + ".json";
+	const json root = JsonSerializer::LoadFromFile(filePath);
+	ParseGroupJson(rootGroupName, root);
 }
 
 void GameParamEditor::RemoveItem(const std::string& groupName, const std::string& key) {
@@ -231,10 +78,98 @@ void GameParamEditor::RemoveItem(const std::string& groupName, const std::string
 	}
 }
 
-void GameParamEditor::SelectGroup(const std::string& groupName) {
-	selectedGroupName_ = groupName;
+void GameParamEditor::SetRootGroupName(const std::string& rootGroupName) {
+	rootGroupName_ = rootGroupName;
 }
 
 void GameParamEditor::SetActiveScene(const std::string& sceneName) {
 	activeSceneName_ = sceneName;
+}
+
+void GameParamEditor::ParseGroupJson(const std::string& rootGroupName, const json& root) {
+
+	auto itRoot = root.find(rootGroupName);
+	assert(itRoot != root.end());
+
+	// シーン名をルートグループに設定
+	if (itRoot->contains("SceneName")) {
+		datas_[rootGroupName].sceneName = itRoot->at("SceneName").get<std::string>();
+	}
+
+	// グループツリーを取得
+	DeserializeGroupFromJson(datas_[rootGroupName], *itRoot);
+}
+
+void GameParamEditor::SerializeGroupToJson(json& node, const Group& group) const {
+
+	// このグループのアイテムをシリアライズ
+	for (const auto& [itemName, item] : group.items) {
+		json& jsonNode = node[itemName];
+		std::visit(JsonSaveVisitor{ jsonNode }, item.value);
+	}
+
+	// サブグループを再帰的にシリアライズ
+	for (const auto& [childName, childGroup] : group.children) {
+		node[childName] = json::object();
+		SerializeGroupToJson(node[childName], childGroup);
+	}
+}
+
+void GameParamEditor::DeserializeGroupFromJson(Group& group, const json& node) {
+
+	for (auto itItem = node.begin(); itItem != node.end(); ++itItem) {
+		const std::string& itemName = itItem.key();
+
+		// SceneName はスキップ
+		if (itemName == "SceneName") { continue; }
+
+		switch (itItem->type()) {
+		case json::value_t::boolean:
+			group.items[itemName].value = itItem->get<bool>();
+			break;
+		case json::value_t::number_integer:
+			group.items[itemName].value = itItem->get<int32_t>();
+			break;
+		case json::value_t::number_unsigned:
+			group.items[itemName].value = itItem->get<uint32_t>();
+			break;
+		case json::value_t::number_float:
+			group.items[itemName].value = itItem->get<float>();
+			break;
+		case json::value_t::array:
+			if (itItem->size() == 2) {
+				group.items[itemName].value = Vector2{ itItem->at(0), itItem->at(1) };
+			} else if (itItem->size() == 3) {
+				group.items[itemName].value = Vector3{ itItem->at(0), itItem->at(1), itItem->at(2) };
+			} else if (itItem->size() == 4) {
+				group.items[itemName].value = Vector4{ itItem->at(0), itItem->at(1), itItem->at(2), itItem->at(3) };
+			}
+			break;
+		case json::value_t::object:
+			if (itItem->contains("Min") && itItem->contains("Max")) {
+				const auto& minArray = itItem->at("Min");
+				const auto& maxArray = itItem->at("Max");
+				if (minArray.size() == 3) {
+					group.items[itemName].value = Range3{
+						{ minArray[0], minArray[1], minArray[2] },
+						{ maxArray[0], maxArray[1], maxArray[2] }
+					};
+				} else if (minArray.size() == 4) {
+					group.items[itemName].value = Range4{
+						{ minArray[0], minArray[1], minArray[2], minArray[3] },
+						{ maxArray[0], maxArray[1], maxArray[2], maxArray[3] }
+					};
+				}
+			} else {
+				// それ以外のオブジェクトはサブグループとして再帰的に読み込む
+				DeserializeGroupFromJson(group.children[itemName], *itItem);
+			}
+			break;
+		case json::value_t::string:
+			group.items[itemName].value = itItem->get<std::string>();
+			break;
+		default:
+			break;
+		}
+	}
 }

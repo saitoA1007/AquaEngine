@@ -24,10 +24,10 @@ void HierarchyWindow::Draw() {
         ImGui::Separator();
     }
 
-    const std::string& selectedGroupName = GameParamEditor::GetInstance()->GetSelectGroup();
+    const std::string& selectedRootGroupName = GameParamEditor::GetInstance()->GetRootGroupName();
 
     // 各グループをリスト表示
-    for (auto& [groupName, group] : GameParamEditor::GetInstance()->GetAllGroups()) {
+    for (auto& [rootGroupName, group] : GameParamEditor::GetInstance()->GetAllGroups()) {
 
         // 指定したシーンにあった項目を表示する
         if (!activeSceneName.empty() && activeSceneName != "None" &&
@@ -36,23 +36,23 @@ void HierarchyWindow::Draw() {
             continue;
         }
 
-        bool isSelected = (selectedGroupName == groupName);
+        bool isSelected = (selectedRootGroupName == rootGroupName);
 
         // 項目数を表示
-        std::string label = groupName;
+        std::string label = rootGroupName;
         if (ImGui::Selectable(label.c_str(), isSelected)) {
-            GameParamEditor::GetInstance()->SelectGroup(groupName);
+            GameParamEditor::GetInstance()->SetRootGroupName(rootGroupName);
         }
 
         // 右クリックメニュー
         if (ImGui::BeginPopupContextItem()) {
             if (ImGui::MenuItem("Save")) {
-                GameParamEditor::GetInstance()->SaveFile(groupName);
-                std::string message = std::format("{}.json saved.", groupName);
+                GameParamEditor::GetInstance()->SaveFile(rootGroupName);
+                std::string message = std::format("{}.json saved.", rootGroupName);
                 MessageBoxA(nullptr, message.c_str(), "GameParamEditor", 0);
             }
             if (ImGui::MenuItem("Load")) {
-                GameParamEditor::GetInstance()->LoadFile(groupName);
+                GameParamEditor::GetInstance()->LoadFile(rootGroupName);
             }
             ImGui::EndPopup();
         }
