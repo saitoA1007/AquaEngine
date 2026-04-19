@@ -15,15 +15,19 @@ namespace GameEngine {
         }
 
 		template<typename T>
-        void Register(const std::string& key, T* valueRef, int priority = INT_MAX,const std::string groupName = "null") {
-            if (groupName != "null") {
-                rootGroupName_ += "/" + groupName;
+        void Register(const std::string& key, T& valueRef, int priority = INT_MAX,const std::string subGroupName = "") {
+            std::string path;
+            if (subGroupName.empty()) {
+                path = rootGroupName_;
+            } else {
+                path = rootGroupName_ + "/" + subGroupName;
             }
+
             // 値を登録する
-            gameParamEditor_->AddItem(rootGroupName_, key, valueRef, priority);
+            gameParamEditor_->AddItem(path, key, valueRef, priority);
 
             // 値を保持
-            bindings_.push_back(std::make_unique<ParamBinding<T>>(rootGroupName_, key, valueRef));
+            bindings_.push_back(std::make_unique<ParamBinding<T>>(path, key, valueRef));
         }
 
         // 値を適応する
@@ -58,17 +62,16 @@ namespace GameEngine {
             }
 
             bool IsDirty() const override {
-                //return gameParamEditor_->IsDirty(groupName, key);
+                return gameParamEditor_->IsDirty(groupName, key);
             }
 
             void ClearDirty() override {
-                //gameParamEditor_->ClearDirty(groupName, key);
+                gameParamEditor_->ClearDirty(groupName, key);
             }
         };
 
     private:
         static GameParamEditor* gameParamEditor_;
-
         std::string rootGroupName_;
         std::vector<std::unique_ptr<IParamBinding>> bindings_;
 	};

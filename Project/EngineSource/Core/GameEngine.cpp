@@ -190,7 +190,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 
 	// シーンの初期化
 	sceneManager_ = std::make_unique<SceneManager>();
-	sceneManager_->Initialize(sceneRegistry_.get());
+	sceneManager_->Initialize(sceneRegistry_.get(), gameParamEditor_.get());
 	
 	// エディターの初期化
 #ifdef USE_IMGUI

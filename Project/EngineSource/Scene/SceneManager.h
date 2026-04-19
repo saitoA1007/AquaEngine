@@ -7,6 +7,9 @@
 
 namespace GameEngine {
 
+	// 前方宣言
+	class GameParamEditor;
+
 	/// <summary>
 	/// シーンの管理
 	/// </summary>
@@ -19,7 +22,7 @@ namespace GameEngine {
 		/// 初期化処理
 		/// </summary>
 		/// <param name="context"></param>
-		void Initialize(SceneRegistry* sceneRegistry);
+		void Initialize(SceneRegistry* sceneRegistry, GameParamEditor* gameParamEditor);
 
 		/// <summary>
 		/// 更新処理
@@ -62,6 +65,9 @@ namespace GameEngine {
 
 		// シーン機能
 		SceneRegistry* sceneRegistry_ = nullptr;
+
+		// パラメータ機能
+		GameParamEditor* gameParamEditor_ = nullptr;
 
 	private: // シーン機能
 

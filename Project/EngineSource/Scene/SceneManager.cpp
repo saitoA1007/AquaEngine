@@ -1,6 +1,5 @@
 #include "SceneManager.h"
-
-#include "ImguiManager.h"
+#include "GameParamEditor.h"
 
 using namespace GameEngine;
 
@@ -9,7 +8,8 @@ SceneManager::~SceneManager() {
 	currentScene_.release();
 }
 
-void SceneManager::Initialize(SceneRegistry* sceneRegistry) {
+void SceneManager::Initialize(SceneRegistry* sceneRegistry, GameParamEditor* gameParamEditor) {
+	gameParamEditor_ = gameParamEditor;
 
 	// シーンの生成機能を初期化
 	sceneRegistry_ = sceneRegistry;
@@ -72,6 +72,9 @@ void SceneManager::ChangeScene(const std::string& sceneName) {
 
 	// シーン名を保存
 	currentSceneName_ = sceneName;
+
+	// 現在のシーンを設定
+	gameParamEditor_->SetActiveScene(currentSceneName_);
 
 	// 前の要素を削除
 	currentScene_.reset();
