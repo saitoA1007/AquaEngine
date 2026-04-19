@@ -10,7 +10,7 @@ ModelManager::~ModelManager() {
 	models_.clear();
 }
 
-void ModelManager::Initialize(ID3D12Device* device, TextureManager* textureManager, SrvManager* srvManager) {
+void ModelManager::Initialize(ID3D12Device5* device, TextureManager* textureManager, SrvManager* srvManager) {
 	// モデル生成システムの初期化
 	loader_.Initialize(device, textureManager, srvManager);
 }

@@ -1,6 +1,7 @@
 #include "GraphicsDevice.h"
 #include <cassert>
 #include "LogManager.h"
+#include "ResourceGarbageCollector.h"
 using namespace GameEngine;
 
 void GraphicsDevice::Initialize(HWND hwnd, uint32_t width, uint32_t height) {
@@ -47,6 +48,9 @@ void GraphicsDevice::Initialize(HWND hwnd, uint32_t width, uint32_t height) {
     // フェンスの生成
     fence_ = std::make_unique<DXFence>();
     fence_->Initialize(device_->GetDevice());
+
+    // フェンスを取得
+    ResourceGarbageCollector::GetInstance().SetFence(fence_.get());
 
     // ビューポート、シザー矩形を生成
     viewportState_ = std::make_unique<DXViewportState>();

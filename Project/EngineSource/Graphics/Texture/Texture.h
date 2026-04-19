@@ -31,9 +31,6 @@ namespace GameEngine {
         std::string fileName_;
         DirectX::ScratchImage mipImage_;
 
-        // 中間リソース(後で削除するようなシステムを作る)
-        Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResources_;
-
         uint32_t srvIndex_ = 0;
         CD3DX12_CPU_DESCRIPTOR_HANDLE srvHandleCPU_;
         CD3DX12_GPU_DESCRIPTOR_HANDLE srvHandleGPU_;

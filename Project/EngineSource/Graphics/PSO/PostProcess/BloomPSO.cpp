@@ -6,7 +6,7 @@
 #include"LogManager.h"
 using namespace GameEngine;
 
-void BloomPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath, DXC* dxc,
+void BloomPSO::Initialize(ID3D12Device5* device, const std::wstring& vsPath, DXC* dxc,
     const std::wstring brightPsPath, const std::wstring blurPsPath, const std::wstring resultPsPath, const std::wstring compositePsPath) {
 
     // 初期化を開始するログ

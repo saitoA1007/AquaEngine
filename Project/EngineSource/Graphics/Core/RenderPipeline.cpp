@@ -1,7 +1,7 @@
 #include "RenderPipeline.h"
 #include "ImGuiManager.h"
 #include "LogManager.h"
-
+#include "ResourceGarbageCollector.h"
 using namespace GameEngine;
 
 void RenderPipeline::Initialize(GraphicsDevice* graphicsDevice, PostEffectManager* postEffectManager, RenderPassController* renderPassController) {
@@ -71,6 +71,9 @@ void RenderPipeline::EndFrame(ImGuiManager* imGuiManager) {
 
     // FPS固定
     frameRateController_->UpdateFixFPS();
+
+    // 使用していないリソースを削除する
+    ResourceGarbageCollector::GetInstance().ProcessCompletedResources();
 }
 
 void RenderPipeline::TransitionBackBuffer(D3D12_RESOURCE_STATES stateBefore, D3D12_RESOURCE_STATES stateAfter) {

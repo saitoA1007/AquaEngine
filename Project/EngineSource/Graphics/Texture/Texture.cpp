@@ -2,11 +2,11 @@
 #include "CreateBufferResource.h"
 #include "TextureLoader.h"
 #include "LogManager.h"
+#include "ResourceGarbageCollector.h"
 using namespace GameEngine;
 
 Texture::~Texture() {
 	resource_.Reset();
-	intermediateResources_.Reset();
 	// srvの解放
 	if (srvManager_) {
 		srvManager_->ReleseIndex(srvIndex_);
@@ -42,11 +42,14 @@ void Texture::Create(const std::string& filePath, ID3D12GraphicsCommandList* cmd
 	/// CPUからGPUへデータを送る
 
 	// テクスチャデータをアップロード
-	intermediateResources_ = TextureLoader::UploadTextureData(device_, cmdList, resource_.Get(), mipImage_);
-	if (!intermediateResources_) {
+	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResources = TextureLoader::UploadTextureData(device_, cmdList, resource_.Get(), mipImage_);
+	if (!intermediateResources) {
 		LogManager::GetInstance().Log("Failed to upload texture data for: " + fileName_);
 		assert(false);
 	}
+
+	// リソースの破棄を登録する
+	ResourceGarbageCollector::GetInstance().Add(intermediateResources);
 
 	/// SRVを作成
 
