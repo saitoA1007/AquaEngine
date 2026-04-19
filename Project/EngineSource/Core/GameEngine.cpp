@@ -190,7 +190,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 
 	// シーンの初期化
 	sceneManager_ = std::make_unique<SceneManager>();
-	sceneManager_->Initialize(sceneRegistry_.get(), gameParamEditor_.get());
+	sceneManager_->Initialize(sceneRegistry_.get(), gameParamEditor_.get(), gameObjectManager_.get());
 	
 	// エディターの初期化
 #ifdef USE_IMGUI
@@ -302,7 +302,10 @@ void Engine::PreUpdate() {
 	} else {
 		// 更新処理が停止してる時、リセットされていなければリセット
 		if (!isReset) {
+			// シーンをリセット
 			sceneManager_->ResetCurrentScene();
+			// ゲームオブジェクトを初期化
+			gameObjectManager_->InitializeAll();
 			isReset = true;
 		}
 	}

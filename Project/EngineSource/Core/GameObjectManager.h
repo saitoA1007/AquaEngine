@@ -26,6 +26,9 @@ namespace GameEngine {
             return ptr;
         }
 
+        // 初期化処理
+        void InitializeAll();
+
         // 更新処理
         void UpdateAll();
 

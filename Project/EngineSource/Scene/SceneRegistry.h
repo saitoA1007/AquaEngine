@@ -23,7 +23,7 @@ namespace GameEngine {
 		/// <param name="sceneName"></param>
 		template<typename T>
 		void RegisterScene(const std::string& sceneName) {
-			static_assert(std::is_base_of<IScene, T>::value, "T must derive from BaseScene");
+			static_assert(std::is_base_of<IScene, T>::value, "T must derive from IScene");
 			creators_[sceneName] = []() { return std::make_unique<T>(); };
 			sceneNames_.push_back(sceneName);
 		}

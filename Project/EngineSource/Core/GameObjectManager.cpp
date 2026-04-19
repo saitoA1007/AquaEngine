@@ -2,6 +2,12 @@
 #include <algorithm>
 using namespace GameEngine;
 
+void GameObjectManager::InitializeAll() {
+    for (auto& obj : objects_) {
+        obj->Initialize();
+    }
+}
+
 void GameObjectManager::UpdateAll() {
     preSize_ = currentSize_;
     currentSize_ = objects_.size();

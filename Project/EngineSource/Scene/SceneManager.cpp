@@ -8,8 +8,9 @@ SceneManager::~SceneManager() {
 	currentScene_.release();
 }
 
-void SceneManager::Initialize(SceneRegistry* sceneRegistry, GameParamEditor* gameParamEditor) {
+void SceneManager::Initialize(SceneRegistry* sceneRegistry, GameParamEditor* gameParamEditor, GameObjectManager* gameObjectManager) {
 	gameParamEditor_ = gameParamEditor;
+	gameObjectManager_ = gameObjectManager;
 
 	// シーンの生成機能を初期化
 	sceneRegistry_ = sceneRegistry;
@@ -78,6 +79,7 @@ void SceneManager::ChangeScene(const std::string& sceneName) {
 
 	// 前の要素を削除
 	currentScene_.reset();
+	gameObjectManager_->ClearAll();
 
 	// 新しいシーンを作成
 	currentScene_ = sceneRegistry_->CreateScene(sceneName);
@@ -95,5 +97,6 @@ void SceneManager::ChangeScene(const std::string& sceneName) {
 
 void SceneManager::ResetCurrentScene() {
 	// 現在のシーンを再初期化する
-	ChangeScene(currentSceneName_);
+	//ChangeScene(currentSceneName_);
+	currentScene_->Initialize();
 }
