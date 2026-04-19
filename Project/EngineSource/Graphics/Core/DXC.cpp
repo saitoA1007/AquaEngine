@@ -1,8 +1,8 @@
-#include"DXC.h"
-#include<cassert>
-#include"ConvertString.h"
-#include<format>
-#include"LogManager.h"
+#include "DXC.h"
+#include <cassert>
+#include "ConvertString.h"
+#include <format>
+#include "LogManager.h"
 #pragma comment(lib,"dxcompiler.lib")
 
 using namespace GameEngine;
@@ -24,16 +24,13 @@ Microsoft::WRL::ComPtr<IDxcBlob>  DXC::CompileShader(
 	const std::wstring& filePath,
 	// Compilerに使用するProfile
 	const wchar_t* profile,
-	// 初期化で生成したものを3つ
-	IDxcUtils* dxcUtils,
-	IDxcCompiler3* dxcCompiler,
-	IDxcIncludeHandler* includeHandler)
+	const std::wstring& entryPoint)
 {
 	// これからシェーダーをコンパイルする旨をログに出す
 	LogManager::GetInstance().Log(ConvertString(std::format(L"Begin CompileShader, path:{}, profile:{}\n", filePath, profile)));
 	// hlslファイルを読む
 	IDxcBlobEncoding* shaderSource = nullptr;
-	HRESULT hr = dxcUtils->LoadFile(filePath.c_str(), nullptr, &shaderSource);
+	HRESULT hr = dxcUtils_->LoadFile(filePath.c_str(), nullptr, &shaderSource);
 	// 読めなかったら止める
 	assert(SUCCEEDED(hr));
 	// 読み込んだファイルの内容を設定する
@@ -42,21 +39,27 @@ Microsoft::WRL::ComPtr<IDxcBlob>  DXC::CompileShader(
 	shaderSourceBuffer.Size = shaderSource->GetBufferSize();
 	shaderSourceBuffer.Encoding = DXC_CP_UTF8; // UTF8の文字コードであることを通知
 
-	LPCWSTR arguments[] = {
+	std::vector<LPCWSTR> arguments = {
 		filePath.c_str(),  // コンパイル対象のhlslファイル名
-		L"-E", L"main",  // エントリーポイントの指定。基礎的にmain以外にはしない
 		L"-T", profile,  // ShaderProfileの設定 
 		L"-Zi", L"-Qembed_debug",  // デバック用に情報を埋め込む
 		L"-Od",  // 最適化を外しておく
 		L"-Zpr", // メモリアウトは行を優先
 	};
+
+	// エントリーポイントが存在する場合設定
+	if (!entryPoint.empty()) {
+		arguments.push_back(L"-E");
+		arguments.push_back(entryPoint.c_str());
+	}
+
 	// 実際にShaderをコンパイルする
 	IDxcResult* shaderResult = nullptr;
-	hr = dxcCompiler->Compile(
-		&shaderSourceBuffer,    // 読み込んだファイル
-		arguments,              // コンパイルオプション
-		_countof(arguments),    // コンパイルオプションの数
-		includeHandler,         // includeが含まれた諸々
+	hr = dxcCompiler_->Compile(
+		&shaderSourceBuffer,		// 読み込んだファイル
+		arguments.data(),			// コンパイルオプション
+		(UINT32)arguments.size(),	// コンパイルオプションの数
+		includeHandler_.Get(),		// includeが含まれた諸々
 		IID_PPV_ARGS(&shaderResult) // コンパイル結果
 	);
 	// コンパイルエラーではなくdxcが起動できないなど致命的な状況

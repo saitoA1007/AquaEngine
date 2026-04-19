@@ -7,19 +7,18 @@ namespace GameEngine {
 
 	class DXDevice final {
 	public:
-
 		DXDevice() = default;
 		~DXDevice() = default;
 
 		void Initialize();
 
-		ID3D12Device* GetDevice() const { return device_.Get(); }
+		ID3D12Device5* GetDevice() const { return device_.Get(); }
 		IDXGIFactory7* GetFactory() const { return dxgiFactory_.Get(); }
 
 	private:
 
 		Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory_;
-		Microsoft::WRL::ComPtr<ID3D12Device> device_;
+		Microsoft::WRL::ComPtr<ID3D12Device5> device_;
 
 	private:
 
@@ -32,6 +31,11 @@ namespace GameEngine {
 		/// デバイスを作成
 		/// </summary>
 		void CreateDevice();
+
+		/// <summary>
+		/// レイトレーシングが使用出来るか確認する
+		/// </summary>
+		void CheckRaytracingEnable();
 
 #ifdef _DEBUG
 

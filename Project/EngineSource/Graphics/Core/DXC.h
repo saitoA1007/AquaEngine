@@ -1,8 +1,8 @@
 #pragma once
 #include <d3d12.h>
-#include<dxcapi.h>
+#include <dxcapi.h>
 #include <wrl.h>
-#include<iostream>
+#include <iostream>
 namespace GameEngine {
 
 	class DXC final {
@@ -18,10 +18,7 @@ namespace GameEngine {
 			const std::wstring& filePath,
 			// Compilerに使用するProfile
 			const wchar_t* profile,
-			// 初期化で生成したものを3つ
-			IDxcUtils* dxcUtils,
-			IDxcCompiler3* dxcCompiler,
-			IDxcIncludeHandler* includeHandler);
+			const std::wstring& entryPoint = L"main");
 
 		IDxcUtils* GetIDxcUtils() const { return dxcUtils_.Get(); }
 

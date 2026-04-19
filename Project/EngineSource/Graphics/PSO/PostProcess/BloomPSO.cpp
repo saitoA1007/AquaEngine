@@ -103,26 +103,21 @@ void BloomPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath, DXC*
 
     // シェーダ読み込み
     Microsoft::WRL::ComPtr<IDxcBlob> vsBlob;
-    vsBlob = dxc->CompileShader(vsPath,
-        L"vs_6_0", dxc->dxcUtils_.Get(), dxc->dxcCompiler_.Get(), dxc->includeHandler_.Get());
+    vsBlob = dxc->CompileShader(vsPath,L"vs_6_0");
     assert(vsBlob != nullptr);
     
     Microsoft::WRL::ComPtr<IDxcBlob> brightPsBlob, blurPsBlob, resultPsBlob, blurCompositePsBlob;
     // 明るい部分を抽出する用
-    brightPsBlob = dxc->CompileShader(brightPsPath,
-        L"ps_6_0", dxc->dxcUtils_.Get(), dxc->dxcCompiler_.Get(), dxc->includeHandler_.Get());
+    brightPsBlob = dxc->CompileShader(brightPsPath,L"ps_6_0");
     assert(brightPsBlob != nullptr);
     // ぼかす用
-    blurPsBlob = dxc->CompileShader(blurPsPath,
-        L"ps_6_0", dxc->dxcUtils_.Get(), dxc->dxcCompiler_.Get(), dxc->includeHandler_.Get());
+    blurPsBlob = dxc->CompileShader(blurPsPath,L"ps_6_0");
     assert(blurPsBlob != nullptr);
     // ぼかした結果をまとめる用
-    resultPsBlob = dxc->CompileShader(resultPsPath,
-        L"ps_6_0", dxc->dxcUtils_.Get(), dxc->dxcCompiler_.Get(), dxc->includeHandler_.Get());
+    resultPsBlob = dxc->CompileShader(resultPsPath,L"ps_6_0");
     assert(resultPsBlob != nullptr);
     // 元の画像と合成する用
-    blurCompositePsBlob = dxc->CompileShader(compositePsPath,
-        L"ps_6_0", dxc->dxcUtils_.Get(), dxc->dxcCompiler_.Get(), dxc->includeHandler_.Get());
+    blurCompositePsBlob = dxc->CompileShader(compositePsPath,L"ps_6_0");
     assert(blurCompositePsBlob != nullptr);
 
     // DepthStencilStateの設定

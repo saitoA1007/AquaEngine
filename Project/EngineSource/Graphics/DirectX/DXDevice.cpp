@@ -77,7 +77,21 @@ void DXDevice::CreateDevice() {
     // デバイスの生成がうまくいかなかったので軌道できない
     assert(device_ != nullptr);
 
+    // レイトレーシングが使用出来るか確認
+    CheckRaytracingEnable();
+
     LogManager::GetInstance().Log("End　Create Device");
+}
+
+void DXDevice::CheckRaytracingEnable() {
+    D3D12_FEATURE_DATA_D3D12_OPTIONS5 option = {};
+    HRESULT hr = device_->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &option, sizeof(option));
+
+    if (FAILED(hr) || option.RaytracingTier == D3D12_RAYTRACING_TIER_NOT_SUPPORTED) {
+        assert(false && "dont support raytracing");
+    }
+
+    LogManager::GetInstance().Log("Raytracing is supported");
 }
 
 #ifdef _DEBUG

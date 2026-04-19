@@ -1,6 +1,6 @@
-#include"GraphicsDevice.h"
+#include "GraphicsDevice.h"
+#include <cassert>
 #include "LogManager.h"
-
 using namespace GameEngine;
 
 void GraphicsDevice::Initialize(HWND hwnd, uint32_t width, uint32_t height) {
@@ -54,6 +54,15 @@ void GraphicsDevice::Initialize(HWND hwnd, uint32_t width, uint32_t height) {
 
     // 初期化を終了するログ
     LogManager::GetInstance().Log("GraphicsDevice Class end Initialize\n");
+}
+
+void GraphicsDevice::CheckDeviceStatus() {
+    HRESULT hr = device_->GetDevice()->GetDeviceRemovedReason();
+
+    if (!SUCCEEDED(hr)) {
+        // デバイスの異常状態
+        assert(false && "Remove Device");
+    }
 }
 
 void GraphicsDevice::CloseCommandList() {

@@ -1,4 +1,4 @@
-#include"ShaderCompiler.h"
+#include "ShaderCompiler.h"
 #include <cassert>
 #include <fstream>
 #include <filesystem>
@@ -114,13 +114,7 @@ bool ShaderCompiler::IsHlslNewer(const std::wstring& hlslPath, const std::wstrin
 
 Microsoft::WRL::ComPtr<IDxcBlob> ShaderCompiler::CompileAndSave(Type type, const std::wstring& hlslPath) {
 	// HLSLをコンパイル
-	Microsoft::WRL::ComPtr<IDxcBlob> shaderBlob = dxc_->CompileShader(
-		hlslPath,
-		compileTypes[static_cast<size_t>(type)].c_str(),
-		dxc_->dxcUtils_.Get(),
-		dxc_->dxcCompiler_.Get(),
-		dxc_->includeHandler_.Get()
-	);
+	Microsoft::WRL::ComPtr<IDxcBlob> shaderBlob = dxc_->CompileShader(hlslPath,compileTypes[static_cast<size_t>(type)].c_str());
 
 	assert(shaderBlob != nullptr && "Shader compilation failed");
 
