@@ -64,9 +64,6 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	windowsApp_ = std::make_unique<WindowsApp>();
 	windowsApp_->CreateGameWindow(title, width, height);
 
-	// リソースチェックのデバック
-	D3DResourceLeakChecker leakCheck;
-
 	// DirectXの機能を生成
 	graphicsDevice_ = std::make_unique<GraphicsDevice>();
 	graphicsDevice_->Initialize(windowsApp_->GetHwnd(), windowsApp_->kWindowWidth, windowsApp_->kWindowHeight);
@@ -264,6 +261,9 @@ void Engine::Update() {
 }
 
 void Engine::PreUpdate() {
+
+	// デバイスの異常状態を確認
+	graphicsDevice_->CheckDeviceStatus();
 
 	// fpsを計測する
 	fpsCounter_->Update();

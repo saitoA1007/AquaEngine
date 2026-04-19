@@ -1,16 +1,16 @@
 #pragma once
-#include"DXDevice.h"
-#include"DXCommand.h"
-#include"DXSwapChain.h"
-#include"DXRenderTarget.h"
-#include"DXDepthStencil.h"
-#include"DXFence.h"
-#include"DXDebugger.h"
-#include"DXViewportState.h"
+#include "DXDevice.h"
+#include "DXCommand.h"
+#include "DXSwapChain.h"
+#include "DXRenderTarget.h"
+#include "DXDepthStencil.h"
+#include "DXFence.h"
+#include "DXDebugger.h"
+#include "DXViewportState.h"
 
-#include"RtvManager.h"
-#include"SrvManager.h"
-#include"DsvManager.h"
+#include "RtvManager.h"
+#include "SrvManager.h"
+#include "DsvManager.h"
 
 namespace GameEngine {
 
@@ -27,6 +27,11 @@ namespace GameEngine {
         /// <param name="height"></param>
         /// <param name="srvManager"></param>
         void Initialize(HWND hwnd, uint32_t width, uint32_t height);
+
+        /// <summary>
+        /// 毎フレームデバイスの状態を確認する
+        /// </summary>
+        void CheckDeviceStatus();
 
         /// <summary>
         /// コマンドリストを閉じる
@@ -54,9 +59,9 @@ namespace GameEngine {
         void Present();
 
     public:
-        ID3D12Device* GetDevice() const { return device_->GetDevice(); }
+        ID3D12Device5* GetDevice() const { return device_->GetDevice(); }
 
-        ID3D12GraphicsCommandList* GetCommandList() const { return command_->GetCommandList(); }
+        ID3D12GraphicsCommandList4* GetCommandList() const { return command_->GetCommandList(); }
 
         IDXGISwapChain4* GetSwapChain() const { return swapChain_->GetSwapChain(); }
         DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() const { return swapChain_->GetSwapChainDesc(); }
