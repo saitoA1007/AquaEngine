@@ -65,8 +65,7 @@ void ParticleCSPSO::CreateCS(ID3D12Device* device, DXC* dxc, LogManager* logMana
 
     // シェーダ読み込み
     Microsoft::WRL::ComPtr<IDxcBlob> computeShaderBlob;
-    computeShaderBlob = dxc->CompileShader(L"Resources/CS/Particle.CS.hlsl",
-        L"cs_6_0", dxc->dxcUtils_.Get(), dxc->dxcCompiler_.Get(), dxc->includeHandler_.Get());
+    computeShaderBlob = dxc->CompileShader(L"Resources/CS/Particle.CS.hlsl",L"cs_6_0");
     assert(computeShaderBlob != nullptr);
 
     // コンピュートパイプラインを設定
@@ -171,12 +170,10 @@ void ParticleCSPSO::CreateVSPS(ID3D12Device* device, DXC* dxc, LogManager* logMa
 	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob, pixelShaderBlob;
 
 	// Shaderをコンパイルする
-	vertexShaderBlob = dxc->CompileShader(L"Resources/Shaders/CS/Particle.VS.hlsl",
-		L"vs_6_0", dxc->dxcUtils_.Get(), dxc->dxcCompiler_.Get(), dxc->includeHandler_.Get());
+	vertexShaderBlob = dxc->CompileShader(L"Resources/Shaders/CS/Particle.VS.hlsl",L"vs_6_0");
 	assert(vertexShaderBlob != nullptr);
 
-	pixelShaderBlob = dxc->CompileShader(L"Resources/Shaders/CS/Particle.PS.hlsl",
-		L"ps_6_0", dxc->dxcUtils_.Get(), dxc->dxcCompiler_.Get(), dxc->includeHandler_.Get());
+	pixelShaderBlob = dxc->CompileShader(L"Resources/Shaders/CS/Particle.PS.hlsl",L"ps_6_0");
 	assert(pixelShaderBlob != nullptr);
 
 	// DepthStencilStateの設定

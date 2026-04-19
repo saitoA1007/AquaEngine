@@ -1,25 +1,25 @@
 #pragma once
 #include <d3d12.h>
-#include<dxcapi.h>
+#include <dxcapi.h>
 #include <wrl.h>
-#include<unordered_map>
-#include<string>
+#include <unordered_map>
+#include <string>
 
-#include"DXC.h"
+#include "DXC.h"
 
-#include"ShaderCompiler.h"
-#include"RootSignatureBuilder.h"
-#include"InputLayoutBuilder.h"
+#include "ShaderCompiler.h"
+#include "RootSignatureBuilder.h"
+#include "InputLayoutBuilder.h"
 
 // 本来は外から持ってくるもの達
-#include"RasterizerBuilder.h"
-#include"BlendBuilder.h"
+#include "RasterizerBuilder.h"
+#include "BlendBuilder.h"
 
-#include"DescriptorCounts.h"
+#include "DescriptorCounts.h"
 
-#include"DrawPSOData.h"
+#include "DrawPSOData.h"
 
-#include<json.hpp>
+#include <json.hpp>
 
 using json = nlohmann::json;
 

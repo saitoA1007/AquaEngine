@@ -78,14 +78,12 @@ void CopyPSO::Initialize(ID3D12Device* device, const std::wstring& vsPath, const
 
     // シェーダ読み込み
     Microsoft::WRL::ComPtr<IDxcBlob> vsBlob;
-    vsBlob = dxc->CompileShader(vsPath,
-        L"vs_6_0", dxc->dxcUtils_.Get(), dxc->dxcCompiler_.Get(), dxc->includeHandler_.Get());
+    vsBlob = dxc->CompileShader(vsPath,L"vs_6_0");
     assert(vsBlob != nullptr);
 
     Microsoft::WRL::ComPtr<IDxcBlob> psBlob;
     // 明るい部分を抽出する用
-    psBlob = dxc->CompileShader(psPath,
-        L"ps_6_0", dxc->dxcUtils_.Get(), dxc->dxcCompiler_.Get(), dxc->includeHandler_.Get());
+    psBlob = dxc->CompileShader(psPath,L"ps_6_0");
     assert(psBlob != nullptr);
 
     // DepthStencilStateの設定
