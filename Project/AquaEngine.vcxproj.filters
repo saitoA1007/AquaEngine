@@ -478,6 +478,7 @@
     <ClCompile Include="EngineSource\Editor\EditorMenu\ViewOptionsBar.cpp" />
     <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectData.cpp" />
     <ClCompile Include="EngineSource\Editor\JsonSerializer.cpp" />
+    <ClCompile Include="EngineSource\Editor\DebugParameter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -925,6 +926,7 @@
     <ClInclude Include="EngineSource\Editor\EditorMenu\ViewOptionsBar.h" />
     <ClInclude Include="EngineSource\Graphics\PostProcess\IPostEffect.h" />
     <ClInclude Include="EngineSource\Editor\JsonSerializer.h" />
+    <ClInclude Include="EngineSource\Editor\DebugParameter.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Externals\imgui\ProggyClean.ttf" />

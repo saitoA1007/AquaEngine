@@ -2,6 +2,10 @@
 
 using namespace GameEngine;
 
+InspectorWindow::InspectorWindow(GameParamEditor* gameParamEditor) {
+    gameParamEditor_ = gameParamEditor;
+}
+
 void InspectorWindow::Draw() {
     if (!isActive) return;
 
@@ -10,7 +14,7 @@ void InspectorWindow::Draw() {
         return;
     }
 
-    const std::string& selectedPath = GameParamEditor::GetInstance()->GetRootGroupName();
+    const std::string& selectedPath = gameParamEditor_->GetRootGroupName();
 
     // グループが選択されていない場合の表示
     if (selectedPath.empty()) {
@@ -23,11 +27,11 @@ void InspectorWindow::Draw() {
     const std::string rootGroupName = selectedPath.substr(0, selectedPath.find('/'));
 
     // ルートグループが存在するかチェック
-    auto& allGroups = GameParamEditor::GetInstance()->GetAllGroups();
+    auto& allGroups = gameParamEditor_->GetAllGroups();
     auto itRoot = allGroups.find(rootGroupName);
     if (itRoot == allGroups.end()) {
         ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "Group not found: %s", rootGroupName.c_str());
-        GameParamEditor::GetInstance()->SetRootGroupName("");
+        gameParamEditor_->SetRootGroupName("");
         ImGui::End();
         return;
     }
@@ -38,7 +42,7 @@ void InspectorWindow::Draw() {
 
     // 保存ボタン
     if (ImGui::Button("Save")) {
-        GameParamEditor::GetInstance()->SaveFile(rootGroupName);
+        gameParamEditor_->SaveFile(rootGroupName);
         std::string message = std::format("{}.json saved.", rootGroupName);
         MessageBoxA(nullptr, message.c_str(), "GameParamEditor", 0);
     }
@@ -47,7 +51,7 @@ void InspectorWindow::Draw() {
 
     // 読み込みボタン
     if (ImGui::Button("Load")) {
-        GameParamEditor::GetInstance()->LoadFile(rootGroupName);
+        gameParamEditor_->LoadFile(rootGroupName);
     }
 
     ImGui::Spacing();
@@ -99,7 +103,7 @@ void InspectorWindow::DrawItems(GameParamEditor::Group& group) {
     // ソート済みの順序で描画
     for (auto& [itemName, itemPtr] : sortedItems) {
         ImGui::PushID(itemName.c_str());
-        std::visit(DebugParameterVisitor{ itemName }, itemPtr->value);
+        std::visit(DebugParameterVisitor{ itemName, itemPtr->isDirty }, itemPtr->value);
         ImGui::PopID();
     }
 }

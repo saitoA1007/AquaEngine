@@ -5,11 +5,6 @@
 using json = nlohmann::json;
 using namespace GameEngine;
 
-GameParamEditor* GameParamEditor::GetInstance() {
-	static GameParamEditor instance;
-	return &instance;
-}
-
 void GameParamEditor::SaveFile(const std::string& rootGroupName) {
 
 	// グループを検索
@@ -17,24 +12,14 @@ void GameParamEditor::SaveFile(const std::string& rootGroupName) {
 	// 未登録チェック
 	assert(itGroup != datas_.end());
 
-	json root = json::object();
 	// jsonオブジェクト登録
+	json root = json::object();
 	root[rootGroupName] = json::object();
 	// シーン名を保存
 	root[rootGroupName]["SceneName"] = activeSceneName_;
 
-	// シーン名はルートグループに保存
-	root[rootGroupName]["SceneName"] = activeSceneName_;
-
 	// グループツリーをシリアライズ
 	SerializeGroupToJson(root[rootGroupName], itGroup->second);
-
-	// 各項目について
-	for (auto& [itemName, item] : itGroup->second.items) {
-		json& jsonNode = root[rootGroupName][itemName];
-		// jsonに値を保存する
-		std::visit(JsonSaveVisitor{ jsonNode }, item.value);
-	}
 
 	// 保存する
 	const std::string filePath = kDirectoryPath + rootGroupName + ".json";
@@ -55,27 +40,6 @@ void GameParamEditor::LoadFile(const std::string& rootGroupName) {
 	const std::string filePath = kDirectoryPath + rootGroupName + ".json";
 	const json root = JsonSerializer::LoadFromFile(filePath);
 	ParseGroupJson(rootGroupName, root);
-}
-
-void GameParamEditor::RemoveItem(const std::string& groupName, const std::string& key) {
-	// グループを検索
-	auto itGroup = datas_.find(groupName);
-
-	// グループが存在しなければ終了
-	if (itGroup == datas_.end()) {
-		return;
-	}
-
-	// グループ内のアイテムマップの参照を取得
-	std::map<std::string, Item>& items = itGroup->second.items;
-
-	// アイテムを検索
-	auto itItem = items.find(key);
-
-	// アイテムが存在すれば削除
-	if (itItem != items.end()) {
-		items.erase(itItem);
-	}
 }
 
 void GameParamEditor::SetRootGroupName(const std::string& rootGroupName) {

@@ -11,8 +11,6 @@ void TitleScene::Initialize() {
 	// ゲームシーンに必要な低レイヤー機能
 #pragma region SceneSystem 
 
-	// 登録するパラメータを設定
-	GameParamEditor::GetInstance()->SetActiveScene("TitleScene");
 #pragma endregion
 
 	// メインカメラの初期化

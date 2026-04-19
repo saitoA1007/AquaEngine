@@ -14,30 +14,16 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model)
 	// ワールド行列を初期化
 	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-2.0f,1.0f,0.0f} });
 
-#ifdef USE_IMGUI
-	//===========================================================
-	// 
-	// 現在、saveを押していないので、Playerのjsonファイルは存在していません
-	// 
-	//===========================================================
 
-	// 値を登録する
-	RegisterDebugParam();
-#else
-	// jsonファイルが作られていない状態で値の適応をおこなうとリリース版でバクります
-	// 値を適応させる
-	ApplyDebugParam();
-#endif
 }
 
 void Player::Initialize() {
-	ApplyDebugParam();
+	
 }
 
 void Player::Update() {
 #ifdef USE_IMGUI
-	// 値を適応
-	ApplyDebugParam();
+	
 #endif
 
 	// プレイヤーの入力処理
@@ -110,16 +96,16 @@ void Player::JumpUpdate() {
 	}
 }
 
-void Player::RegisterDebugParam() {
-	// 値の登録
-	GameParamEditor::GetInstance()->AddItem("Player", "JumpMaxHeight", kJumpHeight_);
-	GameParamEditor::GetInstance()->AddItem("Player", "JumpMaxTime", kJumpMaxTime_);
-	GameParamEditor::GetInstance()->AddItem("Player", "MoveSpeed", kMoveSpeed_);
-}
-
-void Player::ApplyDebugParam() {
-	// 値の適応
-	kJumpHeight_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "JumpMaxHeight");
-	kJumpMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "JumpMaxTime");
-	kMoveSpeed_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "MoveSpeed");
-}
+//void Player::RegisterDebugParam() {
+//	// 値の登録
+//	GameParamEditor::GetInstance()->AddItem("Player", "JumpMaxHeight", kJumpHeight_);
+//	GameParamEditor::GetInstance()->AddItem("Player", "JumpMaxTime", kJumpMaxTime_);
+//	GameParamEditor::GetInstance()->AddItem("Player", "MoveSpeed", kMoveSpeed_);
+//}
+//
+//void Player::ApplyDebugParam() {
+//	// 値の適応
+//	kJumpHeight_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "JumpMaxHeight");
+//	kJumpMaxTime_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "JumpMaxTime");
+//	kMoveSpeed_ = GameParamEditor::GetInstance()->GetValue<float>("Player", "MoveSpeed");
+//}

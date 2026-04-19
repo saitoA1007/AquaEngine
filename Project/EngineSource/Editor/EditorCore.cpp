@@ -28,7 +28,7 @@ EditorCore::EditorCore() {}
 EditorCore::~EditorCore() {}
 
 void EditorCore::Initialize(TextureManager* textureManager, SceneChangeRequest* sceneChangeRequest, RenderPassController* renderPassController,
-	Input* input, RenderQueue* renderQueue, DebugRenderer* debugRenderer, Model* gridModel) {
+	Input* input, RenderQueue* renderQueue, DebugRenderer* debugRenderer, Model* gridModel, GameParamEditor* gameParamEditor) {
 	windowManager_ = std::make_unique<EditorWindowManager>();
 	menuBar_ = std::make_unique<EditorMenuBar>();
 	editorLayout_ = std::make_unique<EditorLayout>();
@@ -39,8 +39,8 @@ void EditorCore::Initialize(TextureManager* textureManager, SceneChangeRequest* 
 	// ウィンドウの内容を登録する
 	windowManager_->RegisterWindow(std::make_unique<SceneWindow>(renderPassController));
 	windowManager_->RegisterWindow(std::make_unique<AssetWindow>());
-	windowManager_->RegisterWindow(std::make_unique<HierarchyWindow>());
-	windowManager_->RegisterWindow(std::make_unique<InspectorWindow>());
+	windowManager_->RegisterWindow(std::make_unique<HierarchyWindow>(gameParamEditor));
+	windowManager_->RegisterWindow(std::make_unique<InspectorWindow>(gameParamEditor));
 	windowManager_->RegisterWindow(std::make_unique<ConsoleWindow>());
 	windowManager_->RegisterWindow(std::make_unique<PerformanceWindow>());
 

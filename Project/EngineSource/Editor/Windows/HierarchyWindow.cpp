@@ -5,6 +5,10 @@
 
 using namespace GameEngine;
 
+HierarchyWindow::HierarchyWindow(GameParamEditor* gameParamEditor) {
+    gameParamEditor_ = gameParamEditor;
+}
+
 void HierarchyWindow::Draw() {
     if (!isActive) return;
 
@@ -13,7 +17,7 @@ void HierarchyWindow::Draw() {
         return;
     }
 
-    const std::string& activeSceneName = GameParamEditor::GetInstance()->GetActiveScene();
+    const std::string& activeSceneName = gameParamEditor_->GetActiveScene();
 
     // シーンフィルタ表示
     if (activeSceneName.empty() || activeSceneName == "None") {
@@ -24,10 +28,10 @@ void HierarchyWindow::Draw() {
         ImGui::Separator();
     }
 
-    const std::string& selectedRootGroupName = GameParamEditor::GetInstance()->GetRootGroupName();
+    const std::string& selectedRootGroupName = gameParamEditor_->GetRootGroupName();
 
     // 各グループをリスト表示
-    for (auto& [rootGroupName, group] : GameParamEditor::GetInstance()->GetAllGroups()) {
+    for (auto& [rootGroupName, group] : gameParamEditor_->GetAllGroups()) {
 
         // 指定したシーンにあった項目を表示する
         if (!activeSceneName.empty() && activeSceneName != "None" &&
@@ -41,18 +45,18 @@ void HierarchyWindow::Draw() {
         // 項目数を表示
         std::string label = rootGroupName;
         if (ImGui::Selectable(label.c_str(), isSelected)) {
-            GameParamEditor::GetInstance()->SetRootGroupName(rootGroupName);
+            gameParamEditor_->SetRootGroupName(rootGroupName);
         }
 
         // 右クリックメニュー
         if (ImGui::BeginPopupContextItem()) {
             if (ImGui::MenuItem("Save")) {
-                GameParamEditor::GetInstance()->SaveFile(rootGroupName);
+                gameParamEditor_->SaveFile(rootGroupName);
                 std::string message = std::format("{}.json saved.", rootGroupName);
                 MessageBoxA(nullptr, message.c_str(), "GameParamEditor", 0);
             }
             if (ImGui::MenuItem("Load")) {
-                GameParamEditor::GetInstance()->LoadFile(rootGroupName);
+                gameParamEditor_->LoadFile(rootGroupName);
             }
             ImGui::EndPopup();
         }

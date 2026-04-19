@@ -18,8 +18,6 @@ void GameScene::Initialize() {
 	// ゲームシーンに必要な低レイヤー機能
 #pragma region SceneSystem
 
-	// 登録するパラメータを設定
-	GameParamEditor::GetInstance()->SetActiveScene("GameScene");
 #pragma endregion
 
 	InputRegisterCommand();
@@ -210,11 +208,11 @@ void GameScene::InputRegisterCommand() {
 
 
 void GameScene::RegisterDebugParam() {
-	GameParamEditor::GetInstance()->AddItem("Test1", "testNum", testNumber);
-	GameParamEditor::GetInstance()->AddItem("Test2", "testVec", testVector);
+	//GameParamEditor::GetInstance()->AddItem("Test1", "testNum", testNumber);
+	//GameParamEditor::GetInstance()->AddItem("Test2", "testVec", testVector);
 }
 
 void GameScene::ApplyDebugParam() {
-	testNumber = GameParamEditor::GetInstance()->GetValue<float>("Test1", "testNum");
-	testVector = GameParamEditor::GetInstance()->GetValue<Vector3>("Test2", "testVec");
+	//testNumber = GameParamEditor::GetInstance()->GetValue<float>("Test1", "testNum");
+	//testVector = GameParamEditor::GetInstance()->GetValue<Vector3>("Test2", "testVec");
 }

@@ -13,6 +13,7 @@ namespace GameEngine {
 	class EditorLayout;
 	class EditorToolBar;
 	class ViewOptionsBar;
+	class GameParamEditor;
 	// エンジン機能
 	class Input;
 	class Model;
@@ -28,7 +29,7 @@ namespace GameEngine {
 
 		// 初期化処理
 		void Initialize(TextureManager* textureManager, SceneChangeRequest* sceneChangeRequest, RenderPassController* renderPassController, 
-			Input* input, RenderQueue* renderQueue, DebugRenderer* debugRenderer, Model* gridModel);
+			Input* input, RenderQueue* renderQueue, DebugRenderer* debugRenderer, Model* gridModel, GameParamEditor* gameParamEditor);
 
 		// 実行
 		void Run();

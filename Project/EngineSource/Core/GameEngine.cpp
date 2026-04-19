@@ -20,6 +20,9 @@
 #include "CollisionManager.h"
 #include "Collider.h"
 
+// Editor
+#include "DebugParameter.h"
+
 // Graphics
 #include "GpuResource.h"
 #include "SrvResource.h"
@@ -141,8 +144,11 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 	// ランダム生成器を初期化
 	RandomGenerator::Initialize();
 
+	gameParamEditor_ = std::make_unique<GameParamEditor>();
 	// 全てのデバック用ファイルを読み込み
-	GameParamEditor::GetInstance()->LoadFiles();
+	gameParamEditor_->LoadFiles();
+
+	DebugParameter::StaticInitialize(gameParamEditor_.get());
 
 	// 当たり判管理機能を初期化
 	collisionManager_ = std::make_unique<CollisionManager>();
@@ -197,7 +203,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 
 	editorCore_ = std::make_unique<EditorCore>();
 	editorCore_->Initialize(textureManager_.get(), sceneChangeRequest_.get(), renderPassController_.get(),
-		input_.get(),renderQueue_.get(), debugRenderer_.get(), gridModel);
+		input_.get(),renderQueue_.get(), debugRenderer_.get(), gridModel, gameParamEditor_.get());
 #endif
 }
 

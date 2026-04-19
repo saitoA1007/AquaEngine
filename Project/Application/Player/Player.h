@@ -67,14 +67,4 @@ private:
 	/// ジャンプする処理
 	/// </summary>
 	void JumpUpdate();
-
-	/// <summary>
-	/// 値を登録する
-	/// </summary>
-	void RegisterDebugParam();
-
-	/// <summary>
-	/// 値を適応する
-	/// </summary>
-	void ApplyDebugParam();
 };

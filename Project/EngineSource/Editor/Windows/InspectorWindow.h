@@ -7,8 +7,13 @@ namespace GameEngine {
 
 	class InspectorWindow : public IEditorWindow {
 	public:
+		InspectorWindow(GameParamEditor* gameParamEditor);
+
 		void Draw() override;
 		std::string GetName() const override { return "ParameterInspector"; }
+
+	private:
+		GameParamEditor* gameParamEditor_ = nullptr;
 
 	private:
 
@@ -21,30 +26,31 @@ namespace GameEngine {
 	// ImGuiで表示する用のパラメータを管理する
 	struct DebugParameterVisitor {
 		const std::string& itemName;
-		explicit DebugParameterVisitor(const std::string& name) : itemName(name) {}
+		bool& isDirty;
+		explicit DebugParameterVisitor(const std::string& name,bool& dirty) : itemName(name), isDirty(dirty){}
 
 		void operator()(int32_t& value) const {
-			ImGui::DragInt(itemName.c_str(), &value, 1);
+			if(ImGui::DragInt(itemName.c_str(), &value, 1)){ isDirty = true; }
 		}
 
 		void operator()(uint32_t& value) const {
-			ImGui::DragScalar(itemName.c_str(), ImGuiDataType_U32, &value, 1.0f);
+			if(ImGui::DragScalar(itemName.c_str(), ImGuiDataType_U32, &value, 1.0f)){ isDirty = true; }
 		}
 
 		void operator()(float& value) const {
-			ImGui::DragFloat(itemName.c_str(), &value, 0.01f);
+			if(ImGui::DragFloat(itemName.c_str(), &value, 0.01f)){ isDirty = true; }
 		}
 
 		void operator()(Vector2& value) const {
-			ImGui::DragFloat2(itemName.c_str(), reinterpret_cast<float*>(&value), 0.01f);
+			if(ImGui::DragFloat2(itemName.c_str(), reinterpret_cast<float*>(&value), 0.01f)){ isDirty = true; }
 		}
 
 		void operator()(Vector3& value) const {
-			ImGui::DragFloat3(itemName.c_str(), reinterpret_cast<float*>(&value), 0.01f);
+			if(ImGui::DragFloat3(itemName.c_str(), reinterpret_cast<float*>(&value), 0.01f)){ isDirty = true; }
 		}
 
 		void operator()(Vector4& value) const {
-			ImGui::ColorEdit4(itemName.c_str(), reinterpret_cast<float*>(&value));
+			if(ImGui::ColorEdit4(itemName.c_str(), reinterpret_cast<float*>(&value))){ isDirty = true; }
 		}
 
 		void operator()(Range3& value) const {
@@ -55,6 +61,7 @@ namespace GameEngine {
 				if (isChangeMin || isChangeMax) {
 					value.min = Min(value.min, value.max);
 					value.max = Max(value.min, value.max);
+					isDirty = true;
 				}
 				ImGui::TreePop();
 			}
@@ -68,17 +75,17 @@ namespace GameEngine {
 				if (isChangeMin || isChangeMax) {
 					value.min = MinVector4(value.min, value.max);
 					value.max = MaxVector4(value.min, value.max);
+					isDirty = true;
 				}
 				ImGui::TreePop();
 			}
 		}
 
 		void operator()(bool& value) const {
-			ImGui::Checkbox(itemName.c_str(), &value);
+			if (ImGui::Checkbox(itemName.c_str(), &value)) { isDirty = true; }
 		}
 
 		void operator()(std::string& value) const {
-			//ImGui::InputText(itemName.c_str(), value.data());
 			ImGui::Text(itemName.c_str(), &value);
 		}
 
