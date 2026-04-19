@@ -26,7 +26,7 @@ namespace GameEngine {
 		/// <param name="metadata">画像メタデータ</param>
 		/// <returns>作成されたリソース</returns>
 		[[nodiscard]]
-		static Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(ID3D12Device* device,const DirectX::TexMetadata& metadata);
+		static Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(ID3D12Device5* device,const DirectX::TexMetadata& metadata);
 
 		/// <summary>
 		/// テクスチャデータをCPUメモリからGPUメモリに転送する
@@ -35,7 +35,7 @@ namespace GameEngine {
 		/// <param name="mipImages">転送元の画像データ</param>
 		/// <returns>中間リソース</returns>
 		[[nodiscard]]
-		static Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(ID3D12Device* device,ID3D12GraphicsCommandList* commandList,
+		static Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(ID3D12Device5* device,ID3D12GraphicsCommandList* commandList,
 			ID3D12Resource* texture, const DirectX::ScratchImage& mipImages);
 	};
 }

@@ -33,7 +33,7 @@ DirectX::ScratchImage TextureLoader::LoadFromFile(const std::string& filePath) {
 }
 
 [[nodiscard]]
-Microsoft::WRL::ComPtr<ID3D12Resource> TextureLoader::CreateTextureResource(ID3D12Device* device,const DirectX::TexMetadata& metadata) {
+Microsoft::WRL::ComPtr<ID3D12Resource> TextureLoader::CreateTextureResource(ID3D12Device5* device,const DirectX::TexMetadata& metadata) {
 	// metadataを基にResourceの設定
 	D3D12_RESOURCE_DESC resourceDesc{};
 	resourceDesc.Width = UINT(metadata.width); // Textureの幅
@@ -62,7 +62,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TextureLoader::CreateTextureResource(ID3D
 }
 
 [[nodiscard]]
-Microsoft::WRL::ComPtr<ID3D12Resource> TextureLoader::UploadTextureData(ID3D12Device* device, ID3D12GraphicsCommandList* commandList, 
+Microsoft::WRL::ComPtr<ID3D12Resource> TextureLoader::UploadTextureData(ID3D12Device5* device, ID3D12GraphicsCommandList* commandList, 
 	ID3D12Resource* texture, const DirectX::ScratchImage& mipImages) {
 	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
 	DirectX::PrepareUpload(device, mipImages.GetImages(), mipImages.GetImageCount(), mipImages.GetMetadata(), subresources);

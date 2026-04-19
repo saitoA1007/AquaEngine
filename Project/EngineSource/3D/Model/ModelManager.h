@@ -20,7 +20,7 @@ namespace GameEngine {
 		ModelManager() = default;
 		~ModelManager();
 
-		void Initialize(ID3D12Device* device, TextureManager* textureManager, SrvManager* srvManager);
+		void Initialize(ID3D12Device5* device, TextureManager* textureManager, SrvManager* srvManager);
 
 		/// <summary>
 		/// モデルデータを登録

@@ -178,8 +178,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\3D\Model\ModelManager.cpp" />
     <ClCompile Include="EngineSource\3D\Renderer\ModelRenderer.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ParticleSystem\ParticleBehavior.cpp" />
+    <ClCompile Include="EngineSource\Common\CreateBufferResource.cpp" />
     <ClCompile Include="EngineSource\Editor\DebugParameter.cpp" />
     <ClCompile Include="EngineSource\Editor\JsonSerializer.cpp" />
+    <ClCompile Include="EngineSource\Graphics\Buffers\BLAS.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\RenderQueue.cpp" />
     <ClCompile Include="EngineSource\3D\Transform\WorldTransform.cpp" />
     <ClCompile Include="EngineSource\3D\Transform\WorldTransforms.cpp" />
@@ -196,6 +198,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Core\FPSCounter.cpp" />
     <ClCompile Include="EngineSource\Core\GameEngine.cpp" />
     <ClCompile Include="EngineSource\Core\GameObjectManager.cpp" />
+    <ClCompile Include="EngineSource\Graphics\Core\ResourceGarbageCollector.cpp" />
     <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectData.cpp" />
     <ClCompile Include="EngineSource\Math\RandomGenerator.cpp" />
     <ClCompile Include="EngineSource\Graphics\Texture\Texture.cpp" />
@@ -375,6 +378,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\3D\Model\ModelManager.h" />
     <ClInclude Include="EngineSource\Editor\DebugParameter.h" />
     <ClInclude Include="EngineSource\Editor\JsonSerializer.h" />
+    <ClInclude Include="EngineSource\Graphics\Buffers\BLAS.h" />
     <ClInclude Include="EngineSource\Graphics\Core\DrawRequest.h" />
     <ClInclude Include="EngineSource\3D\Renderer\ModelRenderer.h" />
     <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleBehavior.h" />
@@ -408,6 +412,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Core\GameEngine.h" />
     <ClInclude Include="EngineSource\Core\GameObjectManager.h" />
     <ClInclude Include="EngineSource\Core\IGameObject.h" />
+    <ClInclude Include="EngineSource\Graphics\Core\ResourceGarbageCollector.h" />
     <ClInclude Include="EngineSource\Graphics\PostProcess\IPostEffect.h" />
     <ClInclude Include="EngineSource\Math\RandomGenerator.h" />
     <ClInclude Include="EngineSource\Graphics\Texture\Texture.h" />

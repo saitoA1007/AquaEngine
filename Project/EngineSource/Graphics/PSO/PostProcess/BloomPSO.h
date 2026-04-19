@@ -27,7 +27,7 @@ namespace GameEngine {
         BloomPSO() = default;
         ~BloomPSO() = default;
 
-        void Initialize(ID3D12Device* device, const std::wstring& vsPath, DXC* dxc,
+        void Initialize(ID3D12Device5* device, const std::wstring& vsPath, DXC* dxc,
             const std::wstring brightPsPath, const std::wstring blurPsPath, const std::wstring resultPsPath, const std::wstring compositePsPath);
         void Set(ID3D12GraphicsCommandList* commandList);
         void Draw(ID3D12GraphicsCommandList* commandList, D3D12_GPU_DESCRIPTOR_HANDLE inputSRV);

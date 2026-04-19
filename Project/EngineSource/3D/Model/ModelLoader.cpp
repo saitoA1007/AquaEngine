@@ -11,7 +11,7 @@
 
 using namespace GameEngine;
 
-void ModelLoader::Initialize(ID3D12Device* device, TextureManager* textureManager, SrvManager* srvManager) {
+void ModelLoader::Initialize(ID3D12Device5* device, TextureManager* textureManager, SrvManager* srvManager) {
 	device_ = device;
 	textureManager_ = textureManager;
 	srvManager_ = srvManager;

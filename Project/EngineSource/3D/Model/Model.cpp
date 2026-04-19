@@ -1,5 +1,5 @@
-#include"Model.h"
-
+#include "Model.h"
+#include <cassert>
 using namespace GameEngine;
 
 void  Model::SetDefaultColor(const Vector4& color, const std::string& materialName) {
