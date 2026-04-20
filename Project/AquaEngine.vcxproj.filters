@@ -357,10 +357,10 @@
     <ClCompile Include="EngineSource\Graphics\DirectX\Memory\DsvManager.cpp">
       <Filter>EngineSource\Graphics\DirectX\Memory</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Graphics\DirectX\Memory\RenderTexture.cpp">
+    <ClCompile Include="EngineSource\Graphics\RenderPass\RenderTexture.cpp">
       <Filter>EngineSource\Graphics\DirectX\Memory</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Graphics\DirectX\Memory\RenderTextureManager.cpp">
+    <ClCompile Include="EngineSource\Graphics\RenderPass\RenderTextureManager.cpp">
       <Filter>EngineSource\Graphics\DirectX\Memory</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\Graphics\DirectX\Memory\RtvManager.cpp">
@@ -756,10 +756,10 @@
     <ClInclude Include="EngineSource\Graphics\DirectX\Memory\DsvManager.h">
       <Filter>EngineSource\Graphics\DirectX\Memory</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Graphics\DirectX\Memory\RenderTexture.h">
+    <ClInclude Include="EngineSource\Graphics\RenderPass\RenderTexture.h">
       <Filter>EngineSource\Graphics\DirectX\Memory</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Graphics\DirectX\Memory\RenderTextureManager.h">
+    <ClInclude Include="EngineSource\Graphics\RenderPass\RenderTextureManager.h">
       <Filter>EngineSource\Graphics\DirectX\Memory</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Graphics\DirectX\Memory\RtvManager.h">

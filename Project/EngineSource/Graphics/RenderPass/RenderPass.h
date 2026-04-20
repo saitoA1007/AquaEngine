@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include "Externals/DirectXTex/d3dx12.h"
-#include"RenderTexture.h"
+#include "RenderTexture.h"
 
 namespace GameEngine {
 

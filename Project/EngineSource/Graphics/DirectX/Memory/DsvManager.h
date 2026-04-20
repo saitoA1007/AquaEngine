@@ -26,6 +26,20 @@ namespace GameEngine {
 
         D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle(uint32_t index) const;
 
+        /// <summary>
+        /// DsvContextのフォーマットに対応したTypelessフォーマットを返す
+        /// </summary>
+        /// <param name="dsvFormat"></param>
+        /// <returns></returns>
+        static DXGI_FORMAT ToTypelessFormat(DXGI_FORMAT dsvFormat);
+
+        /// <summary>
+        /// フォーマットに対応したSRVフォーマットを返す
+        /// </summary>
+        /// <param name="dsvFormat"></param>
+        /// <returns></returns>
+        static DXGI_FORMAT ToSrvFormat(DXGI_FORMAT dsvFormat);
+
     private:
         DsvManager(const DsvManager&) = delete;
         DsvManager& operator=(const DsvManager&) = delete;

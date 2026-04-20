@@ -51,3 +51,25 @@ void DsvManager::CreateDsvDescriptor(uint32_t index, ID3D12Resource* resource, D
     D3D12_CPU_DESCRIPTOR_HANDLE handle = GetCPUDescriptorHandle(dsvHeap_.Get(), descriptorSizeDSV_, index);
     device_->CreateDepthStencilView(resource, &dsvDesc, handle);
 }
+
+DXGI_FORMAT DsvManager::ToTypelessFormat(DXGI_FORMAT dsvFormat) {
+    switch (dsvFormat) {
+    case DXGI_FORMAT_D32_FLOAT:         return DXGI_FORMAT_R32_TYPELESS;
+    case DXGI_FORMAT_D24_UNORM_S8_UINT: return DXGI_FORMAT_R24G8_TYPELESS;
+    case DXGI_FORMAT_D16_UNORM:         return DXGI_FORMAT_R16_TYPELESS;
+    default:
+        assert(false && "未対応の DSV フォーマットです");
+        return DXGI_FORMAT_UNKNOWN;
+    }
+}
+
+DXGI_FORMAT DsvManager::ToSrvFormat(DXGI_FORMAT dsvFormat) {
+    switch (dsvFormat) {
+    case DXGI_FORMAT_D32_FLOAT:         return DXGI_FORMAT_R32_FLOAT;
+    case DXGI_FORMAT_D24_UNORM_S8_UINT: return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+    case DXGI_FORMAT_D16_UNORM:         return DXGI_FORMAT_R16_UNORM;
+    default:
+        assert(false && "未対応の DSV フォーマットです");
+        return DXGI_FORMAT_UNKNOWN;
+    }
+}
