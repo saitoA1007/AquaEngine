@@ -86,7 +86,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 
 	// レンダーテクスチャ機能を生成
 	renderTextureManager_ = std::make_unique<RenderTextureManager>();
-	renderTextureManager_->Initialize(graphicsDevice_->GetRtvManager(), graphicsDevice_->GetSrvManager(), graphicsDevice_->GetDsvManager(), graphicsDevice_->GetDevice());
+	renderTextureManager_->Initialize(graphicsDevice_->GetRtvManager(), graphicsDevice_->GetDsvManager(), graphicsDevice_->GetDevice());
 
 	// レンダーパスの管理機能
 	renderPassController_ = std::make_unique<RenderPassController>();

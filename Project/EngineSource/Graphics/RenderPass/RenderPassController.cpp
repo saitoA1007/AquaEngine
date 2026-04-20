@@ -16,10 +16,7 @@ void RenderPassController::AddPass(const std::string& name, RenderTextureMode mo
 	}
 
 	// renderTextureを作成
-	RtvContext contex;
-	contex.width = wid;
-	contex.height = hei;
-	renderTextureManager_->Create(name, mode,contex);
+	renderTextureManager_->Create(name, wid, hei,mode);
 	RenderTexture* renderTex = renderTextureManager_->GetRenderTexture(name);
 
 	// レンダーパスを作成

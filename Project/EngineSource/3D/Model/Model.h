@@ -124,6 +124,9 @@ namespace GameEngine {
 		SkinCluster* GetSkinCluster() { return &skinClusterBone_.value(); }
 		const SkinCluster* GetSkinClusterData() const { return &skinClusterBone_.value(); }
 
+		// BLASを取得
+		const std::vector<std::unique_ptr<BLAS>>& GetBLASList() const { return blasList_; }
+
 	private:
 		Model(Model&) = delete;
 		Model& operator=(Model&) = delete;

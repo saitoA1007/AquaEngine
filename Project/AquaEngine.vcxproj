@@ -201,6 +201,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Core\GameObjectManager.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\ResourceGarbageCollector.cpp" />
     <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectData.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\RaytracingPipeline.cpp" />
     <ClCompile Include="EngineSource\Math\RandomGenerator.cpp" />
     <ClCompile Include="EngineSource\Graphics\Texture\Texture.cpp" />
     <ClCompile Include="EngineSource\Graphics\Texture\TextureLoader.cpp" />
@@ -416,6 +417,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Core\IGameObject.h" />
     <ClInclude Include="EngineSource\Graphics\Core\ResourceGarbageCollector.h" />
     <ClInclude Include="EngineSource\Graphics\PostProcess\IPostEffect.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\RaytracingPipeline.h" />
     <ClInclude Include="EngineSource\Math\RandomGenerator.h" />
     <ClInclude Include="EngineSource\Graphics\Texture\Texture.h" />
     <ClInclude Include="EngineSource\Graphics\Texture\TextureLoader.h" />

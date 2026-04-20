@@ -483,6 +483,7 @@
     <ClCompile Include="EngineSource\Common\CreateBufferResource.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\ResourceGarbageCollector.cpp" />
     <ClCompile Include="EngineSource\Graphics\Buffers\TLAS.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\RaytracingPipeline.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -934,6 +935,7 @@
     <ClInclude Include="EngineSource\Graphics\Buffers\BLAS.h" />
     <ClInclude Include="EngineSource\Graphics\Core\ResourceGarbageCollector.h" />
     <ClInclude Include="EngineSource\Graphics\Buffers\TLAS.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\RaytracingPipeline.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Externals\imgui\ProggyClean.ttf" />

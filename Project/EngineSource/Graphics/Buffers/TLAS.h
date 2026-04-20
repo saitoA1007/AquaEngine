@@ -5,10 +5,10 @@
 
 namespace GameEngine {
 
-	// TLASに登録する1つ分のインスタンス（モデル）情報
+	// TLASに登録する1つ分のインスタンス情報
 	struct TLASInstanceData {
-		BLAS* blas = nullptr;             // 紐づけるBLASのポインタ
-		float transform[3][4];            // ワールド変換行列 (3x4のRow-Major) ※お使いのMathライブラリに合わせてください
+		BLAS* blas = nullptr;             // BLAS
+		float transform[3][4];            // ワールド変換行列
 		uint32_t instanceID = 0;          // シェーダー側で取得できる任意のID
 		uint32_t hitGroupIndexOffset = 0; // このモデルが使うマテリアル(HitGroup)のインデックス
 	};

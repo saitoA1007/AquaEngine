@@ -7,6 +7,7 @@
 #include "PSO/Core/DrawPSOData.h"
 #include "DrawRequest.h"
 #include "RenderPass/RenderPassController.h"
+#include "TLAS.h"
 
 namespace GameEngine {
 
@@ -75,6 +76,9 @@ namespace GameEngine {
         // デバック用ライン
         void SubmitDebugLine(const DebugRenderer* debugRenderer, const std::string& passName = "DefaultPass");
 
+        // レイトレーシングでのモデル
+        void SubmitRaytracingModel(const Model* model, WorldTransform& worldTransform, const std::string& passName = "DefaultPass");
+
     private:
         ID3D12GraphicsCommandList* commandList_ = nullptr;
         RenderPassController* renderPassController_ = nullptr;
@@ -104,6 +108,11 @@ namespace GameEngine {
 
         // psoのリスト
         std::unordered_map<std::string, DrawPsoData> psoList_;
+
+        // レイトレーシングモデルの管理
+        //TLAS tlas_;
+
+        std::vector<TLASInstanceData> tlasInstanceData_;
 
     private:
         /// <summary>

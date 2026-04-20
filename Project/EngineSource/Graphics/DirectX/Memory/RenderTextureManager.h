@@ -1,9 +1,9 @@
 #pragma once
 #include <unordered_map>
-#include"RtvManager.h"
-#include"SrvManager.h"
-#include"DsvManager.h"
-#include"RenderTexture.h"
+#include "RtvManager.h"
+#include "SrvManager.h"
+#include "DsvManager.h"
+#include "RenderTexture.h"
 
 namespace GameEngine {
 
@@ -12,19 +12,41 @@ namespace GameEngine {
 		RenderTextureManager() = default;
 		~RenderTextureManager() = default;
 
-		void Initialize(RtvManager* rtvMasnager, SrvManager* srvManager,DsvManager* dsvmanager, ID3D12Device* device);
+		void Initialize(RtvManager* rtvMasnager,DsvManager* dsvmanager, ID3D12Device5* device);
 
-		void Create(const std::string& name, RenderTextureMode mode,RtvContext context = RtvContext(1280, 720, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, 1, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, false));
+		/// <summary>
+		/// レンダーテクスチャを作成して登録する
+		/// </summary>
+		void Create(
+			const std::string& name,
+			uint32_t width,uint32_t height,
+			RenderTextureMode  mode = RenderTextureMode::RtvAndDsv,
+			DXGI_FORMAT colorFormat = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
 
-		RenderTexture* GetRenderTexture(const std::string& name);
+		/// <summary>
+		/// 登録済みのレンダーテクスチャを取得する
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
+		[[nodiscard]]
+		RenderTexture* GetRenderTexture(const std::string& name) const;
 
+		/// <summary>
+		/// 登録済みのレンダーテクスチャを解放する
+		/// </summary>
+		/// <param name="name"></param>
 		void Release(const std::string& name);
 
+		/// <summary>
+		/// 全てのレンダーテクスチャを解放する
+		/// </summary>
+		void ReleaseAll();
+
 	private:
-		ID3D12Device* device_ = nullptr;
-		RtvManager* rtvManager_ = nullptr;
-		SrvManager* srvManager_ = nullptr;
-		DsvManager* dsvmanager_ = nullptr;
+		RenderTextureManager(const RenderTextureManager&) = delete;
+		RenderTextureManager& operator=(const RenderTextureManager&) = delete;
+
+		ID3D12Device5* device_ = nullptr;
 		std::unordered_map<std::string, std::unique_ptr<RenderTexture>> renderTextures_;
 	};
 }

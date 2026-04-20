@@ -282,6 +282,15 @@ void RenderQueue::SubmitDebugLine(const DebugRenderer* debugRenderer, const std:
     draw3dQueueList_[passName][request.layer][Get3dPsoName(request.type)].push_back(request);
 }
 
+void RenderQueue::SubmitRaytracingModel(const Model* model, WorldTransform& worldTransform, const std::string& passName) {
+    Draw3dRequest request;
+    request.type = Draw3dType::DebugLine;
+    request.layer = RenderLayer::Debug;
+    request.passName = passName;
+    request.model = model;
+    request.worldTransform = &worldTransform;
+}
+
 void RenderQueue::Execute3dRequest(const Draw3dRequest& request) {
     switch (request.type) {
 

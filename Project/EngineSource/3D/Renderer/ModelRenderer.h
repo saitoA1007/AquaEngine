@@ -97,6 +97,13 @@ namespace GameEngine {
 		/// <param name="worldTransform"></param>
 		static void DrawShadowMap(const Model* model, WorldTransform& worldTransform);
 
+		/// <summary>
+		/// レイトレーシングで描画
+		/// </summary>
+		/// <param name="model"></param>
+		/// <param name="worldTransform"></param>
+		static void DrawRaytracing(const Model* model, WorldTransform& worldTransform);
+
 	private:
 
 		// コマンドリスト
