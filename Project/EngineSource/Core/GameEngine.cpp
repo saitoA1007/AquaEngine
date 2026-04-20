@@ -130,7 +130,7 @@ void Engine::Initialize(const std::wstring& title, const uint32_t& width, const 
 
 	// モデルを管理するクラスを生成
 	modelManager_ = std::make_unique<ModelManager>();
-	modelManager_->Initialize(graphicsDevice_->GetDevice(), textureManager_.get(), graphicsDevice_->GetSrvManager());
+	modelManager_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetCommandList(), textureManager_.get(), graphicsDevice_->GetSrvManager());
 	// アニメーションデータを管理するクラスを生成する
 	animationManager_ = std::make_unique<AnimationManager>();
 

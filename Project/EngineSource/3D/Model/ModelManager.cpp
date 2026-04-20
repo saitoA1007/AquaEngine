@@ -10,9 +10,9 @@ ModelManager::~ModelManager() {
 	models_.clear();
 }
 
-void ModelManager::Initialize(ID3D12Device5* device, TextureManager* textureManager, SrvManager* srvManager) {
+void ModelManager::Initialize(ID3D12Device5* device, ID3D12GraphicsCommandList4* cmdList, TextureManager* textureManager, SrvManager* srvManager) {
 	// モデル生成システムの初期化
-	loader_.Initialize(device, textureManager, srvManager);
+	loader_.Initialize(device,cmdList, textureManager, srvManager);
 }
 
 void ModelManager::RegisterModel(const std::string& modelFile, const std::string& objFileName) {

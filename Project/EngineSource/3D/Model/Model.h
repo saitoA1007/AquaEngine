@@ -7,6 +7,7 @@
 #include "Material.h"
 #include "TransformationMatrix.h"
 #include "AnimationData.h"
+#include "BLAS.h"
 
 namespace GameEngine {
 	
@@ -23,6 +24,15 @@ namespace GameEngine {
 		// マテリアルを追加
 		void AddMaterial(const std::string& name, std::unique_ptr<Material> material) {
 			materials_[name] = std::move(material);
+		}
+
+		// 作成したMeshを元にBLASを作成する
+		void AddBLAS(ID3D12GraphicsCommandList4* cmdList) {
+			for (auto& mesh : meshes_) {
+				std::unique_ptr<BLAS> blas = std::make_unique<BLAS>();
+				blas->Create(cmdList,mesh->GetVertexBufferView(),mesh->GetIndexBufferView(),mesh->GetTotalVertices(),mesh->GetTotalIndices());
+				blasList_.push_back(std::move(blas));
+			}
 		}
 
 		// 外部読み込み用のデータを設定
@@ -127,6 +137,9 @@ namespace GameEngine {
 		// ボーンデータ
 		std::optional<Skeleton> skeletonBone_ = std::nullopt;
 		std::optional<SkinCluster> skinClusterBone_ = std::nullopt;
+
+		// BLAS
+		std::vector<std::unique_ptr<BLAS>> blasList_;
 
 		// Nodeのローカル行列を保持しておく変数
 		Matrix4x4 localMatrix_;

@@ -17,7 +17,7 @@ namespace GameEngine {
 		~ModelLoader() = default;
 
         // 初期化処理
-		void Initialize(ID3D12Device5* device, TextureManager* textureManager, SrvManager* srvManager);
+		void Initialize(ID3D12Device5* device, ID3D12GraphicsCommandList4* cmdList, TextureManager* textureManager, SrvManager* srvManager);
 
     public: // 生成処理
 
@@ -72,6 +72,7 @@ namespace GameEngine {
         ModelLoader& operator=(const ModelLoader&) = delete;
 
         ID3D12Device5* device_ = nullptr;
+        ID3D12GraphicsCommandList4* cmdList_ = nullptr;
         TextureManager* textureManager_ = nullptr;
         SrvManager* srvManager_ = nullptr;
 

@@ -182,6 +182,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Editor\DebugParameter.cpp" />
     <ClCompile Include="EngineSource\Editor\JsonSerializer.cpp" />
     <ClCompile Include="EngineSource\Graphics\Buffers\BLAS.cpp" />
+    <ClCompile Include="EngineSource\Graphics\Buffers\TLAS.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\RenderQueue.cpp" />
     <ClCompile Include="EngineSource\3D\Transform\WorldTransform.cpp" />
     <ClCompile Include="EngineSource\3D\Transform\WorldTransforms.cpp" />
@@ -379,6 +380,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Editor\DebugParameter.h" />
     <ClInclude Include="EngineSource\Editor\JsonSerializer.h" />
     <ClInclude Include="EngineSource\Graphics\Buffers\BLAS.h" />
+    <ClInclude Include="EngineSource\Graphics\Buffers\TLAS.h" />
     <ClInclude Include="EngineSource\Graphics\Core\DrawRequest.h" />
     <ClInclude Include="EngineSource\3D\Renderer\ModelRenderer.h" />
     <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleBehavior.h" />

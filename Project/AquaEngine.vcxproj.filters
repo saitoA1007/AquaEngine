@@ -482,6 +482,7 @@
     <ClCompile Include="EngineSource\Graphics\Buffers\BLAS.cpp" />
     <ClCompile Include="EngineSource\Common\CreateBufferResource.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\ResourceGarbageCollector.cpp" />
+    <ClCompile Include="EngineSource\Graphics\Buffers\TLAS.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -932,6 +933,7 @@
     <ClInclude Include="EngineSource\Editor\DebugParameter.h" />
     <ClInclude Include="EngineSource\Graphics\Buffers\BLAS.h" />
     <ClInclude Include="EngineSource\Graphics\Core\ResourceGarbageCollector.h" />
+    <ClInclude Include="EngineSource\Graphics\Buffers\TLAS.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Externals\imgui\ProggyClean.ttf" />
