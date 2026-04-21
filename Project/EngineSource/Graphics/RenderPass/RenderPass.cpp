@@ -63,17 +63,47 @@ void RenderPass::PrePass() {
 		commandList_->ClearDepthStencilView(renderTexture_->GetDsvHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 		break;
 	}
+
+	case RenderTextureMode::UavOnly: {
+		// UAV状態へ遷移
+		renderTexture_->TransitionToUnorderedAccess(commandList_);
+		break;
 	}
 
-	// Viewportを設定
-	commandList_->RSSetViewports(1, &viewport_);
-	// Scirssorを設定
-	commandList_->RSSetScissorRects(1, &scissorRect_); 
+	case RenderTextureMode::RtvAndUav: {
+		// まずRTV状態で描画パスを開始する
+		renderTexture_->TransitionToRenderTarget(commandList_);
+
+		// RTVのみセットする
+		commandList_->OMSetRenderTargets(1, &renderTexture_->GetRtvHandle(), false, nullptr);
+
+		// 指定した色で画面全体をクリアする
+		float clearColor[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
+		commandList_->ClearRenderTargetView(renderTexture_->GetRtvHandle(), clearColor, 0, nullptr);
+		break;
+	}
+	}
+
+	if (mode_ != RenderTextureMode::UavOnly) {
+		// Viewportを設定
+		commandList_->RSSetViewports(1, &viewport_);
+		// Scirssorを設定
+		commandList_->RSSetScissorRects(1, &scissorRect_);
+	}	
 }
 
 void RenderPass::PostPass() {
 	// 読み込み状態に遷移
 	renderTexture_->TransitionToShaderResource(commandList_);
+}
+
+void RenderPass::SwitchToUnorderedAccess() {
+	commandList_->OMSetRenderTargets(0, nullptr, false, nullptr);
+	renderTexture_->TransitionToUnorderedAccess(commandList_);
+}
+
+void RenderPass::InsertUavBarrier() {
+	renderTexture_->InsertUavBarrier(commandList_);
 }
 
 CD3DX12_GPU_DESCRIPTOR_HANDLE RenderPass::GetSrvHandle() {

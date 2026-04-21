@@ -48,6 +48,26 @@ void RenderPassController::PostPass(const std::string& name) {
 	render->second->PostPass();
 }
 
+void RenderPassController::SwitchToUnorderedAccess(const std::string& name) {
+	// 登録されていなければエラー
+	auto render = renderPassList_.find(name);
+	if (render == renderPassList_.end()) {
+		assert(false && "Not found RenderPass");
+	}
+
+	render->second->SwitchToUnorderedAccess();
+}
+
+void RenderPassController::InsertUavBarrier(const std::string& name) {
+	// 登録されていなければエラー
+	auto render = renderPassList_.find(name);
+	if (render == renderPassList_.end()) {
+		assert(false && "Not found RenderPass");
+	}
+
+	render->second->InsertUavBarrier();
+}
+
 CD3DX12_GPU_DESCRIPTOR_HANDLE RenderPassController::GetSrvHandle(const std::string& name) {
 	// 登録されていなければエラー
 	auto render = renderPassList_.find(name);
