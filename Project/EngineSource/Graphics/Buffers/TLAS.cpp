@@ -4,11 +4,13 @@
 using namespace GameEngine;
 
 TLAS::~TLAS() {
-    resource_.Reset();
-    instanceBuffer_.Reset();
-    if (srvManager_) {
-        srvManager_->ReleseIndex(srvIndex_);
-    }
+    if (isCreated_) {
+        resource_.Reset();
+        instanceBuffer_.Reset();
+        if (srvManager_) {
+            srvManager_->ReleseIndex(srvIndex_);
+        }
+    }  
 }
 
 void TLAS::Create(ID3D12GraphicsCommandList4* cmdList, const std::vector<TLASInstanceData>& instances) {
@@ -102,4 +104,5 @@ void TLAS::Create(ID3D12GraphicsCommandList4* cmdList, const std::vector<TLASIns
     auto srvHandleCPU = srvManager_->GetCPUHandle(srvIndex_);
     device_->CreateShaderResourceView(nullptr, &srvDesc, srvHandleCPU);
 
+    isCreated_ = true;
 }

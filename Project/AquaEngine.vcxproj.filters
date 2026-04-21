@@ -483,7 +483,7 @@
     <ClCompile Include="EngineSource\Common\CreateBufferResource.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\ResourceGarbageCollector.cpp" />
     <ClCompile Include="EngineSource\Graphics\Buffers\TLAS.cpp" />
-    <ClCompile Include="EngineSource\Graphics\PSO\RaytracingPipeline.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\TestRayPipeline.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -935,7 +935,7 @@
     <ClInclude Include="EngineSource\Graphics\Buffers\BLAS.h" />
     <ClInclude Include="EngineSource\Graphics\Core\ResourceGarbageCollector.h" />
     <ClInclude Include="EngineSource\Graphics\Buffers\TLAS.h" />
-    <ClInclude Include="EngineSource\Graphics\PSO\RaytracingPipeline.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\TestRayPipeline.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Externals\imgui\ProggyClean.ttf" />
@@ -947,5 +947,8 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Resources\Shaders\raytracing.hlsl" />
   </ItemGroup>
 </Project>

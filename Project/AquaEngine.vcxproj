@@ -96,6 +96,9 @@
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
 copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll"</Command>
     </PreBuildEvent>
+    <FxCompile>
+      <ShaderModel>6.8</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -121,6 +124,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
 copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll"</Command>
     </PreBuildEvent>
+    <FxCompile>
+      <ShaderModel>6.8</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
     <ClCompile>
@@ -149,6 +155,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <Command>copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxcompiler.dll" "$(TargetDir)dxcompiler.dll"
 copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dxil.dll"</Command>
     </PreBuildEvent>
+    <FxCompile>
+      <ShaderModel>6.8</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application\Camera\CameraController.cpp" />
@@ -201,7 +210,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Core\GameObjectManager.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\ResourceGarbageCollector.cpp" />
     <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectData.cpp" />
-    <ClCompile Include="EngineSource\Graphics\PSO\RaytracingPipeline.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\TestRayPipeline.cpp" />
     <ClCompile Include="EngineSource\Math\RandomGenerator.cpp" />
     <ClCompile Include="EngineSource\Graphics\Texture\Texture.cpp" />
     <ClCompile Include="EngineSource\Graphics\Texture\TextureLoader.cpp" />
@@ -417,7 +426,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Core\IGameObject.h" />
     <ClInclude Include="EngineSource\Graphics\Core\ResourceGarbageCollector.h" />
     <ClInclude Include="EngineSource\Graphics\PostProcess\IPostEffect.h" />
-    <ClInclude Include="EngineSource\Graphics\PSO\RaytracingPipeline.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\TestRayPipeline.h" />
     <ClInclude Include="EngineSource\Math\RandomGenerator.h" />
     <ClInclude Include="EngineSource\Graphics\Texture\Texture.h" />
     <ClInclude Include="EngineSource\Graphics\Texture\TextureLoader.h" />
@@ -558,6 +567,19 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   </ItemGroup>
   <ItemGroup>
     <Font Include="Externals\imgui\ProggyClean.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Resources\Shaders\raytracing.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Library</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Library</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Library</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Development|x64'">6.8</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.8</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.8</ShaderModel>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

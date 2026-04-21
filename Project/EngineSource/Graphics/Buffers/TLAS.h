@@ -36,5 +36,7 @@ namespace GameEngine {
 
 		// SRVインデックス
 		uint32_t srvIndex_ = 0;
+
+		bool isCreated_ = false;
 	};
 }
