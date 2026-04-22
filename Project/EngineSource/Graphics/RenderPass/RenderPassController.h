@@ -38,6 +38,7 @@ namespace GameEngine {
 
 		CD3DX12_GPU_DESCRIPTOR_HANDLE GetSrvHandle(const std::string& name);
 		uint32_t GetSrvIndex(const std::string& name);
+		uint32_t GetUavIndex(const std::string& name);
 	private:
 		RenderPassController(const RenderPassController&) = delete;
 		RenderPassController& operator=(const RenderPassController&) = delete;

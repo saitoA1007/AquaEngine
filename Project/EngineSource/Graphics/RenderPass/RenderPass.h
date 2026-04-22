@@ -25,7 +25,8 @@ namespace GameEngine {
         void InsertUavBarrier();
 
         // srvIndexを取得
-        uint32_t GetSrvIndex() { return renderTexture_->GetSrvIndex(); }
+        uint32_t GetSrvIndex() const { return renderTexture_->GetSrvIndex(); }
+        uint32_t GetUavIndex() const { return renderTexture_->GetUavIndex(); }
 
         CD3DX12_GPU_DESCRIPTOR_HANDLE GetSrvHandle();
 

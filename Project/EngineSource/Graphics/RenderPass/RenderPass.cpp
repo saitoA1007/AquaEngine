@@ -28,12 +28,11 @@ RenderPass::RenderPass(const std::string& name, ID3D12GraphicsCommandList* comma
 }
 
 void RenderPass::PrePass() {
-	// 書き込み状態に遷移
-	renderTexture_->TransitionToRenderTarget(commandList_);
-
 	switch (mode_)
 	{
 	case GameEngine::RenderTextureMode::RtvOnly: {
+		// 書き込み状態に遷移
+		renderTexture_->TransitionToRenderTarget(commandList_);
 		// RTVのみセットする
 		commandList_->OMSetRenderTargets(1, &renderTexture_->GetRtvHandle(), false, nullptr);
 
@@ -44,6 +43,8 @@ void RenderPass::PrePass() {
 	}
 
 	case GameEngine::RenderTextureMode::DsvOnly: {
+		// 書き込み状態に遷移
+		renderTexture_->TransitionToRenderTarget(commandList_);
 		// DSVのみセットする
 		commandList_->OMSetRenderTargets(0, nullptr, false, &renderTexture_->GetDsvHandle());
 
