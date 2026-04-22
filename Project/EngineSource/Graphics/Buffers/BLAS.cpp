@@ -1,5 +1,6 @@
 #include "BLAS.h"
 #include "CreateBufferResource.h"
+#include "ResourceGarbageCollector.h"
 using namespace GameEngine;
 
 void BLAS::Create(ID3D12GraphicsCommandList4* cmdList,
@@ -14,7 +15,7 @@ void BLAS::Create(ID3D12GraphicsCommandList4* cmdList,
     geometryDesc.Triangles.VertexBuffer.StartAddress = vertexBufView.BufferLocation;
     geometryDesc.Triangles.VertexBuffer.StrideInBytes = vertexBufView.StrideInBytes;
     geometryDesc.Triangles.VertexCount = totalVertices;
-    geometryDesc.Triangles.VertexFormat = DXGI_FORMAT_R32G32B32A32_FLOAT;
+    geometryDesc.Triangles.VertexFormat = DXGI_FORMAT_R32G32B32_FLOAT;
     // インデックスデータ
     geometryDesc.Triangles.IndexBuffer = indexBufView.BufferLocation;
     geometryDesc.Triangles.IndexCount = totalIndices;
@@ -42,7 +43,7 @@ void BLAS::Create(ID3D12GraphicsCommandList4* cmdList,
     );
 
     // 構築に使用する一時的な作業メモリ
-    scratchBuffer_ = CreateBufferResource(
+    Microsoft::WRL::ComPtr<ID3D12Resource> scratchBuffer = CreateBufferResource(
         device_,
         prebuildInfo.ScratchDataSizeInBytes,
         D3D12_HEAP_TYPE_DEFAULT,                                    
@@ -53,7 +54,7 @@ void BLAS::Create(ID3D12GraphicsCommandList4* cmdList,
     // ビルド実行
     D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC buildDesc{};
     buildDesc.Inputs = inputs;
-    buildDesc.ScratchAccelerationStructureData = scratchBuffer_->GetGPUVirtualAddress();
+    buildDesc.ScratchAccelerationStructureData = scratchBuffer->GetGPUVirtualAddress();
     buildDesc.DestAccelerationStructureData = resource_->GetGPUVirtualAddress();
     cmdList->BuildRaytracingAccelerationStructure(&buildDesc, 0, nullptr);
 
@@ -63,4 +64,7 @@ void BLAS::Create(ID3D12GraphicsCommandList4* cmdList,
     barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
     barrier.UAV.pResource = resource_.Get();
     cmdList->ResourceBarrier(1, &barrier);
+
+    // リソースの破棄を登録する
+    ResourceGarbageCollector::GetInstance().Add(scratchBuffer);
 }

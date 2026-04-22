@@ -21,6 +21,8 @@ namespace GameEngine {
 		// 描画前に呼び出す(参照する時に切り替えられていなければassertで引っ掛ける)
 		void PrePass(const std::string& name);
 		void PostPass(const std::string& name);
+		void SwitchToUnorderedAccess(const std::string& name);
+		void InsertUavBarrier(const std::string& name);
 
 		// 描画の最終パスの設定
 		void SetSceneFinalPass(const std::string& name);

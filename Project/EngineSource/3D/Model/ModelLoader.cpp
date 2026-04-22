@@ -11,8 +11,9 @@
 
 using namespace GameEngine;
 
-void ModelLoader::Initialize(ID3D12Device5* device, TextureManager* textureManager, SrvManager* srvManager) {
+void ModelLoader::Initialize(ID3D12Device5* device, ID3D12GraphicsCommandList4* cmdList,TextureManager* textureManager, SrvManager* srvManager) {
 	device_ = device;
+	cmdList_ = cmdList;
 	textureManager_ = textureManager;
 	srvManager_ = srvManager;
 }
@@ -26,6 +27,9 @@ std::unique_ptr<Model> ModelLoader::CreateSphere(uint32_t subdivision) {
 	auto tmpMesh = std::make_unique<Mesh>();
 	tmpMesh->CreateSphereMesh(subdivision);
 	model->AddMesh(std::move(tmpMesh));
+
+	// Meshを元にBLASを作成する
+	model->AddBLAS(cmdList_);
 
 	// マテリアルを作成
 	std::unique_ptr<Material> tmpMaterial = std::make_unique<Material>();
@@ -95,6 +99,9 @@ std::unique_ptr<Model> ModelLoader::CreateModel(const std::string& objFilename, 
 
 		model->AddMesh(std::move(tmpMesh));
 	}
+
+	// Meshを元にBLASを作成する
+	model->AddBLAS(cmdList_);
 
 	// マテリアルを作成
 	for (uint32_t index = 0; index < modelData.materials.size(); ++index) {

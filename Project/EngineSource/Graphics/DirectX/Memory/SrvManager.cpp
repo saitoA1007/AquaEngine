@@ -1,6 +1,6 @@
-#include"SrvManager.h"
-#include"DescriptorHandle.h"
-#include"DescriptorHeap.h"
+#include "SrvManager.h"
+#include "DescriptorHandle.h"
+#include "DescriptorHeap.h"
 #include <cassert>
 
 using namespace GameEngine;

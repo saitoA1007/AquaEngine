@@ -249,3 +249,13 @@ void ModelRenderer::DrawLight(GpuResource* lightGroupResource) {
 	commandList_->SetGraphicsRootDescriptorTable(5, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 	commandList_->SetGraphicsRootDescriptorTable(6, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 }
+
+void ModelRenderer::DrawRaytracing(const Model* model, WorldTransform& worldTransform) {
+	model;
+	worldTransform;
+	//auto blasList = model->GetBLASList();
+	//
+	//for (const auto& blas : blasList) {
+	//
+	//}
+}

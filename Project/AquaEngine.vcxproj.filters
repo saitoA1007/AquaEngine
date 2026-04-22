@@ -264,9 +264,6 @@
     <ClCompile Include="EngineSource\Core\FPSCounter.cpp">
       <Filter>EngineSource\Core</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Core\GameEngine.cpp">
-      <Filter>EngineSource\Core</Filter>
-    </ClCompile>
     <ClCompile Include="EngineSource\Core\GameObjectManager.cpp">
       <Filter>EngineSource\Core</Filter>
     </ClCompile>
@@ -357,10 +354,10 @@
     <ClCompile Include="EngineSource\Graphics\DirectX\Memory\DsvManager.cpp">
       <Filter>EngineSource\Graphics\DirectX\Memory</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Graphics\DirectX\Memory\RenderTexture.cpp">
+    <ClCompile Include="EngineSource\Graphics\RenderPass\RenderTexture.cpp">
       <Filter>EngineSource\Graphics\DirectX\Memory</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Graphics\DirectX\Memory\RenderTextureManager.cpp">
+    <ClCompile Include="EngineSource\Graphics\RenderPass\RenderTextureManager.cpp">
       <Filter>EngineSource\Graphics\DirectX\Memory</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\Graphics\DirectX\Memory\RtvManager.cpp">
@@ -482,6 +479,15 @@
     <ClCompile Include="EngineSource\Graphics\Buffers\BLAS.cpp" />
     <ClCompile Include="EngineSource\Common\CreateBufferResource.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\ResourceGarbageCollector.cpp" />
+    <ClCompile Include="EngineSource\Graphics\Buffers\TLAS.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\TestRayPipeline.cpp" />
+    <ClCompile Include="EngineSource\Core\Engine.cpp" />
+    <ClCompile Include="EngineSource\Core\System\CoreSubsystem.cpp" />
+    <ClCompile Include="EngineSource\Core\System\GraphicsSubsystem.cpp" />
+    <ClCompile Include="EngineSource\Core\System\ResourceSubsystem.cpp" />
+    <ClCompile Include="EngineSource\Core\System\InputSubsystem.cpp" />
+    <ClCompile Include="EngineSource\Core\System\SceneSubsystem.cpp" />
+    <ClCompile Include="EngineSource\Core\System\EditorSubsystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -643,9 +649,6 @@
     <ClInclude Include="EngineSource\Core\FPSCounter.h">
       <Filter>EngineSource\Core</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Core\GameEngine.h">
-      <Filter>EngineSource\Core</Filter>
-    </ClInclude>
     <ClInclude Include="EngineSource\Core\GameObjectManager.h">
       <Filter>EngineSource\Core</Filter>
     </ClInclude>
@@ -754,10 +757,10 @@
     <ClInclude Include="EngineSource\Graphics\DirectX\Memory\DsvManager.h">
       <Filter>EngineSource\Graphics\DirectX\Memory</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Graphics\DirectX\Memory\RenderTexture.h">
+    <ClInclude Include="EngineSource\Graphics\RenderPass\RenderTexture.h">
       <Filter>EngineSource\Graphics\DirectX\Memory</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Graphics\DirectX\Memory\RenderTextureManager.h">
+    <ClInclude Include="EngineSource\Graphics\RenderPass\RenderTextureManager.h">
       <Filter>EngineSource\Graphics\DirectX\Memory</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Graphics\DirectX\Memory\RtvManager.h">
@@ -932,6 +935,18 @@
     <ClInclude Include="EngineSource\Editor\DebugParameter.h" />
     <ClInclude Include="EngineSource\Graphics\Buffers\BLAS.h" />
     <ClInclude Include="EngineSource\Graphics\Core\ResourceGarbageCollector.h" />
+    <ClInclude Include="EngineSource\Graphics\Buffers\TLAS.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\TestRayPipeline.h" />
+    <ClInclude Include="EngineSource\Core\IEngineSubsystem.h" />
+    <ClInclude Include="EngineSource\Core\Engine.h" />
+    <ClInclude Include="EngineSource\Core\SubsystemRegistry.h" />
+    <ClInclude Include="EngineSource\Core\System\CoreSubsystem.h" />
+    <ClInclude Include="EngineSource\Core\System\GraphicsSubsystem.h" />
+    <ClInclude Include="EngineSource\Core\System\ResourceSubsystem.h" />
+    <ClInclude Include="EngineSource\Core\System\InputSubsystem.h" />
+    <ClInclude Include="EngineSource\Core\System\SceneSubsystem.h" />
+    <ClInclude Include="EngineSource\Core\System\EditorSubsystem.h" />
+    <ClInclude Include="EngineSource\Core\EngineContext.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Externals\imgui\ProggyClean.ttf" />
@@ -943,5 +958,8 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Resources\Shaders\raytracing.hlsl" />
   </ItemGroup>
 </Project>

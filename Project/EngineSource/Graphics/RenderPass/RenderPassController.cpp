@@ -16,10 +16,7 @@ void RenderPassController::AddPass(const std::string& name, RenderTextureMode mo
 	}
 
 	// renderTextureを作成
-	RtvContext contex;
-	contex.width = wid;
-	contex.height = hei;
-	renderTextureManager_->Create(name, mode,contex);
+	renderTextureManager_->Create(name, wid, hei,mode);
 	RenderTexture* renderTex = renderTextureManager_->GetRenderTexture(name);
 
 	// レンダーパスを作成
@@ -49,6 +46,26 @@ void RenderPassController::PostPass(const std::string& name) {
 
 	// 描画後処理
 	render->second->PostPass();
+}
+
+void RenderPassController::SwitchToUnorderedAccess(const std::string& name) {
+	// 登録されていなければエラー
+	auto render = renderPassList_.find(name);
+	if (render == renderPassList_.end()) {
+		assert(false && "Not found RenderPass");
+	}
+
+	render->second->SwitchToUnorderedAccess();
+}
+
+void RenderPassController::InsertUavBarrier(const std::string& name) {
+	// 登録されていなければエラー
+	auto render = renderPassList_.find(name);
+	if (render == renderPassList_.end()) {
+		assert(false && "Not found RenderPass");
+	}
+
+	render->second->InsertUavBarrier();
 }
 
 CD3DX12_GPU_DESCRIPTOR_HANDLE RenderPassController::GetSrvHandle(const std::string& name) {

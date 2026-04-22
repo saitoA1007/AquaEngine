@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include "Externals/DirectXTex/d3dx12.h"
-#include"RenderTexture.h"
+#include "RenderTexture.h"
 
 namespace GameEngine {
 
@@ -17,6 +17,12 @@ namespace GameEngine {
 
         // 描画後処理
         void PostPass();
+
+        // RTV描画後にUAVとして使用するためUAV状態へ遷移する
+        void SwitchToUnorderedAccess();
+
+        // UAV書き込み後にGPU側の書き込みを完了させるバリアを挿入する
+        void InsertUavBarrier();
 
         // srvIndexを取得
         uint32_t GetSrvIndex() { return renderTexture_->GetSrvIndex(); }
