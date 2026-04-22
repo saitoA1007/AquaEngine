@@ -1,7 +1,8 @@
 #pragma once
 #include <vector>
-#include "GpuResource.h"
+#include "SrvResource.h"
 #include "CreateBufferResource.h"
+#include "Externals/DirectXTex/d3dx12.h"
 
 namespace GameEngine {
 
@@ -9,13 +10,20 @@ namespace GameEngine {
 	/// 頂点データ用クラス
 	/// </summary>
 	template <typename T>
-	class VertexBuffer : public GpuResource {
+	class VertexBuffer : public SrvResource {
 	public:
 		~VertexBuffer() {
-			// マッピングを解除する
-			if (vertexData_) {
-				resource_->Unmap(0, nullptr);
-				vertexData_ = nullptr;
+			if (isCreated_) {
+				// マッピングを解除する
+				if (vertexData_) {
+					resource_->Unmap(0, nullptr);
+					vertexData_ = nullptr;
+				}
+				// SRV インデックス解放
+				if (srvManager_) {
+					srvManager_->ReleseIndex(srvIndex_);
+				}
+				isCreated_ = false;
 			}
 		}
 
@@ -36,6 +44,24 @@ namespace GameEngine {
 			resource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 			// 頂点データをコピー
 			std::memcpy(vertexData_, vertices.data(), sizeof(T) * totalVertices_);
+
+			/// SRVの作成
+			srvIndex_ = srvManager_->AllocateSrvIndex(SrvHeapType::Buffer);
+
+			D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+			srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+			srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+			srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+			srvDesc.Buffer.FirstElement = 0;
+			srvDesc.Buffer.NumElements = totalVertices_;
+			srvDesc.Buffer.StructureByteStride = sizeof(T);
+			srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+
+			D3D12_CPU_DESCRIPTOR_HANDLE srvCPU = srvManager_->GetCPUHandle(srvIndex_);
+			srvGpuHandle_ = static_cast<CD3DX12_GPU_DESCRIPTOR_HANDLE>(srvManager_->GetGPUHandle(srvIndex_));
+			device_->CreateShaderResourceView(resource_.Get(), &srvDesc, srvCPU);
+
+			isCreated_ = true;
 		}
 
 		// ビューを取得
@@ -46,6 +72,9 @@ namespace GameEngine {
 
 		// 頂点数
 		uint32_t GetTotalVertices() const { return totalVertices_; }
+
+		uint32_t GetSrvIndex() const { return srvIndex_; }
+		CD3DX12_GPU_DESCRIPTOR_HANDLE GetSrvGpuHandle() const { return srvGpuHandle_; }
 	private:
 		// 頂点バッファビュー
 		D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
@@ -53,5 +82,10 @@ namespace GameEngine {
 		T* vertexData_ = nullptr;
 		// 頂点数
 		uint32_t totalVertices_ = 0;
+
+		uint32_t srvIndex_ = 0;
+		CD3DX12_GPU_DESCRIPTOR_HANDLE srvGpuHandle_{};
+
+		bool isCreated_ = false;
 	};
 }
