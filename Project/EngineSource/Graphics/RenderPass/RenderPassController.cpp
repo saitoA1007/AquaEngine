@@ -88,6 +88,16 @@ uint32_t RenderPassController::GetSrvIndex(const std::string& name) {
 	return render->second->GetSrvIndex();
 }
 
+uint32_t RenderPassController::GetUavIndex(const std::string& name) {
+	// 登録されていなければエラー
+	auto render = renderPassList_.find(name);
+	if (render == renderPassList_.end()) {
+		assert(false && "Not found RenderPass");
+	}
+
+	return render->second->GetUavIndex();
+}
+
 void RenderPassController::SetSceneFinalPass(const std::string& name) {
 	// 登録されていなければエラー
 	auto render = renderPassList_.find(name);
