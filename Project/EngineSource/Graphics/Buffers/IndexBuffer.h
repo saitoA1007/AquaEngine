@@ -68,6 +68,9 @@ namespace GameEngine {
 
 		// インデックス数
 		uint32_t GetTotalIndices() const { return totalIndices_; }
+
+		uint32_t GetSrvIndex() const { return srvIndex_; }
+		CD3DX12_GPU_DESCRIPTOR_HANDLE GetSrvGpuHandle() const { return srvGpuHandle_; }
 	private:
 		// インデックスバッファビュー
 		D3D12_INDEX_BUFFER_VIEW indexBufferView_{};

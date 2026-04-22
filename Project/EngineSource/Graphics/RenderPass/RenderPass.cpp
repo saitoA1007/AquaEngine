@@ -54,6 +54,8 @@ void RenderPass::PrePass() {
 	}
 
 	case GameEngine::RenderTextureMode::RtvAndDsv: {
+		// 書き込み状態に遷移
+		renderTexture_->TransitionToRenderTarget(commandList_);
 		// RTVとDSVをセットする
 		commandList_->OMSetRenderTargets(1, &renderTexture_->GetRtvHandle(), false, &renderTexture_->GetDsvHandle());
 
