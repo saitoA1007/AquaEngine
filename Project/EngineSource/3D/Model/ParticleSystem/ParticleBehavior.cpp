@@ -148,7 +148,7 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
 }
 
 void ParticleBehavior::RegisterBebugParam() {
-    int index = 0;
+    //int index = 0;
     //GameParamEditor::GetInstance()->AddItem(name_, "SpawnMaxCount", particleEmitter_.spawnMaxCount, index++);
     //GameParamEditor::GetInstance()->AddItem(name_, "SpawnCoolTime", particleEmitter_.spawnCoolTime, index++);
     //GameParamEditor::GetInstance()->AddItem(name_, "IsLoop", particleEmitter_.isLoop, index++);

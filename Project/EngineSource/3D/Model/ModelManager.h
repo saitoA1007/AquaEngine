@@ -1,10 +1,9 @@
 #pragma once
 #include <unordered_map>
 #include "ModelLoader.h"
+#include "Model.h"
 
 namespace GameEngine {
-
-	class Model;
 
 	class ModelManager final {
 	public:

@@ -3,7 +3,6 @@
 #include <iostream>
 #include "LogManager.h"
 
-#include "Model.h"
 using namespace GameEngine;
 
 ModelManager::~ModelManager() {

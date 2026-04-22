@@ -255,7 +255,7 @@ void TestRayPipeline::CreateShaderTable() {
     shaderRecordHG.StrideInBytes = recordSize;
     startAddress += hitgroupRegion;
 
-    dispatchRayDesc_.Width = 1280.0f;
-    dispatchRayDesc_.Height = 720.0f;
+    dispatchRayDesc_.Width = 1280;
+    dispatchRayDesc_.Height = 720;
     dispatchRayDesc_.Depth = 1;
 }
