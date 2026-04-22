@@ -8,6 +8,9 @@
 #include "GameObjectManager.h"
 #include "CollisionManager.h"
 
+#include"TestManager.h"
+#include"TestCamera.h"
+
 namespace GameEngine {
 
     /// <summary>
@@ -46,6 +49,9 @@ namespace GameEngine {
         SceneChangeRequest* GetSceneChangeRequest() const { return sceneChangeRequest_.get(); }
         GameObjectManager* GetGameObjectManager() const { return gameObjectManager_.get(); }
         CollisionManager* GetCollisionManager() const { return collisionManager_.get(); }
+
+        TestManager* GetTestManager() const { return testManager_.get(); }
+        TestCamera* GetTestCamera() const { return testCamera_.get(); }
     private:
         EngineContext context_;
 
@@ -54,5 +60,9 @@ namespace GameEngine {
         std::unique_ptr<SceneChangeRequest> sceneChangeRequest_;
         std::unique_ptr<GameObjectManager> gameObjectManager_;
         std::unique_ptr<CollisionManager> collisionManager_;
+
+
+        std::unique_ptr<TestManager> testManager_;
+        std::unique_ptr<TestCamera> testCamera_;
     };
 }

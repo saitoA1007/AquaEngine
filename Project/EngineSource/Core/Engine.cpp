@@ -63,6 +63,16 @@ void Engine::Initialize(HINSTANCE hInstance) {
     // シーンの初期化
     scene_->SceneInitialize();
 
+    auto* device = graphics_->GetGraphicsDevice()->GetDevice();
+    auto* cmdList = graphics_->GetGraphicsDevice()->GetCommandList();
+    auto* dxc = graphics_->GetDXC();
+    auto* srv = graphics_->GetGraphicsDevice()->GetSrvManager();
+    auto* render = graphics_->GetRenderPassCtrl();
+
+    scene_->GetTestCamera()->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720);
+
+    scene_->GetTestManager()->Initialize(device, cmdList, dxc, srv, render, scene_->GetTestCamera());
+
     // エディタへのシーン情報設定
 #ifdef USE_IMGUI
     auto* request = scene_->GetSceneChangeRequest();
@@ -102,6 +112,8 @@ void Engine::MainLoop() {
 
         scene_->GetCollisionManager()->DebugDraw(graphics_->GetDebugRenderer());
 
+        scene_->GetTestCamera()->Update();
+
         PostUpdate();
 
         PreDraw();
@@ -109,6 +121,9 @@ void Engine::MainLoop() {
         graphics_->GetRenderQueue()->Execute();
         // ポストエフェクトを実行
         graphics_->GetPostEffectManager()->Execute();
+
+        scene_->GetTestManager()->Draw();
+
         PostDraw();
     }
 }

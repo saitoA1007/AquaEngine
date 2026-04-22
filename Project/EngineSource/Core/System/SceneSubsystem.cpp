@@ -1,5 +1,6 @@
 #include "SceneSubsystem.h"
 #include "ResourceSubsystem.h"
+#include"InputSubsystem.h"
 #include "Collider.h"
 using namespace GameEngine;
 
@@ -19,6 +20,10 @@ void SceneSubsystem::Initialize() {
 
     // シーン切り替えリクエスト
     sceneChangeRequest_ = std::make_unique<SceneChangeRequest>();
+
+
+    testManager_ = std::make_unique<TestManager>();
+    testCamera_ = std::make_unique<TestCamera>(context_.input->GetInput());
 }
 
 void SceneSubsystem::SceneInitialize() {
