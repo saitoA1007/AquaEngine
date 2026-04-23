@@ -41,9 +41,13 @@ void TestCamera::Initialize(const Vector3& translate, int width, int height) {
 	Vector3 dir = Vector3(-0.5f, -1.0f, -0.5f);
 	dir = Normalize(dir);
 
+	cameraForGPU_->mtxView = viewMatrix_;
+	cameraForGPU_->mtxProj = projectionMatrix_;
+	cameraForGPU_->mtxViewInv = worldMatrix_;
+	cameraForGPU_->mtxProjInv = InverseMatrix(projectionMatrix_);
 	cameraForGPU_->lightDirection = Vector4(dir.x, dir.y, dir.z,1.0f); // 平行光源の向き.
-	cameraForGPU_->lightColor = Vector4(1.0f, 1.0f, 1.0f, 0.0f);    // 平行光源色.
-	cameraForGPU_->ambientColor = Vector4(0.2f, 0.2f, 0.2f, 0.0f);  // 環境光.
+	cameraForGPU_->lightColor = Vector4(1.0f, 1.0f, 1.0f, 1.0f);    // 平行光源色.
+	cameraForGPU_->ambientColor = Vector4(0.2f, 0.2f, 0.2f, 1.0f);  // 環境光.
 }
 
 void TestCamera::Update() {
@@ -97,14 +101,13 @@ void TestCamera::Update() {
 	worldMatrix_.m[3][1] = translate_.y;
 	worldMatrix_.m[3][2] = translate_.z;
 
-	//cameraForGPU_->worldPosition = GetWorldPosition();
 	// カメラの変更した内容を適用する処理
 	viewMatrix_ = InverseMatrix(worldMatrix_);
 	//cameraForGPU_->vpMatrix = GetVPMatrix();
 
 	cameraForGPU_->mtxView = viewMatrix_;       // ビュー行列.
 	cameraForGPU_->mtxProj = projectionMatrix_; // プロジェクション行列.
-	cameraForGPU_->mtxViewInv = InverseMatrix(viewMatrix_);    // ビュー逆行列.
+	cameraForGPU_->mtxViewInv = worldMatrix_;    // ビュー逆行列.
 	cameraForGPU_->mtxProjInv = InverseMatrix(projectionMatrix_);// プロジェクション逆行列.
 
 	Vector3 dir = Vector3(-0.5f, -1.0f, -0.5f);

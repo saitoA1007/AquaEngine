@@ -44,10 +44,6 @@ void TestManager::Draw() {
     // カメラのセット
     commandList_->SetComputeRootConstantBufferView(1, testCamera_->constBuffer_.GetGpuVirtualAddress());
 
-    //// UAVバッファのセット
-    //auto outputDescriptor = srvManager_->GetGPUHandle(renderPassController_->GetUavIndex("RaytracingPass"));
-    //commandList_->SetComputeRootDescriptorTable(1, outputDescriptor);
-
     // レイトレーシングを開始.
     commandList_->SetPipelineState1(stateObject_.Get());
     commandList_->DispatchRays(&dispatchRayDesc_);
@@ -66,8 +62,8 @@ void TestManager::CreateSceneObjects() {
     std::vector<VertexData> vertices;
     std::vector<uint32_t> indices;
     GetPlane(vertices, indices);
-    meshPlane.vertexBuffer_.Create(vertices);
-    meshPlane.indexBuffer_.Create(indices);
+    meshPlane.indexBuffer_.Create(commandList_, indices);
+    meshPlane.vertexBuffer_.Create(commandList_, vertices);
     meshPlane.shaderName = DefaultHitgroup_.c_str();
 
     //========================================================
@@ -76,8 +72,8 @@ void TestManager::CreateSceneObjects() {
     vertices.clear();
     indices.clear();
     GetColoredCube(vertices, indices);
-    meshCube.vertexBuffer_.Create(vertices);
-    meshCube.indexBuffer_.Create(indices);
+    meshCube.indexBuffer_.Create(commandList_, indices);
+    meshCube.vertexBuffer_.Create(commandList_, vertices);
     meshCube.shaderName = DefaultHitgroup_.c_str();
 }
 

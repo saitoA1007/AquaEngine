@@ -79,10 +79,10 @@ void mainRayGen()
     matrix mtxProjInv = gSceneParam.mtxProjInv;
 
     RayDesc rayDesc;
-    rayDesc.Origin = mul(mtxViewInv, float4(0, 0, 0, 1)).xyz;
-
-    float4 target = mul(mtxProjInv, float4(d.x, -d.y, 1, 1));
-    rayDesc.Direction = mul(mtxViewInv, float4(target.xyz, 0)).xyz;
+    rayDesc.Origin = mul(float4(0, 0, 0, 1), gSceneParam.mtxViewInv).xyz;
+    
+    float4 target = mul(float4(d.x, -d.y, 1, 1), gSceneParam.mtxProjInv);
+    rayDesc.Direction = mul(float4(target.xyz / target.w, 0), gSceneParam.mtxViewInv).xyz;
 
     rayDesc.TMin = 0;
     rayDesc.TMax = 100000;

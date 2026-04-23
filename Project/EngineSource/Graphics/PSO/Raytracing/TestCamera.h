@@ -99,7 +99,5 @@ namespace GameEngine {
 
 		// ターゲットを動かす速度
 		static inline const float kTargetSpeed = 0.5f;
-
-		
 	};
 }

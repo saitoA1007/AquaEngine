@@ -19,7 +19,7 @@ void BLAS::Create(ID3D12GraphicsCommandList4* cmdList,
     // インデックスデータ
     geometryDesc.Triangles.IndexBuffer = indexBufView.BufferLocation;
     geometryDesc.Triangles.IndexCount = totalIndices;
-    geometryDesc.Triangles.IndexFormat = indexBufView.Format;
+    geometryDesc.Triangles.IndexFormat = DXGI_FORMAT_R32_UINT;
 
     // 1つのMeshの入力設定
     D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_INPUTS inputs{};
