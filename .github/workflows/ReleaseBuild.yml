@@ -4,11 +4,11 @@ on:
     branches:
       - master
 env:
-  SOLUTION_FILE_PATH: Project/AquaEngine.sln
+  SOLUTION_FILE_PATH: Project/AquaEngine.slnx
   CONFIGURATION: Release
 jobs:
   build:
-    runs-on: windows-2022
+    runs-on: windows-latest
 
     steps:
     - name: Checkout
