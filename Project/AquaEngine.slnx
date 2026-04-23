@@ -10,5 +10,5 @@
     <File Path=".editorconfig" />
   </Folder>
   <Project Path="AquaEngine.vcxproj" />
-  <Project Path="Externals/DirectXTex/DirectXTex_Desktop_2022_Win10.vcxproj" />
+  <Project Path="Externals/DirectXTex/DirectXTex_Desktop_2022_Win10.vcxproj" Id="371b9fa9-4c90-4ac6-a123-aced756d6c77" />
 </Solution>
