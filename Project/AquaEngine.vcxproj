@@ -17,7 +17,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{02fe7fa0-08ec-4c82-b42f-ee759773a63c}</ProjectGuid>
+    <ProjectGuid>{036FA5D4-A1CA-D982-5B0F-5BFA0D9548DB}</ProjectGuid>
     <RootNamespace>AquaEngine</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
