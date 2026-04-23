@@ -1,0 +1,14 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Development" />
+    <BuildType Name="Release" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Folder Name="/ソリューション項目/">
+    <File Path="../setup.bat" />
+    <File Path=".editorconfig" />
+  </Folder>
+  <Project Path="AquaEngine.vcxproj" />
+  <Project Path="Externals/DirectXTex/DirectXTex_Desktop_2022_Win10.vcxproj" />
+</Solution>
