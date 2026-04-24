@@ -17,6 +17,7 @@ namespace GameEngine {
 		Vector4 lightDirection; // 平行光源の向き.
 		Vector4 lightColor;    // 平行光源色.
 		Vector4 ambientColor;  // 環境光.
+		Vector4 eyePosition;   // 視点.
 	};
 
 	class TestCamera {

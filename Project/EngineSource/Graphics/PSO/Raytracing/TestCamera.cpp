@@ -48,6 +48,8 @@ void TestCamera::Initialize(const Vector3& translate, int width, int height) {
 	cameraForGPU_->lightDirection = Vector4(dir.x, dir.y, dir.z,1.0f); // 平行光源の向き.
 	cameraForGPU_->lightColor = Vector4(1.0f, 1.0f, 1.0f, 1.0f);    // 平行光源色.
 	cameraForGPU_->ambientColor = Vector4(0.2f, 0.2f, 0.2f, 1.0f);  // 環境光.
+	Vector3 p = GetWorldPosition();
+	cameraForGPU_->eyePosition = Vector4(p.x,p.y,p.z,1.0f);
 }
 
 void TestCamera::Update() {
@@ -109,6 +111,8 @@ void TestCamera::Update() {
 	cameraForGPU_->mtxProj = projectionMatrix_; // プロジェクション行列.
 	cameraForGPU_->mtxViewInv = worldMatrix_;    // ビュー逆行列.
 	cameraForGPU_->mtxProjInv = InverseMatrix(projectionMatrix_);// プロジェクション逆行列.
+	Vector3 p = GetWorldPosition();
+	cameraForGPU_->eyePosition = Vector4(p.x, p.y, p.z, 1.0f);
 
 	Vector3 dir = Vector3(-0.5f, -1.0f, -0.5f);
 	dir = Normalize(dir);

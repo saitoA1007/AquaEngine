@@ -71,7 +71,7 @@ void Engine::Initialize(HINSTANCE hInstance) {
 
     scene_->GetTestCamera()->Initialize({ 0.0f,2.0f,-20.0f }, 1280, 720);
 
-    scene_->GetTestManager()->Initialize(device, cmdList, dxc, srv, render, scene_->GetTestCamera());
+    scene_->GetTestManager()->Initialize(device, cmdList, dxc, srv, render, scene_->GetTestCamera(), resource_->GetTextureManager());
 
     // エディタへのシーン情報設定
 #ifdef USE_IMGUI
@@ -129,6 +129,8 @@ void Engine::MainLoop() {
 }
 
 void Engine::PreUpdate() {
+    graphics_->GetGraphicsDevice()->CheckDeviceStatus();
+
     core_->Update(); // FPS
     input_->Update(); // 入力処理
 

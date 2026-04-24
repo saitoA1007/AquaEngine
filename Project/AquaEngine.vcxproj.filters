@@ -1032,6 +1032,11 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\raytracing.hlsl" />
+    <FxCompile Include="Resources\Shaders\Raytracing\chsFloor.hlsl" />
+    <FxCompile Include="Resources\Shaders\Raytracing\chsSphereNoLambert.hlsl" />
+    <FxCompile Include="Resources\Shaders\Raytracing\chsSpherePhong.hlsl" />
+    <FxCompile Include="Resources\Shaders\Raytracing\miss.hlsl" />
+    <FxCompile Include="Resources\Shaders\Raytracing\raygen.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Externals\imgui\ProggyClean.ttf" />
@@ -1040,6 +1045,7 @@
     <None Include="Externals\imgui\imgui_bezier_math.inl" />
     <None Include="Externals\imgui\imgui_extra_math.inl" />
     <None Include="Externals\imgui\imgui_node_editor_internal.inl" />
+    <None Include="Resources\Shaders\Raytracing\common.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />
