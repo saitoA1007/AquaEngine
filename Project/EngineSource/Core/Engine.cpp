@@ -114,6 +114,8 @@ void Engine::MainLoop() {
 }
 
 void Engine::PreUpdate() {
+    // デバイスチェック
+    graphics_->GetGraphicsDevice()->CheckDeviceStatus();
     core_->Update(); // FPS
     input_->Update(); // 入力処理
 
