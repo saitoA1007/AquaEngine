@@ -53,21 +53,27 @@ void mainSphereCHS(inout Payload payload, MyAttribute attrib)
     float3 worldPosition = mul(float4(vtx.Position, 1), ObjectToWorld4x3());
     float3 worldNormal = mul(vtx.Normal, (float3x3) ObjectToWorld4x3());
 
-    if (gSceneParam.flags.x == 0)
-    {
-        // 平行光源でライティング.
-        float3 lightDir = -normalize(gSceneParam.lightDirection.xyz);
-        float dotNL = saturate(dot(worldNormal, lightDir));
-        payload.color = dotNL * sphereDiffuse;
-    }
-    else
-    {
-        // ポイントライトでライティング.
-        float3 pointLightPosition = gSceneParam.pointLight.xyz;
-        float3 lightDir = normalize(pointLightPosition - worldPosition.xyz);
-        float dotNL = saturate(dot(worldNormal, lightDir));
-        payload.color = dotNL * sphereDiffuse;
-    }
+    //if (gSceneParam.flags.x == 0)
+    //{
+    //    // 平行光源でライティング.
+    //    float3 lightDir = -normalize(gSceneParam.lightDirection.xyz);
+    //    float dotNL = saturate(dot(worldNormal, lightDir));
+    //    payload.color = dotNL * sphereDiffuse;
+    //}
+    //else
+    //{
+    //    // ポイントライトでライティング.
+    //    float3 pointLightPosition = gSceneParam.pointLight.xyz;
+    //    float3 lightDir = normalize(pointLightPosition - worldPosition.xyz);
+    //    float dotNL = saturate(dot(worldNormal, lightDir));
+    //    payload.color = dotNL * sphereDiffuse;
+    //}
+    
+      // ポイントライトでライティング.
+    float3 pointLightPosition = gSceneParam.pointLight.xyz;
+    float3 lightDir = normalize(pointLightPosition - worldPosition.xyz);
+    float dotNL = saturate(dot(worldNormal, lightDir));
+    payload.color = dotNL * sphereDiffuse;
 
     payload.color += gSceneParam.ambientColor.xyz * sphereDiffuse;
 }

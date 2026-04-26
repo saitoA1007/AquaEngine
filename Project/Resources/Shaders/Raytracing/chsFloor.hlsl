@@ -143,37 +143,42 @@ void mainFloorCHS(inout Payload payload, MyAttribute attrib)
 
     float3 shadowRayDir = lightDir;
     bool isInShadow = false;
-    if (gSceneParam.flags.x == 0)
-    {
-        isInShadow = ShootShadowRay(worldPosition, shadowRayDir);
-    }
-    else
-    {
-        float3 pointLightPosition = gSceneParam.pointLight.xyz;
-        lightDir = normalize(pointLightPosition - worldPosition.xyz);
-
-#if 0
-        // 光源に向けて散らしたベクトルを生成.
-        float3 perpL = cross(lightDir, float3(0, 1, 0));
-        if (all(perpL == 0.0))
-        {
-            perpL.x = 1.0;
-        }
-        float radius = 0.5;
-        float3 toLightEdge = normalize((pointLightPosition + perpL * radius) - worldPosition);
-        float coneAngle = acos(dot(lightDir, toLightEdge)) * 2.0;
-        uint shadowRayCount = gSceneParam.shadowRayCount;
-        uint randSeed = randomU(worldPosition.xz * 0.1);
-        for (int i = 0; i < shadowRayCount; ++i)
-        {
-            shadowRayDir = getConeSample(randSeed, lightDir, coneAngle);
-            isInShadow |= ShootShadowRay(worldPosition, shadowRayDir);
-        }
-#else
-        // ハードシャドウにしたい時にはシャドウレイを散らさない.
-        isInShadow = ShootShadowRay(worldPosition, lightDir);
-#endif
-    }
+//    if (gSceneParam.flags.x == 0)
+//    {
+//        isInShadow = ShootShadowRay(worldPosition, shadowRayDir);
+//    }
+//    else
+//    {
+//        float3 pointLightPosition = gSceneParam.pointLight.xyz;
+//        lightDir = normalize(pointLightPosition - worldPosition.xyz);
+//
+//#if 0
+//        // 光源に向けて散らしたベクトルを生成.
+//        float3 perpL = cross(lightDir, float3(0, 1, 0));
+//        if (all(perpL == 0.0))
+//        {
+//            perpL.x = 1.0;
+//        }
+//        float radius = 0.5;
+//        float3 toLightEdge = normalize((pointLightPosition + perpL * radius) - worldPosition);
+//        float coneAngle = acos(dot(lightDir, toLightEdge)) * 2.0;
+//        uint shadowRayCount = gSceneParam.shadowRayCount;
+//        uint randSeed = randomU(worldPosition.xz * 0.1);
+//        for (int i = 0; i < shadowRayCount; ++i)
+//        {
+//            shadowRayDir = getConeSample(randSeed, lightDir, coneAngle);
+//            isInShadow |= ShootShadowRay(worldPosition, shadowRayDir);
+//        }
+//#else
+//        // ハードシャドウにしたい時にはシャドウレイを散らさない.
+//        isInShadow = ShootShadowRay(worldPosition, lightDir);
+//#endif
+//    }
+    
+    float3 pointLightPosition = gSceneParam.pointLight.xyz;
+    lightDir = normalize(pointLightPosition - worldPosition.xyz);
+      // ハードシャドウにしたい時にはシャドウレイを散らさない.
+    isInShadow = ShootShadowRay(worldPosition, lightDir);
 
     if (isInShadow)
     {

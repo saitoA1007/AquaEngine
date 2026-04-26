@@ -21,7 +21,7 @@ namespace GameEngine {
 
 		Vector3 pointPos;// ポイントライト
 		uint32_t shadowRayCount_;// シャドウレイ数
-		uint32_t flags;
+		uint32_t flags[4];
 	};
 
 	class TestCamera {

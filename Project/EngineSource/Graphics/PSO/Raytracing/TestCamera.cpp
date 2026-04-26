@@ -50,6 +50,13 @@ void TestCamera::Initialize(const Vector3& translate, int width, int height) {
 	cameraForGPU_->ambientColor = Vector4(0.2f, 0.2f, 0.2f, 1.0f);  // 環境光.
 	Vector3 p = GetWorldPosition();
 	cameraForGPU_->eyePosition = Vector4(p.x,p.y,p.z,1.0f);
+
+	cameraForGPU_->pointPos = {0.0f,2.0f,0.0f};// ポイントライト
+	cameraForGPU_->shadowRayCount_ = 1;// シャドウレイ数
+	cameraForGPU_->flags[0] = 0;
+	cameraForGPU_->flags[1] = 1;
+	cameraForGPU_->flags[2] = 0;
+	cameraForGPU_->flags[3] = 0;
 }
 
 void TestCamera::Update() {
@@ -114,10 +121,10 @@ void TestCamera::Update() {
 	Vector3 p = GetWorldPosition();
 	cameraForGPU_->eyePosition = Vector4(p.x, p.y, p.z, 1.0f);
 
-	Vector3 dir = Vector3(-0.5f, -1.0f, -0.5f);
-	dir = Normalize(dir);
-
-	cameraForGPU_->lightDirection = Vector4(dir.x, dir.y, dir.z, 1.0f); // 平行光源の向き.
+	//Vector3 dir = Vector3(-0.5f, -1.0f, -0.5f);
+	//dir = Normalize(dir);
+	//
+	//cameraForGPU_->lightDirection = Vector4(dir.x, dir.y, dir.z, 1.0f); // 平行光源の向き.
 	cameraForGPU_->lightColor = Vector4(1.0f, 1.0f, 1.0f, 0.0f);    // 平行光源色.
 	cameraForGPU_->ambientColor = Vector4(0.2f, 0.2f, 0.2f, 0.0f);  // 環境光.
 

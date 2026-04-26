@@ -91,7 +91,7 @@ namespace GameEngine {
 		Microsoft::WRL::ComPtr<ID3D12Resource> tlas_;
 		uint32_t tlasSrvIndex_ = 0;
 		Microsoft::WRL::ComPtr<ID3D12Resource> instanceDescBuffer_;
-		Microsoft::WRL::ComPtr<ID3D12Resource> asbUpdate;
+		Microsoft::WRL::ComPtr<ID3D12Resource> tlasUpdate;
 
 		// グローバルのルートシグネチャ
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignatureGlobal_;
@@ -129,6 +129,8 @@ namespace GameEngine {
 		// BLAS を束ねてシーンの TLAS を構築します.
 		void CreateSceneTLAS();
 
+		void UpdateSceneTLAS();
+
 		// レイトレーシング用の StateObject を構築します.
 		void CreateStateObject();
 
@@ -148,9 +150,6 @@ namespace GameEngine {
 
 		// 床用のローカルルートシグネチャを生成します.
 		void CreateFloorLocalRootSignature();
-
-		// ClosestHitシェーダー用ローカルルートシグネチャを生成します.
-		//void CreateLocalRootSignatureCHS();
 
 		// レイトレーシングで使用する ShaderTable を構築します.
 		// レイトレーシングパイプラインで使用する全てのシェーダーの情報が格納されたデータ
@@ -245,12 +244,47 @@ namespace GameEngine {
 			dst = recordStart + hitgroupRecordSize;
 			return dst;
 		}
+		//template<class T>
+		//uint8_t* WriteHitgroupMaterial(uint8_t* dst, const PolygonMesh<T>& mesh, UINT hitgroupRecordSize) {
+		//	Microsoft::WRL::ComPtr<ID3D12StateObjectProperties> rtsoProps;
+		//	stateObject_.As(&rtsoProps);
+		//	auto recordStart = dst;
+		//	auto id = rtsoProps->GetShaderIdentifier(AppHitGroups::NoPhongMaterial.c_str());
+		//	if (id == nullptr) {
+		//		throw std::logic_error("Not found ShaderIdentifier");
+		//	}
+		//	dst += WriteShaderIdentifier(dst, id);
+		//	dst += WriteGPUDescriptor(dst, mesh.indexBuffer_.GetSrvGpuHandle());
+		//	dst += WriteGPUDescriptor(dst, mesh.vertexBuffer_.GetSrvGpuHandle());
+		//
+		//	dst = recordStart + hitgroupRecordSize;
+		//	return dst;
+		//}
+		//template<class T>
+		//uint8_t* WriteHitgroupPhong(uint8_t* dst, const PolygonMesh<T>& mesh, D3D12_GPU_VIRTUAL_ADDRESS address, UINT hitgroupRecordSize) {
+		//	Microsoft::WRL::ComPtr<ID3D12StateObjectProperties> rtsoProps;
+		//	stateObject_.As(&rtsoProps);
+		//	auto recordStart = dst;
+		//	auto id = rtsoProps->GetShaderIdentifier(AppHitGroups::PhongMaterial.c_str());
+		//	if (id == nullptr) {
+		//		throw std::logic_error("Not found ShaderIdentifier");
+		//	}
+		//	dst += WriteShaderIdentifier(dst, id);
+		//	dst += WriteGPUDescriptor(dst, mesh.indexBuffer_.GetSrvGpuHandle());
+		//	dst += WriteGPUDescriptor(dst, mesh.vertexBuffer_.GetSrvGpuHandle());
+		//	dst += WriteGpuResourceAddr(dst, address);
+		//
+		//	dst = recordStart + hitgroupRecordSize;
+		//	return dst;
+		//}
 		template<class T>
-		uint8_t* WriteHitgroupMaterial(uint8_t* dst, const PolygonMesh<T>& mesh, UINT hitgroupRecordSize) {
+		uint8_t* WriteHitgroupShaderEntry(uint8_t* dst, const PolygonMesh<T>& mesh, UINT hgEntrySize)
+		{
 			Microsoft::WRL::ComPtr<ID3D12StateObjectProperties> rtsoProps;
 			stateObject_.As(&rtsoProps);
-			auto recordStart = dst;
-			auto id = rtsoProps->GetShaderIdentifier(AppHitGroups::NoPhongMaterial.c_str());
+			auto entryBegin = dst;
+			auto shader = mesh.shaderName;
+			auto id = rtsoProps->GetShaderIdentifier(shader.c_str());
 			if (id == nullptr) {
 				throw std::logic_error("Not found ShaderIdentifier");
 			}
@@ -258,24 +292,7 @@ namespace GameEngine {
 			dst += WriteGPUDescriptor(dst, mesh.indexBuffer_.GetSrvGpuHandle());
 			dst += WriteGPUDescriptor(dst, mesh.vertexBuffer_.GetSrvGpuHandle());
 
-			dst = recordStart + hitgroupRecordSize;
-			return dst;
-		}
-		template<class T>
-		uint8_t* WriteHitgroupPhong(uint8_t* dst, const PolygonMesh<T>& mesh, D3D12_GPU_VIRTUAL_ADDRESS address, UINT hitgroupRecordSize) {
-			Microsoft::WRL::ComPtr<ID3D12StateObjectProperties> rtsoProps;
-			stateObject_.As(&rtsoProps);
-			auto recordStart = dst;
-			auto id = rtsoProps->GetShaderIdentifier(AppHitGroups::PhongMaterial.c_str());
-			if (id == nullptr) {
-				throw std::logic_error("Not found ShaderIdentifier");
-			}
-			dst += WriteShaderIdentifier(dst, id);
-			dst += WriteGPUDescriptor(dst, mesh.indexBuffer_.GetSrvGpuHandle());
-			dst += WriteGPUDescriptor(dst, mesh.vertexBuffer_.GetSrvGpuHandle());
-			dst += WriteGpuResourceAddr(dst, address);
-
-			dst = recordStart + hitgroupRecordSize;
+			dst = entryBegin + hgEntrySize;
 			return dst;
 		}
 

@@ -4,6 +4,7 @@
 #include "ResourceGarbageCollector.h"
 #include <algorithm>
 #include <random>
+#include "ImGuiManager.h"
 using namespace GameEngine;
 
 void TestManager::Initialize(ID3D12Device5* device, ID3D12GraphicsCommandList4* commandList, DXC* dxc, SrvManager* srvManager, RenderPassController* renderPassController,
@@ -38,7 +39,22 @@ void TestManager::Initialize(ID3D12Device5* device, ID3D12GraphicsCommandList4* 
 
 void TestManager::Update() {
 
+    UpdateSceneTLAS();
 
+    ImGui::Begin("Test");
+    auto& data = testCamera_->constBuffer_.GetData()->pointPos;
+    ImGui::DragFloat3("Pos", &data.x,0.1f);
+
+    auto& dir = testCamera_->constBuffer_.GetData()->lightDirection;
+
+    ImGui::DragFloat3("Dir", &dir.x, 0.1f);
+    Vector3 t = { dir.x,dir.y,dir.z };
+    t = Normalize(t);
+    dir.x = t.x;
+    dir.y = t.y;
+    dir.z = t.z;
+
+    ImGui::End();
 }
 
 void TestManager::Draw() {
@@ -50,8 +66,6 @@ void TestManager::Draw() {
     commandList_->SetComputeRootDescriptorTable(0, srvManager_->GetGPUHandle(tlasSrvIndex_));
     // カメラのセット
     commandList_->SetComputeRootConstantBufferView(1, testCamera_->constBuffer_.GetGpuVirtualAddress());
-    // 背景画像(dds)をセット
-    commandList_->SetComputeRootDescriptorTable(2, srvManager_->GetGPUHandle(textureManager_->GetHandleByName("rostock_laage_airport_4k.dds")));
 
     // レイトレーシングを開始.
     commandList_->SetPipelineState1(stateObject_.Get());
@@ -149,7 +163,7 @@ void TestManager::CreateSceneTLAS() {
     auto& inputs = asDesc.Inputs; // D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_INPUTS
     inputs.Type = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL;
     inputs.DescsLayout = D3D12_ELEMENTS_LAYOUT_ARRAY;
-    inputs.Flags = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_NONE;
+    inputs.Flags = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_ALLOW_UPDATE;
 
     // 数を指定
     inputs.NumDescs = UINT(instanceDescs.size());
@@ -184,13 +198,13 @@ void TestManager::CreateSceneTLAS() {
     // アップデート用バッファを確保
     if (asDesc.Inputs.Flags & D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_ALLOW_UPDATE) {
 
-        asbUpdate = CreateBufferResource(
+        tlasUpdate = CreateBufferResource(
             device_, tlasPrebuild.UpdateScratchDataSizeInBytes,
             D3D12_HEAP_TYPE_DEFAULT,
             D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
             D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS
         );
-        if (asbUpdate == nullptr) {
+        if (tlasUpdate == nullptr) {
             throw std::runtime_error("CreateAccelerationStructure failed.");
         }
     }
@@ -224,44 +238,65 @@ void TestManager::CreateSceneTLAS() {
     device_->CreateShaderResourceView(nullptr, &srvDesc, srvHandleCPU);
 }
 
+void TestManager::UpdateSceneTLAS() {
+    std::vector<D3D12_RAYTRACING_INSTANCE_DESC> instanceDescs;
+    DeployObjects(instanceDescs);
+
+    auto sizeOfInstanceDescs = instanceDescs.size();
+    sizeOfInstanceDescs *= sizeof(D3D12_RAYTRACING_INSTANCE_DESC);
+
+    D3D12_RAYTRACING_INSTANCE_DESC* pDesc = nullptr;
+    instanceDescBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&pDesc));
+    std::memcpy(pDesc, instanceDescs.data(),
+        instanceDescs.size() * sizeof(D3D12_RAYTRACING_INSTANCE_DESC));
+    instanceDescBuffer_->Unmap(0, nullptr);
+    pDesc = nullptr;
+
+    // TLAS の更新ビルドを設定
+    D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC asDesc{};
+    auto& inputs = asDesc.Inputs;
+    inputs.Type = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL;
+    inputs.DescsLayout = D3D12_ELEMENTS_LAYOUT_ARRAY;
+    inputs.NumDescs = UINT(instanceDescs.size());
+    inputs.InstanceDescs = instanceDescBuffer_->GetGPUVirtualAddress();
+    // TLAS の更新処理を行うためのフラグを設定する.
+    inputs.Flags = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_ALLOW_UPDATE
+        | D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_PERFORM_UPDATE;
+    
+    // 更新専用スクラッチバッファ（Create時に確保済みの tlasUpdate を使う）
+    asDesc.ScratchAccelerationStructureData = tlasUpdate->GetGPUVirtualAddress();
+
+    // Source と Dest を同じ tlas_ にすることで in-place 更新
+    asDesc.SourceAccelerationStructureData = tlas_->GetGPUVirtualAddress();
+    asDesc.DestAccelerationStructureData = tlas_->GetGPUVirtualAddress();
+
+    commandList_->BuildRaytracingAccelerationStructure(&asDesc, 0, nullptr);
+
+    // コマンドリストに積む.
+    commandList_->BuildRaytracingAccelerationStructure(&asDesc, 0, nullptr);
+    auto barrier = CD3DX12_RESOURCE_BARRIER::UAV(tlas_.Get());
+    commandList_->ResourceBarrier(1, &barrier);
+}
+
 //=============================================
 // 
 // ルートシグネチャ(Global) を生成します.
 // 
 //=============================================
 void TestManager::CreateRootSignatureGlobal() {
-    std::array<CD3DX12_ROOT_PARAMETER, 3> rootParams{};
+    std::array<CD3DX12_ROOT_PARAMETER, 2> rootParams{};
 
     // TLAS を t0 レジスタに割り当てて使用する設定.
     CD3DX12_DESCRIPTOR_RANGE descRangeTLAS;
     descRangeTLAS.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
 
-    // 背景用テクスチャを t1
-    CD3DX12_DESCRIPTOR_RANGE descRangeBgGh;
-    descRangeBgGh.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
-
     rootParams[0].InitAsDescriptorTable(1, &descRangeTLAS); // t0
     rootParams[1].InitAsConstantBufferView(0); // b0
-    rootParams[2].InitAsDescriptorTable(1, &descRangeBgGh); // t1
-
-    // サンプラーの設定
-    D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
-    staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR; // バイリニアフィルタ
-    staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-    staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-    staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-    staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER; // 比較しない
-    staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX; // ありったけのMIpmapを使う
-    staticSamplers[0].ShaderRegister = 0; // レジスタ番号0を使う
-    staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 
     D3D12_ROOT_SIGNATURE_DESC rootSigDesc{};
     // パラメータを設定
     rootSigDesc.NumParameters = UINT(rootParams.size());
     rootSigDesc.pParameters = rootParams.data();
-    // サンプラーを設定
-    rootSigDesc.pStaticSamplers = staticSamplers;
-    rootSigDesc.NumStaticSamplers = _countof(staticSamplers);
 
     HRESULT hr;
     Microsoft::WRL::ComPtr<ID3DBlob> blob, errBlob;
@@ -356,60 +391,17 @@ void TestManager::CreateSphereLocalRootSignature() {
         Microsoft::WRL::ComPtr<ID3DBlob> blob, errBlob;
         hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &blob, &errBlob);
         if (FAILED(hr)) {
-            throw std::runtime_error("RootSignature(rsSphere1) failed.");
+            throw std::runtime_error("RootSignature(rsSphere) failed.");
         }
 
         hr = device_->CreateRootSignature(
             0, blob->GetBufferPointer(), blob->GetBufferSize(),
-            IID_PPV_ARGS(rsSphere1_.ReleaseAndGetAddressOf())
+            IID_PPV_ARGS(rsSphere_.ReleaseAndGetAddressOf())
         );
         if (FAILED(hr)) {
-            throw std::runtime_error("RootSignature(rsSphere1) failed.");
+            throw std::runtime_error("RootSignature(rsSphere) failed.");
         }
-        rsSphere1_->SetName(L"rsSphere1");
-    } 
-
-    //========================================================================
-    // 反射、屈折用
-    //========================================================================
-
-    {
-        std::array<D3D12_ROOT_PARAMETER, 3> rootParams;
-        rootParams[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-        rootParams[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-        rootParams[0].DescriptorTable.NumDescriptorRanges = 1;
-        rootParams[0].DescriptorTable.pDescriptorRanges = &rangeIB; // t0
-
-        rootParams[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-        rootParams[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-        rootParams[1].DescriptorTable.NumDescriptorRanges = 1;
-        rootParams[1].DescriptorTable.pDescriptorRanges = &rangeVB; // t1
-
-        rootParams[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-        rootParams[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-        rootParams[2].Descriptor.ShaderRegister = 0;  // b0
-        rootParams[2].Descriptor.RegisterSpace = 1;
-
-        D3D12_ROOT_SIGNATURE_DESC rootSigDesc{};
-        rootSigDesc.NumParameters = UINT(rootParams.size());
-        rootSigDesc.pParameters = rootParams.data();
-        rootSigDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_LOCAL_ROOT_SIGNATURE;
-
-        HRESULT hr;
-        Microsoft::WRL::ComPtr<ID3DBlob> blob, errBlob;
-        hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &blob, &errBlob);
-        if (FAILED(hr)) {
-            throw std::runtime_error("RootSignature(rsSphere2) failed.");
-        }
-
-        hr = device_->CreateRootSignature(
-            0, blob->GetBufferPointer(), blob->GetBufferSize(),
-            IID_PPV_ARGS(rsSphere2_.ReleaseAndGetAddressOf())
-        );
-        if (FAILED(hr)) {
-            throw std::runtime_error("RootSignature(rsSphere2) failed.");
-        }
-        rsSphere2_->SetName(L"rsSphere2");
+        rsSphere_->SetName(L"rsSphere");
     }
 }
 
@@ -427,13 +419,7 @@ void TestManager::CreateFloorLocalRootSignature() {
     rangeVB.NumDescriptors = 1;
     rangeVB.RegisterSpace = 1;
 
-    D3D12_DESCRIPTOR_RANGE rangeTex{};
-    rangeTex.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-    rangeTex.BaseShaderRegister = 2;
-    rangeTex.NumDescriptors = 1;
-    rangeTex.RegisterSpace = 1;
-
-    std::array<D3D12_ROOT_PARAMETER, 3> rootParams;
+    std::array<D3D12_ROOT_PARAMETER, 2> rootParams;
     rootParams[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
     rootParams[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
     rootParams[0].DescriptorTable.NumDescriptorRanges = 1;
@@ -443,11 +429,6 @@ void TestManager::CreateFloorLocalRootSignature() {
     rootParams[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
     rootParams[1].DescriptorTable.NumDescriptorRanges = 1;
     rootParams[1].DescriptorTable.pDescriptorRanges = &rangeVB;
-
-    rootParams[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-    rootParams[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-    rootParams[2].DescriptorTable.NumDescriptorRanges = 1;
-    rootParams[2].DescriptorTable.pDescriptorRanges = &rangeTex;
 
     D3D12_ROOT_SIGNATURE_DESC rootSigDesc{};
     rootSigDesc.NumParameters = UINT(rootParams.size());
@@ -483,8 +464,8 @@ void TestManager::CreateStateObject() {
     // シェーダーファイルの読み込み
     //===================================================================================
     auto chsFloorBlob = dxc_->CompileShader(L"Resources/Shaders/Raytracing/chsFloor.hlsl", L"lib_6_5", L"");
-    auto chsSphereNoLambertBlob = dxc_->CompileShader(L"Resources/Shaders/Raytracing/chsSphereNoLambert.hlsl", L"lib_6_5", L"");
-    auto chsSpherePhongBlob = dxc_->CompileShader(L"Resources/Shaders/Raytracing/chsSpherePhong.hlsl", L"lib_6_5", L"");
+    auto chsLightBlob = dxc_->CompileShader(L"Resources/Shaders/Raytracing/chsLight.hlsl", L"lib_6_5", L"");
+    auto chsSphereBlob = dxc_->CompileShader(L"Resources/Shaders/Raytracing/chsSphere.hlsl", L"lib_6_5", L"");
     auto missBlob = dxc_->CompileShader(L"Resources/Shaders/Raytracing/miss.hlsl", L"lib_6_5", L"");
     auto raygenBlob = dxc_->CompileShader(L"Resources/Shaders/Raytracing/raygen.hlsl", L"lib_6_5", L"");
 
@@ -503,6 +484,7 @@ void TestManager::CreateStateObject() {
     D3D12_SHADER_BYTECODE misslibdxil = { missBlob->GetBufferPointer(), missBlob->GetBufferSize() };
     dxilMiss->SetDXILLibrary(&misslibdxil);
     dxilMiss->DefineExport(L"mainMiss");
+    dxilMiss->DefineExport(L"shadowMiss");
 
     // レイがオブジェクトに当たった時
     auto dxilChsFloor = rtPipeline.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
@@ -510,37 +492,37 @@ void TestManager::CreateStateObject() {
     dxilChsFloor->SetDXILLibrary(&floorlibdxil);
     dxilChsFloor->DefineExport(L"mainFloorCHS");
 
-    auto dxilChsSphere0 = rtPipeline.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
-    D3D12_SHADER_BYTECODE chsSphereNoLambertLibdxil = { chsSphereNoLambertBlob->GetBufferPointer(), chsSphereNoLambertBlob->GetBufferSize() };
-    dxilChsSphere0->SetDXILLibrary(&chsSphereNoLambertLibdxil);
-    dxilChsSphere0->DefineExport(L"chsSphereMaterial");
+    auto dxilChsLight = rtPipeline.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
+    D3D12_SHADER_BYTECODE chsLightLibdxil = { chsLightBlob->GetBufferPointer(), chsLightBlob->GetBufferSize() };
+    dxilChsLight->SetDXILLibrary(&chsLightLibdxil);
+    dxilChsLight->DefineExport(L"mainLightCHS");
 
-    auto dxilChsSphere1 = rtPipeline.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
-    D3D12_SHADER_BYTECODE chsSpherePhongLibdxil = { chsSpherePhongBlob->GetBufferPointer(), chsSpherePhongBlob->GetBufferSize() };
-    dxilChsSphere1->SetDXILLibrary(&chsSpherePhongLibdxil);
-    dxilChsSphere1->DefineExport(L"chsSphereMaterialPhong");
+    auto dxilChsSphere = rtPipeline.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();
+    D3D12_SHADER_BYTECODE chsSphereLibdxil = { chsSphereBlob->GetBufferPointer(), chsSphereBlob->GetBufferSize() };
+    dxilChsSphere->SetDXILLibrary(&chsSphereLibdxil);
+    dxilChsSphere->DefineExport(L"mainSphereCHS");
 
     //===================================================================================
     // ヒットグループの設定 
     //===================================================================================
 
-    // ヒットグループの設定(球体に対する).
-    auto hitgroupPhong = rtPipeline.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
-    hitgroupPhong->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-    hitgroupPhong->SetClosestHitShaderImport(L"chsSphereMaterialPhong");
-    hitgroupPhong->SetHitGroupExport(AppHitGroups::PhongMaterial.c_str());
-
-    // ヒットグループの設定(反射および屈折の球体に対する).
-    auto hitgroupNoPhong = rtPipeline.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
-    hitgroupNoPhong->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
-    hitgroupNoPhong->SetClosestHitShaderImport(L"chsSphereMaterial");
-    hitgroupNoPhong->SetHitGroupExport(AppHitGroups::NoPhongMaterial.c_str());
-
-    // ヒットグループの設定(床に対する).
+     // ヒットグループの設定(床に対する).
     auto hitgroupFloor = rtPipeline.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
     hitgroupFloor->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
     hitgroupFloor->SetClosestHitShaderImport(L"mainFloorCHS");
     hitgroupFloor->SetHitGroupExport(AppHitGroups::Floor.c_str());
+
+    // ヒットグループの設定(球体に対する).
+    auto hitgroupLight = rtPipeline.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
+    hitgroupLight->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
+    hitgroupLight->SetClosestHitShaderImport(L"mainLightCHS");
+    hitgroupLight->SetHitGroupExport(AppHitGroups::Light.c_str());
+
+    // ヒットグループの設定(反射および屈折の球体に対する).
+    auto hitgroupSphere = rtPipeline.CreateSubobject<CD3DX12_HIT_GROUP_SUBOBJECT>();
+    hitgroupSphere->SetHitGroupType(D3D12_HIT_GROUP_TYPE_TRIANGLES);
+    hitgroupSphere->SetClosestHitShaderImport(L"mainSphereCHS");
+    hitgroupSphere->SetHitGroupExport(AppHitGroups::Sphere.c_str());
 
     //===================================================================================
     // グローバルルートシグネチャの設定
@@ -566,19 +548,19 @@ void TestManager::CreateStateObject() {
     lrsAssocFloor->AddExport(AppHitGroups::Floor.c_str());
     lrsAssocFloor->SetSubobjectToAssociate(*rsFloor);
 
-    // 非Phongの球体に対して.
-    auto rsModel = rtPipeline.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
-    rsModel->SetRootSignature(rsSphere1_.Get());
-    auto lrsAssocModel = rtPipeline.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
-    lrsAssocModel->AddExport(AppHitGroups::NoPhongMaterial.c_str());
-    lrsAssocModel->SetSubobjectToAssociate(*rsModel);
+    // ライト用
+    auto rsLight = rtPipeline.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
+    rsLight->SetRootSignature(rsSphere_.Get());
+    auto lrsAssocLight = rtPipeline.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
+    lrsAssocLight->AddExport(AppHitGroups::Light.c_str());
+    lrsAssocLight->SetSubobjectToAssociate(*rsLight);
 
-    // Phongの球体に対して.
-    auto rsPhongSphere = rtPipeline.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
-    rsPhongSphere->SetRootSignature(rsSphere2_.Get());
-    auto lrsAssocPhongSphere = rtPipeline.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
-    lrsAssocPhongSphere->AddExport(AppHitGroups::PhongMaterial.c_str());
-    lrsAssocPhongSphere->SetSubobjectToAssociate(*rsPhongSphere);
+    // スフィア用
+    auto rsModel = rtPipeline.CreateSubobject<CD3DX12_LOCAL_ROOT_SIGNATURE_SUBOBJECT>();
+    rsModel->SetRootSignature(rsSphere_.Get());
+    auto lrsAssocModel = rtPipeline.CreateSubobject<CD3DX12_SUBOBJECT_TO_EXPORTS_ASSOCIATION_SUBOBJECT>();
+    lrsAssocModel->AddExport(AppHitGroups::Sphere.c_str());
+    lrsAssocModel->SetSubobjectToAssociate(*rsModel);
 
     //===================================================================================
     // シェーダーの設定
@@ -592,7 +574,7 @@ void TestManager::CreateStateObject() {
     //=================================================================================== 
     // パイプラインの設定 レイの再帰可能段数
     //===================================================================================
-    const uint32_t MaxRecursionDepth = 16;
+    const uint32_t MaxRecursionDepth = 2;
     auto pipelineConfig = rtPipeline.CreateSubobject<CD3DX12_RAYTRACING_PIPELINE_CONFIG_SUBOBJECT>();
     // 1にすると「カメラからのレイ」のみ。反射（鏡など）を作るなら 2 や 3 にする
     pipelineConfig->Config(MaxRecursionDepth);
@@ -651,10 +633,10 @@ void TestManager::CreateShaderTable() {
     missRecordSize += D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
     missRecordSize = RoundUp(missRecordSize, ShaderRecordAlignment);
 
-    // 使用する各シェーダーの個数より、シェーダーテーブルのサイズを求める.
+    // シェーダーテーブルのサイズを求める.
+    UINT hitgroupCount = 3; // 床,ライト,スフィア.
     UINT raygenSize = 1 * raygenRecordSize; // 今1つの Ray Generation シェーダー.
-    UINT missSize = 1 * missRecordSize;  // 今1つの Miss シェーダー.
-    UINT hitgroupCount = 1 + 1 + NormalSpheres;// (床/反射・屈折共用/Phong描画用) によるヒットグループ.
+    UINT missSize = 2 * missRecordSize;  // 通常描画時とシャドウで２つの miss シェーダー.
     UINT hitGroupSize = hitgroupCount * hitgroupRecordSize;
 
     // 各テーブルの開始位置にアライメント制約があるので調整する.
@@ -700,6 +682,7 @@ void TestManager::CreateShaderTable() {
     // Miss Shader 用のシェーダーレコードを書き込み.
     auto missStart = pStart + raygenRegion;
     {
+        auto recordStart = missStart;
         uint8_t* p = missStart;
         auto id = rtsoProps->GetShaderIdentifier(L"mainMiss");
         if (id == nullptr) {
@@ -707,7 +690,16 @@ void TestManager::CreateShaderTable() {
         }
         p += WriteShaderIdentifier(p, id);
 
-        // ローカルルートシグネチャ使用時には他のデータを書き込む.
+        // 次の開始位置をセット
+        recordStart += missRecordSize;
+
+        // シャドウ判定Missシェーダー
+        p = recordStart;
+        id = rtsoProps->GetShaderIdentifier(L"shadowMiss");
+        if (id == nullptr) {
+            throw std::logic_error("Not found ShaderIdentifier");
+        }
+        p += WriteShaderIdentifier(p, id);
     }
 
     // Hit Group 用のシェーダーレコードを書き込み.
@@ -715,30 +707,12 @@ void TestManager::CreateShaderTable() {
     {
         auto recordStart = hitgroupStart;
 
-        auto id = rtsoProps->GetShaderIdentifier(L"hgFloor");
-        if (id == nullptr) {
-            throw std::logic_error("Not found ShaderIdentifier");
-        }
-        // plane に対応するシェーダーエントリを書き込む.
-        recordStart = WriteHitgroupFloor(recordStart, meshPlane, hitgroupRecordSize);
+        recordStart = WriteHitgroupShaderEntry(recordStart, meshPlane, hitgroupRecordSize);
+        recordStart = WriteHitgroupShaderEntry(recordStart, meshLightSphere_, hitgroupRecordSize);
+        recordStart = WriteHitgroupShaderEntry(recordStart, meshSphere_, hitgroupRecordSize);
 
-        // sphere に対応するシェーダーエントリを書き込む.
-        id = rtsoProps->GetShaderIdentifier(L"hgNoPhongSpheres");
-        if (id == nullptr) {
-            throw std::logic_error("Not found ShaderIdentifier");
-        }
-        recordStart = WriteHitgroupMaterial(recordStart, meshSphere_, hitgroupRecordSize);
-
-        // sphere (定数バッファ使用) に対応するエントリを書き込む.
-        id = rtsoProps->GetShaderIdentifier(L"hgPhongSpheres");
-
-        // マテリアル情報を格納した定数バッファのアドレス位置をずらし別のマテリアルを参照させる.
-        auto cbAddress = normalSphereMaterialCB_->GetGPUVirtualAddress();
-        auto stride = sizeof(MaterialParam);
-        for (auto& sphere : spheresNormal_) {
-            recordStart = WriteHitgroupPhong(recordStart, meshSphere_, cbAddress, hitgroupRecordSize);
-            cbAddress += stride;
-        }
+        // 次のテーブル書き込みのためにインクリメント.
+        pStart += hitGroupSize;
     }
 
     shaderTable_->Unmap(0, nullptr);
