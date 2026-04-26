@@ -36,6 +36,11 @@ void TestManager::Initialize(ID3D12Device5* device, ID3D12GraphicsCommandList4* 
     CreateShaderTable();
 }
 
+void TestManager::Update() {
+
+
+}
+
 void TestManager::Draw() {
 
     renderPassController_->PrePass("RaytracingPass");
@@ -62,55 +67,45 @@ void TestManager::CreateSceneObjects() {
     //==================================================
     // 床の生成
     //==================================================
-    std::vector<VertexPNT> verticesPNT;
+    std::vector<VertexPN> verticesPN;
     std::vector<uint32_t> indices;
-    GetPlane(verticesPNT, indices);
+    GetPlane(verticesPN, indices);
     meshPlane.indexBuffer_.Create(commandList_, indices);
-    meshPlane.vertexBuffer_.Create(commandList_, verticesPNT);
+    meshPlane.vertexBuffer_.Create(commandList_, verticesPN);
     meshPlane.shaderName = AppHitGroups::Floor.c_str();
 
     //========================================================
     // スフィアの生成.
     //========================================================
     indices.clear();
-    std::vector<VertexPN> verticesPN;
+    verticesPN.clear();
     GetSphere(verticesPN, indices, 0.5f, 32, 48);
     meshSphere_.indexBuffer_.Create(commandList_, indices);
     meshSphere_.vertexBuffer_.Create(commandList_, verticesPN);
-    meshSphere_.shaderName = L""; // 今回は使用しない
+    meshSphere_.shaderName = AppHitGroups::Sphere.c_str();
 
-    auto spheresCollection = { &spheresReflect_, &spheresRefract_, &spheresNormal_ };
+    //=======================================================
+    // ライト用スフィアを作成
+    //=======================================================
+    indices.clear();
+    verticesPN.clear();
+    GetSphere(verticesPN, indices, 1.0f, 32, 48);
+    meshLightSphere_.indexBuffer_.Create(commandList_, indices);
+    meshLightSphere_.vertexBuffer_.Create(commandList_, verticesPN);
+    meshLightSphere_.shaderName = AppHitGroups::Light.c_str();
 
-    // スフィアを適当に配置する.
+    //// スフィアを適当に配置する.
     std::mt19937 mt;
-    std::uniform_int_distribution rnd(-9, 9);
-    for (auto type : spheresCollection) {
-        for (auto& spherePos : *type) {
-            float y = 0.5f;
-            float x = rnd(mt) + 0.5f;
-            float z = rnd(mt) + 0.5f;
-            spherePos = MakeTranslateMatrix(Vector3(x, y, z));
-        }
+    std::uniform_real_distribution rnd(.5f, 0.75f);
+    std::uniform_int_distribution rnd2(-9, 9);
+    for (auto& sphere : spheres_) {
+        float x = rnd2(mt) + 0.5f;
+        float z = rnd2(mt) + 0.5f;
+        sphere.mtxWorld = MakeTranslateMatrix(Vector3(x, 0.5, z));
     }
 
-    // マテリアル情報を準備する.
-    MaterialParam defaultMaterial{};
-    defaultMaterial.albedo = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-    defaultMaterial.specular = Vector4(1.0f, 1.0f, 1.0f, 40.0f);
-
-    UINT index = 0;
-    for (auto& material : normalSphereMaterials_) {
-        material = defaultMaterial;
-        material.albedo = colorTable[index % _countof(colorTable)];
-        index++;
-    }
-
-    auto bufferSize = sizeof(MaterialParam) * normalSphereMaterials_.size();
-    normalSphereMaterialCB_ = CreateBufferResource(device_, bufferSize);
-    void* mapped = nullptr;
-    normalSphereMaterialCB_->Map(0, nullptr, &mapped);
-    std::memcpy(mapped, normalSphereMaterials_.data(), bufferSize);
-    normalSphereMaterialCB_->Unmap(0, nullptr);
+    // ポイントライト位置用.
+    pointLight_.mtxWorld = MakeTranslateMatrix(Vector3(0, 2.5, 2));
 }
 
 void TestManager::CreateSceneBLAS() {
@@ -124,6 +119,11 @@ void TestManager::CreateSceneBLAS() {
     auto& vc = meshSphere_.vertexBuffer_;
     auto& ic = meshSphere_.indexBuffer_;
     meshSphere_.blas_.Create(commandList_,vc.GetView(),ic.GetView(),vc.GetTotalVertices(),ic.GetTotalIndices());
+
+    // ライト用SphereのBLASを作成する
+    auto& vcl = meshLightSphere_.vertexBuffer_;
+    auto& icl = meshLightSphere_.indexBuffer_;
+    meshLightSphere_.blas_.Create(commandList_, vcl.GetView(), icl.GetView(), vcl.GetTotalVertices(), icl.GetTotalIndices());
 }
 
 void TestManager::CreateSceneTLAS() {
@@ -789,59 +789,42 @@ void TestManager::DeployObjects(std::vector<D3D12_RAYTRACING_INSTANCE_DESC>& ins
         instanceDescs.push_back(desc);
     }
 
-    // スフィアを配置 (反射).
-    int instanceID = 0; // ここを4 にするとキューブマップからのフェッチになる.
-    //instanceID = 4;
-    for (const auto& spherePos : spheresReflect_) {
+    // ライトを配置
+    {
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
-        Matrix4x4 matrix = Transpose(spherePos);
+        Matrix4x4 matrix = Transpose(pointLight_.mtxWorld);
         std::memcpy(&desc.Transform, &matrix, sizeof(float) * 12);
-        desc.InstanceID = instanceID;
-        desc.InstanceMask = 0xFF;
+        desc.InstanceID = 0;
+        desc.InstanceMask = 0x08;
         desc.InstanceContributionToHitGroupIndex = 1;
         desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
-        desc.AccelerationStructure = meshSphere_.blas_.GetGpuVirtualAddress();
+        desc.AccelerationStructure = meshLightSphere_.blas_.GetGpuVirtualAddress();
         instanceDescs.push_back(desc);
     }
 
-    // スフィアを配置 (屈折).
-    instanceID = 1;
-    for (const auto& spherePos : spheresRefract_) {
+    // スフィアを配置
+    uint32_t instanceID = 0;
+    for (const auto& sphere : spheres_) {
         D3D12_RAYTRACING_INSTANCE_DESC desc{};
-        Matrix4x4 matrix = Transpose(spherePos);
+        Matrix4x4 matrix = Transpose(sphere.mtxWorld);
         std::memcpy(&desc.Transform, &matrix, sizeof(float) * 12);
         desc.InstanceID = instanceID;
         desc.InstanceMask = 0xFF;
-        desc.InstanceContributionToHitGroupIndex = 1;
+        desc.InstanceContributionToHitGroupIndex = 2;
         desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
         desc.AccelerationStructure = meshSphere_.blas_.GetGpuVirtualAddress();
         instanceDescs.push_back(desc);
-    }
-
-    // Lambert 描画スフィアを配置.
-    instanceID = 2;
-    auto entryOffset = 2; // 別のシェーダーテーブルを使う.
-    for (const auto& spherePos : spheresNormal_) {
-        D3D12_RAYTRACING_INSTANCE_DESC desc{};
-        Matrix4x4 matrix = Transpose(spherePos);
-        std::memcpy(&desc.Transform, &matrix, sizeof(float) * 12);
-        desc.InstanceID = instanceID;
-        desc.InstanceMask = 0xFF;
-        desc.InstanceContributionToHitGroupIndex = entryOffset;
-        desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
-        desc.AccelerationStructure = meshSphere_.blas_.GetGpuVirtualAddress();
-        instanceDescs.push_back(desc);
-        entryOffset++;
+        instanceID++;
     }
 }
 
-void TestManager::GetPlane(std::vector<VertexPNT>& vertices, std::vector<UINT>& indices) {
+void TestManager::GetPlane(std::vector<VertexPN>& vertices, std::vector<UINT>& indices) {
     float size = 10.0f;
-    VertexPNT srcVertices[] = {
-         VertexPNT{ {-1.0f, 0.0f,-1.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f} },
-         VertexPNT{ {-1.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 1.0f} },
-         VertexPNT{ { 1.0f, 0.0f,-1.0f }, { 0.0f, 1.0f, 0.0f }, { 1.0f, 0.0f} },
-         VertexPNT{ { 1.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 0.0f }, { 1.0f, 1.0f} },
+    VertexPN srcVertices[] = {
+         VertexPN{ {-1.0f, 0.0f,-1.0f }, { 0.0f, 1.0f, 0.0f }},
+         VertexPN{ {-1.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 0.0f }},
+         VertexPN{ { 1.0f, 0.0f,-1.0f }, { 0.0f, 1.0f, 0.0f }},
+         VertexPN{ { 1.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 0.0f }},
     };
     vertices.resize(4);
     std::transform(

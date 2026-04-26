@@ -8,6 +8,10 @@ struct SceneCB
     float4 lightColor; // 平行光源色.
     float4 ambientColor; // 環境光.
     float4 eyePosition; // 視点.
+
+    float3 pointLight; // ポイントライト.
+    uint shadowRayCount; // シャドウレイ数.
+    uint4 flags; // x: 平行光源シャドウON/OFF, y: ポイントライト位置描画
 };
 
 struct Payload
@@ -15,18 +19,16 @@ struct Payload
     float3 color;
     int recursive;
 };
+struct ShadowPayload
+{
+    bool isHit;
+};
 
 struct MyAttribute
 {
     float2 barys;
 };
 
-
-// Global Root Signature
-RaytracingAccelerationStructure gRtScene : register(t0);
-ConstantBuffer<SceneCB> gSceneParam : register(b0);
-TextureCube<float4> gBackground : register(t1);
-SamplerState gSampler : register(s0);
 
 // Common Function
 inline float3 CalcBarycentrics(float2 barys)
@@ -66,104 +68,12 @@ inline bool checkRecursiveLimit(inout Payload payload)
     return false;
 }
 
-float3 Lambert(float3 vertexPosition, float3 vertexNormal)
+// Global Root Signature
+RaytracingAccelerationStructure gRtScene : register(t0);
+ConstantBuffer<SceneCB> gSceneParam : register(b0);
+
+// ワールド空間でのライトへ向かう向きを取得する.
+float3 GetToLightDirection()
 {
-    float3 worldPos = mul(float4(vertexPosition, 1), ObjectToWorld4x3());
-    float3 worldNormal = mul(vertexNormal, (float3x3) ObjectToWorld4x3());
-    float3 worldRayDir = WorldRayDirection();
-
-    float3 lightDir = -normalize(gSceneParam.lightDirection.xyz);
-    float nl = saturate(dot(worldNormal, lightDir));
-    const float3 lightColor = gSceneParam.lightColor.xyz;
-    const float3 ambientColor = gSceneParam.ambientColor.xyz;
-    float3 color = lightColor * nl;
-    color += ambientColor;
-
-    return color;
-}
-
-float3 Reflection(float3 vertexPosition, float3 vertexNormal, int recursive)
-{
-    float3 worldPos = mul(float4(vertexPosition, 1), ObjectToWorld4x3());
-    float3 worldNormal = mul(vertexNormal, (float3x3) ObjectToWorld4x3());
-    float3 worldRayDir = WorldRayDirection();
-    float3 reflectDir = reflect(worldRayDir, worldNormal);
-
-    RAY_FLAG flags = RAY_FLAG_NONE;
-    uint rayMask = 0xFF;
-
-    RayDesc rayDesc;
-    rayDesc.Origin = worldPos;
-    rayDesc.Direction = reflectDir;
-    rayDesc.TMin = 0.01;
-    rayDesc.TMax = 100000;
-
-    Payload reflectPayload;
-    reflectPayload.color = float3(0, 0, 0);
-    reflectPayload.recursive = recursive;
-    TraceRay(
-        gRtScene,
-        flags,
-        rayMask,
-        0, // ray index
-        1, // MultiplierForGeometryContrib
-        0, // miss index
-        rayDesc,
-        reflectPayload);
-    return reflectPayload.color;
-}
-
-float3 Refraction(float3 vertexPosition, float3 vertexNormal, int recursive)
-{
-    float4x3 mtx = ObjectToWorld4x3();
-    float3 worldPos = mul(float4(vertexPosition, 1), mtx);
-    float3 worldNormal = mul(vertexNormal, (float3x3) mtx);
-    float3 worldRayDir = normalize(WorldRayDirection());
-    worldNormal = normalize(worldNormal);
-
-    const float refractVal = 1.4;
-    float nr = dot(worldNormal, worldRayDir);
-    float3 refracted;
-    if (nr < 0)
-    {
-        // 表面. 空気中 -> 屈折媒質.
-        float eta = 1.0 / refractVal;
-        refracted = refract(worldRayDir, worldNormal, eta);
-    }
-    else
-    {
-        // 裏面. 屈折媒質 -> 空気中.
-        float eta = refractVal / 1.0;
-        refracted = refract(worldRayDir, -worldNormal, eta);
-    }
-
-    if (length(refracted) < 0.01)
-    {
-        return Reflection(vertexPosition, vertexNormal, recursive);
-    }
-    else
-    {
-        RAY_FLAG flags = RAY_FLAG_NONE;
-        uint rayMask = 0xFF;
-
-        RayDesc rayDesc;
-        rayDesc.Origin = worldPos;
-        rayDesc.Direction = refracted;
-        rayDesc.TMin = 0.001;
-        rayDesc.TMax = 100000;
-
-        Payload refractPayload;
-        refractPayload.color = float3(0, 1, 0);
-        refractPayload.recursive = recursive;
-        TraceRay(
-            gRtScene,
-            flags,
-            rayMask,
-            0, // ray index
-            1, // MultiplierForGeometryContrib
-            0, // miss index
-            rayDesc,
-            refractPayload);
-        return refractPayload.color;
-    }
+    return -normalize(gSceneParam.lightDirection.xyz);
 }

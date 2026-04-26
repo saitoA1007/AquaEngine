@@ -114,6 +114,8 @@ void Engine::MainLoop() {
 
         scene_->GetTestCamera()->Update();
 
+        scene_->GetTestManager()->Update();
+
         PostUpdate();
 
         PreDraw();

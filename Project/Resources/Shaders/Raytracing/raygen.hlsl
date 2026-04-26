@@ -9,7 +9,7 @@ void mainRayGen()
 {
     uint2 launchIndex = DispatchRaysIndex().xy;
     float2 dims = float2(DispatchRaysDimensions().xy);
-    
+
     float2 d = (launchIndex.xy + 0.5) / dims.xy * 2.0 - 1.0;
     float aspect = dims.x / dims.y;
 
@@ -17,15 +17,11 @@ void mainRayGen()
     matrix mtxProjInv = gSceneParam.mtxProjInv;
 
     RayDesc rayDesc;
-    //rayDesc.Origin = mul(mtxViewInv, float4(0, 0, 0, 1)).xyz;
-    //
-    //float4 target = mul(mtxProjInv, float4(d.x, -d.y, 1, 1));
-    //rayDesc.Direction = normalize(mul(mtxViewInv, float4(target.xyz, 0)).xyz);
-    
-    rayDesc.Origin = mul(float4(0, 0, 0, 1), gSceneParam.mtxViewInv).xyz;
-    
-    float4 target = mul(float4(d.x, -d.y, 1, 1), gSceneParam.mtxProjInv);
-    rayDesc.Direction = mul(float4(target.xyz / target.w, 0), gSceneParam.mtxViewInv).xyz;
+    rayDesc.Origin = mul(float4(0, 0, 0, 1), mtxViewInv).xyz;
+
+    float4 target = mul(float4(d.x, -d.y, 1, 1), mtxProjInv);
+    float3 direction = mul(float4(target.xyz / target.w, 0), mtxViewInv).xyz;
+    rayDesc.Direction = normalize(direction);
 
     rayDesc.TMin = 0;
     rayDesc.TMax = 100000;
@@ -36,6 +32,16 @@ void mainRayGen()
 
     RAY_FLAG flags = RAY_FLAG_NONE;
     uint rayMask = 0xFF;
+
+    if (gSceneParam.flags.x == 0)
+    {
+        rayMask = ~(0x08);
+    }
+    else if (gSceneParam.flags.y == 0)
+    {
+        rayMask = ~(0x08);
+    }
+    
 
     TraceRay(
         gRtScene,

@@ -18,8 +18,8 @@
 namespace GameEngine {
 
 	namespace AppHitGroups {
-		static const std::wstring NoPhongMaterial = L"hgNoPhongSpheres";
-		static const std::wstring PhongMaterial = L"hgPhongSpheres";
+		static const std::wstring Light = L"hgLight";
+		static const std::wstring Sphere = L"hgSphere";
 		static const std::wstring Floor = L"hgFloor";
 	}
 
@@ -52,24 +52,19 @@ namespace GameEngine {
 			std::wstring shaderName;
 		};
 
-		enum SphereTypeCount {
-			NormalSpheres = 10,
-			ReflectSpheres = 10,
-			RefractSpheres = 10,
-			SpheresAll = (NormalSpheres + ReflectSpheres + RefractSpheres),
+		// スフィアごとに持たせる情報.
+		struct SphereInstance {
+			Matrix4x4 mtxWorld = MakeIdentity4x4();
 		};
 
-		struct MaterialParam
-		{
-			Vector4 albedo;
-			Vector4 specular; // スペキュラー色 & w要素にPower
-		};
 	public:
 		TestManager() = default;
 		~TestManager() = default;
 
 		void Initialize(ID3D12Device5* device, ID3D12GraphicsCommandList4* commandList, DXC* dxc, SrvManager* srvManager, RenderPassController* renderPassController,
 			TestCamera* testCamera, TextureManager* textureManager);
+
+		void Update();
 
 		void Draw();
 
@@ -83,17 +78,15 @@ namespace GameEngine {
 		TextureManager* textureManager_ = nullptr;
 
 		// 床用
-		PolygonMesh<VertexPNT> meshPlane;
+		PolygonMesh<VertexPN> meshPlane;
 		// 球用
 		PolygonMesh<VertexPN> meshSphere_;
+		// ライト用
+		PolygonMesh<VertexPN> meshLightSphere_;
 
 		// 球の座標リスト
-		std::array<Matrix4x4, ReflectSpheres> spheresReflect_;
-		std::array<Matrix4x4, RefractSpheres> spheresRefract_;
-		std::array<Matrix4x4, NormalSpheres> spheresNormal_;
-		// Phong描画するための通常スフィアのマテリアル情報.
-		std::array<MaterialParam, NormalSpheres> normalSphereMaterials_;
-		Microsoft::WRL::ComPtr<ID3D12Resource> normalSphereMaterialCB_;
+		std::array<SphereInstance, 10> spheres_;
+		SphereInstance pointLight_;
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> tlas_;
 		uint32_t tlasSrvIndex_ = 0;
@@ -108,9 +101,7 @@ namespace GameEngine {
 		// 床・キューブ用のローカルルートシグネチャ.
 		//Microsoft::WRL::ComPtr<ID3D12RootSignature> rsModel;
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> rsFloor_; // 床のローカルルートシグネチャ.
-		Microsoft::WRL::ComPtr<ID3D12RootSignature> rsSphere1_; // スフィアのローカルルートシグネチャ(反射・屈折用).
-		Microsoft::WRL::ComPtr<ID3D12RootSignature> rsSphere2_; // スフィアのローカルルートシグネチャ(Phong用).
-
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> rsSphere_; // スフィアのローカルルートシグネチャ
 
 		// ステートオブジェクト
 		Microsoft::WRL::ComPtr<ID3D12StateObject> stateObject_;
@@ -207,7 +198,7 @@ namespace GameEngine {
 			}
 		}
 
-		void GetPlane(std::vector<VertexPNT>& vertices, std::vector<UINT>& indices);
+		void GetPlane(std::vector<VertexPN>& vertices, std::vector<UINT>& indices);
 
 		void GetColoredCube(std::vector<VertexData>& vertices, std::vector<uint32_t>& indices);
 
