@@ -426,9 +426,6 @@
     <ClCompile Include="EngineSource\Graphics\PSO\Core\RasterizerBuilder.cpp">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.cpp">
-      <Filter>EngineSource\Graphics\PSO\Core</Filter>
-    </ClCompile>
     <ClCompile Include="EngineSource\Graphics\PSO\Core\ShaderCompiler.cpp">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
     </ClCompile>
@@ -528,6 +525,7 @@
     <ClCompile Include="Externals\imgui\imgui_widgets.cpp">
       <Filter>Externals\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -878,9 +876,6 @@
     <ClInclude Include="EngineSource\Graphics\PSO\Core\RasterizerBuilder.h">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.h">
-      <Filter>EngineSource\Graphics\PSO\Core</Filter>
-    </ClInclude>
     <ClInclude Include="EngineSource\Graphics\PSO\Core\ShaderCompiler.h">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
     </ClInclude>
@@ -1025,6 +1020,7 @@
     <ClInclude Include="Externals\imgui\imstb_truetype.h">
       <Filter>Externals\imgui</Filter>
     </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\raytracing.hlsl" />
