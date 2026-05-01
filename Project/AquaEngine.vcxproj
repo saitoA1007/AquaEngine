@@ -216,6 +216,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Core\GameObjectManager.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\ResourceGarbageCollector.cpp" />
     <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectData.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\RayLibShaderCompiler.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\ShaderTableBuilder.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\StateObjectBuilder.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\StateObjectManager.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\TestCamera.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\TestManager.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\TestRayPipeline.cpp" />
@@ -403,6 +407,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Editor\DebugParameter.h" />
     <ClInclude Include="EngineSource\Editor\JsonSerializer.h" />
     <ClInclude Include="EngineSource\Graphics\Buffers\BLAS.h" />
+    <ClInclude Include="EngineSource\Graphics\Buffers\MaterialBuffer.h" />
     <ClInclude Include="EngineSource\Graphics\Buffers\TLAS.h" />
     <ClInclude Include="EngineSource\Graphics\Core\DrawRequest.h" />
     <ClInclude Include="EngineSource\3D\Renderer\ModelRenderer.h" />
@@ -438,6 +443,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Core\IGameObject.h" />
     <ClInclude Include="EngineSource\Graphics\Core\ResourceGarbageCollector.h" />
     <ClInclude Include="EngineSource\Graphics\PostProcess\IPostEffect.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\RayLibShaderCompiler.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderRecord.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderTable.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderTableBuilder.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\StateObjectBuilder.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\StateObjectManager.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\TestCamera.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\TestManager.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\TestRayPipeline.h" />

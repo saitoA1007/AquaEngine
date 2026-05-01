@@ -2,7 +2,6 @@
 #include <d3d12.h>
 #include <wrl.h>
 #include <queue>
-#include <unordered_set>
 #include <unordered_map>
 
 #include "DescriptorCounts.h"

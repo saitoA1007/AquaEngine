@@ -530,6 +530,10 @@
     </ClCompile>
     <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\TestCamera.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\TestManager.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\RayLibShaderCompiler.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\StateObjectManager.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\StateObjectBuilder.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\ShaderTableBuilder.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1029,6 +1033,13 @@
     </ClInclude>
     <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\TestCamera.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\TestManager.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\RayLibShaderCompiler.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\StateObjectManager.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\StateObjectBuilder.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderTableBuilder.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderRecord.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderTable.h" />
+    <ClInclude Include="EngineSource\Graphics\Buffers\MaterialBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\raytracing.hlsl" />

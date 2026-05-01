@@ -1,0 +1,62 @@
+#pragma once
+#include <d3d12.h>
+#include <vector>
+#include <wrl.h>
+#include <cstring>
+#include <stdexcept>
+
+namespace GameEngine {
+
+    class ShaderRecord {
+    public:
+        // シェーダー識別子を設定する（必ず最初に呼ぶ）
+        ShaderRecord& SetIdentifier(const void* shaderId) {
+            data_.resize(D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
+            std::memcpy(data_.data(), shaderId, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
+            return *this;
+        }
+
+        // GPU ディスクリプターハンドルを末尾に追記する
+        ShaderRecord& AppendDescriptor(D3D12_GPU_DESCRIPTOR_HANDLE handle) {
+            AppendRaw(&handle, sizeof(handle));
+            return *this;
+        }
+
+        // GPU 仮想アドレスを末尾に追記する
+        ShaderRecord& AppendGPUAddress(D3D12_GPU_VIRTUAL_ADDRESS address) {
+            AppendRaw(&address, sizeof(address));
+            return *this;
+        }
+
+        // ComPtr<ID3D12Resource> から GPU アドレスを追記するショートカット
+        ShaderRecord& AppendGPUAddress(
+            const Microsoft::WRL::ComPtr<ID3D12Resource>& resource)
+        {
+            D3D12_GPU_VIRTUAL_ADDRESS addr = resource->GetGPUVirtualAddress();
+            return AppendGPUAddress(addr);
+        }
+
+        // 任意のデータを追記する（定数など）
+        template<class T>
+        ShaderRecord& AppendData(const T& value) {
+            AppendRaw(&value, sizeof(T));
+            return *this;
+        }
+
+        // レコードの生バイト列を取得する
+        const std::vector<uint8_t>& Data() const { return data_; }
+        size_t Size() const { return data_.size(); }
+
+    private:
+        std::vector<uint8_t> data_;
+
+        void AppendRaw(const void* src, size_t size) {
+            if (data_.size() < D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES) {
+                throw std::logic_error(
+                    "ShaderRecord: Call SetIdentifier() before appending data.");
+            }
+            const auto* bytes = reinterpret_cast<const uint8_t*>(src);
+            data_.insert(data_.end(), bytes, bytes + size);
+        }
+    };
+}
