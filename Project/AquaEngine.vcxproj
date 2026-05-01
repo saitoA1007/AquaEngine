@@ -406,6 +406,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Editor\DebugParameter.h" />
     <ClInclude Include="EngineSource\Editor\JsonSerializer.h" />
     <ClInclude Include="EngineSource\Graphics\Buffers\BLAS.h" />
+    <ClInclude Include="EngineSource\Graphics\Buffers\MaterialBuffer.h" />
     <ClInclude Include="EngineSource\Graphics\Buffers\TLAS.h" />
     <ClInclude Include="EngineSource\Graphics\Core\DrawRequest.h" />
     <ClInclude Include="EngineSource\3D\Renderer\ModelRenderer.h" />

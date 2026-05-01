@@ -1021,6 +1021,7 @@
       <Filter>Externals\imgui</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.h" />
+    <ClInclude Include="EngineSource\Graphics\Buffers\MaterialBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\raytracing.hlsl" />

@@ -26,7 +26,7 @@ namespace GameEngine {
 		/// <summary>
 		/// 要素数を指定してバッファを作成
 		/// </summary>
-		void Create(uint32_t numElements) {
+		void Create(uint32_t numElements = 1, SrvHeapType type = SrvHeapType::Buffer) {
 			numElements_ = numElements;
 
 			// リソースを作成
@@ -34,7 +34,7 @@ namespace GameEngine {
 			resource_->Map(0, nullptr, reinterpret_cast<void**>(&data_));
 
 			// SRVのインデックスを取得
-			srvIndex_ = srvManager_->AllocateSrvIndex(SrvHeapType::Buffer);
+			srvIndex_ = srvManager_->AllocateSrvIndex(type);
 			// SRVの作成
 			D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 			srvDesc.Format = DXGI_FORMAT_UNKNOWN;
@@ -50,6 +50,7 @@ namespace GameEngine {
 		}
 
 		T* GetData() const { return data_; }
+		const uint32_t& GetSrvIndex() const { return srvIndex_; }
 		uint32_t GetNumElements() const { return numElements_; }
 		const CD3DX12_GPU_DESCRIPTOR_HANDLE& GetSrvHandleGPU() const { return srvHandleGPU_; }
 
