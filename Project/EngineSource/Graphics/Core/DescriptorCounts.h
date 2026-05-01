@@ -8,6 +8,7 @@ namespace GameEngine {
 		Texture,      // 画像データ
 		System,       // オフスクリーンなど
 		Buffer,       // インスタンシング、パーティクルのStructuredBuffer
+		AccessData,   // buffer1データにアクセスするためのデータ
 		Other,        // 他で使用する(現在はImGuiでのみ使用している)
 
 		Count         // 総数
@@ -17,7 +18,8 @@ namespace GameEngine {
 	enum class SrvHeapTypeCount : uint32_t {
 		TextureMaxCount = 2048,
 		SystemMaxCount = 18,
-		BufferMaxCount = 1024,
+		AccessMaxCount = 512,
+		BufferMaxCount = AccessMaxCount,
 		OtherMaxCount = 1
 	};
 

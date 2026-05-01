@@ -22,6 +22,9 @@ void SrvManager::Initialize(ID3D12Device* device) {
 	ranges_[SrvHeapType::System] = { startIndex, startIndex + static_cast<uint32_t>(SrvHeapTypeCount::SystemMaxCount), startIndex, {} };
 
 	startIndex = startIndex + static_cast<uint32_t>(SrvHeapTypeCount::SystemMaxCount);
+	ranges_[SrvHeapType::AccessData] = { startIndex, startIndex + static_cast<uint32_t>(SrvHeapTypeCount::AccessMaxCount), startIndex, {} };
+
+	startIndex = startIndex + static_cast<uint32_t>(SrvHeapTypeCount::AccessMaxCount);
 	ranges_[SrvHeapType::Buffer] = { startIndex, startIndex + static_cast<uint32_t>(SrvHeapTypeCount::BufferMaxCount), startIndex, {} };
 
 	startIndex = startIndex + static_cast<uint32_t>(SrvHeapTypeCount::BufferMaxCount);
