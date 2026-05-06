@@ -84,6 +84,12 @@ namespace GameEngine {
 		/// </summary>
 		void LoadAllModel();
 
+		/// <summary>
+		/// モデルデータ達
+		/// </summary>
+		/// <returns></returns>
+		std::unordered_map<uint32_t, ModelEntryData>& GetModels() { return models_; }
+
 	private:
 		ModelManager(ModelManager&) = delete;
 		ModelManager& operator=(ModelManager&) = delete;

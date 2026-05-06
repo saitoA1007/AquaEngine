@@ -127,6 +127,10 @@ namespace GameEngine {
 		// BLASを取得
 		const std::vector<std::unique_ptr<BLAS>>& GetBLASList() const { return blasList_; }
 
+		// ヒットグループ
+		void SetHitGroupIndex(const uint32_t& index) { hitGroupIndex_ = index; };
+		const uint32_t& GetHitGroupIndex() const { return hitGroupIndex_; }
+
 	private:
 		Model(Model&) = delete;
 		Model& operator=(Model&) = delete;
@@ -143,6 +147,8 @@ namespace GameEngine {
 
 		// BLAS
 		std::vector<std::unique_ptr<BLAS>> blasList_;
+		// モデルが持つHitGroupの位置。この値は登録順によって可変する
+		uint32_t hitGroupIndex_ = 0;
 
 		// Nodeのローカル行列を保持しておく変数
 		Matrix4x4 localMatrix_;

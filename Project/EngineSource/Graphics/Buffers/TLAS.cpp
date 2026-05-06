@@ -37,7 +37,7 @@ void TLAS::Create(ID3D12GraphicsCommandList4* cmdList, const std::vector<TLASIns
         instanceDescs[i].Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
 
         // Transform行列のコピー
-        memcpy(instanceDescs[i].Transform, instances[i].transform, sizeof(float) * 12);
+        std::memcpy(instanceDescs[i].Transform, instances[i].transform, sizeof(float) * 12);
 
         // 対象となるBLASのGPUアドレスを指定
         instanceDescs[i].AccelerationStructure = instances[i].blas->GetGpuVirtualAddress();
@@ -101,8 +101,9 @@ void TLAS::Create(ID3D12GraphicsCommandList4* cmdList, const std::vector<TLASIns
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srvDesc.RaytracingAccelerationStructure.Location = resource_->GetGPUVirtualAddress();
 
-    auto srvHandleCPU = srvManager_->GetCPUHandle(srvIndex_);
-    device_->CreateShaderResourceView(nullptr, &srvDesc, srvHandleCPU);
+    srvHandleCPU_ = srvManager_->GetCPUHandle(srvIndex_);
+    srvHandleGPU_ = srvManager_->GetGPUHandle(srvIndex_);
+    device_->CreateShaderResourceView(nullptr, &srvDesc, srvHandleCPU_);
 
     isCreated_ = true;
 }

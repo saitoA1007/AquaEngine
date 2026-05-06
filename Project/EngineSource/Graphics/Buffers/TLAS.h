@@ -2,6 +2,7 @@
 #include <vector>
 #include "SrvResource.h"
 #include "BLAS.h"
+#include "Externals/DirectXTex/d3dx12.h"
 
 namespace GameEngine {
 
@@ -10,7 +11,7 @@ namespace GameEngine {
 		BLAS* blas = nullptr;             // BLAS
 		float transform[3][4];            // ワールド変換行列
 		uint32_t instanceID = 0;          // シェーダー側で取得できる任意のID
-		uint32_t hitGroupIndexOffset = 0; // このモデルが使うマテリアル(HitGroup)のインデックス
+		uint32_t hitGroupIndexOffset = 0; // hitGroupのどのレコードを使用するか
 	};
 
 	class TLAS :public SrvResource {
@@ -25,7 +26,7 @@ namespace GameEngine {
 
 		// SRVインデックスの取得
 		uint32_t GetSrvIndex() const { return srvIndex_; }
-
+		const CD3DX12_GPU_DESCRIPTOR_HANDLE& GetSrvHandleGPU() const { return srvHandleGPU_; }
 	private:
 		// コピー禁止
 		TLAS(const TLAS&) = delete;
@@ -36,6 +37,10 @@ namespace GameEngine {
 
 		// SRVインデックス
 		uint32_t srvIndex_ = 0;
+		// CPUのシェーダリソースビューのハンドル
+		CD3DX12_CPU_DESCRIPTOR_HANDLE srvHandleCPU_;
+		// GPUのシェーダリソースビューのハンドル
+		CD3DX12_GPU_DESCRIPTOR_HANDLE srvHandleGPU_;
 
 		bool isCreated_ = false;
 	};

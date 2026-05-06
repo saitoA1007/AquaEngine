@@ -31,12 +31,12 @@ void RootSignatureBuilder::AddCBVParameter(uint32_t shaderRegister, D3D12_SHADER
 
 void RootSignatureBuilder::AddSRVDescriptorTable(uint32_t shaderRegister, uint32_t arrayNum, uint32_t spaceNum, 
     D3D12_SHADER_VISIBILITY visibility, uint32_t startNum) {
-    AddDescriptorTable(shaderRegister, startNum, arrayNum, spaceNum, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, visibility, ParameterType::SRV);
+    AddDescriptorTable(ParameterType::SRV, shaderRegister, startNum, arrayNum, spaceNum, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, visibility);
 }
 
 void RootSignatureBuilder::AddUAVDescriptorTable(uint32_t shaderRegister, uint32_t arrayNum, uint32_t spaceNum,
     D3D12_SHADER_VISIBILITY visibility, uint32_t startNum) {
-    AddDescriptorTable(shaderRegister, startNum, arrayNum, spaceNum, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, visibility, ParameterType::UAV);
+    AddDescriptorTable(ParameterType::UAV, shaderRegister, startNum, arrayNum, spaceNum, D3D12_DESCRIPTOR_RANGE_TYPE_UAV, visibility);
 }
 
 void RootSignatureBuilder::AddSampler(uint32_t shaderRegister, D3D12_FILTER filter, D3D12_TEXTURE_ADDRESS_MODE texAddress, D3D12_SHADER_VISIBILITY visibility, D3D12_COMPARISON_FUNC func) {
@@ -87,8 +87,8 @@ void RootSignatureBuilder::CreateRootSignatureFromReflection(IDxcUtils* utils,ID
     SerializeAndCreate(D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 }
 
-void RootSignatureBuilder::AddDescriptorTable(uint32_t shaderRegister, uint32_t startNum, uint32_t arrayNum, uint32_t spaceNum,
-    D3D12_DESCRIPTOR_RANGE_TYPE rangeType, D3D12_SHADER_VISIBILITY visibility, ParameterType paramType) {
+void RootSignatureBuilder::AddDescriptorTable(ParameterType paramType,uint32_t shaderRegister, uint32_t startNum, uint32_t arrayNum, uint32_t spaceNum,
+    D3D12_DESCRIPTOR_RANGE_TYPE rangeType, D3D12_SHADER_VISIBILITY visibility) {
 
     D3D12_DESCRIPTOR_RANGE range{};
     range.RangeType = rangeType; // 使用するタイプ

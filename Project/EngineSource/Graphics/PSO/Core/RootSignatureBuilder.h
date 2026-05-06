@@ -52,17 +52,20 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="shaderRegister">レジスタ番号</param>
 		/// <param name="arryNum">配列の数</param>
+		/// <param name="spaceNum">配置するスペース</param>
 		/// <param name="visibility">使用するシェーダー</param>
+		/// <param name="startNum">配列の開始位置</param>
 		void AddSRVDescriptorTable(uint32_t shaderRegister, uint32_t arrayNum, uint32_t spaceNum, D3D12_SHADER_VISIBILITY visibility,
 			uint32_t startNum = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND);
 
 		/// <summary>
 		/// UAVを追加する
 		/// </summary>
-		/// <param name="shaderRegister"></param>
-		/// <param name="arrayNum"></param>
+		/// <param name="shaderRegister">レジスタ番号</param>
+		/// <param name="arryNum">配列の数</param>
 		/// <param name="spaceNum"></param>
-		/// <param name="visibility"></param>
+		/// <param name="visibility">使用するシェーダー</param>
+		/// <param name="startNum">配列の開始位置</param>
 		void AddUAVDescriptorTable(uint32_t shaderRegister, uint32_t arrayNum, uint32_t spaceNum, D3D12_SHADER_VISIBILITY visibility,
 			uint32_t startNum = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND);
 
@@ -91,6 +94,8 @@ namespace GameEngine {
 		ID3D12RootSignature* GetRootSignature() const { return rootSignature_.Get(); }
 		std::vector<ParameterType> GetParameterTypes() const { return parameterTypes_; }
 
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> MoveOwnerRootSignature() { return std::move(rootSignature_); }
+
 		// リセット
 		void Reset();
 	private:
@@ -110,8 +115,8 @@ namespace GameEngine {
 
 	private:
 
-		void AddDescriptorTable(uint32_t shaderRegister, uint32_t startNum, uint32_t arrayNum, uint32_t spaceNum,
-			D3D12_DESCRIPTOR_RANGE_TYPE rangeType, D3D12_SHADER_VISIBILITY visibility, ParameterType paramType);
+		void AddDescriptorTable(ParameterType paramType,uint32_t shaderRegister, uint32_t startNum, uint32_t arrayNum, uint32_t spaceNum,
+			D3D12_DESCRIPTOR_RANGE_TYPE rangeType, D3D12_SHADER_VISIBILITY visibility);
 
 		void SerializeAndCreate(D3D12_ROOT_SIGNATURE_FLAGS flags);
 
