@@ -1,6 +1,5 @@
 #include "Material.h"
 #include "MyMath.h"
-#include "CreateBufferResource.h"
 using namespace GameEngine;
 
 Material::~Material() {
@@ -28,6 +27,11 @@ void Material::Initialize(const Vector4& color, const Vector3& specularColor,con
 	materialData_->metallic = 0.01f;
 	// 影の適応
 	materialData_->isActiveShadow = false;
+
+	// マテリアルデータを作成
+	materialBuffer_.Create(static_cast<uint32_t>(MaterialType::kDefalut));
+	auto* data = materialBuffer_.materialDataBuffer_.GetData();
+	data = materialData_;
 }
 
 void Material::SetUVTransform(Transform uvTransform) {

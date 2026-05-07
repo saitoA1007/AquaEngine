@@ -426,9 +426,6 @@
     <ClCompile Include="EngineSource\Graphics\PSO\Core\RasterizerBuilder.cpp">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.cpp">
-      <Filter>EngineSource\Graphics\PSO\Core</Filter>
-    </ClCompile>
     <ClCompile Include="EngineSource\Graphics\PSO\Core\ShaderCompiler.cpp">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
     </ClCompile>
@@ -437,9 +434,6 @@
     </ClCompile>
     <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\CopyPSO.cpp">
       <Filter>EngineSource\Graphics\PSO\PostProcess</Filter>
-    </ClCompile>
-    <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\TestRayPipeline.cpp">
-      <Filter>EngineSource\Graphics\PSO\Raytracing</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\Graphics\RenderPass\RenderPass.cpp">
       <Filter>EngineSource\Graphics\RenderPass</Filter>
@@ -528,6 +522,11 @@
     <ClCompile Include="Externals\imgui\imgui_widgets.cpp">
       <Filter>Externals\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\RayLibShaderCompiler.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\ShaderTableBuilder.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\StateObjectBuilder.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\StateObjectManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -878,9 +877,6 @@
     <ClInclude Include="EngineSource\Graphics\PSO\Core\RasterizerBuilder.h">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.h">
-      <Filter>EngineSource\Graphics\PSO\Core</Filter>
-    </ClInclude>
     <ClInclude Include="EngineSource\Graphics\PSO\Core\ShaderCompiler.h">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
     </ClInclude>
@@ -889,9 +885,6 @@
     </ClInclude>
     <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\CopyPSO.h">
       <Filter>EngineSource\Graphics\PSO\PostProcess</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\TestRayPipeline.h">
-      <Filter>EngineSource\Graphics\PSO\Raytracing</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Graphics\RenderPass\RenderPass.h">
       <Filter>EngineSource\Graphics\RenderPass</Filter>
@@ -1025,9 +1018,20 @@
     <ClInclude Include="Externals\imgui\imstb_truetype.h">
       <Filter>Externals\imgui</Filter>
     </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.h" />
+    <ClInclude Include="EngineSource\Graphics\Buffers\MaterialBuffer.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\RayLibShaderCompiler.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderRecord.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderTable.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderTableBuilder.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\StateObjectBuilder.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\StateObjectManager.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\raytracing.hlsl" />
+    <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />
+    <FxCompile Include="Resources\Shaders\Raytracing\Miss.hlsl" />
+    <FxCompile Include="Resources\Shaders\Raytracing\chsObject.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Externals\imgui\ProggyClean.ttf" />
@@ -1036,6 +1040,7 @@
     <None Include="Externals\imgui\imgui_bezier_math.inl" />
     <None Include="Externals\imgui\imgui_extra_math.inl" />
     <None Include="Externals\imgui\imgui_node_editor_internal.inl" />
+    <None Include="Resources\Shaders\Raytracing\Common.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />

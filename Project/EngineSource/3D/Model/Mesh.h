@@ -52,6 +52,9 @@ namespace GameEngine {
 		// メッシュに対応するマテリアル名を取得
 		const std::string& GetMaterialName() const { return materialName_; }
 
+		const VertexBuffer<VertexData>& GetVertexBuffer() const { return vertexBuffer_; }
+		const IndexBuffer& GetIndexBuffer() const { return indexBuffer_; }
+
 	private:
 		VertexBuffer<VertexData> vertexBuffer_;
 		IndexBuffer indexBuffer_;

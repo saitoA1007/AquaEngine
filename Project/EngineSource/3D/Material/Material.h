@@ -5,6 +5,7 @@
 #include "Transform.h"
 #include <iostream>
 #include "ConstantBuffer.h"
+#include "MaterialBuffer.h"
 
 namespace GameEngine {
 
@@ -107,6 +108,8 @@ namespace GameEngine {
 	private:
 
 		ConstantBuffer<MaterialData> constBuffer_;
+
+		MaterialBuffer<MaterialData> materialBuffer_;
 
 		// マテリアルにデータを書き込む
 		MaterialData* materialData_ = nullptr;
