@@ -1,9 +1,9 @@
-#include "StateObjectManager.h"
+#include "RaytracingPipeline.h"
 #include "ModelManager.h"
 #include "EngineSource/Graphics/PSO/Core/RootSignatureBuilder.h"
 using namespace GameEngine;
 
-void StateObjectManager::Initialize(ID3D12Device5* device, SrvManager* srvManager,DXC* dxc,
+void RaytracingPipeline::Initialize(ID3D12Device5* device, SrvManager* srvManager, DXC* dxc,
 	RenderPassController* renderPassController, ModelManager* modelManager, TLAS* tlas) {
 	device_ = device;
 	srvManager_ = srvManager;
@@ -17,18 +17,12 @@ void StateObjectManager::Initialize(ID3D12Device5* device, SrvManager* srvManage
 	// ルートシグネチャを作成する
 	CreateGlobalRootsignature();
 	CreateLocalRootsignature();
-}
-
-void StateObjectManager::Create() {
 
 	// ステートオブジェクトを作成する
 	CreateStateObject();
-
-	// シェーダーテーブルを設定する
-	CreateShaderTable();
 }
 
-void StateObjectManager::CreateGlobalRootsignature() {
+void RaytracingPipeline::CreateGlobalRootsignature() {
 
 	// tlasの設定、カメラ、ライトの設定、マテリアルアクセスデータ、バッファデータの設定
 
@@ -44,7 +38,7 @@ void StateObjectManager::CreateGlobalRootsignature() {
 	rootSignatureGlobal_ = builder.MoveOwnerRootSignature();
 }
 
-void StateObjectManager::CreateLocalRootsignature() {
+void RaytracingPipeline::CreateLocalRootsignature() {
 
 	// raygen用
 	RootSignatureBuilder raygenBuilder;
@@ -63,7 +57,7 @@ void StateObjectManager::CreateLocalRootsignature() {
 	rsModel_ = objectBuilder.MoveOwnerRootSignature();
 }
 
-void StateObjectManager::CreateStateObject() {
+void RaytracingPipeline::CreateStateObject() {
 	LibraryResult raygenResult = rayLibShaderCompiler_.CompileShader(L"Resources/Shaders/Raytracing/RayGen.hlsl");
 	LibraryResult missResult = rayLibShaderCompiler_.CompileShader(L"Resources/Shaders/Raytracing/Miss.hlsl");
 	LibraryResult objectResult = rayLibShaderCompiler_.CompileShader(L"Resources/Shaders/Raytracing/chsObject.hlsl");
@@ -93,15 +87,23 @@ void StateObjectManager::CreateStateObject() {
 	stateObjectBuilder_.AddLocalRootSignature(rsModel_.Get(), { AppHitGroups::DefaultModel });
 
 	// 生成する
-	Microsoft::WRL::ComPtr<ID3D12StateObject> stateObject = stateObjectBuilder_.Build(device_);
+	stateObject_ = stateObjectBuilder_.Build(device_);
 }
 
-void StateObjectManager::CreateShaderTable() {
+void RaytracingPipeline::CreateShaderTable() {
+
+	Microsoft::WRL::ComPtr<ID3D12StateObjectProperties> rtsoProps;
+	stateObject_.As(&rtsoProps);
 
 	// raygen
 	{
+		auto id = rtsoProps->GetShaderIdentifier(L"MainRayGen");
+		if (id == nullptr) {
+			assert(false && "Not found ShaderIdentifier");
+		}
+
 		ShaderRecord record;
-		auto table = record.SetIdentifier(L"MainRayGen");
+		auto table = record.SetIdentifier(id);
 		table.AppendDescriptor(tlas_->GetSrvHandleGPU());
 		table.AppendDescriptor(srvManager_->GetGPUHandle(renderPassController_->GetUavIndex("RaytracingPass")));
 		shaderTableBuilder_.RayGen().AddRecord(std::move(record));
@@ -109,8 +111,13 @@ void StateObjectManager::CreateShaderTable() {
 
 	// miss
 	{
+		auto id = rtsoProps->GetShaderIdentifier(L"MainMiss");
+		if (id == nullptr) {
+			assert(false && "Not found ShaderIdentifier");
+		}
+
 		ShaderRecord record;
-		record.SetIdentifier(L"MainMiss");
+		record.SetIdentifier(id);
 		shaderTableBuilder_.Miss().AddRecord(std::move(record));
 	}
 
@@ -126,8 +133,13 @@ void StateObjectManager::CreateShaderTable() {
 				auto& index = mesh->GetIndexBuffer();
 				auto& vertex = mesh->GetVertexBuffer();
 
+				auto id = rtsoProps->GetShaderIdentifier(AppHitGroups::DefaultModel.c_str());
+				if (id == nullptr) {
+					assert(false && "Not found ShaderIdentifier");
+				}
+
 				ShaderRecord record;
-				auto table = record.SetIdentifier(AppHitGroups::DefaultModel.c_str());
+				auto table = record.SetIdentifier(id);
 				table.AppendDescriptor(index.GetSrvGpuHandle());
 				table.AppendDescriptor(vertex.GetSrvGpuHandle());
 

@@ -2,7 +2,6 @@
 #include <vector>
 #include <map>
 #include <unordered_map>
-#include <memory>
 
 #include "PSO/Core/DrawPSOData.h"
 #include "DrawRequest.h"
@@ -22,7 +21,7 @@ namespace GameEngine {
         ~RenderQueue() = default;
 
         // 初期化処理
-        void Initialize(ID3D12GraphicsCommandList* commandList, PSOManager* psoManager, RenderPassController* renderPassController);
+        void Initialize(ID3D12GraphicsCommandList4* commandList, PSOManager* psoManager, RenderPassController* renderPassController);
 
         // フレーム開始前処理
         void Begin();
@@ -49,6 +48,9 @@ namespace GameEngine {
         void SetLightCamera(ID3D12Resource* resource) {
             lightCameraResource_ = resource;
         }
+
+        // tlasを取得
+        TLAS* GetTLAS() { return &tlas_; }
 
     public:
 
@@ -80,7 +82,7 @@ namespace GameEngine {
         void SubmitRaytracingModel(const Model* model, WorldTransform& worldTransform, const std::string& passName = "DefaultPass");
 
     private:
-        ID3D12GraphicsCommandList* commandList_ = nullptr;
+        ID3D12GraphicsCommandList4* commandList_ = nullptr;
         RenderPassController* renderPassController_ = nullptr;
 
         // 2D描画コマンドのスタックメモリ [描画パス]->[PSO]->[描画コマンド]
@@ -109,8 +111,11 @@ namespace GameEngine {
         // psoのリスト
         std::unordered_map<std::string, DrawPsoData> psoList_;
 
-        // レイトレーシングモデルの管理
-        //TLAS tlas_;
+        // レイトレーシング用の描画モデル管理
+        TLAS tlas_;
+
+        // レイトレーシングでの最大描画数
+        uint32_t maxRayInstanceNum_ = 200;
 
         std::vector<TLASInstanceData> tlasInstanceData_;
 

@@ -14,15 +14,16 @@ namespace GameEngine {
 		static const std::wstring DefaultModel = L"DefaultModel";
 	}
 
-	class StateObjectManager {
+	class RaytracingPipeline {
 	public:
-		StateObjectManager() =default;
-		~StateObjectManager() = default;
+		RaytracingPipeline() = default;
+		~RaytracingPipeline() = default;
 
 		void Initialize(ID3D12Device5* device, SrvManager* srvManager, DXC* dxc,
-			RenderPassController* renderPassController, ModelManager* modelManager,TLAS* tlas);
+			RenderPassController* renderPassController, ModelManager* modelManager, TLAS* tlas);
 
-		void Create();
+		// シェーダーテーブルを作成
+		void CreateShaderTable();
 
 	private:
 		ID3D12Device5* device_ = nullptr;
@@ -39,6 +40,7 @@ namespace GameEngine {
 
 		// ステートオブジェクトの生成機能
 		StateObjectBuilder stateObjectBuilder_;
+		Microsoft::WRL::ComPtr<ID3D12StateObject> stateObject_;
 
 		// シェーダーテーブル作成機能
 		ShaderTableBuilder shaderTableBuilder_;
@@ -53,12 +55,13 @@ namespace GameEngine {
 
 	private:
 
+		// グローバルルートシグネチャを作成
 		void CreateGlobalRootsignature();
 
+		// ローカルルートシグネチャを作成
 		void CreateLocalRootsignature();
 
+		// ステートオブジェクトを作成
 		void CreateStateObject();
-
-		void CreateShaderTable();
 	};
 }

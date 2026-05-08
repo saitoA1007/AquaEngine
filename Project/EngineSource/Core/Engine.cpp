@@ -1,6 +1,5 @@
 #include "Engine.h"
 #include "Application/Scene/Register/SetUpScenes.h"
-#include "ResourceLeakChecker.h"
 #include "CrashHandle.h"
 #include "LogManager.h"
 

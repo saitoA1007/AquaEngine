@@ -14,6 +14,7 @@
 // あとで削除するべき処理
 #include "PostProcess/CopyPSO.h"
 #include "PostProcess/BloomPSO.h"
+#include "Raytracing/RaytracingPipeline.h"
 
 namespace GameEngine {
 
@@ -67,6 +68,8 @@ namespace GameEngine {
         std::unique_ptr<RenderPassController> renderPassController_;
         // pso管理機能
         std::unique_ptr<PSOManager> psoManager_;
+        // レイトレーシングの描画環境構築機能
+        std::unique_ptr<RaytracingPipeline> raytracingPipeline_;
 
         std::unique_ptr<CopyPSO> copyPSO_;
         std::unique_ptr<BloomPSO> bloomPSO_;

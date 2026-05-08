@@ -354,9 +354,6 @@
     <ClCompile Include="EngineSource\Graphics\Buffers\BLAS.cpp">
       <Filter>EngineSource\Graphics\Buffers</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Graphics\Buffers\TLAS.cpp">
-      <Filter>EngineSource\Graphics\Buffers</Filter>
-    </ClCompile>
     <ClCompile Include="EngineSource\Graphics\ComputePSO\ParticleCSPSO.cpp">
       <Filter>EngineSource\Graphics\ComputePSO</Filter>
     </ClCompile>
@@ -526,7 +523,8 @@
     <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\RayLibShaderCompiler.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\ShaderTableBuilder.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\StateObjectBuilder.cpp" />
-    <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\StateObjectManager.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\RaytracingPipeline.cpp" />
+    <ClCompile Include="EngineSource\Graphics\Buffers\TLAS.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -787,9 +785,6 @@
     <ClInclude Include="EngineSource\Graphics\Buffers\StructuredBuffer.h">
       <Filter>EngineSource\Graphics\Buffers</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Graphics\Buffers\TLAS.h">
-      <Filter>EngineSource\Graphics\Buffers</Filter>
-    </ClInclude>
     <ClInclude Include="EngineSource\Graphics\Buffers\VertexBuffer.h">
       <Filter>EngineSource\Graphics\Buffers</Filter>
     </ClInclude>
@@ -1025,7 +1020,8 @@
     <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderTable.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderTableBuilder.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\StateObjectBuilder.h" />
-    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\StateObjectManager.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\RaytracingPipeline.h" />
+    <ClInclude Include="EngineSource\Graphics\Buffers\TLAS.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\raytracing.hlsl" />

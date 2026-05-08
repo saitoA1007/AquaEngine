@@ -9,7 +9,7 @@ RenderQueue::RenderQueue() {
 
 }
 
-void RenderQueue::Initialize(ID3D12GraphicsCommandList* commandList, PSOManager* psoManager, RenderPassController* renderPassController) {
+void RenderQueue::Initialize(ID3D12GraphicsCommandList4* commandList, PSOManager* psoManager, RenderPassController* renderPassController) {
     commandList_ = commandList;
     renderPassController_ = renderPassController;
 
@@ -17,6 +17,9 @@ void RenderQueue::Initialize(ID3D12GraphicsCommandList* commandList, PSOManager*
     renderPassController_->AddPass("ShadowPass", RenderTextureMode::DsvOnly, 2048, 2048);
     // デフォルトで描画するパス
     renderPassController_->AddPass("DefaultPass");
+    // レイトレーシングで描画するパス
+    renderPassController_->AddPass("RaytracingPass", RenderTextureMode::UavOnly);
+
     // 最終的な描画先を設定
     renderPassController_->SetSceneFinalPass("DefaultPass");
     renderPassController_->SetPresentPass("DefaultPass");
@@ -37,6 +40,9 @@ void RenderQueue::Initialize(ID3D12GraphicsCommandList* commandList, PSOManager*
 
     RegisterPSO("DefaultSprite", psoManager);
     RegisterPSO("AdditiveSprite", psoManager);
+
+    // tlasを作成
+    tlas_.Create(commandList_, maxRayInstanceNum_);
 }
 
 void RenderQueue::Begin() {
