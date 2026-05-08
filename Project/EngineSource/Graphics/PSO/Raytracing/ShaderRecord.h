@@ -9,26 +9,26 @@ namespace GameEngine {
 
     class ShaderRecord {
     public:
-        // シェーダー識別子を設定する（必ず最初に呼ぶ）
+        // シェーダー識別子を設定する
         ShaderRecord& SetIdentifier(const void* shaderId) {
             data_.resize(D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
             std::memcpy(data_.data(), shaderId, D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES);
             return *this;
         }
 
-        // GPU ディスクリプターハンドルを末尾に追記する
+        // GPUディスクリプターハンドルを末尾に追記する
         ShaderRecord& AppendDescriptor(D3D12_GPU_DESCRIPTOR_HANDLE handle) {
             AppendRaw(&handle, sizeof(handle));
             return *this;
         }
 
-        // GPU 仮想アドレスを末尾に追記する
+        // GPU仮想アドレスを末尾に追記する
         ShaderRecord& AppendGPUAddress(D3D12_GPU_VIRTUAL_ADDRESS address) {
             AppendRaw(&address, sizeof(address));
             return *this;
         }
 
-        // ComPtr<ID3D12Resource> から GPU アドレスを追記するショートカット
+        // ComPtr<ID3D12Resource>からGPUアドレスを追記するショートカット
         ShaderRecord& AppendGPUAddress(
             const Microsoft::WRL::ComPtr<ID3D12Resource>& resource)
         {
@@ -36,7 +36,7 @@ namespace GameEngine {
             return AppendGPUAddress(addr);
         }
 
-        // 任意のデータを追記する（定数など）
+        // 定数などのデータを追記する
         template<class T>
         ShaderRecord& AppendData(const T& value) {
             AppendRaw(&value, sizeof(T));

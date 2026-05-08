@@ -43,6 +43,9 @@ void RenderQueue::Initialize(ID3D12GraphicsCommandList4* commandList, PSOManager
 
     // tlasを作成
     tlas_.Create(commandList_, maxRayInstanceNum_);
+
+    // カメラを設定
+    mainCamera_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720);
 }
 
 void RenderQueue::Begin() {

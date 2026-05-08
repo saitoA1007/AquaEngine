@@ -7,6 +7,7 @@
 #include "DrawRequest.h"
 #include "RenderPass/RenderPassController.h"
 #include "TLAS.h"
+#include "Camera.h"
 
 namespace GameEngine {
 
@@ -35,10 +36,17 @@ namespace GameEngine {
             cameraResource_ = cameraResource;
         }
 
+        void SetCamera(Camera* camera) {
+            camera_ = camera;
+        }
+
         void SetDebugCamera(GpuResource* cameraResource) {
             debugCameraResource_ = cameraResource;
             useDebugCamera_ = true;
             
+        }
+        void SetUseDebugCamera(const bool& useDebugCamera) {
+            useDebugCamera_ = useDebugCamera;
         }
 
         void SetLight(GpuResource* lightResource) {
@@ -94,6 +102,8 @@ namespace GameEngine {
 
         // カメラリソース
         GpuResource* cameraResource_ = nullptr;
+        Camera mainCamera_;
+        Camera* camera_ = nullptr;
         GpuResource* debugCameraResource_ = nullptr;
         // ライトリソース
         GpuResource* lightResource_ = nullptr;
@@ -138,7 +148,6 @@ namespace GameEngine {
             draw3dQueueList_.clear();
             translucentDrawQueueList_.clear();
             currentPsoName_.clear();
-            useDebugCamera_ = false;
         }
 
         // psoの名前を取得

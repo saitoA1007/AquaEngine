@@ -109,6 +109,8 @@ void RaytracingPipeline::CreateShaderTable(ModelManager* modelManager) {
 		auto table = record.SetIdentifier(id);
 		table.AppendDescriptor(tlas_->GetSrvHandleGPU());
 		table.AppendDescriptor(srvManager_->GetGPUHandle(renderPassController_->GetUavIndex("RaytracingPass")));
+		table.AppendGPUAddress();
+		table.AppendGPUAddress();
 		shaderTableBuilder_.RayGen().AddRecord(std::move(record));
 	}
 
