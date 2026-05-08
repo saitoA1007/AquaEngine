@@ -45,6 +45,7 @@ namespace GameEngine {
         DebugRenderer* GetDebugRenderer() const { return debugRenderer_.get(); }
         ImGuiManager* GetImGuiManager() const { return imGuiManager_.get(); }
         PostEffectManager* GetPostEffectManager() const { return postEffectManager_.get(); }
+        RaytracingPipeline* GetRaytracingPipeline() const { return raytracingPipeline_.get(); }
     private:
         EngineContext context_;
 

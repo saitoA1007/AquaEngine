@@ -4,11 +4,10 @@
 using namespace GameEngine;
 
 void RaytracingPipeline::Initialize(ID3D12Device5* device, SrvManager* srvManager, DXC* dxc,
-	RenderPassController* renderPassController, ModelManager* modelManager, TLAS* tlas) {
+	RenderPassController* renderPassController, TLAS* tlas) {
 	device_ = device;
 	srvManager_ = srvManager;
 	renderPassController_ = renderPassController;
-	modelManager_ = modelManager;
 	tlas_ = tlas;
 
 	// シェーダコンパイル機能を初期化
@@ -25,15 +24,19 @@ void RaytracingPipeline::Initialize(ID3D12Device5* device, SrvManager* srvManage
 void RaytracingPipeline::CreateGlobalRootsignature() {
 
 	// tlasの設定、カメラ、ライトの設定、マテリアルアクセスデータ、バッファデータの設定
+	uint32_t texMaxNum = static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount); // テクスチャ
+	uint32_t systemMaxNum = static_cast<uint32_t>(SrvHeapTypeCount::SystemMaxCount); // ポストエフェクト
+	uint32_t accessMaxNum = static_cast<uint32_t>(SrvHeapTypeCount::AccessMaxCount); // アクセスデータ
+	uint32_t bufferMaxNum = static_cast<uint32_t>(SrvHeapTypeCount::BufferMaxCount); // データ
 
 	RootSignatureBuilder builder;
 	builder.Initialize(device_);
 	builder.AddSRVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_ALL); // tlas
-	builder.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 1, D3D12_SHADER_VISIBILITY_ALL); // テクスチャ
-	builder.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::AccessMaxCount), 2, D3D12_SHADER_VISIBILITY_ALL); // アクセスデータ
-	builder.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::BufferMaxCount), 3, D3D12_SHADER_VISIBILITY_ALL); // マテリアルなどのデータ
-	builder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_ALL); // light
-	builder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_ALL); // camera
+	builder.AddSRVDescriptorTable(0, texMaxNum, 1, D3D12_SHADER_VISIBILITY_ALL); // テクスチャ
+	builder.AddSRVDescriptorTable(0, accessMaxNum, 2, D3D12_SHADER_VISIBILITY_ALL, texMaxNum + systemMaxNum); // アクセスデータ
+	builder.AddSRVDescriptorTable(0, bufferMaxNum, 3, D3D12_SHADER_VISIBILITY_ALL, texMaxNum + systemMaxNum + accessMaxNum); // マテリアルなどのデータ
+	builder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_ALL); // camera
+	builder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_ALL); // light
 	builder.CreateRootSignature();
 	rootSignatureGlobal_ = builder.MoveOwnerRootSignature();
 }
@@ -44,16 +47,16 @@ void RaytracingPipeline::CreateLocalRootsignature() {
 	RootSignatureBuilder raygenBuilder;
 	raygenBuilder.Initialize(device_);
 	raygenBuilder.AddUAVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
-	raygenBuilder.CreateRootSignature();
+	raygenBuilder.CreateRootSignature(D3D12_ROOT_SIGNATURE_FLAG_LOCAL_ROOT_SIGNATURE);
 	rsRayGen_ = raygenBuilder.MoveOwnerRootSignature();
 
 	// Object用
 	RootSignatureBuilder objectBuilder;
 	objectBuilder.Initialize(device_);
-	objectBuilder.AddSRVDescriptorTable(0, 1, 1, D3D12_SHADER_VISIBILITY_ALL);
-	objectBuilder.AddSRVDescriptorTable(1, 1, 1, D3D12_SHADER_VISIBILITY_ALL);
+	objectBuilder.AddSRVDescriptorTable(0, 1, 4, D3D12_SHADER_VISIBILITY_ALL);
+	objectBuilder.AddSRVDescriptorTable(1, 1, 4, D3D12_SHADER_VISIBILITY_ALL);
 	objectBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_ALL);
-	objectBuilder.CreateRootSignature();
+	objectBuilder.CreateRootSignature(D3D12_ROOT_SIGNATURE_FLAG_LOCAL_ROOT_SIGNATURE);
 	rsModel_ = objectBuilder.MoveOwnerRootSignature();
 }
 
@@ -77,7 +80,7 @@ void RaytracingPipeline::CreateStateObject() {
 	const uint32_t MaxPayloadSize = sizeof(float) * 3 + sizeof(uint32_t);
 	const uint32_t MaxAttributeSize = sizeof(float) * 2;
 	stateObjectBuilder_.SetShaderConfig(MaxPayloadSize, MaxAttributeSize);
-	stateObjectBuilder_.SetPipelineConfig(2);
+	stateObjectBuilder_.SetPipelineConfig(3);
 
 	// グローバルルートシグネチャを設定
 	stateObjectBuilder_.SetGlobalRootSignature(rootSignatureGlobal_.Get());
@@ -90,7 +93,7 @@ void RaytracingPipeline::CreateStateObject() {
 	stateObject_ = stateObjectBuilder_.Build(device_);
 }
 
-void RaytracingPipeline::CreateShaderTable() {
+void RaytracingPipeline::CreateShaderTable(ModelManager* modelManager) {
 
 	Microsoft::WRL::ComPtr<ID3D12StateObjectProperties> rtsoProps;
 	stateObject_.As(&rtsoProps);
@@ -125,18 +128,18 @@ void RaytracingPipeline::CreateShaderTable() {
 	uint32_t hitGroupIndex = 0;
 	// hitGroup
 	{
-		auto& models = modelManager_->GetModels();
+		auto& models = modelManager->GetModels();
+
+		auto id = rtsoProps->GetShaderIdentifier(AppHitGroups::DefaultModel.c_str());
+		if (id == nullptr) {
+			assert(false && "Not found ShaderIdentifier");
+		}
 
 		for (auto& [key, data] : models) {
 			for (auto& mesh : data.model->GetMeshes()) {
 				data.model->SetHitGroupIndex(hitGroupIndex);
 				auto& index = mesh->GetIndexBuffer();
 				auto& vertex = mesh->GetVertexBuffer();
-
-				auto id = rtsoProps->GetShaderIdentifier(AppHitGroups::DefaultModel.c_str());
-				if (id == nullptr) {
-					assert(false && "Not found ShaderIdentifier");
-				}
 
 				ShaderRecord record;
 				auto table = record.SetIdentifier(id);

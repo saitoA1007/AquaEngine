@@ -5,12 +5,10 @@
 #include "SpriteRenderer.h"
 #include "ModelRenderer.h"
 #include "CoreSubsystem.h"
-#include "ResourceSubsystem.h"
 using namespace GameEngine;
 
 void GraphicsSubsystem::Initialize() {
     auto* windowsApp = context_.core->GetWindowsApp();
-    //auto* modelManager = context_.resource->GetModelManager();
 
     // DirectXの機能を生成
     graphicsDevice_ = std::make_unique<GraphicsDevice>();
@@ -50,7 +48,8 @@ void GraphicsSubsystem::Initialize() {
 
     // レイトレーシング用のパイプライン
     raytracingPipeline_ = std::make_unique<RaytracingPipeline>();
-    //raytracingPipeline_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetSrvManager(), dxc_.get(), renderPassController_.get(), modelManager, );
+    raytracingPipeline_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetSrvManager(), dxc_.get(),
+        renderPassController_.get(), renderQueue_->GetTLAS());
 
     // ポストエフェクトマネージャーの初期化
     postEffectManager_ = std::make_unique<PostEffectManager>();

@@ -1,5 +1,6 @@
 #ifndef COMMON_HLSLI
 #define COMMON_HLSLI
+#include"../LightElement.hlsli"
 
 struct Payload
 {
@@ -28,19 +29,34 @@ struct SceneCB
     uint4 flags; // x: 平行光源シャドウON/OFF, y: ポイントライト位置描画
 };
 
+struct Camera
+{
+    float32_t3 worldPosition;
+    matrix mtxViewInv; // ビュー逆行列
+    matrix mtxProjInv; // プロジェクション逆行列
+};
+
 struct MaterialRef
 {
     uint32_t type; // マテリアルデータのタイプ
-    uint32_t MaterialIndex = 0; // マテリアルデータの参照するハンドル
+    uint32_t MaterialIndex; // マテリアルデータの参照するハンドル
 };
 
 // Global Root Signature
-RaytracingAccelerationStructure gRtScene : register(t0);
+RaytracingAccelerationStructure gRtScene : register(t0,space0);
 Texture2D<float32_t4> gTexture[] : register(t0, space1);
 StructuredBuffer<MaterialRef> gMaterialRefs[] : register(t0, space2);
 ByteAddressBuffer gBufferData[] : register(t0, space3);
 
-ConstantBuffer<SceneCB> gSceneParam : register(b0);
+ConstantBuffer<Camera> gCamera : register(b1);
+cbuffer LightGroup : register(b2)
+{
+    DirectionalLight gDirectionalLight;
+    PointLight gPointLight;
+    SpotLight gSpotLight;
+    uint32_t environmentTexture;
+    int32_t isActiveEnvironment;
+};
 
 inline float3 CalcBarycentrics(float2 barys)
 {
@@ -72,7 +88,7 @@ float3 CalcHitAttribute3(float3 vertexAttribute[3], float2 barycentrics)
 inline bool checkRecursiveLimit(inout Payload payload)
 {
     payload.recursive++;
-    if (payload.recursive >= 15)
+    if (payload.recursive > 3)
     {
         payload.color = float3(0, 0, 0);
         return true;

@@ -20,17 +20,15 @@ namespace GameEngine {
 		~RaytracingPipeline() = default;
 
 		void Initialize(ID3D12Device5* device, SrvManager* srvManager, DXC* dxc,
-			RenderPassController* renderPassController, ModelManager* modelManager, TLAS* tlas);
+			RenderPassController* renderPassController, TLAS* tlas);
 
 		// シェーダーテーブルを作成
-		void CreateShaderTable();
+		void CreateShaderTable(ModelManager* modelManager);
 
 	private:
 		ID3D12Device5* device_ = nullptr;
 		// srv管理機能
 		SrvManager* srvManager_ = nullptr;
-		// モデル管理機能
-		ModelManager* modelManager_ = nullptr;
 		// 描画パス
 		RenderPassController* renderPassController_ = nullptr;
 		TLAS* tlas_ = nullptr;

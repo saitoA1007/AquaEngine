@@ -55,6 +55,8 @@ void Engine::Initialize(HINSTANCE hInstance) {
     // 初期化をおこなう
     subsystemRegistry_.InitializeAll();
 
+    //resource_->GetModelManager();
+
     // シーンを登録する
     SetupScenes(*scene_->GetSceneRegistry());
     // シーンに各機能を設定
