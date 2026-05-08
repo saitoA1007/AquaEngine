@@ -93,7 +93,7 @@ void RaytracingPipeline::CreateStateObject() {
 	stateObject_ = stateObjectBuilder_.Build(device_);
 }
 
-void RaytracingPipeline::CreateShaderTable(ModelManager* modelManager) {
+void RaytracingPipeline::CreateShaderTable(ModelManager* modelManager, GpuResource* cameraResource, GpuResource* lightResource) {
 
 	Microsoft::WRL::ComPtr<ID3D12StateObjectProperties> rtsoProps;
 	stateObject_.As(&rtsoProps);
@@ -109,8 +109,8 @@ void RaytracingPipeline::CreateShaderTable(ModelManager* modelManager) {
 		auto table = record.SetIdentifier(id);
 		table.AppendDescriptor(tlas_->GetSrvHandleGPU());
 		table.AppendDescriptor(srvManager_->GetGPUHandle(renderPassController_->GetUavIndex("RaytracingPass")));
-		table.AppendGPUAddress();
-		table.AppendGPUAddress();
+		table.AppendGPUAddress(cameraResource->GetGpuVirtualAddress());
+		table.AppendGPUAddress(lightResource->GetGpuVirtualAddress());
 		shaderTableBuilder_.RayGen().AddRecord(std::move(record));
 	}
 

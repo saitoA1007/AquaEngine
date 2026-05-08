@@ -46,6 +46,16 @@ void RenderQueue::Initialize(ID3D12GraphicsCommandList4* commandList, PSOManager
 
     // カメラを設定
     mainCamera_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720);
+
+    // 平行光源ライト
+    directionalData_.active = true;
+    directionalData_.color = { 1.0f,1.0f,1.0f,1.0f };
+    directionalData_.direction = { 0.0,-1.0f,0.0f };
+    directionalData_.intensity = 1.0f;
+
+    // ライトの設定
+    lightManager_.Initialize(true, false, false);
+    lightManager_.SetDirectionalData(directionalData_);
 }
 
 void RenderQueue::Begin() {
@@ -54,6 +64,11 @@ void RenderQueue::Begin() {
 }
 
 void RenderQueue::Execute() {
+
+    // カメラを設定する
+    if (cameraPtr_ != nullptr) {
+        mainCamera_.SetCamera(*cameraPtr_);
+    }
 
     for (const auto& passName : passExecuteOrder_) {
 
@@ -157,13 +172,13 @@ void RenderQueue::RegisterPSO(const std::string& name, PSOManager* psoManager) {
 void RenderQueue::PreDraw(const std::string& psoName) {
 
     if (psoName == "ShadowMap") {
-        ModelRenderer::SetCamera(lightCameraResource_);
+        ModelRenderer::SetCamera(lightManager_.GetResource());
     } else {
         if (useDebugCamera_) {
             // デバック用のカメラを設定
             ModelRenderer::SetCamera(debugCameraResource_->GetResource());
         } else {
-            ModelRenderer::SetCamera(cameraResource_->GetResource());
+            ModelRenderer::SetCamera(mainCamera_.GetResource());   
         }
     }
 
@@ -305,7 +320,7 @@ void RenderQueue::Execute3dRequest(const Draw3dRequest& request) {
 
     case Draw3dType::Default:
     case Draw3dType::DefaultAdd:
-        ModelRenderer::DrawLight(lightResource_);
+        ModelRenderer::DrawLight(lightManager_.GetConstantBuffer());
         ModelRenderer::Draw(request.model, *request.worldTransform, request.material);
         break;
 

@@ -8,6 +8,8 @@
 #include "RenderPass/RenderPassController.h"
 #include "TLAS.h"
 #include "Camera.h"
+#include "LightManager.h"
+#include "DirectionalLight.h"
 
 namespace GameEngine {
 
@@ -32,33 +34,26 @@ namespace GameEngine {
 
     public:
 
-        void SetCamera(GpuResource* cameraResource) {
-            cameraResource_ = cameraResource;
-        }
-
         void SetCamera(Camera* camera) {
-            camera_ = camera;
+            cameraPtr_ = camera;
         }
 
         void SetDebugCamera(GpuResource* cameraResource) {
-            debugCameraResource_ = cameraResource;
-            useDebugCamera_ = true;
-            
+            debugCameraResource_ = cameraResource;  
         }
+
         void SetUseDebugCamera(const bool& useDebugCamera) {
             useDebugCamera_ = useDebugCamera;
         }
 
-        void SetLight(GpuResource* lightResource) {
-            lightResource_ = lightResource;
-        }
-
-        void SetLightCamera(ID3D12Resource* resource) {
-            lightCameraResource_ = resource;
-        }
-
         // tlasを取得
         TLAS* GetTLAS() { return &tlas_; }
+
+        // カメラリソースを取得
+        GpuResource* GetCameraResource() { return mainCamera_.GetConstantBuffer(); }
+
+        // ライトリソースを取得
+        GpuResource* GetLightResource() { return lightManager_.GetConstantBuffer(); }
 
     public:
 
@@ -101,13 +96,13 @@ namespace GameEngine {
         std::map<std::string, std::vector<Draw3dRequest>> translucentDrawQueueList_;
 
         // カメラリソース
-        GpuResource* cameraResource_ = nullptr;
         Camera mainCamera_;
-        Camera* camera_ = nullptr;
+        Camera* cameraPtr_ = nullptr;
         GpuResource* debugCameraResource_ = nullptr;
         // ライトリソース
-        GpuResource* lightResource_ = nullptr;
-        ID3D12Resource* lightCameraResource_ = nullptr;
+        LightManager lightManager_;
+        // 平行光源
+        DirectionalLight::DirectionalLightData directionalData_;
 
         // デバックカメラを使用するか
         bool useDebugCamera_ = false;

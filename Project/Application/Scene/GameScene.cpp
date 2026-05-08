@@ -134,11 +134,8 @@ void GameScene::Update() {
 }
 
 void GameScene::Draw() {
-
-	// 太陽の位置のカメラを設定
-	renderQueue_->SetLightCamera(directionLightCamera_->GetResource());
 	// 描画に使用するカメラを設定
-	renderQueue_->SetCamera(mainCamera_->GetConstantBuffer());
+	renderQueue_->SetCamera(mainCamera_.get());
 
 	//// 描画パスの管理を取得
 	//auto pass = context_->renderPassController;

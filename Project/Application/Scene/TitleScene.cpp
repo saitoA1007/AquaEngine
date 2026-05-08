@@ -28,5 +28,5 @@ void TitleScene::Update() {
 void TitleScene::Draw() {
 
 	// 描画に使用するカメラを設定
-	renderQueue_->SetCamera(mainCamera_->GetConstantBuffer());
+	renderQueue_->SetCamera(mainCamera_.get());
 }
