@@ -48,8 +48,8 @@ Texture2D<float32_t4> gTexture[] : register(t0, space1);
 StructuredBuffer<MaterialRef> gMaterialRefs[] : register(t0, space2);
 ByteAddressBuffer gBufferData[] : register(t0, space3);
 
-ConstantBuffer<Camera> gCamera : register(b1);
-cbuffer LightGroup : register(b2)
+ConstantBuffer<Camera> gCamera : register(b0);
+cbuffer LightGroup : register(b1)
 {
     DirectionalLight gDirectionalLight;
     PointLight gPointLight;
