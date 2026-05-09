@@ -525,6 +525,8 @@
     <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\StateObjectBuilder.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\RaytracingPipeline.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\TLAS.cpp" />
+    <ClCompile Include="EngineSource\Graphics\Core\BufferRefManager.cpp" />
+    <ClCompile Include="EngineSource\Graphics\Resources\BufferRefResource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1022,6 +1024,8 @@
     <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\StateObjectBuilder.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\RaytracingPipeline.h" />
     <ClInclude Include="EngineSource\Graphics\Core\TLAS.h" />
+    <ClInclude Include="EngineSource\Graphics\Core\BufferRefManager.h" />
+    <ClInclude Include="EngineSource\Graphics\Resources\BufferRefResource.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\raytracing.hlsl" />

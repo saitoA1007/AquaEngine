@@ -10,6 +10,7 @@
 #include "RenderQueue.h"
 #include "DebugRenderer.h"
 #include "RenderTextureManager.h"
+#include "BufferRefManager.h"
 
 // あとで削除するべき処理
 #include "PostProcess/CopyPSO.h"
@@ -71,6 +72,9 @@ namespace GameEngine {
         std::unique_ptr<PSOManager> psoManager_;
         // レイトレーシングの描画環境構築機能
         std::unique_ptr<RaytracingPipeline> raytracingPipeline_;
+
+        // バッファのアクセスデータ管理機能
+        std::unique_ptr<BufferRefManager> bufferRefManager_;
 
         std::unique_ptr<CopyPSO> copyPSO_;
         std::unique_ptr<BloomPSO> bloomPSO_;

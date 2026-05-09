@@ -1,6 +1,7 @@
 #include "GraphicsSubsystem.h"
 #include "GpuResource.h"
 #include "SrvResource.h"
+#include "BufferRefResource.h"
 #include "Sprite.h"
 #include "SpriteRenderer.h"
 #include "ModelRenderer.h"
@@ -33,6 +34,13 @@ void GraphicsSubsystem::Initialize() {
     // GPUリソースの静的初期化
     GpuResource::StaticInitialize(graphicsDevice_->GetDevice());
     SrvResource::StaticInitialize(graphicsDevice_->GetSrvManager());
+
+    // バッファのアクセスデータ管理機能の初期化
+    bufferRefManager_ = std::make_unique<BufferRefManager>();
+    bufferRefManager_->Initialize();
+
+    // アクセスデータ管理機能を登録する
+    BufferRefResource::StaticInitialize(bufferRefManager_.get());
 
     // レンダーテクスチャ機能を生成
     renderTextureManager_ = std::make_unique<RenderTextureManager>();

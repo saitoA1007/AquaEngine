@@ -1,29 +1,22 @@
 #pragma once
+#include "BufferRefResource.h"
 #include "StructuredBuffer.h"
+#include "BufferRefManager.h"
 
 namespace GameEngine {
-
-	// マテリアル情報へのアクセスデータ
-	struct MaterialRef {
-		uint32_t type;  // マテリアルデータのタイプ
-		uint32_t MaterialIndex = 0; // マテリアルデータの参照するハンドル
-	};
-
-	// マテリアルタイプ
-	enum class MaterialType {
-		kDefalut,
-
-		kMaxCount
-	};
 
 	/// <summary>
 	/// マテリアルを作成する構造体
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
 	template <typename T>
-	class MaterialBuffer {
+	class MaterialBuffer : public BufferRefResource {
 	public:
-		~MaterialBuffer() {}
+		~MaterialBuffer() {
+			if (isCreated_) {
+				bufferRefManager_->ReleseIndex(index_);
+			}
+		}
 
 		/// <summary>
 		/// マテリアルデータを作成
@@ -31,25 +24,29 @@ namespace GameEngine {
 		/// <param name="type">マテリアルのタイプを設定</param>
 		void Create(const uint32_t& type) {
 
-			// マテリアルへのアクセスデータを作成
-			materialRefBuffer_.Create(1,SrvHeapType::AccessData);
-
 			// マテリアルデータを作成
 			materialDataBuffer_.Create();
 
+			index_ = bufferRefManager_->AllocateIndex();
+			auto* data = bufferRefManager_->GetBufferRef(index_);
+
 			// マテリアルのsrv番号を設定
-			MaterialRef* materialRef = materialRefBuffer_.GetData();
-			materialRef->type = type; // タイプを設定
-			materialRef->MaterialIndex = materialDataBuffer_.GetSrvIndex(); // srvの番号を設定
+			data->type = type; // タイプを設定
+			data->index = materialDataBuffer_.GetSrvIndex(); // srvの番号を設定
+
+			isCreated_ = true;
 		}
+
+		// アクセス用のsrvインデックス
+		const uint32_t& GetRefIndex() const { return index_; }
 
 	public:
 		// マテリアルのデータ用
 		StructuredBuffer<T> materialDataBuffer_;
 
 	private:
+		uint32_t index_ = 0;
 
-		// マテリアルにアクセスするためのデータ保存用
-		StructuredBuffer<MaterialRef> materialRefBuffer_;
+		bool isCreated_ = false;
 	};
 }

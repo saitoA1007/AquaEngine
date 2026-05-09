@@ -82,7 +82,7 @@ namespace GameEngine {
         void SubmitDebugLine(const DebugRenderer* debugRenderer, const std::string& passName = "DefaultPass");
 
         // レイトレーシングでのモデル
-        void SubmitRaytracingModel(const Model* model, WorldTransform& worldTransform, const std::string& passName = "DefaultPass");
+        void SubmitRaytracingModel(const Model* model, WorldTransform& worldTransform,const uint32_t* materialIndex = nullptr, const std::string& passName = "RaytracingPass");
 
     private:
         ID3D12GraphicsCommandList4* commandList_ = nullptr;
@@ -94,6 +94,8 @@ namespace GameEngine {
         std::map<std::string, std::map<RenderLayer, std::unordered_map<std::string, std::vector<Draw3dRequest>>>> draw3dQueueList_;
         // 半透明の描画コマンドのスタックメモリ
         std::map<std::string, std::vector<Draw3dRequest>> translucentDrawQueueList_;
+        // レイトレーシングの描画コマンド
+        std::map<std::string,std::vector<TLASInstanceData>> raytracingDrawQueueList_;
 
         // カメラリソース
         Camera mainCamera_;
@@ -121,8 +123,6 @@ namespace GameEngine {
 
         // レイトレーシングでの最大描画数
         uint32_t maxRayInstanceNum_ = 200;
-
-        std::vector<TLASInstanceData> tlasInstanceData_;
 
     private:
         /// <summary>

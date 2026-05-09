@@ -7,7 +7,6 @@
 #include "Material.h"
 #include "TransformationMatrix.h"
 #include "AnimationData.h"
-#include "BLAS.h"
 
 namespace GameEngine {
 	
@@ -29,9 +28,7 @@ namespace GameEngine {
 		// 作成したMeshを元にBLASを作成する
 		void AddBLAS(ID3D12GraphicsCommandList4* cmdList) {
 			for (auto& mesh : meshes_) {
-				std::unique_ptr<BLAS> blas = std::make_unique<BLAS>();
-				blas->Create(cmdList,mesh->GetVertexBufferView(),mesh->GetIndexBufferView(),mesh->GetTotalVertices(),mesh->GetTotalIndices());
-				blasList_.push_back(std::move(blas));
+				mesh->CreateBLAS(cmdList);
 			}
 		}
 
@@ -124,13 +121,6 @@ namespace GameEngine {
 		SkinCluster* GetSkinCluster() { return &skinClusterBone_.value(); }
 		const SkinCluster* GetSkinClusterData() const { return &skinClusterBone_.value(); }
 
-		// BLASを取得
-		const std::vector<std::unique_ptr<BLAS>>& GetBLASList() const { return blasList_; }
-
-		// ヒットグループ
-		void SetHitGroupIndex(const uint32_t& index) { hitGroupIndex_ = index; };
-		const uint32_t& GetHitGroupIndex() const { return hitGroupIndex_; }
-
 	private:
 		Model(Model&) = delete;
 		Model& operator=(Model&) = delete;
@@ -144,11 +134,6 @@ namespace GameEngine {
 		// ボーンデータ
 		std::optional<Skeleton> skeletonBone_ = std::nullopt;
 		std::optional<SkinCluster> skinClusterBone_ = std::nullopt;
-
-		// BLAS
-		std::vector<std::unique_ptr<BLAS>> blasList_;
-		// モデルが持つHitGroupの位置。この値は登録順によって可変する
-		uint32_t hitGroupIndex_ = 0;
 
 		// Nodeのローカル行列を保持しておく変数
 		Matrix4x4 localMatrix_;

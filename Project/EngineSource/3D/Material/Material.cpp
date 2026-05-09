@@ -29,7 +29,7 @@ void Material::Initialize(const Vector4& color, const Vector3& specularColor,con
 	materialData_->isActiveShadow = false;
 
 	// マテリアルデータを作成
-	materialBuffer_.Create(static_cast<uint32_t>(MaterialType::kDefalut));
+	materialBuffer_.Create(static_cast<uint32_t>(BufferType::kDefalutMaterial));
 	auto* data = materialBuffer_.materialDataBuffer_.GetData();
 	data = materialData_;
 }

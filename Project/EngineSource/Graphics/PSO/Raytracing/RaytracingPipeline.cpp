@@ -139,7 +139,7 @@ void RaytracingPipeline::CreateShaderTable(ModelManager* modelManager, GpuResour
 
 		for (auto& [key, data] : models) {
 			for (auto& mesh : data.model->GetMeshes()) {
-				data.model->SetHitGroupIndex(hitGroupIndex);
+				mesh->SetHitGroupIndex(hitGroupIndex);
 				auto& index = mesh->GetIndexBuffer();
 				auto& vertex = mesh->GetVertexBuffer();
 

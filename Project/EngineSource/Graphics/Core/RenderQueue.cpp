@@ -100,6 +100,9 @@ void RenderQueue::Execute() {
             }
         }
 
+        // レイトレーシング描画コマンドを解放
+
+
         // 半透明描画コマンドを解放
         if (hasTranslucent) {
             auto& translucentList = translucentDrawQueueList_[passName];
@@ -306,13 +309,29 @@ void RenderQueue::SubmitDebugLine(const DebugRenderer* debugRenderer, const std:
     draw3dQueueList_[passName][request.layer][Get3dPsoName(request.type)].push_back(request);
 }
 
-void RenderQueue::SubmitRaytracingModel(const Model* model, WorldTransform& worldTransform, const std::string& passName) {
-    Draw3dRequest request;
-    request.type = Draw3dType::DebugLine;
-    request.layer = RenderLayer::Debug;
-    request.passName = passName;
-    request.model = model;
-    request.worldTransform = &worldTransform;
+void RenderQueue::SubmitRaytracingModel(const Model* model, WorldTransform& worldTransform, const uint32_t* materialIndex, const std::string& passName) {
+    // 登録
+    auto& meshes = model->GetMeshes();
+    for (auto& mesh : meshes) {
+        TLASInstanceData data;
+
+        data.blas = mesh->GetBLAS();
+        data.hitGroupIndexOffset = mesh->GetHitGroupIndex();
+
+        if (materialIndex == nullptr) {
+            // マテリアルを設定
+            const Material* drawMaterial = model->GetMaterial(mesh->GetMaterialName());
+
+            data.instanceID = drawMaterial->GetMaterialRefIndex();
+        } else {
+            data.instanceID = *materialIndex;
+        }
+
+        Matrix4x4 matrix = Transpose(worldTransform.GetWorldMatrix());
+        std::memcpy(&data.transform, &matrix, sizeof(float) * 12);
+
+        raytracingDrawQueueList_[passName].push_back(std::move(data));
+    }
 }
 
 void RenderQueue::Execute3dRequest(const Draw3dRequest& request) {

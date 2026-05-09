@@ -105,6 +105,10 @@ namespace GameEngine {
 
 		D3D12_GPU_VIRTUAL_ADDRESS GetGpuVirtualAddress() const { return constBuffer_.GetGpuVirtualAddress(); }
 		ConstantBuffer<MaterialData>* GetConstantBuffer() { return &constBuffer_; }
+
+		// マテリアルデータ参照用IDを取得
+		const uint32_t& GetMaterialRefIndex() const { return materialBuffer_.GetRefIndex(); };
+
 	private:
 
 		ConstantBuffer<MaterialData> constBuffer_;
