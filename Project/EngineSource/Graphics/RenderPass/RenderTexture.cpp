@@ -168,7 +168,7 @@ void RenderTexture::TransitionToShaderResource(ID3D12GraphicsCommandList* comman
 
 void RenderTexture::TransitionToUnorderedAccess(ID3D12GraphicsCommandList* commandList) {
 	assert((mode_ == RenderTextureMode::UavOnly || mode_ == RenderTextureMode::RtvAndUav) &&
-		"このモードは UAV 遷移をサポートしていません");
+		"このモードはUAV遷移をサポートしていません");
 
 	// 既にUAV状態
 	if (colorState_ == ColorResourceState::UnorderedAccess) { return; }

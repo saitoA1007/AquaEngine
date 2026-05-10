@@ -74,3 +74,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE SrvManager::GetCPUHandle(uint32_t index) const {
 D3D12_GPU_DESCRIPTOR_HANDLE SrvManager::GetGPUHandle(uint32_t index) const {
 	return GetGPUDescriptorHandle(srvHeap_.Get(), descriptorSizeSRV_, index);
 }
+
+const uint32_t& SrvManager::GetStartSrvIndex(const SrvHeapType& type) {
+	return ranges_[type].start;
+}

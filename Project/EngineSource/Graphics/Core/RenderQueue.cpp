@@ -3,22 +3,27 @@
 #include "ModelRenderer.h"
 #include "DebugRenderer.h"
 #include "SpriteRenderer.h"
+#include "Raytracing/RaytracingPipeline.h"
 using namespace GameEngine;
 
 RenderQueue::RenderQueue() {
 
 }
 
-void RenderQueue::Initialize(ID3D12GraphicsCommandList4* commandList, PSOManager* psoManager, RenderPassController* renderPassController) {
+void RenderQueue::Initialize(ID3D12GraphicsCommandList4* commandList, SrvManager* srvManager, PSOManager* psoManager, RenderPassController* renderPassController,
+    RaytracingPipeline* raytracingPipeline, BufferRefManager* bufferRefManager) {
     commandList_ = commandList;
     renderPassController_ = renderPassController;
+    raytracingPipeline_ = raytracingPipeline;
+    srvManager_ = srvManager;
+    bufferRefManager_ = bufferRefManager;
 
     // 影を描画するパス
     renderPassController_->AddPass("ShadowPass", RenderTextureMode::DsvOnly, 2048, 2048);
     // デフォルトで描画するパス
     renderPassController_->AddPass("DefaultPass");
     // レイトレーシングで描画するパス
-    renderPassController_->AddPass("RaytracingPass", RenderTextureMode::UavOnly);
+    renderPassController_->AddPass("RaytracingPass", RenderTextureMode::RtvAndUav);
 
     // 最終的な描画先を設定
     renderPassController_->SetSceneFinalPass("DefaultPass");
@@ -40,6 +45,9 @@ void RenderQueue::Initialize(ID3D12GraphicsCommandList4* commandList, PSOManager
 
     RegisterPSO("DefaultSprite", psoManager);
     RegisterPSO("AdditiveSprite", psoManager);
+
+    // bufferのsrvIndexのスタート位置を設定
+    bufferStartSrvIndex_ = srvManager_->GetStartSrvIndex(SrvHeapType::Buffer);
 
     // tlasを作成
     tlas_.Create(commandList_, maxRayInstanceNum_);
@@ -76,10 +84,23 @@ void RenderQueue::Execute() {
         bool hasOpaque = draw3dQueueList_.count(passName) > 0;
         bool hasTranslucent = translucentDrawQueueList_.count(passName) > 0;
         bool has2d = draw2dQueueList_.count(passName) > 0;
-        if (!hasOpaque && !hasTranslucent && !has2d) {
+        bool hasRaytracing = raytracingDrawQueueList_.count(passName) > 0;
+        if (!hasOpaque && !hasTranslucent && !has2d && !hasRaytracing) {
             renderPassController_->PrePass(passName);
             renderPassController_->PostPass(passName);
             continue;
+        }
+
+        // レイトレーシング描画コマンドを解放
+        if (hasRaytracing) {
+            // UAVに状態を変更
+            renderPassController_->SwitchToUnorderedAccess(passName);
+
+            // レイトレーシングの描画
+            DrawRaytracing();
+
+            // UAV書き込み完了
+            renderPassController_->InsertUavBarrier(passName);
         }
 
         renderPassController_->PrePass(passName);
@@ -99,9 +120,6 @@ void RenderQueue::Execute() {
                 }
             }
         }
-
-        // レイトレーシング描画コマンドを解放
-
 
         // 半透明描画コマンドを解放
         if (hasTranslucent) {
@@ -327,6 +345,9 @@ void RenderQueue::SubmitRaytracingModel(const Model* model, WorldTransform& worl
             data.instanceID = *materialIndex;
         }
 
+        if (model->IsLoad()) {
+            worldTransform.SetWVPMatrix(model->GetLocalMatrix());
+        }
         Matrix4x4 matrix = Transpose(worldTransform.GetWorldMatrix());
         std::memcpy(&data.transform, &matrix, sizeof(float) * 12);
 
@@ -391,4 +412,24 @@ void RenderQueue::Execute2dRequest(const Draw2dRequest& request) {
         assert(false && "未対応のDraw2dTypeです");
         break;
     }
+}
+
+void RenderQueue::DrawRaytracing() {
+    commandList_->SetComputeRootSignature(raytracingPipeline_->GetGlobalRootSignature());
+    // TLASのセット
+    commandList_->SetComputeRootDescriptorTable(0, tlas_.GetSrvHandleGPU());
+    // テスクチャのセット
+    commandList_->SetGraphicsRootDescriptorTable(1, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+    // BufferRefのセット
+    commandList_->SetComputeRootDescriptorTable(2, bufferRefManager_->GetSrvHandleGPU());
+    // Bufferのセット
+    commandList_->SetComputeRootDescriptorTable(3, srvManager_->GetGPUHandle(bufferStartSrvIndex_));
+    // カメラのセット
+    commandList_->SetComputeRootConstantBufferView(4, mainCamera_.GetConstantBuffer()->GetGpuVirtualAddress());
+    // ライトのセット
+    commandList_->SetComputeRootConstantBufferView(5, lightManager_.GetConstantBuffer()->GetGpuVirtualAddress());
+
+    // レイトレーシングを開始
+    commandList_->SetPipelineState1(raytracingPipeline_->GetStateObject());
+    commandList_->DispatchRays(&raytracingPipeline_->GetDispatchRayDesc());
 }

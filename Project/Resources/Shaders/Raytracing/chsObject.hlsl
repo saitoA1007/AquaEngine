@@ -78,7 +78,7 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     
     // アクセスデータを取得
     uint refHandle = InstanceID();
-    MaterialRef ref = gMaterialRefs[refHandle][0];
+    MaterialRef ref = gMaterialRefs[refHandle];
     MaterialData material = gBufferData[ref.MaterialIndex].Load<MaterialData>(0);
     
      // 拡散反射

@@ -13,7 +13,10 @@
 
 namespace GameEngine {
 
+    // 前方宣言
     class PSOManager;
+    class BufferRefManager;
+    class RaytracingPipeline;
 
     /// <summary>
     /// 溜めた描画コマンドを解放する機能
@@ -24,7 +27,8 @@ namespace GameEngine {
         ~RenderQueue() = default;
 
         // 初期化処理
-        void Initialize(ID3D12GraphicsCommandList4* commandList, PSOManager* psoManager, RenderPassController* renderPassController);
+        void Initialize(ID3D12GraphicsCommandList4* commandList, SrvManager* srvManager, PSOManager* psoManager, RenderPassController* renderPassController,
+            RaytracingPipeline* raytracingPipeline, BufferRefManager* bufferRefManager);
 
         // フレーム開始前処理
         void Begin();
@@ -87,6 +91,9 @@ namespace GameEngine {
     private:
         ID3D12GraphicsCommandList4* commandList_ = nullptr;
         RenderPassController* renderPassController_ = nullptr;
+        RaytracingPipeline* raytracingPipeline_ = nullptr;
+        SrvManager* srvManager_ = nullptr;
+        BufferRefManager* bufferRefManager_ = nullptr;
 
         // 2D描画コマンドのスタックメモリ [描画パス]->[PSO]->[描画コマンド]
         std::map<std::string, std::map<RenderLayer, std::unordered_map<std::string, std::vector<Draw2dRequest>>>> draw2dQueueList_;
@@ -124,6 +131,9 @@ namespace GameEngine {
         // レイトレーシングでの最大描画数
         uint32_t maxRayInstanceNum_ = 200;
 
+        // bufferが存在しているsrvのスタート位置
+        uint32_t bufferStartSrvIndex_ = 0;
+
     private:
         /// <summary>
         /// PSOManagerから名前を指定して動的に登録する。
@@ -152,5 +162,8 @@ namespace GameEngine {
         // 描画コマンドを解放
         void Execute3dRequest(const Draw3dRequest& request);
         void Execute2dRequest(const Draw2dRequest& request);
+
+        // レイトレーシングの描画
+        void DrawRaytracing();
     };
 }

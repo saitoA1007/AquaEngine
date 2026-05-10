@@ -26,6 +26,14 @@ namespace GameEngine {
 		// シェーダーテーブルを作成
 		void CreateShaderTable(ModelManager* modelManager, GpuResource* cameraResource, GpuResource* lightResource);
 
+	public:
+
+		const D3D12_DISPATCH_RAYS_DESC& GetDispatchRayDesc() const { return dispatchRayDesc_; }
+
+		ID3D12StateObject* GetStateObject() const { return stateObject_.Get(); }
+
+		ID3D12RootSignature* GetGlobalRootSignature() const {return rootSignatureGlobal_.Get();}
+
 	private:
 		ID3D12Device5* device_ = nullptr;
 		// srv管理機能

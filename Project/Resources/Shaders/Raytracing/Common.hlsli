@@ -45,7 +45,7 @@ struct MaterialRef
 // Global Root Signature
 RaytracingAccelerationStructure gRtScene : register(t0,space0);
 Texture2D<float32_t4> gTexture[] : register(t0, space1);
-StructuredBuffer<MaterialRef> gMaterialRefs[] : register(t0, space2);
+StructuredBuffer<MaterialRef> gMaterialRefs : register(t0, space2);
 ByteAddressBuffer gBufferData[] : register(t0, space3);
 
 ConstantBuffer<Camera> gCamera : register(b0);

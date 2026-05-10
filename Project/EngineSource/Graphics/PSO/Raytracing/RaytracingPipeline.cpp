@@ -33,7 +33,7 @@ void RaytracingPipeline::CreateGlobalRootsignature() {
 	builder.Initialize(device_);
 	builder.AddSRVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_ALL); // tlas
 	builder.AddSRVDescriptorTable(0, texMaxNum, 1, D3D12_SHADER_VISIBILITY_ALL); // テクスチャ
-	builder.AddSRVDescriptorTable(0, accessMaxNum, 2, D3D12_SHADER_VISIBILITY_ALL, texMaxNum + systemMaxNum); // アクセスデータ
+	builder.AddSRVDescriptorTable(0, accessMaxNum, 2, D3D12_SHADER_VISIBILITY_ALL); // アクセスデータ
 	builder.AddSRVDescriptorTable(0, bufferMaxNum, 3, D3D12_SHADER_VISIBILITY_ALL, texMaxNum + systemMaxNum + accessMaxNum); // マテリアルなどのデータ
 	builder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_ALL); // camera
 	builder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_ALL); // light

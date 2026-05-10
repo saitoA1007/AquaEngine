@@ -18,8 +18,8 @@ namespace GameEngine {
 	enum class SrvHeapTypeCount : uint32_t {
 		TextureMaxCount = 2048,
 		SystemMaxCount = 18,
-		AccessMaxCount = 512,
-		BufferMaxCount = AccessMaxCount,
+		AccessMaxCount = 2,
+		BufferMaxCount = 512,
 		OtherMaxCount = 1
 	};
 
