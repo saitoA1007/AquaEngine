@@ -4,11 +4,10 @@
 using namespace GameEngine;
 
 void RaytracingPipeline::Initialize(ID3D12Device5* device, SrvManager* srvManager, DXC* dxc,
-	RenderPassController* renderPassController, TLAS* tlas) {
+	RenderPassController* renderPassController) {
 	device_ = device;
 	srvManager_ = srvManager;
 	renderPassController_ = renderPassController;
-	tlas_ = tlas;
 
 	// シェーダコンパイル機能を初期化
 	rayLibShaderCompiler_.Initialize(dxc);
@@ -93,7 +92,7 @@ void RaytracingPipeline::CreateStateObject() {
 	stateObject_ = stateObjectBuilder_.Build(device_);
 }
 
-void RaytracingPipeline::CreateShaderTable(ModelManager* modelManager, GpuResource* cameraResource, GpuResource* lightResource) {
+void RaytracingPipeline::CreateShaderTable(ModelManager* modelManager) {
 
 	Microsoft::WRL::ComPtr<ID3D12StateObjectProperties> rtsoProps;
 	stateObject_.As(&rtsoProps);
@@ -107,10 +106,7 @@ void RaytracingPipeline::CreateShaderTable(ModelManager* modelManager, GpuResour
 
 		ShaderRecord record;
 		auto table = record.SetIdentifier(id);
-		table.AppendDescriptor(tlas_->GetSrvHandleGPU());
 		table.AppendDescriptor(srvManager_->GetGPUHandle(renderPassController_->GetUavIndex("RaytracingPass")));
-		table.AppendGPUAddress(cameraResource->GetGpuVirtualAddress());
-		table.AppendGPUAddress(lightResource->GetGpuVirtualAddress());
 		shaderTableBuilder_.RayGen().AddRecord(std::move(record));
 	}
 

@@ -55,7 +55,9 @@ void Engine::Initialize(HINSTANCE hInstance) {
     // 初期化をおこなう
     subsystemRegistry_.InitializeAll();
 
-    //resource_->GetModelManager();
+    // シェーダーテーブルを作成する
+    auto* rayPipeline = graphics_->GetRaytracingPipeline();
+    rayPipeline->CreateShaderTable(resource_->GetModelManager());
 
     // シーンを登録する
     SetupScenes(*scene_->GetSceneRegistry());

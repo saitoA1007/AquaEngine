@@ -4,7 +4,6 @@
 #include "ShaderTableBuilder.h"
 #include "RenderPassController.h"
 #include "SrvManager.h"
-#include "TLAS.h"
 
 namespace GameEngine {
 
@@ -21,10 +20,10 @@ namespace GameEngine {
 
 		// 初期化
 		void Initialize(ID3D12Device5* device, SrvManager* srvManager, DXC* dxc,
-			RenderPassController* renderPassController, TLAS* tlas);
+			RenderPassController* renderPassController);
 
 		// シェーダーテーブルを作成
-		void CreateShaderTable(ModelManager* modelManager, GpuResource* cameraResource, GpuResource* lightResource);
+		void CreateShaderTable(ModelManager* modelManager);
 
 	public:
 
@@ -40,7 +39,6 @@ namespace GameEngine {
 		SrvManager* srvManager_ = nullptr;
 		// 描画パス
 		RenderPassController* renderPassController_ = nullptr;
-		TLAS* tlas_ = nullptr;
 
 		// レイトレーシング用のhlslをコンパイルする機能
 		RayLibShaderCompiler rayLibShaderCompiler_;
