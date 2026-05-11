@@ -28,6 +28,7 @@ struct MaterialRef
 };
 
 // Global Root Signature
+RWTexture2D<float4> gOutput : register(u0);
 RaytracingAccelerationStructure gRtScene : register(t0,space0);
 Texture2D<float32_t4> gTexture[] : register(t0, space1);
 StructuredBuffer<MaterialRef> gBufferRefs : register(t0, space2);

@@ -17,6 +17,13 @@ void TitleScene::Initialize() {
 	mainCamera_ = std::make_unique<Camera>();
 	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720);
 	mainCamera_->Update();
+
+	// プレイヤーモデルを生成
+	model_ = modelManager_->GetNameByModel("Cube");
+	model_->SetDefaultIsEnableLight(true);
+	model_->SetDefaultIsEnableShadow(true);
+
+	world_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 }
 
 void TitleScene::Update() {
@@ -29,4 +36,6 @@ void TitleScene::Draw() {
 
 	// 描画に使用するカメラを設定
 	renderQueue_->SetCamera(mainCamera_.get());
+
+	renderQueue_->SubmitRaytracingModel(model_, world_);
 }

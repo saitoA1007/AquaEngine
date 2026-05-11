@@ -2,7 +2,6 @@
 #include "RayLibShaderCompiler.h"
 #include "StateObjectBuilder.h"
 #include "ShaderTableBuilder.h"
-#include "RenderPassController.h"
 #include "SrvManager.h"
 
 namespace GameEngine {
@@ -19,8 +18,7 @@ namespace GameEngine {
 		~RaytracingPipeline() = default;
 
 		// 初期化
-		void Initialize(ID3D12Device5* device, SrvManager* srvManager, DXC* dxc,
-			RenderPassController* renderPassController);
+		void Initialize(ID3D12Device5* device, SrvManager* srvManager, DXC* dxc);
 
 		// シェーダーテーブルを作成
 		void CreateShaderTable(ModelManager* modelManager);
@@ -37,8 +35,6 @@ namespace GameEngine {
 		ID3D12Device5* device_ = nullptr;
 		// srv管理機能
 		SrvManager* srvManager_ = nullptr;
-		// 描画パス
-		RenderPassController* renderPassController_ = nullptr;
 
 		// レイトレーシング用のhlslをコンパイルする機能
 		RayLibShaderCompiler rayLibShaderCompiler_;

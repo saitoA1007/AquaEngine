@@ -26,11 +26,12 @@ void RenderQueue::Initialize(ID3D12GraphicsCommandList4* commandList, SrvManager
     renderPassController_->AddPass("RaytracingPass", RenderTextureMode::RtvAndUav);
 
     // 最終的な描画先を設定
-    renderPassController_->SetSceneFinalPass("DefaultPass");
-    renderPassController_->SetPresentPass("DefaultPass");
+    finalPassName_ = "RaytracingPass";
+    renderPassController_->SetSceneFinalPass(finalPassName_);
+    renderPassController_->SetPresentPass(finalPassName_);
 
     // 実行順序を設定
-    RegisterPassOrder({ "ShadowPass", "DefaultPass" });
+    RegisterPassOrder({ "ShadowPass", "DefaultPass","RaytracingPass" });
 
     // PSOを登録
     RegisterPSO("Default3D", psoManager);
@@ -91,18 +92,6 @@ void RenderQueue::Execute() {
             continue;
         }
 
-        // レイトレーシング描画コマンドを解放
-        if (hasRaytracing) {
-            // UAVに状態を変更
-            renderPassController_->SwitchToUnorderedAccess(passName);
-
-            // レイトレーシングの描画
-            DrawRaytracing();
-
-            // UAV書き込み完了
-            renderPassController_->InsertUavBarrier(passName);
-        }
-
         renderPassController_->PrePass(passName);
         currentPsoName_.clear();
 
@@ -154,11 +143,27 @@ void RenderQueue::Execute() {
             }
         }
 
+        // レイトレーシング描画コマンドを解放
+        if (hasRaytracing) {
+        
+            // tlasを更新する
+            tlas_.Update(commandList_, raytracingDrawQueueList_[passName]);
+         
+            // UAVに状態を変更
+            renderPassController_->SwitchToUAV(passName);
+         
+            // レイトレーシングの描画
+            DrawRaytracing();
+         
+            // UAV書き込み完了
+            renderPassController_->InsertUavBarrier(passName);
+        }
+
         renderPassController_->PostPass(passName);
     }
 
     // 最終的に画面に出すためのパスの設定
-    renderPassController_->SetPresentPass("DefaultPass");
+    renderPassController_->SetPresentPass(finalPassName_);
 }
 
 const char* RenderQueue::Get3dPsoName(Draw3dType type) {
@@ -419,15 +424,22 @@ void RenderQueue::DrawRaytracing() {
     // TLASのセット
     commandList_->SetComputeRootDescriptorTable(0, tlas_.GetSrvHandleGPU());
     // テスクチャのセット
-    commandList_->SetGraphicsRootDescriptorTable(1, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+    commandList_->SetComputeRootDescriptorTable(1, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
     // BufferRefのセット
     commandList_->SetComputeRootDescriptorTable(2, bufferRefManager_->GetSrvHandleGPU());
     // Bufferのセット
     commandList_->SetComputeRootDescriptorTable(3, srvManager_->GetGPUHandle(bufferStartSrvIndex_));
     // カメラのセット
-    commandList_->SetComputeRootConstantBufferView(4, mainCamera_.GetConstantBuffer()->GetGpuVirtualAddress());
+    if (useDebugCamera_) {
+        commandList_->SetComputeRootConstantBufferView(4, debugCameraResource_->GetGpuVirtualAddress());
+    } else {
+        commandList_->SetComputeRootConstantBufferView(4, mainCamera_.GetConstantBuffer()->GetGpuVirtualAddress());
+    }
+
     // ライトのセット
     commandList_->SetComputeRootConstantBufferView(5, lightManager_.GetConstantBuffer()->GetGpuVirtualAddress());
+
+    commandList_->SetComputeRootDescriptorTable(6, srvManager_->GetGPUHandle(renderPassController_->GetUavIndex("RaytracingPass")));
 
     // レイトレーシングを開始
     commandList_->SetPipelineState1(raytracingPipeline_->GetStateObject());

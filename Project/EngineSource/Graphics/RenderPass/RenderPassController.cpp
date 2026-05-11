@@ -48,7 +48,7 @@ void RenderPassController::PostPass(const std::string& name) {
 	render->second->PostPass();
 }
 
-void RenderPassController::SwitchToUnorderedAccess(const std::string& name) {
+void RenderPassController::SwitchToUAV(const std::string& name) {
 	// 登録されていなければエラー
 	auto render = renderPassList_.find(name);
 	if (render == renderPassList_.end()) {

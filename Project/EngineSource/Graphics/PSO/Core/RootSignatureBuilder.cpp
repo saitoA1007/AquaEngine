@@ -131,7 +131,7 @@ void RootSignatureBuilder::SerializeAndCreate(D3D12_ROOT_SIGNATURE_FLAGS flags) 
     desc.Flags = flags;
 
     Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob, errorBlob;
-    HRESULT hr = D3D12SerializeRootSignature(&desc, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+    HRESULT hr = D3D12SerializeRootSignature(&desc, D3D_ROOT_SIGNATURE_VERSION_1_0, &signatureBlob, &errorBlob);
     if (FAILED(hr)) {
         if (errorBlob) {
             LogManager::GetInstance().Log(reinterpret_cast<const char*>(errorBlob->GetBufferPointer()));

@@ -1,7 +1,5 @@
 #include "Common.hlsli"
 
-RWTexture2D<float4> gOutput : register(u0);
-
 [shader("raygeneration")]
 void MainRayGen()
 {
@@ -21,7 +19,7 @@ void MainRayGen()
     float3 direction = mul(float4(target.xyz / target.w, 0), mtxViewInv).xyz;
     rayDesc.Direction = normalize(direction);
 
-    rayDesc.TMin = 0;
+    rayDesc.TMin = 0.001f;
     rayDesc.TMax = 100000;
 
     Payload payload;

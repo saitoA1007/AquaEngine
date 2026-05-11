@@ -52,8 +52,7 @@ void GraphicsSubsystem::Initialize() {
 
     // レイトレーシング用のパイプライン
     raytracingPipeline_ = std::make_unique<RaytracingPipeline>();
-    raytracingPipeline_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetSrvManager(), dxc_.get(),
-        renderPassController_.get());
+    raytracingPipeline_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetSrvManager(), dxc_.get());
 
     // 描画コマンド管理
     renderQueue_ = std::make_unique<RenderQueue>();

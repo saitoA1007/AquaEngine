@@ -58,4 +58,8 @@ private: // シーン機能
 
 	// メインカメラ
 	std::unique_ptr<GameEngine::Camera> mainCamera_;
+
+	GameEngine::Model* model_;
+
+	GameEngine::WorldTransform world_;
 };

@@ -1,8 +1,6 @@
 #pragma once
 #include "ShaderTable.h"
 #include <d3d12.h>
-#include <wrl.h>
-#include <stdexcept>
 #include <cassert>
 
 namespace GameEngine {

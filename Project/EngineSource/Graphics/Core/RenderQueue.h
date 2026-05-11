@@ -134,6 +134,9 @@ namespace GameEngine {
         // bufferが存在しているsrvのスタート位置
         uint32_t bufferStartSrvIndex_ = 0;
 
+        // 最終的に画面に描画させるパスの名前
+        std::string finalPassName_ = "";
+
     private:
         /// <summary>
         /// PSOManagerから名前を指定して動的に登録する。
@@ -153,6 +156,7 @@ namespace GameEngine {
             draw3dQueueList_.clear();
             translucentDrawQueueList_.clear();
             currentPsoName_.clear();
+            raytracingDrawQueueList_.clear();
         }
 
         // psoの名前を取得

@@ -8,7 +8,7 @@ void ShaderTableBuilder::Build(ID3D12Device* device) {
         assert(false && "ShaderTableBuilder: RayGen table must have exactly 1 record.");
     }
 
-    // 各テーブルのサイズをD3D12_RAYTRACING_SHADER_TABLE_BYTE_ALIGNMENT に揃える
+    // 各テーブルのサイズをD3D12_RAYTRACING_SHADER_TABLE_BYTE_ALIGNMENTに揃える
     UINT raygenSize = Align(raygenTable_.TableSize(), TABLE_ALIGN);
     UINT missSize = Align(missTable_.TableSize(), TABLE_ALIGN);
     UINT hitgroupSize = Align(hitgroupTable_.TableSize(), TABLE_ALIGN);
@@ -27,7 +27,7 @@ void ShaderTableBuilder::Build(ID3D12Device* device) {
 
     shaderTable_->Unmap(0, nullptr);
 
-    // GPU アドレスを記録しておく（DispatchRaysDesc 用）
+    // DispatchRaysDescのためにGPUアドレスを記録しておく
     D3D12_GPU_VIRTUAL_ADDRESS base = shaderTable_->GetGPUVirtualAddress();
     raygenAddr_ = base;
     missAddr_ = base + raygenSize;
@@ -51,6 +51,7 @@ D3D12_DISPATCH_RAYS_DESC ShaderTableBuilder::CreateDispatchRaysDesc(UINT width, 
     desc.HitGroupTable.SizeInBytes = hitgroupTable_.TableSize();
     desc.HitGroupTable.StrideInBytes = hitgroupTable_.RecordStride();
 
+    // 画面サイズ
     desc.Width = width;
     desc.Height = height;
     desc.Depth = 1;

@@ -70,7 +70,7 @@ void TLAS::Create(ID3D12GraphicsCommandList4* cmdList, const uint32_t& maxInstan
     cmdList->ResourceBarrier(1, &barrier);
 
     // SRVを作成
-    srvIndex_ = srvManager_->AllocateSrvIndex(SrvHeapType::Buffer);
+    srvIndex_ = srvManager_->AllocateSrvIndex(SrvHeapType::AccessData);
 
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
     srvDesc.Format = DXGI_FORMAT_UNKNOWN;

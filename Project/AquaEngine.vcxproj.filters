@@ -1028,7 +1028,6 @@
     <ClInclude Include="EngineSource\Graphics\Resources\BufferRefResource.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Resources\Shaders\raytracing.hlsl" />
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />
     <FxCompile Include="Resources\Shaders\Raytracing\Miss.hlsl" />
     <FxCompile Include="Resources\Shaders\Raytracing\chsObject.hlsl" />

@@ -3,11 +3,9 @@
 #include "EngineSource/Graphics/PSO/Core/RootSignatureBuilder.h"
 using namespace GameEngine;
 
-void RaytracingPipeline::Initialize(ID3D12Device5* device, SrvManager* srvManager, DXC* dxc,
-	RenderPassController* renderPassController) {
+void RaytracingPipeline::Initialize(ID3D12Device5* device, SrvManager* srvManager, DXC* dxc) {
 	device_ = device;
 	srvManager_ = srvManager;
-	renderPassController_ = renderPassController;
 
 	// シェーダコンパイル機能を初期化
 	rayLibShaderCompiler_.Initialize(dxc);
@@ -32,10 +30,11 @@ void RaytracingPipeline::CreateGlobalRootsignature() {
 	builder.Initialize(device_);
 	builder.AddSRVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_ALL); // tlas
 	builder.AddSRVDescriptorTable(0, texMaxNum, 1, D3D12_SHADER_VISIBILITY_ALL); // テクスチャ
-	builder.AddSRVDescriptorTable(0, accessMaxNum, 2, D3D12_SHADER_VISIBILITY_ALL); // アクセスデータ
+	builder.AddSRVDescriptorTable(0, 1, 2, D3D12_SHADER_VISIBILITY_ALL); // アクセスデータ
 	builder.AddSRVDescriptorTable(0, bufferMaxNum, 3, D3D12_SHADER_VISIBILITY_ALL, texMaxNum + systemMaxNum + accessMaxNum); // マテリアルなどのデータ
 	builder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_ALL); // camera
 	builder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_ALL); // light
+	builder.AddUAVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_ALL); // UAV gOutput
 	builder.CreateRootSignature();
 	rootSignatureGlobal_ = builder.MoveOwnerRootSignature();
 }
@@ -45,7 +44,7 @@ void RaytracingPipeline::CreateLocalRootsignature() {
 	// raygen用
 	RootSignatureBuilder raygenBuilder;
 	raygenBuilder.Initialize(device_);
-	raygenBuilder.AddUAVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
+	//raygenBuilder.AddUAVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
 	raygenBuilder.CreateRootSignature(D3D12_ROOT_SIGNATURE_FLAG_LOCAL_ROOT_SIGNATURE);
 	rsRayGen_ = raygenBuilder.MoveOwnerRootSignature();
 
@@ -106,7 +105,6 @@ void RaytracingPipeline::CreateShaderTable(ModelManager* modelManager) {
 
 		ShaderRecord record;
 		auto table = record.SetIdentifier(id);
-		table.AppendDescriptor(srvManager_->GetGPUHandle(renderPassController_->GetUavIndex("RaytracingPass")));
 		shaderTableBuilder_.RayGen().AddRecord(std::move(record));
 	}
 
