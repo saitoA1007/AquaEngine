@@ -20,4 +20,6 @@ struct alignas(16) CameraForGPU {
 	Vector3 worldPosition;
 	float pad;
 	Matrix4x4 vpMatrix;
+	Matrix4x4 mtxViewInv; // ビュー逆行列
+	Matrix4x4 mtxProjInv; // プロジェクション逆行列
 };

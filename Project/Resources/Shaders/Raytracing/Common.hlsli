@@ -13,27 +13,12 @@ struct MyAttribute
     float2 barys;
 };
 
-struct SceneCB
-{
-    matrix mtxView; // ビュー行列.
-    matrix mtxProj; // プロジェクション行列.
-    matrix mtxViewInv; // ビュー逆行列.
-    matrix mtxProjInv; // プロジェクション逆行列.
-    float4 lightDirection; // 平行光源の向き.
-    float4 lightColor; // 平行光源色.
-    float4 ambientColor; // 環境光.
-    float4 eyePosition; // 視点.
-
-    float3 pointLight; // ポイントライト.
-    uint shadowRayCount; // シャドウレイ数.
-    uint4 flags; // x: 平行光源シャドウON/OFF, y: ポイントライト位置描画
-};
-
 struct Camera
 {
     float32_t3 worldPosition;
-    matrix mtxViewInv; // ビュー逆行列
-    matrix mtxProjInv; // プロジェクション逆行列
+    float32_t4x4 vpMatrix;
+    float32_t4x4 mtxViewInv; // ビュー逆行列
+    float32_t4x4 mtxProjInv; // プロジェクション逆行列
 };
 
 struct MaterialRef
@@ -45,7 +30,7 @@ struct MaterialRef
 // Global Root Signature
 RaytracingAccelerationStructure gRtScene : register(t0,space0);
 Texture2D<float32_t4> gTexture[] : register(t0, space1);
-StructuredBuffer<MaterialRef> gMaterialRefs : register(t0, space2);
+StructuredBuffer<MaterialRef> gBufferRefs : register(t0, space2);
 ByteAddressBuffer gBufferData[] : register(t0, space3);
 
 ConstantBuffer<Camera> gCamera : register(b0);
