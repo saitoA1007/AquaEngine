@@ -76,7 +76,7 @@ void RaytracingPipeline::CreateStateObject() {
 	const uint32_t MaxPayloadSize = sizeof(float) * 3 + sizeof(uint32_t);
 	const uint32_t MaxAttributeSize = sizeof(float) * 2;
 	stateObjectBuilder_.SetShaderConfig(MaxPayloadSize, MaxAttributeSize);
-	stateObjectBuilder_.SetPipelineConfig(3);
+	stateObjectBuilder_.SetPipelineConfig(4);
 
 	// グローバルルートシグネチャを設定
 	stateObjectBuilder_.SetGlobalRootSignature(rootSignatureGlobal_.Get());

@@ -21,6 +21,9 @@ struct MaterialData {
     uint32_t textureHandle;
     float metallic;
     int32_t isActiveShadow;
+    
+    float ior;
+    float3 padding1;
 };
 
 StructuredBuffer<uint> indexBuffer : register(t0, space4);
@@ -68,10 +71,7 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     float3 viewDir = normalize(gCamera.worldPosition.xyz - worldPosition);
     
      // 裏面の法線を視線側に向け直す
-    if (dot(worldNormal, viewDir) < 0.0f)
-    {
-        worldNormal = -worldNormal;
-    }
+    if (dot(worldNormal, viewDir) < 0.0f) { worldNormal = -worldNormal;}
     
     // アクセスデータを取得
     uint refHandle = InstanceID();
@@ -81,16 +81,16 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     
     // テクスチャカラーを取得
     float4 textureColor = gTexture[material.textureHandle].SampleLevel(gSampler, vtx.texcoord, 0);
-    
-    // アルベド色
+    // アルベド色を取得
     float3 albedoColor = material.color.rgb * textureColor.rgb;
+    
     // ライティングをしない場合はアルベドの色を返す
     if (!material.enableLighting)
     {
         payload.color = albedoColor;
         return;
     }
-    
+        
     float roughness = clamp(sqrt(2.0f / (material.shininess + 2.0f)), 0.05f, 1.0f);
     // ライト
     float3 lightDir = normalize(-gDirectionalLight.direction);
@@ -104,6 +104,19 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     
     // 環境光
     float3 indirectLight = CalculateIBL(albedoColor, reflectColor, worldNormal, viewDir, material.metallic);
+    
+     // 透明度の表示
+    if (ref.type == 1)
+    {   
+        /// 屈折
+        // 屈折レイを飛ばす
+        float3 refractColor = TranslucentRefraction(vtx.position.xyz, vtx.normal, payload.recursive, material.ior);
+        // オブジェクトの色を取得
+        float3 objectColor = directLight + indirectLight;
+        
+        payload.color = lerp(refractColor, objectColor, material.color.a);
+        return;
+    }
     
     // 最終的な色を設定
     payload.color = directLight + indirectLight;

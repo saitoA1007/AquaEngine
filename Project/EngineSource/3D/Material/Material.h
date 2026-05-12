@@ -23,8 +23,9 @@ namespace GameEngine {
 			uint32_t textureHandle;
 			float metallic;
 			int32_t isActiveShadow;
+			float ior; // 屈折率
+			float padding2[3];
 		};
-		static_assert(sizeof(MaterialData) == 128);
 	public:
 		Material() = default;
 		~Material();
@@ -44,7 +45,11 @@ namespace GameEngine {
 		/// 色を設定
 		/// </summary>
 		/// <param name="color"></param>
-		void SetColor(Vector4 color) { materialData_->color = color;}
+		void SetColor(Vector4 color) {
+			materialData_->color = color;
+			// 透明度確認
+			CheackTranslucent();
+		}
 
 		/// <summary>
 		/// specularの色を設定
@@ -94,6 +99,12 @@ namespace GameEngine {
 		/// <param name="metallic"></param>
 		void SetMetallic(const float& metallic) { materialData_->metallic = metallic; }
 
+		/// <summary>
+		/// 屈折率を設定
+		/// </summary>
+		/// <param name="ior"></param>
+		void SetIOR(const float& ior) { materialData_->ior = ior; }
+
 		void SetTextureHandle(const uint32_t& tex) {materialData_->textureHandle = tex;}
 
 		const uint32_t& GetTextureHandle() const { return materialData_->textureHandle; }
@@ -109,6 +120,9 @@ namespace GameEngine {
 
 		// マテリアルデータ参照用IDを取得
 		const uint32_t& GetMaterialRefIndex() const { return materialBuffer_.GetRefIndex(); };
+
+		// 半透明であるかを確認する
+		void CheackTranslucent();
 
 	private:
 		// マテリアルデータ

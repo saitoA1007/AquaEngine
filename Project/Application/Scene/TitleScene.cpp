@@ -16,7 +16,7 @@ void TitleScene::Initialize() {
 	model_ = modelManager_->GetNameByModel("Walk");
 	model_->SetDefaultIsEnableLight(true);
 	model_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
-	world_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
+	world_.Initialize({ {2.0f,2.0f,2.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 
 	// 地面
 	model1_ = modelManager_->GetNameByModel("Terrain");
@@ -30,7 +30,7 @@ void TitleScene::Initialize() {
 	model2_ = modelManager_->GetNameByModel("Cube");
 	model2_->SetDefaultIsEnableLight(true);
 	model2_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
-	world2_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-3.0f,1.0f,0.0f} });
+	world2_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-4.0f,1.0f,0.0f} });
 
 	// 背景画像を設定
 	uint32_t skyboxGH = textureManager_->GetHandleByName("rostock_laage_airport_4k.dds");
@@ -40,7 +40,26 @@ void TitleScene::Initialize() {
 void TitleScene::Update() {
 
 	// カメラの更新処理
-	mainCamera_->Update();
+	mainCamera_->Update();	
+}
+
+void TitleScene::DebugUpdate() {
+#ifdef USE_IMGUI
+	ImGui::Begin("test");
+
+	ImGui::ColorEdit4("color", &color_.x);
+	ImGui::DragFloat("metalic",&metalic_,0.01f);
+	ImGui::DragFloat("grassMetalic",&metalic1_,0.01f);
+	ImGui::DragFloat("shininess",&shininess_);
+	ImGui::DragFloat("IOR",&ior_,0.1f);
+
+	model_->SetDefaultColor(color_);
+	model_->SetDefaultMetallic(metalic_);
+	model1_->SetDefaultMetallic(metalic1_);
+	model_->SetDefaultShininess(shininess_);
+	model_->SetDefaultIOR(ior_);
+	ImGui::End();
+#endif
 }
 
 void TitleScene::Draw() {

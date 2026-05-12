@@ -14,6 +14,7 @@ namespace GameEngine {
 	// バッファタイプ
 	enum class BufferType {
 		kDefalutMaterial,
+		kDefalutMaterialTranslucent,
 
 		kMaxCount
 	};

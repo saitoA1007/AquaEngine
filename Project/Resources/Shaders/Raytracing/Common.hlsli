@@ -76,7 +76,7 @@ float3 CalcHitAttribute3(float3 vertexAttribute[3], float2 barycentrics)
 inline bool checkRecursiveLimit(inout Payload payload)
 {
     payload.recursive++;
-    if (payload.recursive >= 3)
+    if (payload.recursive >= 4)
     {
         // 背景画像を返す
         payload.color = gBackgroundTexture.SampleLevel(
@@ -86,7 +86,7 @@ inline bool checkRecursiveLimit(inout Payload payload)
     return false;
 }
 
-// 反射
+// 反射関数
 float3 Reflection(float3 vertexPosition, float3 vertexNormal, int recursive)
 {
     float3 worldPos = mul(float4(vertexPosition, 1), ObjectToWorld4x3());
@@ -116,5 +116,61 @@ float3 Reflection(float3 vertexPosition, float3 vertexNormal, int recursive)
         rayDesc,
         reflectPayload);
     return reflectPayload.color;
+}
+
+// 透明度表現で使用する屈折関数
+float3 TranslucentRefraction(float3 vertexPosition, float3 vertexNormal, int recursive, float ior)
+{
+    float4x3 mtx = ObjectToWorld4x3();
+    float3 worldPos = mul(float4(vertexPosition, 1), mtx);
+    float3 worldNormal = mul(vertexNormal, (float3x3) mtx);
+    float3 worldRayDir = normalize(WorldRayDirection());
+    worldNormal = normalize(worldNormal);
+
+    float nr = dot(worldNormal, worldRayDir);
+    float3 refracted;
+    if (nr < 0)
+    {
+        // 表面. 空気中 -> 屈折媒質.
+        float eta = 1.0 / ior;
+        refracted = refract(worldRayDir, worldNormal, eta);
+    }
+    else
+    {
+        // 裏面. 屈折媒質 -> 空気中.
+        float eta = ior / 1.0;
+        refracted = refract(worldRayDir, -worldNormal, eta);
+    }
+
+    if (length(refracted) < 0.01)
+    {
+        return Reflection(vertexPosition, vertexNormal, recursive);
+    }
+    else
+    {
+        // 裏面をスキップ
+        RAY_FLAG flags = RAY_FLAG_CULL_BACK_FACING_TRIANGLES;
+        uint rayMask = 0xFF;
+
+        RayDesc rayDesc;
+        rayDesc.Origin = worldPos;
+        rayDesc.Direction = refracted;
+        rayDesc.TMin = 0.001f;
+        rayDesc.TMax = 100000;
+
+        Payload refractPayload;
+        refractPayload.color = float3(0, 0, 0);
+        refractPayload.recursive = recursive;
+        TraceRay(
+            gRtScene,
+            flags,
+            rayMask,
+            0, // ray index
+            1, // MultiplierForGeometryContrib
+            0, // miss index
+            rayDesc,
+            refractPayload);
+        return refractPayload.color;
+    }
 }
 #endif
