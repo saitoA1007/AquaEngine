@@ -3,7 +3,7 @@
 #include "ModelRenderer.h"
 #include "DebugRenderer.h"
 #include "SpriteRenderer.h"
-#include "Raytracing/RaytracingPipeline.h"
+#include "RaytracingPipeline.h"
 using namespace GameEngine;
 
 RenderQueue::RenderQueue() {

@@ -100,6 +100,20 @@ namespace GameEngine {
 		void SetDefaultTextureHandle(const uint32_t& handle, const std::string& materialName = "default");
 
 		/// <summary>
+		/// デフォルトの反射率を設定
+		/// </summary>
+		/// <param name="metallic"></param>
+		/// <param name="materialName"></param>
+		void SetDefaultMetallic(const float& metallic, const std::string& materialName = "default");
+
+		/// <summary>
+		/// デフォルトの屈折率を設定
+		/// </summary>
+		/// <param name="ior"></param>
+		/// <param name="materialName"></param>
+		void SetDefaultIOR(const float& ior, const std::string& materialName = "default");
+
+		/// <summary>
 		/// モデルの名前を取得
 		/// </summary>
 		/// <returns></returns>

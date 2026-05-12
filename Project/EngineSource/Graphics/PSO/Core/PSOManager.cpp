@@ -323,8 +323,8 @@ void PSOManager::DefaultLoadPSO() {
     // デフォルトの3Dオブジェクト用PSO
     CreatePSOData default3D;
     default3D.rootSigName = "Default3D";
-    default3D.vsPath = L"Resources/Shaders/Object3d.VS.hlsl";
-    default3D.psPath = L"Resources/Shaders/Object3d.PS.hlsl";
+    default3D.vsPath = L"Resources/Shaders/Rasterize/Object3d.VS.hlsl";
+    default3D.psPath = L"Resources/Shaders/Rasterize/Object3d.PS.hlsl";
     default3D.drawMode = DrawModel::FillFront;
     default3D.blendMode = BlendMode::kBlendModeNormal;
     default3D.isDepthEnable = true;
@@ -351,8 +351,8 @@ void PSOManager::DefaultLoadPSO() {
     // デフォルトのスプライト用PSO
     CreatePSOData defaultSprite;
     defaultSprite.rootSigName = "Default2D";
-    defaultSprite.vsPath = L"Resources/Shaders/Sprite.VS.hlsl";
-    defaultSprite.psPath = L"Resources/Shaders/Sprite.PS.hlsl";
+    defaultSprite.vsPath = L"Resources/Shaders/Rasterize/Sprite.VS.hlsl";
+    defaultSprite.psPath = L"Resources/Shaders/Rasterize/Sprite.PS.hlsl";
     defaultSprite.drawMode = DrawModel::None;
     defaultSprite.blendMode = BlendMode::kBlendModeNormal;
     defaultSprite.isDepthEnable = false;
@@ -371,8 +371,8 @@ void PSOManager::DefaultLoadPSO() {
     // インスタンシング描画用PSO
     CreatePSOData instancing3D;
     instancing3D.rootSigName = "Instancing3D";
-    instancing3D.vsPath = L"Resources/Shaders/Particle.VS.hlsl";
-    instancing3D.psPath = L"Resources/Shaders/Particle.PS.hlsl";
+    instancing3D.vsPath = L"Resources/Shaders/Rasterize/Particle.VS.hlsl";
+    instancing3D.psPath = L"Resources/Shaders/Rasterize/Particle.PS.hlsl";
     instancing3D.drawMode = DrawModel::FillFront;
     instancing3D.blendMode = BlendMode::kBlendModeNormal;
     instancing3D.isDepthEnable = true;
@@ -393,8 +393,8 @@ void PSOManager::DefaultLoadPSO() {
     // グリッド描画用のPSO
     CreatePSOData grid;
     grid.rootSigName = "Grid";
-    grid.vsPath = L"Resources/Shaders/Grid.VS.hlsl";
-    grid.psPath = L"Resources/Shaders/Grid.PS.hlsl";
+    grid.vsPath = L"Resources/Shaders/Rasterize/Grid.VS.hlsl";
+    grid.psPath = L"Resources/Shaders/Rasterize/Grid.PS.hlsl";
     grid.drawMode = DrawModel::None;
     grid.blendMode = BlendMode::kBlendModeNormal;
     grid.isDepthEnable = true;
@@ -410,8 +410,8 @@ void PSOManager::DefaultLoadPSO() {
     // デバックライン描画用のPSO
     CreatePSOData line;
     line.rootSigName = "Line";
-    line.vsPath = L"Resources/Shaders/Primitive.VS.hlsl";
-    line.psPath = L"Resources/Shaders/Primitive.PS.hlsl";
+    line.vsPath = L"Resources/Shaders/Rasterize/Primitive.VS.hlsl";
+    line.psPath = L"Resources/Shaders/Rasterize/Primitive.PS.hlsl";
     line.drawMode = DrawModel::None;
     line.blendMode = BlendMode::kBlendModeNormal;
     line.isDepthEnable = true;
@@ -427,8 +427,8 @@ void PSOManager::DefaultLoadPSO() {
     // アニメーション描画用のPSO
     CreatePSOData animation;
     animation.rootSigName = "Animation";
-    animation.vsPath = L"Resources/Shaders/SkinningObject3d.VS.hlsl";
-    animation.psPath = L"Resources/Shaders/Object3d.PS.hlsl";
+    animation.vsPath = L"Resources/Shaders/Rasterize/SkinningObject3d.VS.hlsl";
+    animation.psPath = L"Resources/Shaders/Rasterize/Object3d.PS.hlsl";
     animation.drawMode = DrawModel::FillFront;
     animation.blendMode = BlendMode::kBlendModeNormal;
     animation.isDepthEnable = true;
@@ -452,8 +452,8 @@ void PSOManager::DefaultLoadPSO() {
     // skyboxのpso設定
     CreatePSOData skybox;
     skybox.rootSigName = "Skybox";
-    skybox.vsPath = L"Resources/Shaders/Skybox.VS.hlsl";
-    skybox.psPath = L"Resources/Shaders/Skybox.PS.hlsl";
+    skybox.vsPath = L"Resources/Shaders/Rasterize/Skybox.VS.hlsl";
+    skybox.psPath = L"Resources/Shaders/Rasterize/Skybox.PS.hlsl";
     skybox.drawMode = DrawModel::FillFront;
     skybox.blendMode = BlendMode::kBlendModeNormal;
     skybox.isDepthEnable = true;
@@ -473,7 +473,7 @@ void PSOManager::DefaultLoadPSO() {
     // ShadowMap用のPSO設定
     CreatePSOData shadowMap;
     shadowMap.rootSigName = "ShadowMap";
-    shadowMap.vsPath = L"Resources/Shaders/ShadowMap.VS.hlsl";
+    shadowMap.vsPath = L"Resources/Shaders/Rasterize/ShadowMap.VS.hlsl";
     shadowMap.blendMode = BlendMode::kBlendModeNormal;
     RootSignatureBuilder shadowMapRootSigBuilder;
     shadowMapRootSigBuilder.Initialize(device_);

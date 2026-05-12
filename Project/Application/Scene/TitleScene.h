@@ -26,7 +26,7 @@ public:
 	/// <summary>
 	/// デバック時、処理して良いものを更新する
 	/// </summary>
-	void DebugUpdate() override{}
+	void DebugUpdate() override;
 
 	/// <summary>
 	/// 描画処理
@@ -67,4 +67,10 @@ private: // シーン機能
 
 	GameEngine::Model* model2_;
 	GameEngine::WorldTransform world2_;
+	
+	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
+	float metalic_ = 0.01f;
+	float metalic1_ = 0.01f;
+	float shininess_ = 500.0f;
+	float ior_ = 1.0f;
 };

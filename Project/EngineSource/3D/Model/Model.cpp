@@ -72,6 +72,22 @@ void Model::SetDefaultTextureHandle(const uint32_t& handle, const std::string& m
 	material->SetTextureHandle(handle);
 }
 
+void  Model::SetDefaultMetallic(const float& metallic, const std::string& materialName) {
+	auto it = materialName == "default" ? materials_.begin() : materials_.find(materialName);
+
+	assert(it != materials_.end() && "Material not found");
+	Material* material = it->second.get();
+	material->SetMetallic(metallic);
+}
+
+void Model::SetDefaultIOR(const float& ior, const std::string& materialName) {
+	auto it = materialName == "default" ? materials_.begin() : materials_.find(materialName);
+
+	assert(it != materials_.end() && "Material not found");
+	Material* material = it->second.get();
+	material->SetIOR(ior);
+}
+
 Material* Model::GetMaterial(const std::string& name) const {
 	auto it = materials_.find(name);
 	if (it != materials_.end()) {

@@ -27,8 +27,18 @@ void Material::Initialize(const Vector4& color, const Vector3& specularColor,con
 	materialData_->metallic = 0.01f;
 	// 影の適応
 	materialData_->isActiveShadow = false;
+	// 屈折率
+	materialData_->ior = 1.0f;
 }
 
 void Material::SetUVTransform(Transform uvTransform) {
 	materialData_->uvTransform = MakeAffineMatrix(uvTransform.scale, uvTransform.rotate, uvTransform.translate);
+}
+
+void Material::CheackTranslucent() {
+	if (materialData_->color.w != 1.0f) {
+		materialBuffer_.SetBufferType(static_cast<uint32_t>(BufferType::kDefalutMaterialTranslucent));
+	} else {
+		materialBuffer_.SetBufferType(static_cast<uint32_t>(BufferType::kDefalutMaterial));
+	}	
 }
