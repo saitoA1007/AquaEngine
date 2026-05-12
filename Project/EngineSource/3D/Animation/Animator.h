@@ -67,7 +67,7 @@ namespace GameEngine {
 
 		// 使用するモデルデータ
 		SkinCluster* skinCluster_ = nullptr;
-		Skeleton* skeleton_ = nullptr;
+		SkeletonData* skeleton_ = nullptr;
 
 		// 時間
 		float timer_ = 0.0f;
@@ -89,10 +89,10 @@ namespace GameEngine {
 		/// <param name="skeleton"></param>
 		/// <param name="animation"></param>
 		/// <param name="animationTime"></param>
-		static void ApplyAnimation(Skeleton& skeleton, const AnimationData& animation, float animationTime);
+		static void ApplyAnimation(SkeletonData& skeleton, const AnimationData& animation, float animationTime);
 
-		void SkeletonUpdate(Skeleton& skeleton);
+		void SkeletonUpdate(SkeletonData& skeleton);
 
-		void SkinClusterUpdate(SkinCluster& skinCluster, const Skeleton& skeleton);
+		void SkinClusterUpdate(SkinCluster& skinCluster, const SkeletonData& skeleton);
 	};
 }

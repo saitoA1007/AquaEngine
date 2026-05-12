@@ -126,7 +126,7 @@ std::unique_ptr<Model> ModelLoader::CreateModel(const std::string& objFilename, 
 	if (modelData.isAnimation_) {
 		LogManager::GetInstance().Log(objFilename + " : Load animationData");
 		// ボーン情報を取得する
-		Skeleton skeletonBone = CreateSkeleton(modelData.rootNode);
+		SkeletonData skeletonBone = CreateSkeleton(modelData.rootNode);
 		SkinCluster skinClusterBone = CreateSkinCluster(skeletonBone, modelData);
 
 		model->SetSkeletonData(skeletonBone, skinClusterBone);
@@ -139,9 +139,9 @@ std::unique_ptr<Model> ModelLoader::CreateModel(const std::string& objFilename, 
 
 
 [[nodiscard]]
-Skeleton ModelLoader::CreateSkeleton(const Node& rootNode) {
+SkeletonData ModelLoader::CreateSkeleton(const Node& rootNode) {
 
-	Skeleton skeleton;
+	SkeletonData skeleton;
 	skeleton.root = CreateJoint(rootNode, {}, skeleton.joints);
 
 	// 名前とindexのマッピングを行いアクセスしやすくする
@@ -456,7 +456,7 @@ int32_t ModelLoader::CreateJoint(const Node& node, const std::optional<int32_t>&
 
 
 [[nodiscard]]
-SkinCluster ModelLoader::CreateSkinCluster(const Skeleton& skeleton, const ModelData& modelData) {
+SkinCluster ModelLoader::CreateSkinCluster(const SkeletonData& skeleton, const ModelData& modelData) {
 
 	assert(!skeleton.joints.empty() && "Skeleton joints are empty!");
 	assert(!modelData.meshes.empty() && "Model has no meshes!");

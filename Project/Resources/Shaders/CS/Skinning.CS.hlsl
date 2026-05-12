@@ -1,4 +1,5 @@
 
+// 頂点情報
 struct VertexData
 {
     float4 position;
@@ -12,9 +13,10 @@ struct VertexInfluence
     int4 index;
 };
 
+// スキニングに利用する情報
 struct SkinningInformation
 {
-    uint numVertices;
+    uint numVertices; // 処理する頂点数
 };
 
 struct Well

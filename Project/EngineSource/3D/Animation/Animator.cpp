@@ -1,4 +1,4 @@
-#include"Animator.h"
+#include "Animator.h"
 #include <cassert>
 #include <algorithm>
 #include "MyMath.h"
@@ -83,7 +83,7 @@ Quaternion Animator::CalculateValue(const std::vector<KeyframeQuaternion>& keyfr
 	return (*keyframes.rbegin()).value;
 }
 
-void Animator::ApplyAnimation(Skeleton& skeleton, const AnimationData& animation, float animationTime) {
+void Animator::ApplyAnimation(SkeletonData& skeleton, const AnimationData& animation, float animationTime) {
 	for (Joint& joint : skeleton.joints) {
 		// 対象のJointのAnimationがあれば、値の適応を行う。
 		if (auto it = animation.nodeAnimations.find(joint.name); it != animation.nodeAnimations.end()) {
@@ -95,7 +95,7 @@ void Animator::ApplyAnimation(Skeleton& skeleton, const AnimationData& animation
 	}
 }
 
-void Animator::SkeletonUpdate(Skeleton& skeleton) {
+void Animator::SkeletonUpdate(SkeletonData& skeleton) {
 	// すべてのJointを更新。
 	for (Joint& joint : skeleton.joints) {
 		joint.localMatrix = MakeAffineMatrix(joint.transform.scale, joint.transform.rotate, joint.transform.translate);
@@ -107,7 +107,7 @@ void Animator::SkeletonUpdate(Skeleton& skeleton) {
 	}
 }
 
-void Animator::SkinClusterUpdate(SkinCluster& skinCluster, const Skeleton& skeleton) {
+void Animator::SkinClusterUpdate(SkinCluster& skinCluster, const SkeletonData& skeleton) {
 	for (size_t jointIndex = 0; jointIndex < skeleton.joints.size(); ++jointIndex) {
 		assert(jointIndex < skinCluster.inverseBindPoseMatrices.size());
 		skinCluster.mappedPalette[jointIndex].skeletonSpaceMatrix = skinCluster.inverseBindPoseMatrices[jointIndex] * skeleton.joints[jointIndex].skeletonSpaceMatrix;

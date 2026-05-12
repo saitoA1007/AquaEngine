@@ -40,7 +40,7 @@ namespace GameEngine {
 		}
 
 		// ボーンデータを追加
-		void SetSkeletonData(Skeleton skeletonBone, SkinCluster skinClusterBone) {
+		void SetSkeletonData(SkeletonData skeletonBone, SkinCluster skinClusterBone) {
 			isSkeleton_ = true;
 			skeletonBone_ = skeletonBone;
 			skinClusterBone_ = skinClusterBone;
@@ -131,7 +131,7 @@ namespace GameEngine {
 		const bool IsSkeleton() const { return isSkeleton_; }
 
 		// ボーンデータ
-		Skeleton* GetSkeleton() { return &skeletonBone_.value(); }
+		SkeletonData* GetSkeleton() { return &skeletonBone_.value(); }
 		SkinCluster* GetSkinCluster() { return &skinClusterBone_.value(); }
 		const SkinCluster* GetSkinClusterData() const { return &skinClusterBone_.value(); }
 
@@ -146,7 +146,7 @@ namespace GameEngine {
 		std::unordered_map<std::string, std::unique_ptr<Material>> materials_;
 
 		// ボーンデータ
-		std::optional<Skeleton> skeletonBone_ = std::nullopt;
+		std::optional<SkeletonData> skeletonBone_ = std::nullopt;
 		std::optional<SkinCluster> skinClusterBone_ = std::nullopt;
 
 		// Nodeのローカル行列を保持しておく変数

@@ -65,7 +65,7 @@ namespace GameEngine {
         /// スケルトンを生成
         /// </summary>
         [[nodiscard]]
-        Skeleton CreateSkeleton(const Node& rootNode);
+        SkeletonData CreateSkeleton(const Node& rootNode);
 
     private:
         ModelLoader(const ModelLoader&) = delete;
@@ -109,6 +109,6 @@ namespace GameEngine {
         int32_t CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints);
 
         [[nodiscard]]
-        SkinCluster CreateSkinCluster(const Skeleton& skeleton, const ModelData& modelData);
+        SkinCluster CreateSkinCluster(const SkeletonData& skeleton, const ModelData& modelData);
 	};
 }
