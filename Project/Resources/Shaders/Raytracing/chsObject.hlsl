@@ -1,4 +1,5 @@
 #include "Common.hlsli"
+#include"../LightElement.hlsli"
 
 struct VertexData {
     float4 position;
@@ -48,26 +49,6 @@ VertexData GetHitVertex(MyAttribute attrib) {
     return v;
 }
 
-// Lambert拡散反射
-inline float3 CalcDiffuse(float3 normal, float3 lightDir, float3 lightColor, float3 albedo) 
-{  
-    float NdotL = dot(normal, lightDir);
-    float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-    float3 diffuse = albedo * lightColor * cos;
-    return diffuse;
-}
-
-// Blinn-Phong鏡面反射
-inline float3 CalcSpecular(float3 normal, float3 lightDir, float3 viewDir,
-    float3 lightColor, float3 specularColor, float shininess)
-{  
-    float3 halfVector = normalize(lightDir + viewDir);
-    float NDotH = dot(normal, halfVector);
-    float specularPow = pow(saturate(NDotH), shininess);
-    float3 specular = lightColor * specularPow * specularColor;
-    return specular;
-}
-
 [shader("closesthit")]
 void MainObjectCHS(inout Payload payload, MyAttribute attrib) {    
     if (checkRecursiveLimit(payload))
@@ -86,6 +67,12 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     // 視線ベクトル
     float3 viewDir = normalize(gCamera.worldPosition.xyz - worldPosition);
     
+     // 裏面の法線を視線側に向け直す
+    if (dot(worldNormal, viewDir) < 0.0f)
+    {
+        worldNormal = -worldNormal;
+    }
+    
     // アクセスデータを取得
     uint refHandle = InstanceID();
     MaterialRef ref = gBufferRefs[refHandle];
@@ -95,27 +82,22 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     // テクスチャカラーを取得
     float4 textureColor = gTexture[material.textureHandle].SampleLevel(gSampler, vtx.texcoord, 0);
     
-    // 色を取得
+    // 色
     float3 albedoColor = material.color.rgb * textureColor.rgb;
+    float roughness = clamp(sqrt(2.0f / (material.shininess + 2.0f)), 0.05f, 1.0f);
+    // ライト
     float3 lightDir = normalize(-gDirectionalLight.direction);
     float3 lightColor = gDirectionalLight.color.xyz * gDirectionalLight.intensity;
-     // 拡散反射
-    float3 diffuse = CalcDiffuse(worldNormal, lightDir, lightColor, albedoColor);
-    // 鏡面反射
-    float3 specular = CalcSpecular(worldNormal, lightDir, viewDir,
-       lightColor, material.specularColor.rgb, material.shininess);
+    
+    // 平行光源
+    float3 directLight = CalculatePBR(albedoColor, worldNormal, viewDir, lightDir, lightColor, roughness, material.metallic);
     
     // 反射レイを飛ばして反射色を取得
     float3 reflectColor = Reflection(vtx.position.xyz, vtx.normal, payload.recursive);
-
-    // Schlick近似によるFresnel係数
-    float3 shadingNormal = dot(worldNormal, viewDir) < 0.0f ? -worldNormal : worldNormal;
-    float cosTheta = saturate(dot(shadingNormal, viewDir));
-    float3 F0 = lerp(float3(0.04, 0.04, 0.04), albedoColor, material.metallic);
-    float3 fresnel = F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
-    // 反射色を取得
-    float3 tintedReflect = reflectColor * lerp(float3(1, 1, 1), albedoColor, material.metallic);
     
-     // 最終的な色を設定
-    payload.color = lerp(diffuse + specular, tintedReflect, fresnel);
+    // 環境光
+    float3 indirectLight = CalculateIBL(albedoColor, reflectColor, worldNormal, viewDir, material.metallic);
+    
+    // 最終的な色を設定
+    payload.color = directLight + indirectLight;
 }
