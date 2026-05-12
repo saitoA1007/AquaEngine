@@ -82,8 +82,15 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     // テクスチャカラーを取得
     float4 textureColor = gTexture[material.textureHandle].SampleLevel(gSampler, vtx.texcoord, 0);
     
-    // 色
+    // アルベド色
     float3 albedoColor = material.color.rgb * textureColor.rgb;
+    // ライティングをしない場合はアルベドの色を返す
+    if (!material.enableLighting)
+    {
+        payload.color = albedoColor;
+        return;
+    }
+    
     float roughness = clamp(sqrt(2.0f / (material.shininess + 2.0f)), 0.05f, 1.0f);
     // ライト
     float3 lightDir = normalize(-gDirectionalLight.direction);
