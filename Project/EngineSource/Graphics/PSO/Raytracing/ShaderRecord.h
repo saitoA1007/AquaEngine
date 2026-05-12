@@ -3,7 +3,7 @@
 #include <vector>
 #include <wrl.h>
 #include <cstring>
-#include <stdexcept>
+#include <cassert>
 
 namespace GameEngine {
 
@@ -52,8 +52,7 @@ namespace GameEngine {
 
         void AppendRaw(const void* src, size_t size) {
             if (data_.size() < D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES) {
-                throw std::logic_error(
-                    "ShaderRecord: Call SetIdentifier() before appending data.");
+                assert(false && "ShaderRecord: Call SetIdentifier() before appending data");
             }
             const auto* bytes = reinterpret_cast<const uint8_t*>(src);
             data_.insert(data_.end(), bytes, bytes + size);

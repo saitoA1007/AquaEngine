@@ -40,10 +40,6 @@ void Mesh::CreateGridPlaneMesh(const Vector2& size) {
 	// 右下
 	vertices[3].position = { right,0.0f,bottom,1.0f }; // 左上
 
-	// 頂点データを作成
-	vertexBuffer_.Create(vertices);
-
-
 	// インデックスデータを生成
 	std::vector<uint32_t> indices(6);
 	// 三角形
@@ -51,7 +47,10 @@ void Mesh::CreateGridPlaneMesh(const Vector2& size) {
 	// 三角形2
 	indices[3] = 1;  indices[4] = 3;  indices[5] = 2;
 
+	// インデックスデータを作成
 	indexBuffer_.Create(indices);
+	// 頂点データを作成
+	vertexBuffer_.Create(vertices);
 }
 
 void Mesh::CreatePlaneMesh(const Vector2& size) {
@@ -80,9 +79,6 @@ void Mesh::CreatePlaneMesh(const Vector2& size) {
 	vertices[3].texcoord = { 0.0f,0.0f };
 	vertices[3].normal = { 0.0f,0.0f,-1.0f };
 
-	// 頂点データを作成
-	vertexBuffer_.Create(vertices);
-
 	// インデックスデータを生成
 	std::vector<uint32_t> indices(6);
 
@@ -91,7 +87,10 @@ void Mesh::CreatePlaneMesh(const Vector2& size) {
 	// 三角形2
 	indices[3] = 1;  indices[4] = 3;  indices[5] = 2;
 
+	// インデックスデータを作成
 	indexBuffer_.Create(indices);
+	// 頂点データを作成
+	vertexBuffer_.Create(vertices);
 }
 
 void Mesh::CreateSphereMesh(uint32_t subdivision) {
@@ -116,8 +115,6 @@ void Mesh::CreateSphereMesh(uint32_t subdivision) {
 		}
 	}
 
-	vertexBuffer_.Create(vertices);
-
 	// インデックス生成
 	std::vector<uint32_t> indices;
 	for (uint32_t latIndex = 0; latIndex < subdivision; ++latIndex) {
@@ -130,7 +127,10 @@ void Mesh::CreateSphereMesh(uint32_t subdivision) {
 		}
 	}
 
+	// インデックスデータを作成
 	indexBuffer_.Create(indices);
+	// 頂点データを作成
+	vertexBuffer_.Create(vertices);
 }
 
 void Mesh::CreateModelMesh(ModelData modelData, const uint32_t& index) {
@@ -141,8 +141,10 @@ void Mesh::CreateModelMesh(ModelData modelData, const uint32_t& index) {
 	const auto& meshData = modelData.meshes[index];
 	materialName_ = meshData.materialName;
 
-	vertexBuffer_.Create(meshData.vertices);
+	// インデックスデータを作成
 	indexBuffer_.Create(meshData.indices);
+	// 頂点データを作成
+	vertexBuffer_.Create(meshData.vertices);
 }
 
 void Mesh::CreateBLAS(ID3D12GraphicsCommandList4* cmdList) {

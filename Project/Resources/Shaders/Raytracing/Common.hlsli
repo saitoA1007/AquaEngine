@@ -76,7 +76,7 @@ inline bool checkRecursiveLimit(inout Payload payload)
     payload.recursive++;
     if (payload.recursive > 3)
     {
-        payload.color = float3(0, 0, 0);
+        payload.color = float3(0, 1, 1);
         return true;
     }
     return false;

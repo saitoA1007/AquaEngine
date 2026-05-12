@@ -435,7 +435,6 @@ void RenderQueue::DrawRaytracing() {
     } else {
         commandList_->SetComputeRootConstantBufferView(4, mainCamera_.GetConstantBuffer()->GetGpuVirtualAddress());
     }
-
     // ライトのセット
     commandList_->SetComputeRootConstantBufferView(5, lightManager_.GetConstantBuffer()->GetGpuVirtualAddress());
 

@@ -19,11 +19,20 @@ void TitleScene::Initialize() {
 	mainCamera_->Update();
 
 	// プレイヤーモデルを生成
-	model_ = modelManager_->GetNameByModel("Cube");
+	model_ = modelManager_->GetNameByModel("Walk");
 	model_->SetDefaultIsEnableLight(true);
 	model_->SetDefaultIsEnableShadow(true);
+	model_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
 
 	world_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
+
+	model1_ = modelManager_->GetNameByModel("Terrain");
+	model1_->SetDefaultIsEnableLight(true);
+	model1_->SetDefaultIsEnableShadow(true);
+	model1_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
+	uint32_t grassGH = textureManager_->GetHandleByName("grass.png");
+	model1_->SetDefaultTextureHandle(grassGH);
+	world1_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,-1.0f,0.0f} });
 }
 
 void TitleScene::Update() {
@@ -38,4 +47,6 @@ void TitleScene::Draw() {
 	renderQueue_->SetCamera(mainCamera_.get());
 
 	renderQueue_->SubmitRaytracingModel(model_, world_);
+
+	renderQueue_->SubmitRaytracingModel(model1_, world1_);
 }

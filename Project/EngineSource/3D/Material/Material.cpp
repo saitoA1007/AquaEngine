@@ -18,7 +18,7 @@ void Material::Initialize(const Vector4& color, const Vector3& specularColor,con
 	// UVTransform行列を初期化
 	materialData_->uvTransform = MakeIdentity4x4();
 	// specularの色を設定
-	materialData_->specularColor = specularColor;
+	materialData_->specularColor = Vector4(specularColor.x, specularColor.y, specularColor.z, 1);
 	// 輝度を設定
 	materialData_->shininess = shininess;
 	// テクスチャデータ
@@ -30,8 +30,9 @@ void Material::Initialize(const Vector4& color, const Vector3& specularColor,con
 
 	// マテリアルデータを作成
 	materialBuffer_.Create(static_cast<uint32_t>(BufferType::kDefalutMaterial));
-	auto* data = materialBuffer_.materialDataBuffer_.GetData();
-	data = materialData_;
+	tmpmaterialData_ = materialBuffer_.GetData();
+	MaterialData tmp = *materialData_;
+	*tmpmaterialData_ = tmp;
 }
 
 void Material::SetUVTransform(Transform uvTransform) {

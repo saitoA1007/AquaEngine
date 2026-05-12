@@ -1,16 +1,21 @@
 #include "Common.hlsli"
 
 struct VertexData {
-    float4 position : POSITION0;
-    float2 texcoord : TEXCOORD0;
-    float3 normal : NORMAL0;
+    float4 position;
+    float2 texcoord;
+    float3 normal;
 };
 
 struct MaterialData {
-    float32_t4 color;
-    int32_t enableLighting;
-    float32_t4x4 uvTransform;
-    float32_t3 specularColor;
+    float4 color;
+    
+    int enableLighting;
+    float3 padding0;
+    
+    float4x4 uvTransform;
+    
+    float4 specularColor;
+    
     float shininess;
     uint32_t textureHandle;
     float metallic;
@@ -35,7 +40,7 @@ VertexData GetHitVertex(MyAttribute attrib) {
         texcoords[i] = vertexBuffer[index].texcoord;
     }
     
-    VertexData v;
+    VertexData v = (VertexData) 0;
     v.position.xyz = CalcHitAttribute3(positions, attrib.barys);
     v.position.w = 1.0f;
     v.texcoord = CalcHitAttribute2(texcoords, attrib.barys);
@@ -46,32 +51,38 @@ VertexData GetHitVertex(MyAttribute attrib) {
 
 // Lambert拡散反射
 inline float3 CalcDiffuse(float3 normal, float3 lightDir, float3 lightColor, float3 albedo) 
-{
-    float dotNL = saturate(dot(normal, lightDir));
-    return dotNL * lightColor * albedo;
+{  
+    float NdotL = dot(normal, lightDir);
+    float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
+    float3 diffuse = albedo * lightColor * cos;
+    return diffuse;
 }
 
-// Phong鏡面反射
+// Blinn-Phong鏡面反射
 inline float3 CalcSpecular(float3 normal, float3 lightDir, float3 viewDir,
-    float3 lightColor, float3 specularColor, float specularPower)
-{
-    float3 reflectDir = reflect(-lightDir, normal);
-    float dotRV = saturate(dot(reflectDir, viewDir));
-    return pow(dotRV, specularPower) * lightColor * specularColor;
+    float3 lightColor, float3 specularColor, float shininess)
+{  
+    float3 halfVector = normalize(lightDir + viewDir);
+    float NDotH = dot(normal, halfVector);
+    float specularPow = pow(saturate(NDotH), shininess);
+    float3 specular = lightColor * specularPow * specularColor;
+    return specular;
 }
 
 [shader("closesthit")]
-void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
+void MainObjectCHS(inout Payload payload, MyAttribute attrib) {    
     if (checkRecursiveLimit(payload))
     {
         return;
     }
     
+    // 頂点データを取得する
     VertexData vtx = GetHitVertex(attrib);
-
+    
     // ワールド空間に変換
     float3 worldPosition = mul(vtx.position, ObjectToWorld4x3());
-    float3 worldNormal = mul(vtx.normal, (float3x3) ObjectToWorld4x3());
+    float3 worldNormal = mul(vtx.normal, (float3x3)ObjectToWorld4x3());
+    worldNormal = normalize(worldNormal);
     
     // 視線ベクトル
     float3 viewDir = normalize(gCamera.worldPosition.xyz - worldPosition);
@@ -79,15 +90,22 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     // アクセスデータを取得
     uint refHandle = InstanceID();
     MaterialRef ref = gBufferRefs[refHandle];
+    // マテリアルデータを取得
     MaterialData material = gBufferData[ref.MaterialIndex].Load<MaterialData>(0);
     
-     // 拡散反射
-    float3 diffuse = CalcDiffuse(worldNormal, gDirectionalLight.direction, gDirectionalLight.color.xyz, material.color.xyz);
+    // テクスチャカラーを取得
+    float4 textureColor = gTexture[material.textureHandle].SampleLevel(gSampler, vtx.texcoord, 0);
     
+    // 色を取得
+    float3 albedoColor = material.color.rgb * textureColor.rgb;
+    float3 lightDir = normalize(-gDirectionalLight.direction);
+    float3 lightColor = gDirectionalLight.color.xyz * gDirectionalLight.intensity;
+     // 拡散反射
+    float3 diffuse = CalcDiffuse(worldNormal, lightDir, lightColor, albedoColor);
     // 鏡面反射
-    float3 specular = CalcSpecular(worldNormal, gDirectionalLight.direction, viewDir,
-        gDirectionalLight.color.xyz, material.specularColor,material.shininess);
+    float3 specular = CalcSpecular(worldNormal, lightDir, viewDir,
+       lightColor, material.specularColor.rgb, material.shininess);
 
     // 最終的な色を設定
-    payload.color = diffuse + specular;
+    payload.color = diffuse + specular; 
 }

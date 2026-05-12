@@ -12,17 +12,20 @@ namespace GameEngine {
 	public:
 		struct alignas(16) MaterialData {
 			Vector4 color;
+
 			int32_t enableLighting;
 			float padding[3];
+
 			Matrix4x4 uvTransform;
-			Vector3 specularColor;
+
+			Vector4 specularColor;
+
 			float shininess;
 			uint32_t textureHandle;
 			float metallic;
 			int32_t isActiveShadow;
-			float padding2;
 		};
-
+		static_assert(sizeof(MaterialData) == 128);
 	public:
 		Material() = default;
 		~Material();
@@ -42,13 +45,15 @@ namespace GameEngine {
 		/// 色を設定
 		/// </summary>
 		/// <param name="color"></param>
-		void SetColor(Vector4 color) { materialData_->color = color; }
+		void SetColor(Vector4 color) { materialData_->color = color;
+		tmpmaterialData_->color = color;
+		}
 
 		/// <summary>
 		/// specularの色を設定
 		/// </summary>
 		/// <param name="specularColor"></param>
-		void SetSpecularColor(Vector3 specularColor) { materialData_->specularColor = specularColor; }
+		void SetSpecularColor(Vector3 specularColor) { materialData_->specularColor = Vector4(specularColor.x, specularColor.y, specularColor.z,1); }
 
 		/// <summary>
 		/// 透明度を設定
@@ -92,7 +97,10 @@ namespace GameEngine {
 		/// <param name="metallic"></param>
 		void SetMetallic(const float& metallic) { materialData_->metallic = metallic; }
 
-		void SetTextureHandle(const uint32_t& tex) { materialData_->textureHandle = tex; }
+		void SetTextureHandle(const uint32_t& tex) {
+			materialData_->textureHandle = tex;
+			tmpmaterialData_->textureHandle = tex;
+		}
 
 		const uint32_t& GetTextureHandle() const { return materialData_->textureHandle; }
 
@@ -116,6 +124,8 @@ namespace GameEngine {
 
 		// マテリアルにデータを書き込む
 		MaterialData* materialData_ = nullptr;
+
+		MaterialData* tmpmaterialData_ = nullptr;
 
 		// テクスチャ情報
 		uint32_t defaultTextureHandle_ = 0;

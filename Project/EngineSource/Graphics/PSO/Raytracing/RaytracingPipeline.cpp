@@ -22,8 +22,6 @@ void RaytracingPipeline::CreateGlobalRootsignature() {
 
 	// tlasの設定、カメラ、ライトの設定、マテリアルアクセスデータ、バッファデータの設定
 	uint32_t texMaxNum = static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount); // テクスチャ
-	uint32_t systemMaxNum = static_cast<uint32_t>(SrvHeapTypeCount::SystemMaxCount); // ポストエフェクト
-	uint32_t accessMaxNum = static_cast<uint32_t>(SrvHeapTypeCount::AccessMaxCount); // アクセスデータ
 	uint32_t bufferMaxNum = static_cast<uint32_t>(SrvHeapTypeCount::BufferMaxCount); // データ
 
 	RootSignatureBuilder builder;
@@ -31,7 +29,7 @@ void RaytracingPipeline::CreateGlobalRootsignature() {
 	builder.AddSRVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_ALL); // tlas
 	builder.AddSRVDescriptorTable(0, texMaxNum, 1, D3D12_SHADER_VISIBILITY_ALL); // テクスチャ
 	builder.AddSRVDescriptorTable(0, 1, 2, D3D12_SHADER_VISIBILITY_ALL); // アクセスデータ
-	builder.AddSRVDescriptorTable(0, bufferMaxNum, 3, D3D12_SHADER_VISIBILITY_ALL, texMaxNum + systemMaxNum + accessMaxNum); // マテリアルなどのデータ
+	builder.AddSRVDescriptorTable(0, bufferMaxNum, 3, D3D12_SHADER_VISIBILITY_ALL); // マテリアルなどのデータ
 	builder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_ALL); // camera
 	builder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_ALL); // light
 	builder.AddUAVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_ALL); // UAV gOutput
@@ -44,7 +42,6 @@ void RaytracingPipeline::CreateLocalRootsignature() {
 	// raygen用
 	RootSignatureBuilder raygenBuilder;
 	raygenBuilder.Initialize(device_);
-	//raygenBuilder.AddUAVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
 	raygenBuilder.CreateRootSignature(D3D12_ROOT_SIGNATURE_FLAG_LOCAL_ROOT_SIGNATURE);
 	rsRayGen_ = raygenBuilder.MoveOwnerRootSignature();
 
@@ -138,7 +135,7 @@ void RaytracingPipeline::CreateShaderTable(ModelManager* modelManager) {
 				auto& vertex = mesh->GetVertexBuffer();
 
 				ShaderRecord record;
-				auto table = record.SetIdentifier(id);
+				auto& table = record.SetIdentifier(id);
 				table.AppendDescriptor(index.GetSrvGpuHandle());
 				table.AppendDescriptor(vertex.GetSrvGpuHandle());
 
