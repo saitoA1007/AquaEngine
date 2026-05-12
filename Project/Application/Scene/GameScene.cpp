@@ -10,11 +10,8 @@ GameScene::~GameScene() {
 }
 
 void GameScene::Initialize() {
-	// ゲームシーンに必要な低レイヤー機能
-#pragma region SceneSystem
 
-#pragma endregion
-
+	// 入力コマンド設定
 	InputRegisterCommand();
 
 	// メインカメラの初期化
