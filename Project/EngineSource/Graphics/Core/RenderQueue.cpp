@@ -437,8 +437,10 @@ void RenderQueue::DrawRaytracing() {
     }
     // ライトのセット
     commandList_->SetComputeRootConstantBufferView(5, lightManager_.GetConstantBuffer()->GetGpuVirtualAddress());
-
+    // 出力画像を設定
     commandList_->SetComputeRootDescriptorTable(6, srvManager_->GetGPUHandle(renderPassController_->GetUavIndex("RaytracingPass")));
+    // 背景画像
+    commandList_->SetComputeRootDescriptorTable(7, srvManager_->GetGPUHandle(skyboxTextureIndex_));
 
     // レイトレーシングを開始
     commandList_->SetPipelineState1(raytracingPipeline_->GetStateObject());

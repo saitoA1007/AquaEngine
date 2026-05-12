@@ -64,4 +64,7 @@ private: // シーン機能
 
 	GameEngine::Model* model1_;
 	GameEngine::WorldTransform world1_;
+
+	GameEngine::Model* model2_;
+	GameEngine::WorldTransform world2_;
 };

@@ -33,6 +33,8 @@ void RaytracingPipeline::CreateGlobalRootsignature() {
 	builder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_ALL); // camera
 	builder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_ALL); // light
 	builder.AddUAVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_ALL); // UAV gOutput
+	builder.AddSRVDescriptorTable(1, 1, 0, D3D12_SHADER_VISIBILITY_ALL); // skybox
+	builder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_ALL);
 	builder.CreateRootSignature();
 	rootSignatureGlobal_ = builder.MoveOwnerRootSignature();
 }
@@ -50,7 +52,6 @@ void RaytracingPipeline::CreateLocalRootsignature() {
 	objectBuilder.Initialize(device_);
 	objectBuilder.AddSRVDescriptorTable(0, 1, 4, D3D12_SHADER_VISIBILITY_ALL);
 	objectBuilder.AddSRVDescriptorTable(1, 1, 4, D3D12_SHADER_VISIBILITY_ALL);
-	objectBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_ALL);
 	objectBuilder.CreateRootSignature(D3D12_ROOT_SIGNATURE_FLAG_LOCAL_ROOT_SIGNATURE);
 	rsModel_ = objectBuilder.MoveOwnerRootSignature();
 }

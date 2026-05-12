@@ -1,7 +1,6 @@
 #pragma once
 #include <d3d12.h>
 #include <vector>
-#include <wrl.h>
 #include <cstring>
 #include <cassert>
 
@@ -17,30 +16,19 @@ namespace GameEngine {
         }
 
         // GPUディスクリプターハンドルを末尾に追記する
-        ShaderRecord& AppendDescriptor(D3D12_GPU_DESCRIPTOR_HANDLE handle) {
+        void AppendDescriptor(D3D12_GPU_DESCRIPTOR_HANDLE handle) {
             AppendRaw(&handle, sizeof(handle));
-            return *this;
         }
 
         // GPU仮想アドレスを末尾に追記する
-        ShaderRecord& AppendGPUAddress(D3D12_GPU_VIRTUAL_ADDRESS address) {
+        void AppendGPUAddress(D3D12_GPU_VIRTUAL_ADDRESS address) {
             AppendRaw(&address, sizeof(address));
-            return *this;
-        }
-
-        // ComPtr<ID3D12Resource>からGPUアドレスを追記するショートカット
-        ShaderRecord& AppendGPUAddress(
-            const Microsoft::WRL::ComPtr<ID3D12Resource>& resource)
-        {
-            D3D12_GPU_VIRTUAL_ADDRESS addr = resource->GetGPUVirtualAddress();
-            return AppendGPUAddress(addr);
         }
 
         // 定数などのデータを追記する
         template<class T>
-        ShaderRecord& AppendData(const T& value) {
+        void AppendData(const T& value) {
             AppendRaw(&value, sizeof(T));
-            return *this;
         }
 
         // レコードの生バイト列を取得する

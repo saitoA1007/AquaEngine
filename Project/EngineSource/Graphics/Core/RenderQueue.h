@@ -59,6 +59,11 @@ namespace GameEngine {
         // ライトリソースを取得
         GpuResource* GetLightResource() { return lightManager_.GetConstantBuffer(); }
 
+        // 背景画像ハンドルを設定する
+        void SetSkyboxTexture(const uint32_t& texture) {
+            skyboxTextureIndex_ = texture;
+        }
+
     public:
 
         // 画像描画
@@ -112,6 +117,8 @@ namespace GameEngine {
         LightManager lightManager_;
         // 平行光源
         DirectionalLight::DirectionalLightData directionalData_;
+        // 背景画像ハンドル
+        uint32_t skyboxTextureIndex_ = 0;
 
         // デバックカメラを使用するか
         bool useDebugCamera_ = false;

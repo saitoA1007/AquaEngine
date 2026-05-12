@@ -24,7 +24,6 @@ struct MaterialData {
 
 StructuredBuffer<uint> indexBuffer : register(t0, space4);
 StructuredBuffer<VertexData> vertexBuffer : register(t1, space4);
-SamplerState gSampler : register(s0);
 
 VertexData GetHitVertex(MyAttribute attrib) {
     uint start = PrimitiveIndex() * 3;
@@ -105,7 +104,18 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     // 鏡面反射
     float3 specular = CalcSpecular(worldNormal, lightDir, viewDir,
        lightColor, material.specularColor.rgb, material.shininess);
+    
+    // 反射レイを飛ばして反射色を取得
+    float3 reflectColor = Reflection(vtx.position.xyz, vtx.normal, payload.recursive);
 
-    // 最終的な色を設定
-    payload.color = diffuse + specular; 
+    // Schlick近似によるFresnel係数
+    float3 shadingNormal = dot(worldNormal, viewDir) < 0.0f ? -worldNormal : worldNormal;
+    float cosTheta = saturate(dot(shadingNormal, viewDir));
+    float3 F0 = lerp(float3(0.04, 0.04, 0.04), albedoColor, material.metallic);
+    float3 fresnel = F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+    // 反射色を取得
+    float3 tintedReflect = reflectColor * lerp(float3(1, 1, 1), albedoColor, material.metallic);
+    
+     // 最終的な色を設定
+    payload.color = lerp(diffuse + specular, tintedReflect, fresnel);
 }

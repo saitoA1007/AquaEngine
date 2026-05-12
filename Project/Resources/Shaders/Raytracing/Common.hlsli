@@ -29,10 +29,12 @@ struct MaterialRef
 
 // Global Root Signature
 RWTexture2D<float4> gOutput : register(u0);
-RaytracingAccelerationStructure gRtScene : register(t0,space0);
+RaytracingAccelerationStructure gRtScene : register(t0, space0);
 Texture2D<float32_t4> gTexture[] : register(t0, space1);
 StructuredBuffer<MaterialRef> gBufferRefs : register(t0, space2);
 ByteAddressBuffer gBufferData[] : register(t0, space3);
+TextureCube<float4> gBackgroundTexture : register(t1, space0);
+SamplerState gSampler : register(s0);
 
 ConstantBuffer<Camera> gCamera : register(b0);
 cbuffer LightGroup : register(b1)
@@ -74,11 +76,45 @@ float3 CalcHitAttribute3(float3 vertexAttribute[3], float2 barycentrics)
 inline bool checkRecursiveLimit(inout Payload payload)
 {
     payload.recursive++;
-    if (payload.recursive > 3)
+    if (payload.recursive >= 3)
     {
-        payload.color = float3(0, 1, 1);
+        // 背景画像を返す
+        payload.color = gBackgroundTexture.SampleLevel(
+            gSampler, WorldRayDirection(), 0.0).rgb;
         return true;
     }
     return false;
+}
+
+// 反射
+float3 Reflection(float3 vertexPosition, float3 vertexNormal, int recursive)
+{
+    float3 worldPos = mul(float4(vertexPosition, 1), ObjectToWorld4x3());
+    float3 worldNormal = mul(vertexNormal, (float3x3) ObjectToWorld4x3());
+    float3 worldRayDir = WorldRayDirection();
+    float3 reflectDir = reflect(worldRayDir, worldNormal);
+
+    RAY_FLAG flags = RAY_FLAG_NONE;
+    uint rayMask = 0xFF;
+
+    RayDesc rayDesc;
+    rayDesc.Origin = worldPos;
+    rayDesc.Direction = reflectDir;
+    rayDesc.TMin = 0.001f;
+    rayDesc.TMax = 100000;
+
+    Payload reflectPayload;
+    reflectPayload.color = float3(0, 0, 0);
+    reflectPayload.recursive = recursive;
+    TraceRay(
+        gRtScene,
+        flags,
+        rayMask,
+        0, // ray index
+        1, // MultiplierForGeometryContrib
+        0, // miss index
+        rayDesc,
+        reflectPayload);
+    return reflectPayload.color;
 }
 #endif
