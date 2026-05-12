@@ -1,5 +1,5 @@
 #include "Common.hlsli"
-#include"../LightElement.hlsli"
+#include "../LightElement.hlsli"
 
 struct VertexData {
     float4 position;

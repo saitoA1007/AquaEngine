@@ -1,6 +1,6 @@
 #ifndef COMMON_HLSLI
 #define COMMON_HLSLI
-#include"../LightElement.hlsli"
+#include "../LightElement.hlsli"
 
 struct Payload
 {

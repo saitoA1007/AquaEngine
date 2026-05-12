@@ -1,5 +1,5 @@
-#include"Object3d.hlsli"
-#include"LightElement.hlsli"
+#include "Object3d.hlsli"
+#include "../LightElement.hlsli"
 
 struct Material
 {

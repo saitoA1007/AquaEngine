@@ -354,9 +354,6 @@
     <ClCompile Include="EngineSource\Graphics\Buffers\BLAS.cpp">
       <Filter>EngineSource\Graphics\Buffers</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Graphics\ComputePSO\ParticleCSPSO.cpp">
-      <Filter>EngineSource\Graphics\ComputePSO</Filter>
-    </ClCompile>
     <ClCompile Include="EngineSource\Graphics\Core\DXC.cpp">
       <Filter>EngineSource\Graphics\Core</Filter>
     </ClCompile>
@@ -411,19 +408,19 @@
     <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectManager.cpp">
       <Filter>EngineSource\Graphics\PostProcess</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Graphics\PSO\Core\BlendBuilder.cpp">
+    <ClCompile Include="EngineSource\Graphics\PSO\Rasterize\BlendBuilder.cpp">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Graphics\PSO\Core\InputLayoutBuilder.cpp">
+    <ClCompile Include="EngineSource\Graphics\PSO\Rasterize\InputLayoutBuilder.cpp">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\Graphics\PSO\Core\PSOManager.cpp">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Graphics\PSO\Core\RasterizerBuilder.cpp">
+    <ClCompile Include="EngineSource\Graphics\PSO\Rasterize\RasterizerBuilder.cpp">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Graphics\PSO\Core\ShaderCompiler.cpp">
+    <ClCompile Include="EngineSource\Graphics\PSO\Rasterize\ShaderCompiler.cpp">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\BloomPSO.cpp">
@@ -523,7 +520,7 @@
     <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\RayLibShaderCompiler.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\ShaderTableBuilder.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\StateObjectBuilder.cpp" />
-    <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\RaytracingPipeline.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Core\RaytracingPipeline.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\TLAS.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\BufferRefManager.cpp" />
     <ClCompile Include="EngineSource\Graphics\Resources\BufferRefResource.cpp" />
@@ -790,9 +787,6 @@
     <ClInclude Include="EngineSource\Graphics\Buffers\VertexBuffer.h">
       <Filter>EngineSource\Graphics\Buffers</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Graphics\ComputePSO\ParticleCSPSO.h">
-      <Filter>EngineSource\Graphics\ComputePSO</Filter>
-    </ClInclude>
     <ClInclude Include="EngineSource\Graphics\Core\DescriptorCounts.h">
       <Filter>EngineSource\Graphics\Core</Filter>
     </ClInclude>
@@ -856,7 +850,7 @@
     <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectManager.h">
       <Filter>EngineSource\Graphics\PostProcess</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Graphics\PSO\Core\BlendBuilder.h">
+    <ClInclude Include="EngineSource\Graphics\PSO\Rasterize\BlendBuilder.h">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Graphics\PSO\Core\BlendMode.h">
@@ -865,16 +859,16 @@
     <ClInclude Include="EngineSource\Graphics\PSO\Core\DrawPSOData.h">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Graphics\PSO\Core\InputLayoutBuilder.h">
+    <ClInclude Include="EngineSource\Graphics\PSO\Rasterize\InputLayoutBuilder.h">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Graphics\PSO\Core\PSOManager.h">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Graphics\PSO\Core\RasterizerBuilder.h">
+    <ClInclude Include="EngineSource\Graphics\PSO\Rasterize\RasterizerBuilder.h">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Graphics\PSO\Core\ShaderCompiler.h">
+    <ClInclude Include="EngineSource\Graphics\PSO\Rasterize\ShaderCompiler.h">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\BloomPSO.h">
@@ -1022,7 +1016,7 @@
     <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderTable.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderTableBuilder.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\StateObjectBuilder.h" />
-    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\RaytracingPipeline.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Core\RaytracingPipeline.h" />
     <ClInclude Include="EngineSource\Graphics\Core\TLAS.h" />
     <ClInclude Include="EngineSource\Graphics\Core\BufferRefManager.h" />
     <ClInclude Include="EngineSource\Graphics\Resources\BufferRefResource.h" />

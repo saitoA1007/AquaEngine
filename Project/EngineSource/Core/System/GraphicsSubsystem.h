@@ -15,7 +15,7 @@
 // あとで削除するべき処理
 #include "PostProcess/CopyPSO.h"
 #include "PostProcess/BloomPSO.h"
-#include "Raytracing/RaytracingPipeline.h"
+#include "RaytracingPipeline.h"
 
 namespace GameEngine {
 
