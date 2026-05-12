@@ -90,7 +90,8 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
         payload.color = albedoColor;
         return;
     }
-        
+     
+    // 粗さを求める
     float roughness = clamp(sqrt(2.0f / (material.shininess + 2.0f)), 0.05f, 1.0f);
     // ライト
     float3 lightDir = normalize(-gDirectionalLight.direction);

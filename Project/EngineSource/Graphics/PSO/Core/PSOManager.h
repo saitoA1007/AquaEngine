@@ -10,8 +10,6 @@
 #include "ShaderCompiler.h"
 #include "RootSignatureBuilder.h"
 #include "InputLayoutBuilder.h"
-
-// 本来は外から持ってくるもの達
 #include "RasterizerBuilder.h"
 #include "BlendBuilder.h"
 
@@ -25,12 +23,6 @@ using json = nlohmann::json;
 
 namespace GameEngine {
 
-	//// 描画する際に必要なデータを送る
-	//struct DrawPsoData {
-	//	ID3D12RootSignature* rootSignature;
-	//	ID3D12PipelineState* graphicsPipelineState;
-	//};
-
 	class PSOManager {
 	public:
 
@@ -39,6 +31,7 @@ namespace GameEngine {
 			std::string rootSigName = "default";  // 使用するルートシグネチャの名前
 			std::wstring vsPath = L"vsPath"; // 頂点シェーダーのパス
 			std::wstring psPath = L"psPath"; // ピクセルシェーダーのパス
+			std::wstring csPath = L"csPath"; // コンピュートシェーダーのパス
 			DrawModel drawMode = DrawModel::FillFront; // 描画モード
 			BlendMode blendMode = BlendMode::kBlendModeNormal; // ブレンドモード
 			bool isDepthEnable = true; // 深度の使用
@@ -46,9 +39,9 @@ namespace GameEngine {
 			D3D12_PRIMITIVE_TOPOLOGY_TYPE primitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE; // 描画タイプ
 		};
 
-		// グラフィックスパイプラインのデータ
+		// パイプラインのデータ
 		struct PSOData {
-			Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState;
+			Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState;
 			std::string rootSigName = "default"; // 関連するルートシグネチャ
 		};
 
@@ -78,6 +71,14 @@ namespace GameEngine {
 		/// <param name="rootSignature"></param>
 		/// <param name="inputLayout"></param>
 		void RegisterPSO(const std::string& name, const CreatePSOData& psoData,RootSignatureBuilder* rootSignature, InputLayoutBuilder* inputLayout);
+
+		/// <summary>
+		/// コンピュートのPSOを登録する(手動生成)
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="psoData"></param>
+		/// <param name="rootSignature"></param>
+		void RegisterComputePSO(const std::string& name, const CreatePSOData& psoData,RootSignatureBuilder* rootSignature);
 
 		/// <summary>
 		/// シャドウマップ専用のPSO(後で一つにまとめる)

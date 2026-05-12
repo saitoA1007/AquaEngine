@@ -90,7 +90,55 @@ void PSOManager::RegisterPSO(const std::string& name, const CreatePSOData& psoDa
     pso.rootSigName = psoData.rootSigName;
 
     // 実際に生成
-    HRESULT hr = device_->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&pso.graphicsPipelineState));
+    HRESULT hr = device_->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&pso.pipelineState));
+    assert(SUCCEEDED(hr));
+
+    // PSOを保存
+    psoList_[name] = pso;
+
+    LogManager::GetInstance().Log("PSO registerd name : " + name);
+}
+
+void PSOManager::RegisterComputePSO(const std::string& name, const CreatePSOData& psoData, RootSignatureBuilder* rootSignature) {
+
+    // 既に登録されていたら飛ばす
+    if (psoList_.find(name) != psoList_.end()) {
+        return;
+    }
+
+    // シェーダーをコンパイル
+    LogManager::GetInstance().Log("Compiling compute shader");
+    Microsoft::WRL::ComPtr<IDxcBlob> csBlob = shaderCompiler_.CompileShader(ShaderCompiler::Type::Cs, psoData.csPath);
+
+    if (!csBlob) {
+        LogManager::GetInstance().Log("Shader compilation failed for: " + name);
+        return;
+    }
+
+    // ルートシグネチャが登録されていなければ生成する
+    if (rootSignatureList_.find(psoData.rootSigName) == rootSignatureList_.end()) {
+        RootSignatureData rootSignatureData;
+        rootSignatureData.rootSignature = rootSignature->GetRootSignature();
+        rootSignatureData.parameterTypes = rootSignature->GetParameterTypes();
+        // RootSignatureを保存
+        rootSignatureList_[psoData.rootSigName] = rootSignatureData;
+    }
+
+    // コンピュートパイプラインを設定
+    D3D12_COMPUTE_PIPELINE_STATE_DESC computePipelineStateDesc{};
+    computePipelineStateDesc.CS = {
+        .pShaderBytecode = csBlob->GetBufferPointer(),
+        .BytecodeLength = csBlob->GetBufferSize(),
+    };
+    computePipelineStateDesc.pRootSignature = rootSignatureList_[psoData.rootSigName].rootSignature.Get();
+
+    // PSOの生成
+    PSOData pso;
+    // リンクするルートシグネチャを保存
+    pso.rootSigName = psoData.rootSigName;
+
+    // 生成
+    HRESULT hr = device_->CreateComputePipelineState(&computePipelineStateDesc, IID_PPV_ARGS(&pso.pipelineState));
     assert(SUCCEEDED(hr));
 
     // PSOを保存
@@ -160,7 +208,7 @@ void PSOManager::RegisterShadowMapPSO(const std::string& name, const CreatePSODa
     pso.rootSigName = psoData.rootSigName;
 
     // 実際に生成
-    HRESULT hr = device_->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&pso.graphicsPipelineState));
+    HRESULT hr = device_->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&pso.pipelineState));
     assert(SUCCEEDED(hr));
 
     // PSOを保存
@@ -267,7 +315,7 @@ void PSOManager::CreatePSO(const std::string& psoName, const CreatePSOData& psoD
     pso.rootSigName = psoData.rootSigName;
 
     // 実際に生成
-    HRESULT hr = device_->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&pso.graphicsPipelineState));
+    HRESULT hr = device_->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&pso.pipelineState));
     assert(SUCCEEDED(hr));
 
     // PSOを保存
@@ -290,7 +338,7 @@ ID3D12RootSignature* PSOManager::GetRootSignature(const std::string& name) {
 ID3D12PipelineState* PSOManager::GetPSO(const std::string& name) {
 	auto it = psoList_.find(name);
 	if (it != psoList_.end()) {
-		return it->second.graphicsPipelineState.Get();
+		return it->second.pipelineState.Get();
 	}
 
 	LogManager::GetInstance().Log("PSO not found: " + name);
@@ -312,7 +360,7 @@ DrawPsoData PSOManager::GetDrawPsoData(const std::string& PsoName) const {
 
     DrawPsoData drawData;
     drawData.rootSignature = root->second.rootSignature.Get();
-    drawData.graphicsPipelineState = pso->second.graphicsPipelineState.Get();
+    drawData.graphicsPipelineState = pso->second.pipelineState.Get();
     return drawData;
 }
 
@@ -481,6 +529,20 @@ void PSOManager::DefaultLoadPSO() {
     shadowMapRootSigBuilder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_VERTEX);
     shadowMapRootSigBuilder.CreateRootSignature();
     RegisterShadowMapPSO("ShadowMap", shadowMap, &shadowMapRootSigBuilder, &inputLayoutBuilder);
+
+    // アニメーション用のコンピュートPSO設定
+    CreatePSOData computeAnimation;
+    computeAnimation.rootSigName = "ComputeAnimation";
+    computeAnimation.csPath = L"Resources/Shaders/CS/Skinning.CS.hlsl";
+    RootSignatureBuilder animationCsRs;
+    animationCsRs.Initialize(device_);
+    animationCsRs.AddSRVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
+    animationCsRs.AddSRVDescriptorTable(1, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
+    animationCsRs.AddSRVDescriptorTable(2, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
+    animationCsRs.AddUAVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
+    animationCsRs.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_ALL);
+    animationCsRs.CreateRootSignature();
+    RegisterComputePSO("ComputeAnimation", computeAnimation, &animationCsRs);
 
     LogManager::GetInstance().Log("Default PSOs loaded");
 }
