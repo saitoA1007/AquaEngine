@@ -36,15 +36,15 @@ void ModelComponent::Draw(RenderQueue* renderQueue, const Draw3dType& drawType, 
 	switch (drawType)
 	{
 	case GameEngine::Draw3dType::Default:
-		renderQueue->SubmitModel(model_, worldTransform_,color_.w, defaultMaterial_.GetConstantBuffer(), passName);
+		renderQueue->SubmitModel(model_, worldTransform_,color_.w, &defaultMaterial_.GetMaterialBuffer(), passName);
 		break;
 
 	case GameEngine::Draw3dType::DefaultAdd:
-		renderQueue->SubmitModel(model_, worldTransform_, color_.w, defaultMaterial_.GetConstantBuffer(), passName);
+		renderQueue->SubmitModel(model_, worldTransform_, color_.w, &defaultMaterial_.GetMaterialBuffer(), passName);
 		break;
 
 	case GameEngine::Draw3dType::Animation:
-		renderQueue->SubmitAnimation(model_, worldTransform_, color_.w, defaultMaterial_.GetConstantBuffer(), passName);
+		renderQueue->SubmitAnimation(model_, worldTransform_, color_.w, &defaultMaterial_.GetMaterialBuffer(), passName);
 		break;
 
 	case GameEngine::Draw3dType::ShadowMap:

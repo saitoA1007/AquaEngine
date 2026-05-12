@@ -3,7 +3,6 @@
 #include "Vector3.h"
 #include "Matrix4x4.h"
 #include "Transform.h"
-#include "ConstantBuffer.h"
 #include "MaterialBuffer.h"
 
 namespace GameEngine {
@@ -45,9 +44,7 @@ namespace GameEngine {
 		/// 色を設定
 		/// </summary>
 		/// <param name="color"></param>
-		void SetColor(Vector4 color) { materialData_->color = color;
-		tmpmaterialData_->color = color;
-		}
+		void SetColor(Vector4 color) { materialData_->color = color;}
 
 		/// <summary>
 		/// specularの色を設定
@@ -97,10 +94,7 @@ namespace GameEngine {
 		/// <param name="metallic"></param>
 		void SetMetallic(const float& metallic) { materialData_->metallic = metallic; }
 
-		void SetTextureHandle(const uint32_t& tex) {
-			materialData_->textureHandle = tex;
-			tmpmaterialData_->textureHandle = tex;
-		}
+		void SetTextureHandle(const uint32_t& tex) {materialData_->textureHandle = tex;}
 
 		const uint32_t& GetTextureHandle() const { return materialData_->textureHandle; }
 
@@ -110,22 +104,18 @@ namespace GameEngine {
 
 		MaterialData* GetMaterialData() { return materialData_; }
 
-		D3D12_GPU_VIRTUAL_ADDRESS GetGpuVirtualAddress() const { return constBuffer_.GetGpuVirtualAddress(); }
-		ConstantBuffer<MaterialData>* GetConstantBuffer() { return &constBuffer_; }
+		D3D12_GPU_VIRTUAL_ADDRESS GetGpuVirtualAddress() const { return materialBuffer_.GetGpuVirtualAddress(); }
+		MaterialBuffer<MaterialData>& GetMaterialBuffer() { return materialBuffer_; }
 
 		// マテリアルデータ参照用IDを取得
 		const uint32_t& GetMaterialRefIndex() const { return materialBuffer_.GetRefIndex(); };
 
 	private:
-
-		ConstantBuffer<MaterialData> constBuffer_;
-
+		// マテリアルデータ
 		MaterialBuffer<MaterialData> materialBuffer_;
 
 		// マテリアルにデータを書き込む
 		MaterialData* materialData_ = nullptr;
-
-		MaterialData* tmpmaterialData_ = nullptr;
 
 		// テクスチャ情報
 		uint32_t defaultTextureHandle_ = 0;
