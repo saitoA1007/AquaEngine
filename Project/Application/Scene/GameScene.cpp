@@ -1,6 +1,6 @@
 #include "GameScene.h"
 #include "ImguiManager.h"
-
+#include "MyMath.h"
 // アプリ機能
 #include "Application/Player/Player.h"
 

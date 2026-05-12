@@ -117,8 +117,10 @@ void Animator::SkinClusterUpdate(SkinCluster& skinCluster, const SkeletonData& s
 
 void Animator::SetModelData(Model* model) {
 	if (model->IsSkeleton()) {
-		skinCluster_ = model->GetSkinCluster();
-		skeleton_ = model->GetSkeleton();
+		auto* skeleton = model->GetSkeleton();
+
+		skinCluster_ = skeleton->GetSkinCluster();
+		skeleton_ = skeleton->GetSkeletonData();
 	} else {
 		assert(false && "Not found Model Bone");
 	}

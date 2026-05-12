@@ -4,6 +4,7 @@
 #include "DebugRenderer.h"
 #include "SpriteRenderer.h"
 #include "RaytracingPipeline.h"
+#include "MyMath.h"
 using namespace GameEngine;
 
 RenderQueue::RenderQueue() {
