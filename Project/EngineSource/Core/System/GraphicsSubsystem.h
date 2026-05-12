@@ -10,10 +10,12 @@
 #include "RenderQueue.h"
 #include "DebugRenderer.h"
 #include "RenderTextureManager.h"
+#include "BufferRefManager.h"
 
 // あとで削除するべき処理
 #include "PostProcess/CopyPSO.h"
 #include "PostProcess/BloomPSO.h"
+#include "Raytracing/RaytracingPipeline.h"
 
 namespace GameEngine {
 
@@ -44,6 +46,7 @@ namespace GameEngine {
         DebugRenderer* GetDebugRenderer() const { return debugRenderer_.get(); }
         ImGuiManager* GetImGuiManager() const { return imGuiManager_.get(); }
         PostEffectManager* GetPostEffectManager() const { return postEffectManager_.get(); }
+        RaytracingPipeline* GetRaytracingPipeline() const { return raytracingPipeline_.get(); }
     private:
         EngineContext context_;
 
@@ -67,6 +70,11 @@ namespace GameEngine {
         std::unique_ptr<RenderPassController> renderPassController_;
         // pso管理機能
         std::unique_ptr<PSOManager> psoManager_;
+        // レイトレーシングの描画環境構築機能
+        std::unique_ptr<RaytracingPipeline> raytracingPipeline_;
+
+        // バッファのアクセスデータ管理機能
+        std::unique_ptr<BufferRefManager> bufferRefManager_;
 
         std::unique_ptr<CopyPSO> copyPSO_;
         std::unique_ptr<BloomPSO> bloomPSO_;

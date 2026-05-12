@@ -1,6 +1,5 @@
 #include "Engine.h"
 #include "Application/Scene/Register/SetUpScenes.h"
-#include "ResourceLeakChecker.h"
 #include "CrashHandle.h"
 #include "LogManager.h"
 
@@ -55,6 +54,10 @@ void Engine::Initialize(HINSTANCE hInstance) {
 
     // 初期化をおこなう
     subsystemRegistry_.InitializeAll();
+
+    // シェーダーテーブルを作成する
+    auto* rayPipeline = graphics_->GetRaytracingPipeline();
+    rayPipeline->CreateShaderTable(resource_->GetModelManager());
 
     // シーンを登録する
     SetupScenes(*scene_->GetSceneRegistry());

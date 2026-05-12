@@ -3,8 +3,6 @@
 #include "Vector3.h"
 #include "Matrix4x4.h"
 #include "Transform.h"
-#include <iostream>
-#include "ConstantBuffer.h"
 #include "MaterialBuffer.h"
 
 namespace GameEngine {
@@ -13,17 +11,20 @@ namespace GameEngine {
 	public:
 		struct alignas(16) MaterialData {
 			Vector4 color;
+
 			int32_t enableLighting;
 			float padding[3];
+
 			Matrix4x4 uvTransform;
-			Vector3 specularColor;
+
+			Vector4 specularColor;
+
 			float shininess;
 			uint32_t textureHandle;
 			float metallic;
 			int32_t isActiveShadow;
-			float padding2;
 		};
-
+		static_assert(sizeof(MaterialData) == 128);
 	public:
 		Material() = default;
 		~Material();
@@ -43,13 +44,13 @@ namespace GameEngine {
 		/// 色を設定
 		/// </summary>
 		/// <param name="color"></param>
-		void SetColor(Vector4 color) { materialData_->color = color; }
+		void SetColor(Vector4 color) { materialData_->color = color;}
 
 		/// <summary>
 		/// specularの色を設定
 		/// </summary>
 		/// <param name="specularColor"></param>
-		void SetSpecularColor(Vector3 specularColor) { materialData_->specularColor = specularColor; }
+		void SetSpecularColor(Vector3 specularColor) { materialData_->specularColor = Vector4(specularColor.x, specularColor.y, specularColor.z,1); }
 
 		/// <summary>
 		/// 透明度を設定
@@ -93,7 +94,7 @@ namespace GameEngine {
 		/// <param name="metallic"></param>
 		void SetMetallic(const float& metallic) { materialData_->metallic = metallic; }
 
-		void SetTextureHandle(const uint32_t& tex) { materialData_->textureHandle = tex; }
+		void SetTextureHandle(const uint32_t& tex) {materialData_->textureHandle = tex;}
 
 		const uint32_t& GetTextureHandle() const { return materialData_->textureHandle; }
 
@@ -103,12 +104,14 @@ namespace GameEngine {
 
 		MaterialData* GetMaterialData() { return materialData_; }
 
-		D3D12_GPU_VIRTUAL_ADDRESS GetGpuVirtualAddress() const { return constBuffer_.GetGpuVirtualAddress(); }
-		ConstantBuffer<MaterialData>* GetConstantBuffer() { return &constBuffer_; }
+		D3D12_GPU_VIRTUAL_ADDRESS GetGpuVirtualAddress() const { return materialBuffer_.GetGpuVirtualAddress(); }
+		MaterialBuffer<MaterialData>& GetMaterialBuffer() { return materialBuffer_; }
+
+		// マテリアルデータ参照用IDを取得
+		const uint32_t& GetMaterialRefIndex() const { return materialBuffer_.GetRefIndex(); };
+
 	private:
-
-		ConstantBuffer<MaterialData> constBuffer_;
-
+		// マテリアルデータ
 		MaterialBuffer<MaterialData> materialBuffer_;
 
 		// マテリアルにデータを書き込む

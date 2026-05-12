@@ -44,6 +44,9 @@ namespace GameEngine {
 		/// </summary>
 		D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle(uint32_t index) const;
 
+		// heapのsrvIndexのスタート位置を取得
+		const uint32_t& GetStartSrvIndex(const SrvHeapType& type);
+
 	private:
 
 		// メモリの領域データ

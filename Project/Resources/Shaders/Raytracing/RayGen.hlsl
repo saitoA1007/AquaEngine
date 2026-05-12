@@ -1,7 +1,5 @@
 #include "Common.hlsli"
 
-RWTexture2D<float4> gOutput : register(u0);
-
 [shader("raygeneration")]
 void MainRayGen()
 {
@@ -11,9 +9,9 @@ void MainRayGen()
     float2 d = (launchIndex.xy + 0.5) / dims.xy * 2.0 - 1.0;
     float aspect = dims.x / dims.y;
 
-    matrix mtxViewInv = gSceneParam.mtxViewInv;
-    matrix mtxProjInv = gSceneParam.mtxProjInv;
-
+    matrix mtxViewInv = gCamera.mtxViewInv;
+    matrix mtxProjInv = gCamera.mtxProjInv;
+    
     RayDesc rayDesc;
     rayDesc.Origin = mul(float4(0, 0, 0, 1), mtxViewInv).xyz;
 
@@ -21,7 +19,7 @@ void MainRayGen()
     float3 direction = mul(float4(target.xyz / target.w, 0), mtxViewInv).xyz;
     rayDesc.Direction = normalize(direction);
 
-    rayDesc.TMin = 0;
+    rayDesc.TMin = 0.001f;
     rayDesc.TMax = 100000;
 
     Payload payload;
@@ -30,16 +28,6 @@ void MainRayGen()
 
     RAY_FLAG flags = RAY_FLAG_NONE;
     uint rayMask = 0xFF;
-
-    if (gSceneParam.flags.x == 0)
-    {
-        rayMask = ~(0x08);
-    }
-    else if (gSceneParam.flags.y == 0)
-    {
-        rayMask = ~(0x08);
-    }
-    
 
     TraceRay(
         gRtScene,

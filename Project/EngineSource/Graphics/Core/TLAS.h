@@ -22,7 +22,10 @@ namespace GameEngine {
 		/// <summary>
 		/// 複数のインスタンス情報からTLASを構築する
 		/// </summary>
-		void Create(ID3D12GraphicsCommandList4* cmdList, const std::vector<TLASInstanceData>& instances);
+		void Create(ID3D12GraphicsCommandList4* cmdList, const uint32_t& maxInstanceNum);
+
+		// 更新
+		void Update(ID3D12GraphicsCommandList4* cmdList, const std::vector<TLASInstanceData>& instances);
 
 		// SRVインデックスの取得
 		uint32_t GetSrvIndex() const { return srvIndex_; }
@@ -32,8 +35,17 @@ namespace GameEngine {
 		TLAS(const TLAS&) = delete;
 		TLAS& operator=(const TLAS&) = delete;
 
+		// 最大描画数
+		uint32_t maxInstanceCount_ = 0;
+
 		// インスタンス情報をGPUに送るためのバッファ
 		Microsoft::WRL::ComPtr<ID3D12Resource> instanceBuffer_;
+		D3D12_RAYTRACING_INSTANCE_DESC* instanceDescs_ = nullptr;
+
+		// 作業リソース
+		Microsoft::WRL::ComPtr<ID3D12Resource> scratchBuffer_;
+		// ビルドの入力設定
+		D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_INPUTS inputs_{};
 
 		// SRVインデックス
 		uint32_t srvIndex_ = 0;

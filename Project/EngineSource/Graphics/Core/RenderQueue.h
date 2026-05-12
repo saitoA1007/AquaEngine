@@ -2,16 +2,21 @@
 #include <vector>
 #include <map>
 #include <unordered_map>
-#include <memory>
 
 #include "PSO/Core/DrawPSOData.h"
 #include "DrawRequest.h"
 #include "RenderPass/RenderPassController.h"
 #include "TLAS.h"
+#include "Camera.h"
+#include "LightManager.h"
+#include "DirectionalLight.h"
 
 namespace GameEngine {
 
+    // 前方宣言
     class PSOManager;
+    class BufferRefManager;
+    class RaytracingPipeline;
 
     /// <summary>
     /// 溜めた描画コマンドを解放する機能
@@ -22,7 +27,8 @@ namespace GameEngine {
         ~RenderQueue() = default;
 
         // 初期化処理
-        void Initialize(ID3D12GraphicsCommandList* commandList, PSOManager* psoManager, RenderPassController* renderPassController);
+        void Initialize(ID3D12GraphicsCommandList4* commandList, SrvManager* srvManager, PSOManager* psoManager, RenderPassController* renderPassController,
+            RaytracingPipeline* raytracingPipeline, BufferRefManager* bufferRefManager);
 
         // フレーム開始前処理
         void Begin();
@@ -32,22 +38,30 @@ namespace GameEngine {
 
     public:
 
-        void SetCamera(GpuResource* cameraResource) {
-            cameraResource_ = cameraResource;
+        void SetCamera(Camera* camera) {
+            cameraPtr_ = camera;
         }
 
         void SetDebugCamera(GpuResource* cameraResource) {
-            debugCameraResource_ = cameraResource;
-            useDebugCamera_ = true;
-            
+            debugCameraResource_ = cameraResource;  
         }
 
-        void SetLight(GpuResource* lightResource) {
-            lightResource_ = lightResource;
+        void SetUseDebugCamera(const bool& useDebugCamera) {
+            useDebugCamera_ = useDebugCamera;
         }
 
-        void SetLightCamera(ID3D12Resource* resource) {
-            lightCameraResource_ = resource;
+        // tlasを取得
+        TLAS* GetTLAS() { return &tlas_; }
+
+        // カメラリソースを取得
+        GpuResource* GetCameraResource() { return mainCamera_.GetConstantBuffer(); }
+
+        // ライトリソースを取得
+        GpuResource* GetLightResource() { return lightManager_.GetConstantBuffer(); }
+
+        // 背景画像ハンドルを設定する
+        void SetSkyboxTexture(const uint32_t& texture) {
+            skyboxTextureIndex_ = texture;
         }
 
     public:
@@ -77,11 +91,14 @@ namespace GameEngine {
         void SubmitDebugLine(const DebugRenderer* debugRenderer, const std::string& passName = "DefaultPass");
 
         // レイトレーシングでのモデル
-        void SubmitRaytracingModel(const Model* model, WorldTransform& worldTransform, const std::string& passName = "DefaultPass");
+        void SubmitRaytracingModel(const Model* model, WorldTransform& worldTransform,const uint32_t* materialIndex = nullptr, const std::string& passName = "RaytracingPass");
 
     private:
-        ID3D12GraphicsCommandList* commandList_ = nullptr;
+        ID3D12GraphicsCommandList4* commandList_ = nullptr;
         RenderPassController* renderPassController_ = nullptr;
+        RaytracingPipeline* raytracingPipeline_ = nullptr;
+        SrvManager* srvManager_ = nullptr;
+        BufferRefManager* bufferRefManager_ = nullptr;
 
         // 2D描画コマンドのスタックメモリ [描画パス]->[PSO]->[描画コマンド]
         std::map<std::string, std::map<RenderLayer, std::unordered_map<std::string, std::vector<Draw2dRequest>>>> draw2dQueueList_;
@@ -89,13 +106,19 @@ namespace GameEngine {
         std::map<std::string, std::map<RenderLayer, std::unordered_map<std::string, std::vector<Draw3dRequest>>>> draw3dQueueList_;
         // 半透明の描画コマンドのスタックメモリ
         std::map<std::string, std::vector<Draw3dRequest>> translucentDrawQueueList_;
+        // レイトレーシングの描画コマンド
+        std::map<std::string,std::vector<TLASInstanceData>> raytracingDrawQueueList_;
 
         // カメラリソース
-        GpuResource* cameraResource_ = nullptr;
+        Camera mainCamera_;
+        Camera* cameraPtr_ = nullptr;
         GpuResource* debugCameraResource_ = nullptr;
         // ライトリソース
-        GpuResource* lightResource_ = nullptr;
-        ID3D12Resource* lightCameraResource_ = nullptr;
+        LightManager lightManager_;
+        // 平行光源
+        DirectionalLight::DirectionalLightData directionalData_;
+        // 背景画像ハンドル
+        uint32_t skyboxTextureIndex_ = 0;
 
         // デバックカメラを使用するか
         bool useDebugCamera_ = false;
@@ -109,10 +132,17 @@ namespace GameEngine {
         // psoのリスト
         std::unordered_map<std::string, DrawPsoData> psoList_;
 
-        // レイトレーシングモデルの管理
-        //TLAS tlas_;
+        // レイトレーシング用の描画モデル管理
+        TLAS tlas_;
 
-        std::vector<TLASInstanceData> tlasInstanceData_;
+        // レイトレーシングでの最大描画数
+        uint32_t maxRayInstanceNum_ = 200;
+
+        // bufferが存在しているsrvのスタート位置
+        uint32_t bufferStartSrvIndex_ = 0;
+
+        // 最終的に画面に描画させるパスの名前
+        std::string finalPassName_ = "";
 
     private:
         /// <summary>
@@ -133,7 +163,7 @@ namespace GameEngine {
             draw3dQueueList_.clear();
             translucentDrawQueueList_.clear();
             currentPsoName_.clear();
-            useDebugCamera_ = false;
+            raytracingDrawQueueList_.clear();
         }
 
         // psoの名前を取得
@@ -143,5 +173,8 @@ namespace GameEngine {
         // 描画コマンドを解放
         void Execute3dRequest(const Draw3dRequest& request);
         void Execute2dRequest(const Draw2dRequest& request);
+
+        // レイトレーシングの描画
+        void DrawRaytracing();
     };
 }

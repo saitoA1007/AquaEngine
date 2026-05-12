@@ -64,7 +64,7 @@ namespace GameEngine {
 		/// <param name="farPlane">描画する最大の距離</param>
 		void SetProjectionMatrix(float fovY, int kClientWidth, int kClientHeight, float nearPlane, float farPlane);
 
-		Matrix4x4 GetProjectionMatrix() { return projectionMatrix_; }
+		Matrix4x4 GetProjectionMatrix() const { return projectionMatrix_; }
 
 		/// <summary>
 		/// ビュープロジェクション行列を設定

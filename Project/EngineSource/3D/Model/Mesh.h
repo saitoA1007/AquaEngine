@@ -2,6 +2,7 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "VertexData.h"
+#include "BLAS.h"
 
 namespace GameEngine {
 
@@ -39,6 +40,12 @@ namespace GameEngine {
 		/// <param name="modelData">読み込んだモデルデータ</param>
 		void CreateModelMesh(ModelData modelData,const uint32_t& index);
 
+		/// <summary>
+		/// BLASを作成する
+		/// </summary>
+		/// <param name="cmdList"></param>
+		void CreateBLAS(ID3D12GraphicsCommandList4* cmdList);
+
 	public: // ゲッター
 
 		// 頂点バッファビューを取得
@@ -55,9 +62,22 @@ namespace GameEngine {
 		const VertexBuffer<VertexData>& GetVertexBuffer() const { return vertexBuffer_; }
 		const IndexBuffer& GetIndexBuffer() const { return indexBuffer_; }
 
+		// blasを取得
+		BLAS* GetBLAS() const { return blas_.get(); }
+
+		// ヒットグループ
+		void SetHitGroupIndex(const uint32_t& index) { hitGroupIndex_ = index; };
+		const uint32_t& GetHitGroupIndex() const { return hitGroupIndex_; }
+
 	private:
 		VertexBuffer<VertexData> vertexBuffer_;
 		IndexBuffer indexBuffer_;
+
+		// blas
+		std::unique_ptr<BLAS> blas_;
+
+		// モデルが持つHitGroupの位置。この値は登録順によって可変する
+		uint32_t hitGroupIndex_ = 0;
 
 		std::string materialName_ = "default";
 	};

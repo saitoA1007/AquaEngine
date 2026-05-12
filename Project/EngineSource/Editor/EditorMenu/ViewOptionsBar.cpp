@@ -18,6 +18,8 @@ ViewOptionsBar::ViewOptionsBar(Input* input, RenderQueue* renderQueue, DebugRend
 	gridModel_ = gridModel;
 	// 描画機能
 	renderQueue_ = renderQueue;
+	// デバックカメラを設定
+	renderQueue_->SetDebugCamera(debugCamera_->GetConstantBuffer());
 	// デバック描画機能
 	debugRenderer_ = debugRenderer;
 }
@@ -35,12 +37,13 @@ void ViewOptionsBar::Run() {
 		ImGui::EndMainMenuBar();
 	}
 
+	// デバックカメラを設定
+	renderQueue_->SetUseDebugCamera(isDebugView_);
+
 	// デバック
 	if (isDebugView_) {
 		// デバックカメラを操作
 		debugCamera_->Update();
-		// デバックカメラを設定
-		renderQueue_->SetDebugCamera(debugCamera_->GetConstantBuffer());
 
 		// グリッドの更新処理
 		gridWorldTransform_.transform_.translate = Vector3(debugCamera_->GetTargetPosition().x, -0.1f, debugCamera_->GetTargetPosition().z);

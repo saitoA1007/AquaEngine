@@ -2,7 +2,6 @@
 #include "ShaderTable.h"
 #include <d3d12.h>
 #include <wrl.h>
-#include <stdexcept>
 #include <cassert>
 
 namespace GameEngine {
@@ -21,14 +20,14 @@ namespace GameEngine {
         // DispatchRaysDescを生成
         D3D12_DISPATCH_RAYS_DESC CreateDispatchRaysDesc(UINT width, UINT height) const;
 
-        ID3D12Resource* GetBuffer() const { return buffer_.Get(); }
+        ID3D12Resource* GetBuffer() const { return shaderTable_.Get(); }
 
     private:
         ShaderTable raygenTable_;
         ShaderTable missTable_;
         ShaderTable hitgroupTable_;
 
-        Microsoft::WRL::ComPtr<ID3D12Resource> buffer_;
+        Microsoft::WRL::ComPtr<ID3D12Resource> shaderTable_;
         D3D12_GPU_VIRTUAL_ADDRESS raygenAddr_ = 0;
         D3D12_GPU_VIRTUAL_ADDRESS missAddr_ = 0;
         D3D12_GPU_VIRTUAL_ADDRESS hitgroupAddr_ = 0;

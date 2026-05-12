@@ -131,7 +131,7 @@ void RootSignatureBuilder::SerializeAndCreate(D3D12_ROOT_SIGNATURE_FLAGS flags) 
     desc.Flags = flags;
 
     Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob, errorBlob;
-    HRESULT hr = D3D12SerializeRootSignature(&desc, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+    HRESULT hr = D3D12SerializeRootSignature(&desc, D3D_ROOT_SIGNATURE_VERSION_1_0, &signatureBlob, &errorBlob);
     if (FAILED(hr)) {
         if (errorBlob) {
             LogManager::GetInstance().Log(reinterpret_cast<const char*>(errorBlob->GetBufferPointer()));
@@ -142,98 +142,6 @@ void RootSignatureBuilder::SerializeAndCreate(D3D12_ROOT_SIGNATURE_FLAGS flags) 
     hr = device_->CreateRootSignature(0, signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(), IID_PPV_ARGS(rootSignature_.ReleaseAndGetAddressOf()));
     assert(SUCCEEDED(hr) && "CreateRootSignature failed");
 }
-
-//void RootSignatureBuilder::ReflectionBoundResource(IDxcUtils* utils,DxcBuffer reflectionBuffer, IDxcBlob* shaderBlob, D3D12_SHADER_VISIBILITY visibility) {
-//    reflectionBuffer.Ptr = shaderBlob->GetBufferPointer();
-//    reflectionBuffer.Size = shaderBlob->GetBufferSize();
-//
-//    Microsoft::WRL::ComPtr<ID3D12ShaderReflection> reflection;
-//    HRESULT hr = utils->CreateReflection(&reflectionBuffer, IID_PPV_ARGS(&reflection));
-//    if (FAILED(hr)) {
-//        assert(0);
-//    }
-//
-//    D3D12_SHADER_DESC shaderDesc{};
-//    reflection->GetDesc(&shaderDesc);
-//
-//    // バインドされたリソースを解析
-//    for (UINT i = 0; i < shaderDesc.BoundResources; ++i) {
-//        D3D12_SHADER_INPUT_BIND_DESC bindDesc{};
-//        reflection->GetResourceBindingDesc(i, &bindDesc);
-//
-//        D3D12_ROOT_PARAMETER param{};
-//        param.ShaderVisibility = visibility;
-//
-//        switch (bindDesc.Type) {
-//
-//            // 定数バッファ
-//        case D3D_SIT_CBUFFER: {
-//            param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
-//            param.Descriptor.ShaderRegister = bindDesc.BindPoint;
-//            param.Descriptor.RegisterSpace = bindDesc.Space;
-//            rootParameters_.push_back(param);
-//            parameterTypes_.push_back(ParameterType::CBV);
-//
-//            std::string s = "none";
-//            if (param.ShaderVisibility == D3D12_SHADER_VISIBILITY_VERTEX) {
-//                s = "Vertex";
-//            } else if (param.ShaderVisibility == D3D12_SHADER_VISIBILITY_PIXEL) {
-//                s = "Pixel";
-//            } else if (param.ShaderVisibility == D3D12_SHADER_VISIBILITY_ALL) {
-//                s = "All";
-//            }
-//
-//            LogManager::GetInstance().Log("arrayNum" + std::to_string(rootParameters_.size() - 1) + " / Type : CBV / registerNum : " + std::to_string(bindDesc.BindPoint) + " / visibility : " + s);
-//            break;
-//        }
-//
-//
-//            // SRV
-//        case D3D_SIT_TEXTURE: {
-//            D3D12_DESCRIPTOR_RANGE range{};
-//            range.RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-//            range.NumDescriptors = bindDesc.BindCount;
-//            range.BaseShaderRegister = bindDesc.BindPoint;
-//            range.RegisterSpace = bindDesc.Space;
-//            range.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
-//            descriptorRanges_.push_back(std::move(range));
-//
-//            param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-//            param.DescriptorTable.NumDescriptorRanges = 1;
-//            param.DescriptorTable.pDescriptorRanges = &descriptorRanges_.back();
-//            rootParameters_.push_back(param);
-//            parameterTypes_.push_back(ParameterType::SRV);
-//            std::string s = "none";
-//            if (param.ShaderVisibility == D3D12_SHADER_VISIBILITY_VERTEX) {
-//                s = "Vertex";
-//            } else if (param.ShaderVisibility == D3D12_SHADER_VISIBILITY_PIXEL) {
-//                s = "Pixel";
-//            } else if (param.ShaderVisibility == D3D12_SHADER_VISIBILITY_ALL) {
-//                s = "All";
-//            }
-//            LogManager::GetInstance().Log("arrayNum" + std::to_string(rootParameters_.size() - 1) + " / Type : SRV / registerNum : " + std::to_string(bindDesc.BindPoint) + " / visibility : " + s);
-//            break;
-//        }
-//
-//
-//        // サンプラー
-//        case D3D_SIT_SAMPLER: {
-//            D3D12_STATIC_SAMPLER_DESC samplerDesc{};
-//            samplerDesc.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-//            samplerDesc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-//            samplerDesc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-//            samplerDesc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-//            samplerDesc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
-//            samplerDesc.MaxLOD = D3D12_FLOAT32_MAX;
-//            samplerDesc.ShaderRegister = bindDesc.BindPoint;
-//            samplerDesc.RegisterSpace = bindDesc.Space;
-//            samplerDesc.ShaderVisibility = visibility;
-//            staticSamplers_.push_back(samplerDesc);
-//            break;
-//        }
-//        }
-//    }
-//}
 
 void RootSignatureBuilder::ReflectionBoundResourceToMap(IDxcUtils* utils, DxcBuffer reflectionBuffer, IDxcBlob* shaderBlob, D3D12_SHADER_VISIBILITY visibility,
     std::map<uint32_t, ResourceInfo>& cbvMap, std::map<uint32_t, ResourceInfo>& srvMap,

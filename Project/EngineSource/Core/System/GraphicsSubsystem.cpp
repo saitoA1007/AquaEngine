@@ -1,6 +1,7 @@
 #include "GraphicsSubsystem.h"
 #include "GpuResource.h"
 #include "SrvResource.h"
+#include "BufferRefResource.h"
 #include "Sprite.h"
 #include "SpriteRenderer.h"
 #include "ModelRenderer.h"
@@ -34,6 +35,13 @@ void GraphicsSubsystem::Initialize() {
     GpuResource::StaticInitialize(graphicsDevice_->GetDevice());
     SrvResource::StaticInitialize(graphicsDevice_->GetSrvManager());
 
+    // バッファのアクセスデータ管理機能の初期化
+    bufferRefManager_ = std::make_unique<BufferRefManager>();
+    bufferRefManager_->Initialize();
+
+    // アクセスデータ管理機能を登録する
+    BufferRefResource::StaticInitialize(bufferRefManager_.get());
+
     // レンダーテクスチャ機能を生成
     renderTextureManager_ = std::make_unique<RenderTextureManager>();
     renderTextureManager_->Initialize(graphicsDevice_->GetRtvManager(), graphicsDevice_->GetDsvManager(), graphicsDevice_->GetDevice());
@@ -42,9 +50,14 @@ void GraphicsSubsystem::Initialize() {
     renderPassController_ = std::make_unique<RenderPassController>();
     renderPassController_->Initialize(renderTextureManager_.get(), graphicsDevice_->GetCommandList());
 
+    // レイトレーシング用のパイプライン
+    raytracingPipeline_ = std::make_unique<RaytracingPipeline>();
+    raytracingPipeline_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetSrvManager(), dxc_.get());
+
     // 描画コマンド管理
     renderQueue_ = std::make_unique<RenderQueue>();
-    renderQueue_->Initialize(graphicsDevice_->GetCommandList(), psoManager_.get(), renderPassController_.get());
+    renderQueue_->Initialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager(), psoManager_.get(),
+        renderPassController_.get(), raytracingPipeline_.get(), bufferRefManager_.get());
 
     // ポストエフェクトマネージャーの初期化
     postEffectManager_ = std::make_unique<PostEffectManager>();

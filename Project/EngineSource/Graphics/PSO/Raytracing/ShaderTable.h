@@ -46,6 +46,8 @@ namespace GameEngine {
         std::vector<ShaderRecord> records_;
         size_t maxRecordSize_ = D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
 
+    private:
+
         static UINT Align(UINT size, UINT alignment) {
             return (size + alignment - 1) & ~(alignment - 1);
         }

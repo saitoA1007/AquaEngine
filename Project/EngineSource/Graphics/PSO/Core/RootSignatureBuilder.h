@@ -120,11 +120,6 @@ namespace GameEngine {
 
 		void SerializeAndCreate(D3D12_ROOT_SIGNATURE_FLAGS flags);
 
-		/// <summary>
-		/// バインドされたリソースを解析する
-		/// </summary>
-		//void ReflectionBoundResource(IDxcUtils* utils, DxcBuffer reflectionBuffer, IDxcBlob* shaderBlob,D3D12_SHADER_VISIBILITY visibility);
-
 		// hlslから使用するリソースを取得する
 		void ReflectionBoundResourceToMap(IDxcUtils* utils, DxcBuffer reflectionBuffer, IDxcBlob* shaderBlob, D3D12_SHADER_VISIBILITY visibility,
 			std::map<uint32_t, ResourceInfo>& cbvMap, std::map<uint32_t, ResourceInfo>& srvMap, std::map<uint32_t, ResourceInfo>& uavMap, std::map<uint32_t, ResourceInfo>& samplerMap);

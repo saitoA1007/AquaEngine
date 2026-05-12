@@ -21,7 +21,7 @@ namespace GameEngine {
 		DXC* dxc_ = nullptr;
 
 		const std::wstring csoDirectory_ = L"Resources/Shaders/Compiled/";
-		const std::wstring kLibProfile_ = L"lib_6_5";
+		const std::wstring kLibProfile_ = L"lib_6_6";
 
 	private:
 
