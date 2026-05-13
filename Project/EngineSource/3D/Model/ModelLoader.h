@@ -17,7 +17,7 @@ namespace GameEngine {
 		~ModelLoader() = default;
 
         // 初期化処理
-		void Initialize(ID3D12Device5* device, ID3D12GraphicsCommandList4* cmdList, TextureManager* textureManager, SrvManager* srvManager);
+		void Initialize(ID3D12GraphicsCommandList4* cmdList, TextureManager* textureManager, SrvManager* srvManager);
 
     public: // 生成処理
 
@@ -65,13 +65,12 @@ namespace GameEngine {
         /// スケルトンを生成
         /// </summary>
         [[nodiscard]]
-        Skeleton CreateSkeleton(const Node& rootNode);
+        SkeletonData CreateSkeleton(const Node& rootNode);
 
     private:
         ModelLoader(const ModelLoader&) = delete;
         ModelLoader& operator=(const ModelLoader&) = delete;
 
-        ID3D12Device5* device_ = nullptr;
         ID3D12GraphicsCommandList4* cmdList_ = nullptr;
         TextureManager* textureManager_ = nullptr;
         SrvManager* srvManager_ = nullptr;
@@ -107,8 +106,5 @@ namespace GameEngine {
         /// <returns></returns>
         [[nodiscard]]
         int32_t CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints);
-
-        [[nodiscard]]
-        SkinCluster CreateSkinCluster(const Skeleton& skeleton, const ModelData& modelData);
 	};
 }

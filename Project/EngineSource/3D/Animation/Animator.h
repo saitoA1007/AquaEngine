@@ -6,9 +6,17 @@ namespace GameEngine {
 
 	// モデル
 	class Model;
+	class PSOManager;
 
 	class Animator {
 	public:
+
+		/// <summary>
+		/// 静的初期化
+		/// </summary>
+		/// <param name="commandList"></param>
+		/// <param name="psoManager"></param>
+		static void StaticInitialize(ID3D12GraphicsCommandList4* commandList, PSOManager* psoManager);
 
 		/// <summary>
 		/// 初期化処理
@@ -27,6 +35,19 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="time"></param>
 		void Update(const float& time);
+
+		/// <summary>
+		/// コンピュートシェーダーを使用した更新処理(再生を自動管理)
+		/// </summary>
+		void ComputeUpdate();
+
+		/// <summary>
+		/// コンピュートシェーダーを使用した更新処理(再生を手動管理)
+		/// </summary>
+		/// <param name="time"></param>
+		void ComputeUpdate(const float& time);
+
+	public:
 
 		/// <summary>
 		/// 最大再生時間を取得
@@ -59,6 +80,10 @@ namespace GameEngine {
 		void SetModelData(Model* model);
 
 	private:
+		static ID3D12GraphicsCommandList4* commandList_;
+		static ID3D12RootSignature* rootSignature_;
+		static ID3D12PipelineState* pipelineState_;
+
 		// ループの管理
 		bool isLoop_ = true;
 
@@ -67,7 +92,9 @@ namespace GameEngine {
 
 		// 使用するモデルデータ
 		SkinCluster* skinCluster_ = nullptr;
-		Skeleton* skeleton_ = nullptr;
+		SkeletonData* skeleton_ = nullptr;
+
+		Model* model_ = nullptr;
 
 		// 時間
 		float timer_ = 0.0f;
@@ -89,10 +116,13 @@ namespace GameEngine {
 		/// <param name="skeleton"></param>
 		/// <param name="animation"></param>
 		/// <param name="animationTime"></param>
-		static void ApplyAnimation(Skeleton& skeleton, const AnimationData& animation, float animationTime);
+		static void ApplyAnimation(SkeletonData& skeleton, const AnimationData& animation, float animationTime);
 
-		void SkeletonUpdate(Skeleton& skeleton);
+		void SkeletonUpdate(SkeletonData& skeleton);
 
-		void SkinClusterUpdate(SkinCluster& skinCluster, const Skeleton& skeleton);
+		void SkinClusterUpdate(SkinCluster& skinCluster, const SkeletonData& skeleton);
+
+		// コンピュートシェーダーを更新
+		void UpdateCompute();
 	};
 }

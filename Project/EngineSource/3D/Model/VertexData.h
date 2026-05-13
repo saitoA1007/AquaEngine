@@ -71,7 +71,7 @@ struct Joint {
 	std::optional<int32_t> parent; // 親JointのIndex。いなければnullptr
 };
 
-struct Skeleton {
+struct SkeletonData {
 	int32_t root; // RootJointのIndex
 	std::map<std::string, int32_t> jointMap; // Joint名とIndexとの辞書
 	std::vector<Joint> joints; // 所属しているジョイント

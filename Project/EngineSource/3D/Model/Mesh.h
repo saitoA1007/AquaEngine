@@ -44,7 +44,7 @@ namespace GameEngine {
 		/// BLASを作成する
 		/// </summary>
 		/// <param name="cmdList"></param>
-		void CreateBLAS(ID3D12GraphicsCommandList4* cmdList);
+		void CreateBLAS(ID3D12GraphicsCommandList4* cmdList,const bool& isUpdate);
 
 	public: // ゲッター
 

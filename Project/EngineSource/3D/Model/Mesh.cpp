@@ -147,7 +147,7 @@ void Mesh::CreateModelMesh(ModelData modelData, const uint32_t& index) {
 	vertexBuffer_.Create(meshData.vertices);
 }
 
-void Mesh::CreateBLAS(ID3D12GraphicsCommandList4* cmdList) {
+void Mesh::CreateBLAS(ID3D12GraphicsCommandList4* cmdList, const bool& isUpdate) {
 	blas_ = std::make_unique<BLAS>();
-	blas_->Create(cmdList, GetVertexBufferView(), GetIndexBufferView(), GetTotalVertices(), GetTotalIndices());
+	blas_->Create(cmdList, GetVertexBufferView(), GetIndexBufferView(), GetTotalVertices(), GetTotalIndices(), isUpdate);
 }

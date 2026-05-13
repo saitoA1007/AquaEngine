@@ -12,14 +12,16 @@ namespace GameEngine {
 	class StructuredBuffer : public SrvResource {
 	public:
 		~StructuredBuffer() {
-			// Unmap
-			if (data_) {
-				resource_->Unmap(0, nullptr);
-				data_ = nullptr;
-			}
-			// srvの解放
-			if (srvManager_) {
-				srvManager_->ReleseIndex(srvIndex_);
+			if (isCreated_) {
+				// Unmap
+				if (data_) {
+					resource_->Unmap(0, nullptr);
+					data_ = nullptr;
+				}
+				// srvの解放
+				if (srvManager_) {
+					srvManager_->ReleseIndex(srvIndex_);
+				}
 			}
 		}
 
@@ -47,6 +49,8 @@ namespace GameEngine {
 			srvHandleCPU_ = srvManager_->GetCPUHandle(srvIndex_);
 			srvHandleGPU_ = srvManager_->GetGPUHandle(srvIndex_);
 			device_->CreateShaderResourceView(resource_.Get(), &srvDesc, srvHandleCPU_);
+
+			isCreated_ = true;
 		}
 
 		T* GetData() const { return data_; }
@@ -55,6 +59,7 @@ namespace GameEngine {
 		const CD3DX12_GPU_DESCRIPTOR_HANDLE& GetSrvHandleGPU() const { return srvHandleGPU_; }
 
 	private:
+		bool isCreated_ = false;
 
 		T* data_ = nullptr;
 		uint32_t numElements_ = 0;

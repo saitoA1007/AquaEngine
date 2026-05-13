@@ -6,6 +6,7 @@
 #include "SpriteRenderer.h"
 #include "ModelRenderer.h"
 #include "CoreSubsystem.h"
+#include "Animator.h"
 using namespace GameEngine;
 
 void GraphicsSubsystem::Initialize() {
@@ -80,6 +81,8 @@ void GraphicsSubsystem::Initialize() {
     Sprite::StaticInitialize(windowsApp->kWindowWidth, windowsApp->kWindowHeight);
     SpriteRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager());
     ModelRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager());
+    // アニメーション用の静的初期化
+    Animator::StaticInitialize(graphicsDevice_->GetCommandList(), psoManager_.get());
 }
 
 void GraphicsSubsystem::InitializePSO() {

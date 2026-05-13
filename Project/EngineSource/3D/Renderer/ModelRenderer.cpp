@@ -129,12 +129,13 @@ void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTrans
 	
 	// メッシュを取得
 	const std::vector<std::unique_ptr<Mesh>>& meshes = model->GetMeshes();
+	const auto* skeleton = model->GetSkeleton();
 
 	for (uint32_t i = 0; i < meshes.size(); ++i) {
 
 		D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
 			meshes[i]->GetVertexBufferView(),
-			model->GetSkinClusterData()->influenceBufferView
+			skeleton->GetSkinClusterData()->influenceBuffer.GetView()
 		};
 
 		commandList_->IASetVertexBuffers(0, 2, vbvs);
@@ -152,7 +153,7 @@ void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTrans
 		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetGpuVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 
-		commandList_->SetGraphicsRootDescriptorTable(3, model->GetSkinClusterData()->paletteSrvHandle.second);
+		commandList_->SetGraphicsRootDescriptorTable(3, skeleton->GetSkinClusterData()->wellBuffer.GetSrvHandleGPU());
 		commandList_->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
 
 		if (meshes[i]->GetTotalIndices() != 0) {

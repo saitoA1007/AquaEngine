@@ -2,11 +2,12 @@
 #include"IScene.h"
 
 // エンジン機能をインクルード
-#include"Camera.h"
-#include"Model.h"
-#include"WorldTransform.h"
+#include "Camera.h"
+#include "Model.h"
+#include "WorldTransform.h"
+#include "Animator.h"
 
-#include"Application/Scene/Transition/Fade.h"
+#include "Application/Scene/Transition/Fade.h"
 
 class TitleScene : public GameEngine::IScene {
 public:
@@ -61,6 +62,10 @@ private: // シーン機能
 
 	GameEngine::Model* model_;
 	GameEngine::WorldTransform world_;
+	// 歩くアニメーションデータ
+	std::map<std::string, AnimationData> walkAnimationData_;
+	// アニメーションを再生するクラス
+	std::unique_ptr<GameEngine::Animator> walkAnimator_;
 
 	GameEngine::Model* model1_;
 	GameEngine::WorldTransform world1_;

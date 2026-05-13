@@ -3,15 +3,15 @@
 #include"Vector3.h"
 #include"Vector2.h"
 #include"Matrix4x4.h"
-#include"MyMath.h"
 #include"VertexData.h"
 
 #include<vector>
 #include<map>
-#include<iostream>
 
 #include <d3d12.h>
-#include <wrl.h>
+
+#include "vertexBuffer.h"
+#include "StructuredBuffer.h"
 
 template <typename tValue>
 struct Keyframe {
@@ -54,11 +54,9 @@ struct WellForGPU {
 struct SkinCluster {
 	std::vector<Matrix4x4> inverseBindPoseMatrices;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> influenceResource;
-	D3D12_VERTEX_BUFFER_VIEW influenceBufferView;
+	GameEngine::VertexBuffer<VertexInfluence> influenceBuffer;
 	std::span<VertexInfluence> mappedInfluence;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> paletteResource;
+	GameEngine::StructuredBuffer<WellForGPU> wellBuffer;
 	std::span<WellForGPU> mappedPalette;
-	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> paletteSrvHandle;
 };

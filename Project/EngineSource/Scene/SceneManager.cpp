@@ -19,8 +19,18 @@ void SceneManager::Initialize(SceneRegistry* sceneRegistry, GameParamEditor* gam
 	sceneTransition_ = std::make_unique<SceneTransition>();
 	sceneTransition_->Initialize();
 	
-	// デフォルトシーンで初期化
-	ChangeScene(sceneRegistry_->GetDefaultScene());
+	/// デフォルトシーンで初期化
+	// シーン名を保存
+	currentSceneName_ = sceneRegistry_->GetDefaultScene();
+	// 現在のシーンを設定
+	gameParamEditor_->SetActiveScene(currentSceneName_);
+	// 前の要素を削除
+	currentScene_.reset();
+	gameObjectManager_->ClearAll();
+	// 新しいシーンを作成
+	currentScene_ = sceneRegistry_->CreateScene(currentSceneName_);
+	// 新しく作ったシーンを初期化
+	currentScene_->Initialize();
 }
 
 void SceneManager::Update() {

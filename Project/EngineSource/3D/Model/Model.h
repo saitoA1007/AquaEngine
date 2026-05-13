@@ -7,6 +7,7 @@
 #include "Material.h"
 #include "TransformationMatrix.h"
 #include "AnimationData.h"
+#include "Skeleton.h"
 
 namespace GameEngine {
 	
@@ -26,9 +27,9 @@ namespace GameEngine {
 		}
 
 		// 作成したMeshを元にBLASを作成する
-		void AddBLAS(ID3D12GraphicsCommandList4* cmdList) {
+		void AddBLAS(ID3D12GraphicsCommandList4* cmdList,const bool& isUpdate) {
 			for (auto& mesh : meshes_) {
-				mesh->CreateBLAS(cmdList);
+				mesh->CreateBLAS(cmdList, isUpdate);
 			}
 		}
 
@@ -40,10 +41,9 @@ namespace GameEngine {
 		}
 
 		// ボーンデータを追加
-		void SetSkeletonData(Skeleton skeletonBone, SkinCluster skinClusterBone) {
+		void SetSkeleton(std::unique_ptr<Skeleton> skeleton) {
 			isSkeleton_ = true;
-			skeletonBone_ = skeletonBone;
-			skinClusterBone_ = skinClusterBone;
+			skeleton_ = std::move(skeleton);
 		}
 
 	public:
@@ -130,11 +130,9 @@ namespace GameEngine {
 		// ボーンが存在しているか
 		const bool IsSkeleton() const { return isSkeleton_; }
 
-		// ボーンデータ
-		Skeleton* GetSkeleton() { return &skeletonBone_.value(); }
-		SkinCluster* GetSkinCluster() { return &skinClusterBone_.value(); }
-		const SkinCluster* GetSkinClusterData() const { return &skinClusterBone_.value(); }
-
+		// ボーンデータを取得
+		Skeleton* GetSkeleton() { return skeleton_.get(); }
+		const Skeleton* GetSkeleton() const { return skeleton_.get(); }
 	private:
 		Model(Model&) = delete;
 		Model& operator=(Model&) = delete;
@@ -146,8 +144,7 @@ namespace GameEngine {
 		std::unordered_map<std::string, std::unique_ptr<Material>> materials_;
 
 		// ボーンデータ
-		std::optional<Skeleton> skeletonBone_ = std::nullopt;
-		std::optional<SkinCluster> skinClusterBone_ = std::nullopt;
+		std::unique_ptr<Skeleton> skeleton_;
 
 		// Nodeのローカル行列を保持しておく変数
 		Matrix4x4 localMatrix_;

@@ -4,7 +4,6 @@
 using namespace GameEngine;
 
 void ResourceSubsystem::Initialize() {
-	auto* device = context_.graphics->GetGraphicsDevice()->GetDevice();
 	auto* cmdList = context_.graphics->GetGraphicsDevice()->GetCommandList();
 	auto* srvManager = context_.graphics->GetGraphicsDevice()->GetSrvManager();
 
@@ -14,7 +13,7 @@ void ResourceSubsystem::Initialize() {
 
 	// モデルを管理するクラスを生成
 	modelManager_ = std::make_unique<ModelManager>();
-	modelManager_->Initialize(device, cmdList, textureManager_.get(), srvManager);
+	modelManager_->Initialize(cmdList, textureManager_.get(), srvManager);
 
 	// アニメーション
 	animationManager_ = std::make_unique<AnimationManager>();
