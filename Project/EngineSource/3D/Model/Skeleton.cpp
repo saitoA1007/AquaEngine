@@ -4,10 +4,22 @@
 #include "MyMath.h"
 using namespace GameEngine;
 
-void Skeleton::Create(const SkeletonData& skeletonData,const ModelData& modelData) {
+void Skeleton::Create(ID3D12GraphicsCommandList4* cmdList, const SkeletonData& skeletonData,const ModelData& modelData) {
 	assert(!skeletonData.joints.empty() && "Skeleton joints are empty!");
 	assert(!modelData.meshes.empty() && "Model has no meshes!");
 	assert(!modelData.meshes[0].vertices.empty() && "Model mesh[0] has no vertices!");
+
+	// アウトプット用の頂点リソースを作成
+	outputvertexBuffer_.Create(cmdList, modelData.meshes[0].vertices);
+
+	// 頂点数を取得
+	verticesNum_ = static_cast<uint32_t>(modelData.meshes[0].vertices.size());
+
+	// 定数バッファを生成
+	constBuffer_.Create();
+	// 頂点数を設定
+	auto* data = constBuffer_.GetData();
+	data->numVertices = modelData.meshes[0].vertices.size();
 
 	// スケルトンデータを取得
 	skeletonData_ = skeletonData;

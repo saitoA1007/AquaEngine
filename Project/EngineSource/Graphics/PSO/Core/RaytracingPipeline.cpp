@@ -133,12 +133,18 @@ void RaytracingPipeline::CreateShaderTable(ModelManager* modelManager) {
 			for (auto& mesh : data.model->GetMeshes()) {
 				mesh->SetHitGroupIndex(hitGroupIndex);
 				auto& index = mesh->GetIndexBuffer();
-				auto& vertex = mesh->GetVertexBuffer();
 
 				ShaderRecord record;
 				auto& table = record.SetIdentifier(id);
 				table.AppendDescriptor(index.GetSrvGpuHandle());
-				table.AppendDescriptor(vertex.GetSrvGpuHandle());
+
+				if (data.model->IsSkeleton()) {
+					auto* skeleton = data.model->GetSkeleton();
+					table.AppendDescriptor(skeleton->GetOutputVertexBuffer()->GetSrvGpuHandle());
+				} else {
+					auto& vertex = mesh->GetVertexBuffer();
+					table.AppendDescriptor(vertex.GetSrvGpuHandle());
+				}
 
 				shaderTableBuilder_.HitGroup().AddRecord(std::move(record));
 

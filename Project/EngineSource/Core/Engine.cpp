@@ -125,6 +125,9 @@ void Engine::PreUpdate() {
     graphics_->GetImGuiManager()->BeginFrame();
     graphics_->GetRenderQueue()->Begin();
 
+    // ヒープを設定する
+    graphics_->BeginFrame();
+
 #ifdef USE_IMGUI
     graphics_->GetDebugRenderer()->Clear();
     editor_->Update();
@@ -159,7 +162,7 @@ void Engine::PostUpdate() {
 }
 
 void Engine::PreDraw() { 
-    graphics_->BeginFrame(); 
+    //graphics_->BeginFrame(); 
 }
 
 void Engine::PostDraw() { 

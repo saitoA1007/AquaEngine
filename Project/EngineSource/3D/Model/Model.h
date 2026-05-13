@@ -27,9 +27,9 @@ namespace GameEngine {
 		}
 
 		// 作成したMeshを元にBLASを作成する
-		void AddBLAS(ID3D12GraphicsCommandList4* cmdList) {
+		void AddBLAS(ID3D12GraphicsCommandList4* cmdList,const bool& isUpdate) {
 			for (auto& mesh : meshes_) {
-				mesh->CreateBLAS(cmdList);
+				mesh->CreateBLAS(cmdList, isUpdate);
 			}
 		}
 

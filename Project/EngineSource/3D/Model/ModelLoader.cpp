@@ -23,7 +23,7 @@ std::unique_ptr<Model> ModelLoader::CreateSphere(uint32_t subdivision) {
 	model->AddMesh(std::move(tmpMesh));
 
 	// Meshを元にBLASを作成する
-	model->AddBLAS(cmdList_);
+	model->AddBLAS(cmdList_, false);
 
 	// マテリアルを作成
 	std::unique_ptr<Material> tmpMaterial = std::make_unique<Material>();
@@ -94,8 +94,8 @@ std::unique_ptr<Model> ModelLoader::CreateModel(const std::string& objFilename, 
 		model->AddMesh(std::move(tmpMesh));
 	}
 
-	// Meshを元にBLASを作成する
-	model->AddBLAS(cmdList_);
+	// Meshを元にBLASを作成する。アニメーションがあればBLASを更新用に作成
+	model->AddBLAS(cmdList_, modelData.isAnimation_);
 
 	// マテリアルを作成
 	for (uint32_t index = 0; index < modelData.materials.size(); ++index) {
@@ -123,7 +123,7 @@ std::unique_ptr<Model> ModelLoader::CreateModel(const std::string& objFilename, 
 		SkeletonData skeletonBone = CreateSkeleton(modelData.rootNode);
 
 		std::unique_ptr<Skeleton> skeleton = std::make_unique<Skeleton>();
-		skeleton->Create(skeletonBone, modelData);
+		skeleton->Create(cmdList_, skeletonBone, modelData);
 
 		model->SetSkeleton(std::move(skeleton));
 	}

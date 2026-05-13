@@ -9,7 +9,6 @@
 #include<map>
 
 #include <d3d12.h>
-#include <wrl.h>
 
 #include "vertexBuffer.h"
 #include "StructuredBuffer.h"

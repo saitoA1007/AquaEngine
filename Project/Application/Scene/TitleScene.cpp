@@ -18,6 +18,12 @@ void TitleScene::Initialize() {
 	model_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
 	world_.Initialize({ {2.0f,2.0f,2.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 
+	// 歩くアニメーションデータを取得する
+	walkAnimationData_ = animationManager_->GetNameByAnimations("Walk");
+	// 歩くアニメーションの再生を管理する
+	walkAnimator_ = std::make_unique<Animator>();
+	walkAnimator_->Initialize(model_, &walkAnimationData_["Armature|mixamo.com|Layer0"]);
+
 	// 地面
 	model1_ = modelManager_->GetNameByModel("Terrain");
 	model1_->SetDefaultIsEnableLight(true);
@@ -40,7 +46,10 @@ void TitleScene::Initialize() {
 void TitleScene::Update() {
 
 	// カメラの更新処理
-	mainCamera_->Update();	
+	mainCamera_->Update();
+
+	// アニメーションの更新処理
+	walkAnimator_->ComputeUpdate();
 }
 
 void TitleScene::DebugUpdate() {
