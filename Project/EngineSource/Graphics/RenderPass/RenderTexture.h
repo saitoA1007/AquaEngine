@@ -11,7 +11,10 @@ namespace GameEngine {
 		DsvOnly,    // Dsvのみ
 		RtvAndDsv,  // RTVとDSV
 		UavOnly,    // ComputeShader/Raytracing用
-		RtvAndUav   // 描画とUAV両方
+		RtvAndUav,  // 描画情報とUav両方
+		UavWithDepth, // 深度情報とUav
+
+		MaxCount
 	};
 
 	// リソースの現在の状態を追跡する列挙型

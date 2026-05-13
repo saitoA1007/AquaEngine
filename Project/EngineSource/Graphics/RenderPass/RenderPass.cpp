@@ -1,5 +1,4 @@
-#include"RenderPass.h"
-
+#include "RenderPass.h"
 using namespace GameEngine;
 
 RenderPass::RenderPass(const std::string& name, ID3D12GraphicsCommandList* commandList, RenderTexture* renderTexture) {
