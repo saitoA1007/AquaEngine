@@ -18,9 +18,9 @@ struct MaterialData {
     float4 specularColor;
     
     float shininess;
-    uint32_t textureHandle;
+    uint textureHandle;
     float metallic;
-    int32_t isActiveShadow;
+    int isActiveShadow;
     
     float ior;
     float3 padding1;

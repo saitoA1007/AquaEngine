@@ -15,22 +15,22 @@ struct MyAttribute
 
 struct Camera
 {
-    float32_t3 worldPosition;
-    float32_t4x4 vpMatrix;
-    float32_t4x4 mtxViewInv; // ビュー逆行列
-    float32_t4x4 mtxProjInv; // プロジェクション逆行列
+    float3 worldPosition;
+    float4x4 vpMatrix;
+    float4x4 mtxViewInv; // ビュー逆行列
+    float4x4 mtxProjInv; // プロジェクション逆行列
 };
 
 struct MaterialRef
 {
-    uint32_t type; // マテリアルデータのタイプ
-    uint32_t MaterialIndex; // マテリアルデータの参照するハンドル
+    uint type; // マテリアルデータのタイプ
+    uint MaterialIndex; // マテリアルデータの参照するハンドル
 };
 
 // Global Root Signature
 RWTexture2D<float4> gOutput : register(u0);
 RaytracingAccelerationStructure gRtScene : register(t0, space0);
-Texture2D<float32_t4> gTexture[] : register(t0, space1);
+Texture2D<float4> gTexture[] : register(t0, space1);
 StructuredBuffer<MaterialRef> gBufferRefs : register(t0, space2);
 ByteAddressBuffer gBufferData[] : register(t0, space3);
 TextureCube<float4> gBackgroundTexture : register(t1, space0);
@@ -42,8 +42,8 @@ cbuffer LightGroup : register(b1)
     DirectionalLight gDirectionalLight;
     PointLight gPointLight;
     SpotLight gSpotLight;
-    uint32_t environmentTexture;
-    int32_t isActiveEnvironment;
+    uint environmentTexture;
+    int isActiveEnvironment;
 };
 
 inline float3 CalcBarycentrics(float2 barys)
