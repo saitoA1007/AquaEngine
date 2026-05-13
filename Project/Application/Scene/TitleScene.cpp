@@ -50,6 +50,23 @@ void TitleScene::Update() {
 
 	// アニメーションの更新処理
 	walkAnimator_->ComputeUpdate();
+
+#ifdef USE_IMGUI
+	ImGui::Begin("test");
+
+	ImGui::ColorEdit4("color", &color_.x);
+	ImGui::DragFloat("metalic", &metalic_, 0.01f);
+	ImGui::DragFloat("grassMetalic", &metalic1_, 0.01f);
+	ImGui::DragFloat("shininess", &shininess_);
+	ImGui::DragFloat("IOR", &ior_, 0.1f);
+
+	model_->SetDefaultColor(color_);
+	model_->SetDefaultMetallic(metalic_);
+	model1_->SetDefaultMetallic(metalic1_);
+	model_->SetDefaultShininess(shininess_);
+	model_->SetDefaultIOR(ior_);
+	ImGui::End();
+#endif
 }
 
 void TitleScene::DebugUpdate() {

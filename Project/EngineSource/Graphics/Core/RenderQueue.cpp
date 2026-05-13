@@ -26,6 +26,9 @@ void RenderQueue::Initialize(ID3D12GraphicsCommandList4* commandList, SrvManager
     // レイトレーシングで描画するパス
     renderPassController_->AddPass("RaytracingPass", RenderTextureMode::RtvAndUav);
 
+    // レイトレーシング描画の深度情報を記録する。描画に使用しない
+    renderPassController_->AddPass("RaytracingPassDepth", RenderTextureMode::UavOnly,1280,720, DXGI_FORMAT_R32_FLOAT);
+
     // 最終的な描画先を設定
     finalPassName_ = "RaytracingPass";
     renderPassController_->SetSceneFinalPass(finalPassName_);
@@ -152,12 +155,15 @@ void RenderQueue::Execute() {
          
             // UAVに状態を変更
             renderPassController_->SwitchToUAV(passName);
+            renderPassController_->SwitchToUAV("RaytracingPassDepth");
          
             // レイトレーシングの描画
             DrawRaytracing();
          
             // UAV書き込み完了
             renderPassController_->InsertUavBarrier(passName);
+            renderPassController_->InsertUavBarrier("RaytracingPassDepth");
+            renderPassController_->PostPass("RaytracingPassDepth");
         }
 
         renderPassController_->PostPass(passName);
@@ -440,8 +446,9 @@ void RenderQueue::DrawRaytracing() {
     commandList_->SetComputeRootConstantBufferView(5, lightManager_.GetConstantBuffer()->GetGpuVirtualAddress());
     // 出力画像を設定
     commandList_->SetComputeRootDescriptorTable(6, srvManager_->GetGPUHandle(renderPassController_->GetUavIndex("RaytracingPass")));
+    commandList_->SetComputeRootDescriptorTable(7, srvManager_->GetGPUHandle(renderPassController_->GetUavIndex("RaytracingPassDepth")));
     // 背景画像
-    commandList_->SetComputeRootDescriptorTable(7, srvManager_->GetGPUHandle(skyboxTextureIndex_));
+    commandList_->SetComputeRootDescriptorTable(8, srvManager_->GetGPUHandle(skyboxTextureIndex_));
 
     // レイトレーシングを開始
     commandList_->SetPipelineState1(raytracingPipeline_->GetStateObject());

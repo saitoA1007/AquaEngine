@@ -6,6 +6,7 @@ struct Payload
 {
     float3 color;
     int recursive;
+    float depth;
 };
 
 struct MyAttribute
@@ -29,6 +30,7 @@ struct MaterialRef
 
 // Global Root Signature
 RWTexture2D<float4> gOutput : register(u0);
+RWTexture2D<float> gDepthOutput : register(u1);
 RaytracingAccelerationStructure gRtScene : register(t0, space0);
 Texture2D<float4> gTexture[] : register(t0, space1);
 StructuredBuffer<MaterialRef> gBufferRefs : register(t0, space2);

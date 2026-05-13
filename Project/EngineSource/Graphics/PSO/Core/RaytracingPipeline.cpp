@@ -33,6 +33,7 @@ void RaytracingPipeline::CreateGlobalRootsignature() {
 	builder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_ALL); // camera
 	builder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_ALL); // light
 	builder.AddUAVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_ALL); // UAV gOutput
+	builder.AddUAVDescriptorTable(1, 1, 0, D3D12_SHADER_VISIBILITY_ALL); // UAV gOutputDepth
 	builder.AddSRVDescriptorTable(1, 1, 0, D3D12_SHADER_VISIBILITY_ALL); // skybox
 	builder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_ALL);
 	builder.CreateRootSignature();
@@ -73,7 +74,7 @@ void RaytracingPipeline::CreateStateObject() {
 	stateObjectBuilder_.AddHitGroup(AppHitGroups::DefaultModel, L"MainObjectCHS");
 
 	// シェーダー設定
-	const uint32_t MaxPayloadSize = sizeof(float) * 3 + sizeof(uint32_t);
+	const uint32_t MaxPayloadSize = sizeof(float) * 3 + sizeof(uint32_t) + sizeof(float);
 	const uint32_t MaxAttributeSize = sizeof(float) * 2;
 	stateObjectBuilder_.SetShaderConfig(MaxPayloadSize, MaxAttributeSize);
 	stateObjectBuilder_.SetPipelineConfig(4);

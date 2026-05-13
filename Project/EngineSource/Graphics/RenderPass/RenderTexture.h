@@ -12,7 +12,6 @@ namespace GameEngine {
 		RtvAndDsv,  // RTVとDSV
 		UavOnly,    // ComputeShader/Raytracing用
 		RtvAndUav,  // 描画情報とUav両方
-		UavWithDepth, // 深度情報とUav
 
 		MaxCount
 	};

@@ -7,4 +7,5 @@ void MainMiss(inout Payload payload)
     float4 color = gBackgroundTexture.SampleLevel(
         gSampler, WorldRayDirection(), 0.0);
     payload.color = color.xyz;
+    payload.depth = 1.0f;
 }

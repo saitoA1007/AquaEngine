@@ -67,6 +67,10 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     float3 worldNormal = mul(vtx.normal, (float3x3)ObjectToWorld4x3());
     worldNormal = normalize(worldNormal);
     
+    // 深度情報を書き込む
+    float4 clipPos = mul(float4(worldPosition, 1.0f), gCamera.vpMatrix);
+    payload.depth = clipPos.z / clipPos.w;
+    
     // 視線ベクトル
     float3 viewDir = normalize(gCamera.worldPosition.xyz - worldPosition);
     
