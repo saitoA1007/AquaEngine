@@ -72,6 +72,7 @@ private: // シーン機能
 
 	GameEngine::Model* model2_;
 	GameEngine::WorldTransform world2_;
+	GameEngine::WorldTransform world3_;
 	
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 	float metalic_ = 0.01f;

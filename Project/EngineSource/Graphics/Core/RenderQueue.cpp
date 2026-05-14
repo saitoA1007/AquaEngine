@@ -25,12 +25,14 @@ void RenderQueue::Initialize(ID3D12GraphicsCommandList4* commandList, SrvManager
     renderPassController_->AddPass("DefaultPass");
     // レイトレーシングで描画するパス
     renderPassController_->AddPass("RaytracingPass", RenderTextureMode::RtvAndUav);
+    // レイトレとラスタライズを合成する用のパス
+    renderPassController_->AddPass("LightingCompositePass");
 
     // レイトレーシング描画の深度情報を記録する。描画に使用しない
     renderPassController_->AddPass("RaytracingPassDepth", RenderTextureMode::UavOnly,1280,720, DXGI_FORMAT_R32_FLOAT);
 
     // 最終的な描画先を設定
-    finalPassName_ = "RaytracingPass";
+    finalPassName_ = "LightingCompositePass";
     renderPassController_->SetSceneFinalPass(finalPassName_);
     renderPassController_->SetPresentPass(finalPassName_);
 
@@ -50,6 +52,9 @@ void RenderQueue::Initialize(ID3D12GraphicsCommandList4* commandList, SrvManager
 
     RegisterPSO("DefaultSprite", psoManager);
     RegisterPSO("AdditiveSprite", psoManager);
+
+    // レイトレとラスタライズの合成用
+    RegisterPSO("LightingComposite", psoManager);
 
     // bufferのsrvIndexのスタート位置を設定
     bufferStartSrvIndex_ = srvManager_->GetStartSrvIndex(SrvHeapType::Buffer);
@@ -168,6 +173,16 @@ void RenderQueue::Execute() {
 
         renderPassController_->PostPass(passName);
     }
+
+    // レイトレとラスタライズの内容を合成する
+    renderPassController_->PrePass("LightingCompositePass");
+    PreDraw("LightingComposite");
+    commandList_->SetGraphicsRootDescriptorTable(0, srvManager_->GetGPUHandle(renderPassController_->GetSrvIndex("DefaultPass")));
+    commandList_->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUHandle(renderPassController_->GetDepthSrvIndex("DefaultPass")));
+    commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetGPUHandle(renderPassController_->GetSrvIndex("RaytracingPass")));
+    commandList_->SetGraphicsRootDescriptorTable(3, srvManager_->GetGPUHandle(renderPassController_->GetSrvIndex("RaytracingPassDepth")));
+    commandList_->DrawInstanced(3, 1, 0, 0);
+    renderPassController_->PostPass("LightingCompositePass");
 
     // 最終的に画面に出すためのパスの設定
     renderPassController_->SetPresentPass(finalPassName_);

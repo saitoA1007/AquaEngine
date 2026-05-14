@@ -58,6 +58,7 @@ namespace GameEngine {
 		uint32_t GetRtvIndex() const { return rtvIndex_; }
 		uint32_t GetSrvIndex() { return srvIndex_; }
 		uint32_t GetUavIndex() const { return uavIndex_; }
+		uint32_t GetDepthSrvIndex() const { return depthSrvIndex_; }
 
 		uint32_t GetWidth() const { return width_; }
 		uint32_t GetHeight() const { return height_; }
@@ -89,7 +90,7 @@ namespace GameEngine {
 		// 深度リソース
 		Microsoft::WRL::ComPtr<ID3D12Resource> depthResource_ = nullptr;
 		uint32_t dsvIndex_ = 0;
-		uint32_t dsvSrvIndex_ = 0;
+		uint32_t depthSrvIndex_ = 0;
 		// dsvハンドル
 		D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle_;
 		CD3DX12_GPU_DESCRIPTOR_HANDLE   depthSrvGpuHandle_ = {};

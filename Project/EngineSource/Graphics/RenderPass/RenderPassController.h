@@ -37,9 +37,13 @@ namespace GameEngine {
 		void SetPresentPass(const std::string& name);
 		const std::string& GetPresentPass() const { return presentPassName_; }
 
+		// 描画範囲を設定
+		void SetDrawRange(const std::string& name, const uint32_t& width, const uint32_t& height, const uint32_t& left = 0, const uint32_t& top = 0);
+
 		CD3DX12_GPU_DESCRIPTOR_HANDLE GetSrvHandle(const std::string& name);
 		uint32_t GetSrvIndex(const std::string& name);
 		uint32_t GetUavIndex(const std::string& name);
+		uint32_t GetDepthSrvIndex(const std::string& name);
 	private:
 		RenderPassController(const RenderPassController&) = delete;
 		RenderPassController& operator=(const RenderPassController&) = delete;

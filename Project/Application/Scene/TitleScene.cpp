@@ -37,6 +37,7 @@ void TitleScene::Initialize() {
 	model2_->SetDefaultIsEnableLight(true);
 	model2_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
 	world2_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-4.0f,1.0f,0.0f} });
+	world3_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{5.0f,1.0f,0.0f} });
 
 	// 背景画像を設定
 	uint32_t skyboxGH = textureManager_->GetHandleByName("rostock_laage_airport_4k.dds");
@@ -97,4 +98,5 @@ void TitleScene::Draw() {
 	renderQueue_->SubmitRaytracingModel(model_, world_);
 	renderQueue_->SubmitRaytracingModel(model1_, world1_);
 	renderQueue_->SubmitRaytracingModel(model2_, world2_);
+	renderQueue_->SubmitModel(model2_, world3_);
 }

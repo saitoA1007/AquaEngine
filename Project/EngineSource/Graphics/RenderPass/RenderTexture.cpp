@@ -34,8 +34,8 @@ RenderTexture::~RenderTexture() {
 		}
 
 		// RtvAndDsvの場合、深度用SRVインデックスはsrvIndexとは別
-		if (mode_ == RenderTextureMode::RtvAndDsv && dsvSrvIndex_ != 0) {
-			srvManager_->ReleseIndex(dsvSrvIndex_);
+		if (mode_ == RenderTextureMode::RtvAndDsv && depthSrvIndex_ != 0) {
+			srvManager_->ReleseIndex(depthSrvIndex_);
 		}
 	}
 }
@@ -54,7 +54,7 @@ void RenderTexture::Create(uint32_t width, uint32_t height, RenderTextureMode mo
 	case RenderTextureMode::DsvOnly:
 		CreateDepthTarget(width, height);
 		// DsvOnlyでは深度SRVをメインSRVとして扱う
-		srvIndex_ = dsvSrvIndex_;
+		srvIndex_ = depthSrvIndex_;
 		srvGpuHandle_ = depthSrvGpuHandle_;
 		break;
 
@@ -242,21 +242,27 @@ void RenderTexture::CreateUavTarget(uint32_t width, uint32_t height, DXGI_FORMAT
 void RenderTexture::CreateDepthTarget(uint32_t width, uint32_t height) {
 
 	// 深度リソース作成
-	depthResource_ = CreateDepthStencilTextureResource(device_, width, height);
+	D3D12_RESOURCE_DESC desc = CreateTexture2dDesc(width, height, DXGI_FORMAT_R32_TYPELESS, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
+	// クリア設定
+	D3D12_CLEAR_VALUE depthClearValue{};
+	depthClearValue.DepthStencil.Depth = 1.0f;
+	depthClearValue.Format = DXGI_FORMAT_D32_FLOAT;
+	// 深度リソース作成
+	depthResource_ = CreateResource(device_, desc, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &depthClearValue);
 
 	// dsvの作成
-	dsvIndex_ = dsvManager_->CreateView(depthResource_.Get());
+	dsvIndex_ = dsvManager_->CreateView(depthResource_.Get(), DXGI_FORMAT_D32_FLOAT);
 	dsvHandle_ = dsvManager_->GetCPUHandle(dsvIndex_);
 
 	// 深度SRV作成
-	dsvSrvIndex_ = srvManager_->AllocateSrvIndex(SrvHeapType::System);
+	depthSrvIndex_ = srvManager_->AllocateSrvIndex(SrvHeapType::System);
 	D3D12_SHADER_RESOURCE_VIEW_DESC depthSrvDesc{};
-	depthSrvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+	depthSrvDesc.Format = DXGI_FORMAT_R32_FLOAT;
 	depthSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	depthSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;// 2Dテクスチャ
 	depthSrvDesc.Texture2D.MipLevels = 1;
-	D3D12_CPU_DESCRIPTOR_HANDLE depthSrvCPU = srvManager_->GetCPUHandle(dsvSrvIndex_);
-	depthSrvGpuHandle_ = static_cast<CD3DX12_GPU_DESCRIPTOR_HANDLE>(srvManager_->GetGPUHandle(dsvSrvIndex_));
+	D3D12_CPU_DESCRIPTOR_HANDLE depthSrvCPU = srvManager_->GetCPUHandle(depthSrvIndex_);
+	depthSrvGpuHandle_ = static_cast<CD3DX12_GPU_DESCRIPTOR_HANDLE>(srvManager_->GetGPUHandle(depthSrvIndex_));
 	device_->CreateShaderResourceView(depthResource_.Get(), &depthSrvDesc, depthSrvCPU);
 }
 

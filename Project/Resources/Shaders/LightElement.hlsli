@@ -85,7 +85,7 @@ float3 F_Schlick(float cosTheta, float3 F0)
     return F0 + (1.0f - F0) * pow(1.0f - cosTheta, 5.0f);
 }
 
-float3 CalculatePBR(
+float3 CalculateBRDF(
     float3 albedo,
     float3 N,
     float3 V,

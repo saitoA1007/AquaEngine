@@ -70,7 +70,7 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     // 深度情報を書き込む
     float4 clipPos = mul(float4(worldPosition, 1.0f), gCamera.vpMatrix);
     payload.depth = clipPos.z / clipPos.w;
-    
+  
     // 視線ベクトル
     float3 viewDir = normalize(gCamera.worldPosition.xyz - worldPosition);
     
@@ -96,13 +96,13 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     }
      
     // 粗さを求める
-    float roughness = clamp(sqrt(2.0f / (material.shininess + 2.0f)), 0.05f, 1.0f);
+    float roughness = clamp(sqrt(2.0f / (material.shininess + 2.0f)), 0.01f, 1.0f);
     // ライト
     float3 lightDir = normalize(-gDirectionalLight.direction);
     float3 lightColor = gDirectionalLight.color.xyz * gDirectionalLight.intensity;
     
     // 平行光源
-    float3 directLight = CalculatePBR(albedoColor, worldNormal, viewDir, lightDir, lightColor, roughness, material.metallic);
+    float3 directLight = CalculateBRDF(albedoColor, worldNormal, viewDir, lightDir, lightColor, roughness, material.metallic);
     
     // 反射レイを飛ばして反射色を取得
     float3 reflectColor = Reflection(vtx.position.xyz, vtx.normal, payload.recursive);
