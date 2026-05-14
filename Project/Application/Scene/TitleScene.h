@@ -79,4 +79,7 @@ private: // シーン機能
 	float metalic1_ = 0.01f;
 	float shininess_ = 500.0f;
 	float ior_ = 1.0f;
+
+	float intensity_ = 1.0f;
+	Vector3 dir_ = { 0.0f,-1.0f,0.0f };
 };

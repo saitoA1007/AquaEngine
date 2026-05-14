@@ -41,6 +41,5 @@ PixelShaderOutput main(VertexShaderOutput input) {
     {
         output.color = gRtColor.Sample(gSampler, input.texcoord);
     }
-    
     return output;
 }

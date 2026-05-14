@@ -19,25 +19,28 @@ void RenderQueue::Initialize(ID3D12GraphicsCommandList4* commandList, SrvManager
     srvManager_ = srvManager;
     bufferRefManager_ = bufferRefManager;
 
+    // レイトレーシングで描画するパス
+    renderPassController_->AddPass("RaytracingPass", RenderTextureMode::RtvAndUav);
+    // レイトレーシング描画の深度情報を記録する。描画に使用しない
+    renderPassController_->AddPass("RaytracingPassDepth", RenderTextureMode::UavOnly, 1280, 720, DXGI_FORMAT_R32_FLOAT);
+
+    // レイトレとラスタライズを合成する用のパス
+    renderPassController_->AddPass("LightingCompositePass");
+
     // 影を描画するパス
     renderPassController_->AddPass("ShadowPass", RenderTextureMode::DsvOnly, 2048, 2048);
     // デフォルトで描画するパス
     renderPassController_->AddPass("DefaultPass");
-    // レイトレーシングで描画するパス
-    renderPassController_->AddPass("RaytracingPass", RenderTextureMode::RtvAndUav);
-    // レイトレとラスタライズを合成する用のパス
-    renderPassController_->AddPass("LightingCompositePass");
 
-    // レイトレーシング描画の深度情報を記録する。描画に使用しない
-    renderPassController_->AddPass("RaytracingPassDepth", RenderTextureMode::UavOnly,1280,720, DXGI_FORMAT_R32_FLOAT);
-
+    // ラスタライズの最終描画
+    rasterizeFinalPassName_ = "DefaultPass";
     // 最終的な描画先を設定
     finalPassName_ = "LightingCompositePass";
     renderPassController_->SetSceneFinalPass(finalPassName_);
     renderPassController_->SetPresentPass(finalPassName_);
 
     // 実行順序を設定
-    RegisterPassOrder({ "ShadowPass", "DefaultPass","RaytracingPass" });
+    RegisterPassOrder({ "ShadowPass", "DefaultPass"});
 
     // PSOを登録
     RegisterPSO("Default3D", psoManager);
@@ -88,14 +91,16 @@ void RenderQueue::Execute() {
         mainCamera_.SetCamera(*cameraPtr_);
     }
 
+    // ライトの更新
+    lightManager_.Update();
+
     for (const auto& passName : passExecuteOrder_) {
 
         // 不透明、半透明ともにコマンドがなければ飛ばす
         bool hasOpaque = draw3dQueueList_.count(passName) > 0;
         bool hasTranslucent = translucentDrawQueueList_.count(passName) > 0;
         bool has2d = draw2dQueueList_.count(passName) > 0;
-        bool hasRaytracing = raytracingDrawQueueList_.count(passName) > 0;
-        if (!hasOpaque && !hasTranslucent && !has2d && !hasRaytracing) {
+        if (!hasOpaque && !hasTranslucent && !has2d) {
             renderPassController_->PrePass(passName);
             renderPassController_->PostPass(passName);
             continue;
@@ -151,38 +156,14 @@ void RenderQueue::Execute() {
                 }
             }
         }
-
-        // レイトレーシング描画コマンドを解放
-        if (hasRaytracing) {
-        
-            // tlasを更新する
-            tlas_.Update(commandList_, raytracingDrawQueueList_[passName]);
-         
-            // UAVに状態を変更
-            renderPassController_->SwitchToUAV(passName);
-            renderPassController_->SwitchToUAV("RaytracingPassDepth");
-         
-            // レイトレーシングの描画
-            DrawRaytracing();
-         
-            // UAV書き込み完了
-            renderPassController_->InsertUavBarrier(passName);
-            renderPassController_->InsertUavBarrier("RaytracingPassDepth");
-            renderPassController_->PostPass("RaytracingPassDepth");
-        }
-
         renderPassController_->PostPass(passName);
     }
 
-    // レイトレとラスタライズの内容を合成する
-    renderPassController_->PrePass("LightingCompositePass");
-    PreDraw("LightingComposite");
-    commandList_->SetGraphicsRootDescriptorTable(0, srvManager_->GetGPUHandle(renderPassController_->GetSrvIndex("DefaultPass")));
-    commandList_->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUHandle(renderPassController_->GetDepthSrvIndex("DefaultPass")));
-    commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetGPUHandle(renderPassController_->GetSrvIndex("RaytracingPass")));
-    commandList_->SetGraphicsRootDescriptorTable(3, srvManager_->GetGPUHandle(renderPassController_->GetSrvIndex("RaytracingPassDepth")));
-    commandList_->DrawInstanced(3, 1, 0, 0);
-    renderPassController_->PostPass("LightingCompositePass");
+    // レイトレーシング描画コマンドを解放
+    RaytracingExecute();
+
+    // レイトレとラスタライズの描画を合成する
+    LightingComposite();
 
     // 最終的に画面に出すためのパスの設定
     renderPassController_->SetPresentPass(finalPassName_);
@@ -354,7 +335,7 @@ void RenderQueue::SubmitDebugLine(const DebugRenderer* debugRenderer, const std:
     draw3dQueueList_[passName][request.layer][Get3dPsoName(request.type)].push_back(request);
 }
 
-void RenderQueue::SubmitRaytracingModel(const Model* model, WorldTransform& worldTransform, const uint32_t* materialIndex, const std::string& passName) {
+void RenderQueue::SubmitRaytracingModel(const Model* model, WorldTransform& worldTransform, const uint32_t* materialIndex) {
     // 登録
     auto& meshes = model->GetMeshes();
     for (auto& mesh : meshes) {
@@ -378,7 +359,7 @@ void RenderQueue::SubmitRaytracingModel(const Model* model, WorldTransform& worl
         Matrix4x4 matrix = Transpose(worldTransform.GetWorldMatrix());
         std::memcpy(&data.transform, &matrix, sizeof(float) * 12);
 
-        raytracingDrawQueueList_[passName].push_back(std::move(data));
+        raytracingDrawQueueList_.push_back(std::move(data));
     }
 }
 
@@ -468,4 +449,34 @@ void RenderQueue::DrawRaytracing() {
     // レイトレーシングを開始
     commandList_->SetPipelineState1(raytracingPipeline_->GetStateObject());
     commandList_->DispatchRays(&raytracingPipeline_->GetDispatchRayDesc());
+}
+
+void RenderQueue::RaytracingExecute() {
+    // tlasを更新する
+    tlas_.Update(commandList_, raytracingDrawQueueList_);
+
+    // UAVに状態を変更
+    renderPassController_->SwitchToUAV("RaytracingPass");
+    renderPassController_->SwitchToUAV("RaytracingPassDepth");
+
+    // レイトレーシングの描画
+    DrawRaytracing();
+
+    // UAV書き込み完了
+    renderPassController_->InsertUavBarrier("RaytracingPass");
+    renderPassController_->InsertUavBarrier("RaytracingPassDepth");
+    renderPassController_->PostPass("RaytracingPass");
+    renderPassController_->PostPass("RaytracingPassDepth");
+}
+
+void RenderQueue::LightingComposite() {
+    // レイトレとラスタライズの内容を合成する
+    renderPassController_->PrePass("LightingCompositePass");
+    PreDraw("LightingComposite");
+    commandList_->SetGraphicsRootDescriptorTable(0, srvManager_->GetGPUHandle(renderPassController_->GetSrvIndex(rasterizeFinalPassName_)));
+    commandList_->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUHandle(renderPassController_->GetDepthSrvIndex(rasterizeFinalPassName_)));
+    commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetGPUHandle(renderPassController_->GetSrvIndex("RaytracingPass")));
+    commandList_->SetGraphicsRootDescriptorTable(3, srvManager_->GetGPUHandle(renderPassController_->GetSrvIndex("RaytracingPassDepth")));
+    commandList_->DrawInstanced(3, 1, 0, 0);
+    renderPassController_->PostPass("LightingCompositePass");
 }

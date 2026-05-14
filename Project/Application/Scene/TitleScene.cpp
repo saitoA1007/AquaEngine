@@ -53,6 +53,8 @@ void TitleScene::Update() {
 	walkAnimator_->ComputeUpdate();
 
 #ifdef USE_IMGUI
+	auto* light = renderQueue_->GetLightManager();
+
 	ImGui::Begin("test");
 
 	ImGui::ColorEdit4("color", &color_.x);
@@ -60,6 +62,13 @@ void TitleScene::Update() {
 	ImGui::DragFloat("grassMetalic", &metalic1_, 0.01f);
 	ImGui::DragFloat("shininess", &shininess_);
 	ImGui::DragFloat("IOR", &ior_, 0.1f);
+
+	ImGui::DragFloat3("lightDir", &dir_.x, 0.1f);
+	ImGui::DragFloat("lightIntensity", &intensity_, 0.1f);
+	dir_ = Normalize(dir_);
+
+	light->SetDirectionalDirction(dir_);
+	light->SetDirectionalIntensity(intensity_);
 
 	model_->SetDefaultColor(color_);
 	model_->SetDefaultMetallic(metalic_);
@@ -72,6 +81,8 @@ void TitleScene::Update() {
 
 void TitleScene::DebugUpdate() {
 #ifdef USE_IMGUI
+	auto* light = renderQueue_->GetLightManager();
+
 	ImGui::Begin("test");
 
 	ImGui::ColorEdit4("color", &color_.x);
@@ -79,6 +90,13 @@ void TitleScene::DebugUpdate() {
 	ImGui::DragFloat("grassMetalic",&metalic1_,0.01f);
 	ImGui::DragFloat("shininess",&shininess_);
 	ImGui::DragFloat("IOR",&ior_,0.1f);
+
+	ImGui::DragFloat3("lightDir", &dir_.x, 0.1f);
+	ImGui::DragFloat("lightIntensity", &intensity_,0.1f);
+	dir_ = Normalize(dir_);
+
+	light->SetDirectionalDirction(dir_);
+	light->SetDirectionalIntensity(intensity_);
 
 	model_->SetDefaultColor(color_);
 	model_->SetDefaultMetallic(metalic_);

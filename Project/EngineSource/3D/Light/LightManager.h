@@ -50,6 +50,8 @@ namespace GameEngine {
         /// <param name="lightdir"></param>
         void SetDirectionalDirction(const Vector3& lightdir);
 
+        void SetDirectionalIntensity(const float& intensity);
+
         /// <summary>
         /// 平行光源の有効化
         /// </summary>
