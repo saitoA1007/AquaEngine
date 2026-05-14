@@ -85,6 +85,11 @@ float3 F_Schlick(float cosTheta, float3 F0)
     return F0 + (1.0f - F0) * pow(1.0f - cosTheta, 5.0f);
 }
 
+float3 F_EnvApprox(float NdotV, float3 F0, float3 F90)
+{
+    return F0 + (F90 - F0) * pow(1.0f - NdotV, 5.0f);
+}
+
 float3 CalculateBRDF(
     float3 albedo,
     float3 N,
@@ -125,15 +130,19 @@ float3 CalculateBRDF(
     return (kD * albedo / PI + specular) * lightColor * NdotL;
 }
 
-float3 CalculateIBL(float3 albedo, float3 reflectColor, float3 N, float3 V, float metallic)
+float3 CalculateIBL(float3 albedo, float3 reflectColor, float3 N, float3 V, float metallic, float roughness)
 {
     float NdotV = saturate(dot(N, V));
      // 金属
     float3 F0 = lerp(float3(0.04f, 0.04f, 0.04f), albedo, metallic);
+    float3 F90 = max(float3(1.0f - roughness, 1.0f - roughness, 1.0f - roughness), F0);
     
     // 視線角度でのフレネル
-    float3 F_env = F_Schlick(NdotV, F0);
+    float3 F_env = F_EnvApprox(NdotV, F0, F90);
     float3 kD_env = (1.0f - F_env) * (1.0f - metallic);
+    
+    // 反射強度
+    float reflectStrength = (1.0f - roughness) * (1.0f - roughness);
     
     // 反射色
     float3 tintedReflect = reflectColor * lerp(float3(1.0f, 1.0f, 1.0f), albedo, metallic);
@@ -141,6 +150,6 @@ float3 CalculateIBL(float3 albedo, float3 reflectColor, float3 N, float3 V, floa
     // 簡易アンビエント
     float3 ambient = albedo * 0.03f;
     
-    return kD_env * ambient + F_env * tintedReflect;
+    return kD_env * ambient + F_env * reflectStrength * tintedReflect;
 }
 #endif

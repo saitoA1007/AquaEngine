@@ -75,10 +75,15 @@ private: // シーン機能
 	GameEngine::WorldTransform world3_;
 	
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
+	Vector4 color1_ = { 1.0f,1.0f,1.0f,1.0f };
 	float metalic_ = 0.01f;
 	float metalic1_ = 0.01f;
-	float shininess_ = 500.0f;
+	float metalic2_ = 0.01f;
+	float shininess_ = 1.0f;
+	float shininess1_ = 1.0f;
+	float shininess2_ = 1.0f;
 	float ior_ = 1.0f;
+	float ior1_ = 1.0f;
 
 	float intensity_ = 1.0f;
 	Vector3 dir_ = { 0.0f,-1.0f,0.0f };

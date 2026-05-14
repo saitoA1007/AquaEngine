@@ -1,6 +1,6 @@
-#include"TitleScene.h"
-#include"ImguiManager.h"
-#include"GameParamEditor.h"
+#include "TitleScene.h"
+#include "ImguiManager.h"
+#include "GameParamEditor.h"
 using namespace GameEngine;
 
 TitleScene::~TitleScene() {
@@ -37,10 +37,10 @@ void TitleScene::Initialize() {
 	model2_->SetDefaultIsEnableLight(true);
 	model2_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
 	world2_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-4.0f,1.0f,0.0f} });
-	world3_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{5.0f,1.0f,0.0f} });
+	world3_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{5.0f,-4.0f,0.0f} });
 
-	// 背景画像を設定
-	uint32_t skyboxGH = textureManager_->GetHandleByName("rostock_laage_airport_4k.dds");
+	// 背景画像を設定rostock_laage_airport_4k
+	uint32_t skyboxGH = textureManager_->GetHandleByName("grasslands_sunset_1k.dds");
 	renderQueue_->SetSkyboxTexture(skyboxGH);
 }
 
@@ -58,10 +58,15 @@ void TitleScene::Update() {
 	ImGui::Begin("test");
 
 	ImGui::ColorEdit4("color", &color_.x);
-	ImGui::DragFloat("metalic", &metalic_, 0.01f);
-	ImGui::DragFloat("grassMetalic", &metalic1_, 0.01f);
-	ImGui::DragFloat("shininess", &shininess_);
-	ImGui::DragFloat("IOR", &ior_, 0.1f);
+	ImGui::ColorEdit4("Cubecolor", &color1_.x);
+	ImGui::DragFloat("P_metalic", &metalic_, 0.01f, 0.0f, 1.0f);
+	ImGui::DragFloat("grassMetalic", &metalic1_, 0.01f, 0.0f, 1.0f);
+	ImGui::DragFloat("CubeMetalic", &metalic2_, 0.01f, 0.0f, 1.0f);
+	ImGui::DragFloat("P_shininess", &shininess_,0.1f, 0.0f, 1.0f);
+	ImGui::DragFloat("CubeShininess", &shininess1_,0.1f, 0.0f, 1.0f);
+	ImGui::DragFloat("GrassShininess", &shininess2_,0.1f, 0.0f, 1.0f);
+	ImGui::DragFloat("P_IOR", &ior_, 0.1f);
+	ImGui::DragFloat("CubeIOR", &ior1_, 0.1f);
 
 	ImGui::DragFloat3("lightDir", &dir_.x, 0.1f);
 	ImGui::DragFloat("lightIntensity", &intensity_, 0.1f);
@@ -71,10 +76,15 @@ void TitleScene::Update() {
 	light->SetDirectionalIntensity(intensity_);
 
 	model_->SetDefaultColor(color_);
+	model2_->SetDefaultColor(color1_);
 	model_->SetDefaultMetallic(metalic_);
 	model1_->SetDefaultMetallic(metalic1_);
+	model2_->SetDefaultMetallic(metalic2_);
 	model_->SetDefaultShininess(shininess_);
+	model2_->SetDefaultShininess(shininess1_);
+	model1_->SetDefaultShininess(shininess2_);
 	model_->SetDefaultIOR(ior_);
+	model2_->SetDefaultIOR(ior1_);
 	ImGui::End();
 #endif
 }
@@ -86,23 +96,33 @@ void TitleScene::DebugUpdate() {
 	ImGui::Begin("test");
 
 	ImGui::ColorEdit4("color", &color_.x);
-	ImGui::DragFloat("metalic",&metalic_,0.01f);
-	ImGui::DragFloat("grassMetalic",&metalic1_,0.01f);
-	ImGui::DragFloat("shininess",&shininess_);
-	ImGui::DragFloat("IOR",&ior_,0.1f);
+	ImGui::ColorEdit4("Cubecolor", &color1_.x);
+	ImGui::DragFloat("P_metalic", &metalic_, 0.01f, 0.0f, 1.0f);
+	ImGui::DragFloat("grassMetalic", &metalic1_, 0.01f, 0.0f, 1.0f);
+	ImGui::DragFloat("CubeMetalic", &metalic2_, 0.01f, 0.0f, 1.0f);
+	ImGui::DragFloat("P_shininess", &shininess_,0.1f, 0.0f, 1.0f);
+	ImGui::DragFloat("CubeShininess", &shininess1_,0.1f, 0.0f, 1.0f);
+	ImGui::DragFloat("GrassShininess", &shininess2_,0.1f,0.0f,1.0f);
+	ImGui::DragFloat("P_IOR", &ior_, 0.1f, 0.0f, 1.0f);
+	ImGui::DragFloat("CubeIOR", &ior1_, 0.1f, 0.0f, 1.0f);
 
 	ImGui::DragFloat3("lightDir", &dir_.x, 0.1f);
-	ImGui::DragFloat("lightIntensity", &intensity_,0.1f);
+	ImGui::DragFloat("lightIntensity", &intensity_, 0.1f);
 	dir_ = Normalize(dir_);
 
 	light->SetDirectionalDirction(dir_);
 	light->SetDirectionalIntensity(intensity_);
 
 	model_->SetDefaultColor(color_);
+	model2_->SetDefaultColor(color1_);
 	model_->SetDefaultMetallic(metalic_);
 	model1_->SetDefaultMetallic(metalic1_);
+	model2_->SetDefaultMetallic(metalic2_);
 	model_->SetDefaultShininess(shininess_);
+	model2_->SetDefaultShininess(shininess1_);
+	model1_->SetDefaultShininess(shininess2_);
 	model_->SetDefaultIOR(ior_);
+	model2_->SetDefaultIOR(ior1_);
 	ImGui::End();
 #endif
 }

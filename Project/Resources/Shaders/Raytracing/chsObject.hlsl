@@ -96,7 +96,8 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     }
      
     // 粗さを求める
-    float roughness = clamp(sqrt(2.0f / (material.shininess + 2.0f)), 0.01f, 1.0f);
+    //float roughness = clamp(sqrt(2.0f / (material.shininess + 2.0f)), 0.01f, 1.0f);
+    float roughness = clamp(material.shininess, 0.01f, 1.0f);
     // ライト
     float3 lightDir = normalize(-gDirectionalLight.direction);
     float3 lightColor = gDirectionalLight.color.xyz * gDirectionalLight.intensity;
@@ -108,7 +109,7 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     float3 reflectColor = Reflection(vtx.position.xyz, vtx.normal, payload.recursive);
     
     // 環境光
-    float3 indirectLight = CalculateIBL(albedoColor, reflectColor, worldNormal, viewDir, material.metallic);
+    float3 indirectLight = CalculateIBL(albedoColor, reflectColor, worldNormal, viewDir, material.metallic, roughness);
     
      // 透明度の表示
     if (ref.type == 1)
