@@ -125,4 +125,12 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     
     // 最終的な色を設定
     payload.color = directLight + indirectLight;
+    
+    // 影判定を取得
+    bool isInShadow = ShootShadowRay(worldPosition, lightDir);
+    // 影の中であれば、影色を設定
+    if (isInShadow)
+    {
+        payload.color.xyz *= 0.5;
+    }
 }

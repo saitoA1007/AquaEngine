@@ -113,10 +113,18 @@ void RaytracingPipeline::CreateShaderTable(ModelManager* modelManager) {
 		if (id == nullptr) {
 			assert(false && "Not found ShaderIdentifier");
 		}
-
 		ShaderRecord record;
 		record.SetIdentifier(id);
 		shaderTableBuilder_.Miss().AddRecord(std::move(record));
+
+		// シャドウ判定用のMissシェーダー
+		auto shadowId = rtsoProps->GetShaderIdentifier(L"ShadowMiss");
+		if (shadowId == nullptr) {
+			assert(false && "Not found ShaderIdentifier");
+		}
+		ShaderRecord shadowRecord;
+		shadowRecord.SetIdentifier(shadowId);
+		shaderTableBuilder_.Miss().AddRecord(std::move(shadowRecord));
 	}
 
 	// ヒットグループ番号

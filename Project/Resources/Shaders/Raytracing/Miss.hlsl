@@ -9,3 +9,9 @@ void MainMiss(inout Payload payload)
     payload.color = color.xyz;
     payload.depth = 1.0f;
 }
+
+[shader("miss")]
+void ShadowMiss(inout ShadowPayload payload)
+{
+    payload.isHit = false;
+}

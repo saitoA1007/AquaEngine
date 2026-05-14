@@ -9,6 +9,11 @@ struct Payload
     float depth;
 };
 
+struct ShadowPayload
+{
+    bool isHit;
+};
+
 struct MyAttribute
 {
     float2 barys;
@@ -174,5 +179,34 @@ float3 TranslucentRefraction(float3 vertexPosition, float3 vertexNormal, int rec
             refractPayload);
         return refractPayload.color;
     }
+}
+
+// 影判定用のレイ
+bool ShootShadowRay(float3 origin, float3 direction)
+{
+    RayDesc rayDesc;
+    rayDesc.Origin = origin;
+    rayDesc.Direction = direction;
+    rayDesc.TMin = 0.001f;
+    rayDesc.TMax = 100000;
+
+    ShadowPayload payload;
+    payload.isHit = true;
+
+    RAY_FLAG flags = RAY_FLAG_NONE;
+    //flags |= RAY_FLAG_FORCE_OPAQUE;
+    flags |= RAY_FLAG_SKIP_CLOSEST_HIT_SHADER;
+    uint rayMask = 0xFF;
+
+    TraceRay(
+        gRtScene,
+        flags,
+        rayMask,
+        0, // ray index
+        1, // MultiplierForGeometryContrib
+        1, // miss index
+        rayDesc,
+        payload);
+    return payload.isHit;
 }
 #endif
