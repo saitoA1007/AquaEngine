@@ -25,6 +25,7 @@ void MainRayGen()
     Payload payload;
     payload.color = float3(0, 0, 0.5);
     payload.recursive = 0;
+    payload.depth = 1.0f;
 
     RAY_FLAG flags = RAY_FLAG_NONE;
     uint rayMask = 0xFF;
@@ -41,4 +42,5 @@ void MainRayGen()
     float3 col = payload.color;
 
     gOutput[launchIndex.xy] = float4(col, 1);
+    gDepthOutput[launchIndex.xy] = payload.depth;
 }

@@ -77,7 +77,7 @@ void PSOManager::RegisterPSO(const std::string& name, const CreatePSOData& psoDa
     psoDesc.VS = { vsBlob->GetBufferPointer(), vsBlob->GetBufferSize() };
     psoDesc.PS = { psBlob->GetBufferPointer(), psBlob->GetBufferSize() };
     psoDesc.DepthStencilState = depthStencilDesc;
-    psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    psoDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
     psoDesc.NumRenderTargets = 1;
     psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
     psoDesc.PrimitiveTopologyType = psoData.primitiveType;
@@ -301,7 +301,7 @@ void PSOManager::CreatePSO(const std::string& psoName, const CreatePSOData& psoD
     psoDesc.RasterizerState = rasterizerBuiler_.GetRasterizerDesc(psoData.drawMode);
     // DepthStencilState
     psoDesc.DepthStencilState = depthStencilDesc;
-    psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    psoDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
     psoDesc.NumRenderTargets = 1;
     psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
     psoDesc.SampleDesc.Count = 1;
@@ -589,4 +589,17 @@ void PSOManager::DeaultLoadPostEffectPSO() {
     // ラジアルブラーを作成
     defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/RadialBlur/RadialBlur.PS.hlsl";
     RegisterPSO("RadialBlur", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
+
+    // ラスタライズとレイトレの描画を合成する
+    defaultPostEffect.rootSigName = "LightingComposite";
+    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/LightingComposite.PS.hlsl";
+    RootSignatureBuilder rsBuilder;
+    rsBuilder.Initialize(device_);
+    rsBuilder.AddSRVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL);
+    rsBuilder.AddSRVDescriptorTable(1, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL);
+    rsBuilder.AddSRVDescriptorTable(2, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL);
+    rsBuilder.AddSRVDescriptorTable(3, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL);
+    rsBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
+    rsBuilder.CreateRootSignature();
+    RegisterPSO("LightingComposite", defaultPostEffect, &rsBuilder, &inputLayoutBuilder);
 }

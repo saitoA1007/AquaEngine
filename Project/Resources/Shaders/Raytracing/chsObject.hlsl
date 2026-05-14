@@ -18,9 +18,9 @@ struct MaterialData {
     float4 specularColor;
     
     float shininess;
-    uint32_t textureHandle;
+    uint textureHandle;
     float metallic;
-    int32_t isActiveShadow;
+    int isActiveShadow;
     
     float ior;
     float3 padding1;
@@ -67,6 +67,10 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     float3 worldNormal = mul(vtx.normal, (float3x3)ObjectToWorld4x3());
     worldNormal = normalize(worldNormal);
     
+    // 深度情報を書き込む
+    float4 clipPos = mul(float4(worldPosition, 1.0f), gCamera.vpMatrix);
+    payload.depth = clipPos.z / clipPos.w;
+  
     // 視線ベクトル
     float3 viewDir = normalize(gCamera.worldPosition.xyz - worldPosition);
     
@@ -92,19 +96,20 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     }
      
     // 粗さを求める
-    float roughness = clamp(sqrt(2.0f / (material.shininess + 2.0f)), 0.05f, 1.0f);
+    //float roughness = clamp(sqrt(2.0f / (material.shininess + 2.0f)), 0.01f, 1.0f);
+    float roughness = clamp(material.shininess, 0.01f, 1.0f);
     // ライト
     float3 lightDir = normalize(-gDirectionalLight.direction);
     float3 lightColor = gDirectionalLight.color.xyz * gDirectionalLight.intensity;
     
     // 平行光源
-    float3 directLight = CalculatePBR(albedoColor, worldNormal, viewDir, lightDir, lightColor, roughness, material.metallic);
+    float3 directLight = CalculateBRDF(albedoColor, worldNormal, viewDir, lightDir, lightColor, roughness, material.metallic);
     
     // 反射レイを飛ばして反射色を取得
     float3 reflectColor = Reflection(vtx.position.xyz, vtx.normal, payload.recursive);
     
     // 環境光
-    float3 indirectLight = CalculateIBL(albedoColor, reflectColor, worldNormal, viewDir, material.metallic);
+    float3 indirectLight = CalculateIBL(albedoColor, reflectColor, worldNormal, viewDir, material.metallic, roughness);
     
      // 透明度の表示
     if (ref.type == 1)
@@ -121,4 +126,12 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     
     // 最終的な色を設定
     payload.color = directLight + indirectLight;
+    
+    // 影判定を取得
+    bool isInShadow = ShootShadowRay(worldPosition, lightDir);
+    // 影の中であれば、影色を設定
+    if (isInShadow)
+    {
+        payload.color.xyz *= 0.5;
+    }
 }

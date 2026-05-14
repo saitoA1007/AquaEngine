@@ -6,6 +6,12 @@ struct Payload
 {
     float3 color;
     int recursive;
+    float depth;
+};
+
+struct ShadowPayload
+{
+    bool isHit;
 };
 
 struct MyAttribute
@@ -15,22 +21,23 @@ struct MyAttribute
 
 struct Camera
 {
-    float32_t3 worldPosition;
-    float32_t4x4 vpMatrix;
-    float32_t4x4 mtxViewInv; // ビュー逆行列
-    float32_t4x4 mtxProjInv; // プロジェクション逆行列
+    float3 worldPosition;
+    float4x4 vpMatrix;
+    float4x4 mtxViewInv; // ビュー逆行列
+    float4x4 mtxProjInv; // プロジェクション逆行列
 };
 
 struct MaterialRef
 {
-    uint32_t type; // マテリアルデータのタイプ
-    uint32_t MaterialIndex; // マテリアルデータの参照するハンドル
+    uint type; // マテリアルデータのタイプ
+    uint MaterialIndex; // マテリアルデータの参照するハンドル
 };
 
 // Global Root Signature
 RWTexture2D<float4> gOutput : register(u0);
+RWTexture2D<float> gDepthOutput : register(u1);
 RaytracingAccelerationStructure gRtScene : register(t0, space0);
-Texture2D<float32_t4> gTexture[] : register(t0, space1);
+Texture2D<float4> gTexture[] : register(t0, space1);
 StructuredBuffer<MaterialRef> gBufferRefs : register(t0, space2);
 ByteAddressBuffer gBufferData[] : register(t0, space3);
 TextureCube<float4> gBackgroundTexture : register(t1, space0);
@@ -42,8 +49,8 @@ cbuffer LightGroup : register(b1)
     DirectionalLight gDirectionalLight;
     PointLight gPointLight;
     SpotLight gSpotLight;
-    uint32_t environmentTexture;
-    int32_t isActiveEnvironment;
+    uint environmentTexture;
+    int isActiveEnvironment;
 };
 
 inline float3 CalcBarycentrics(float2 barys)
@@ -172,5 +179,34 @@ float3 TranslucentRefraction(float3 vertexPosition, float3 vertexNormal, int rec
             refractPayload);
         return refractPayload.color;
     }
+}
+
+// 影判定用のレイ
+bool ShootShadowRay(float3 origin, float3 direction)
+{
+    RayDesc rayDesc;
+    rayDesc.Origin = origin;
+    rayDesc.Direction = direction;
+    rayDesc.TMin = 0.001f;
+    rayDesc.TMax = 100000;
+
+    ShadowPayload payload;
+    payload.isHit = true;
+
+    RAY_FLAG flags = RAY_FLAG_NONE;
+    //flags |= RAY_FLAG_FORCE_OPAQUE;
+    flags |= RAY_FLAG_SKIP_CLOSEST_HIT_SHADER;
+    uint rayMask = 0xFF;
+
+    TraceRay(
+        gRtScene,
+        flags,
+        rayMask,
+        0, // ray index
+        1, // MultiplierForGeometryContrib
+        1, // miss index
+        rayDesc,
+        payload);
+    return payload.isHit;
 }
 #endif

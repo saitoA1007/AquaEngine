@@ -59,6 +59,9 @@ namespace GameEngine {
         // ライトリソースを取得
         GpuResource* GetLightResource() { return lightManager_.GetConstantBuffer(); }
 
+        // ライト管理機能を取得
+        LightManager* GetLightManager() { return &lightManager_; }
+
         // 背景画像ハンドルを設定する
         void SetSkyboxTexture(const uint32_t& texture) {
             skyboxTextureIndex_ = texture;
@@ -91,7 +94,7 @@ namespace GameEngine {
         void SubmitDebugLine(const DebugRenderer* debugRenderer, const std::string& passName = "DefaultPass");
 
         // レイトレーシングでのモデル
-        void SubmitRaytracingModel(const Model* model, WorldTransform& worldTransform,const uint32_t* materialIndex = nullptr, const std::string& passName = "RaytracingPass");
+        void SubmitRaytracingModel(const Model* model, WorldTransform& worldTransform,const uint32_t* materialIndex = nullptr);
 
     private:
         ID3D12GraphicsCommandList4* commandList_ = nullptr;
@@ -107,7 +110,7 @@ namespace GameEngine {
         // 半透明の描画コマンドのスタックメモリ
         std::map<std::string, std::vector<Draw3dRequest>> translucentDrawQueueList_;
         // レイトレーシングの描画コマンド
-        std::map<std::string,std::vector<TLASInstanceData>> raytracingDrawQueueList_;
+        std::vector<TLASInstanceData> raytracingDrawQueueList_;
 
         // カメラリソース
         Camera mainCamera_;
@@ -144,6 +147,9 @@ namespace GameEngine {
         // 最終的に画面に描画させるパスの名前
         std::string finalPassName_ = "";
 
+        // ラスタライズ描画で最終的に描画させるパス
+        std::string rasterizeFinalPassName_ = "";
+
     private:
         /// <summary>
         /// PSOManagerから名前を指定して動的に登録する。
@@ -176,5 +182,11 @@ namespace GameEngine {
 
         // レイトレーシングの描画
         void DrawRaytracing();
+
+        // レイトレの描画コマンドを解放
+        void RaytracingExecute();
+
+        // レイトレとラスタライズの描画を合成する
+        void LightingComposite();
     };
 }

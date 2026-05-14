@@ -3,27 +3,30 @@
 
 struct Material
 {
-    float32_t4 color;
-    int32_t enableLighting;
-    float32_t4x4 uvTransform;
-    float32_t3 specularColor;
+    float4 color;
+    int enableLighting;
+    float3 padding0;
+    float4x4 uvTransform;
+    float4 specularColor;
     float shininess;
-    uint32_t textureHandle;
+    uint textureHandle;
     float metallic;
-    int32_t isActiveShadow;
+    int isActiveShadow;
+    float ior;
+    float3 padding1;
 };
 ConstantBuffer<Material> gMaterial : register(b0);
 
-Texture2D<float32_t4> gTexture[] : register(t0,space0);
-TextureCube<float32_t4> gCubeTexture[] : register(t1,space1);
+Texture2D<float4> gTexture[] : register(t0,space0);
+TextureCube<float4> gCubeTexture[] : register(t1,space1);
 Texture2D<float> gShadowMap[] : register(t2,space2);
 SamplerState gSampler : register(s0);
 SamplerComparisonState gShadowSampler : register(s1);
 
 struct Camera
 {
-    float32_t3 worldPosition;
-    float32_t4x4 vpMatrix;
+    float3 worldPosition;
+    float4x4 vpMatrix;
 };
 ConstantBuffer<Camera> gCamera : register(b1);
 
@@ -32,13 +35,13 @@ cbuffer LightGroup : register(b2)
     DirectionalLight gDirectionalLight;
     PointLight gPointLight;
     SpotLight gSpotLight;
-    uint32_t environmentTexture;
-    int32_t isActiveEnvironment;
+    uint environmentTexture;
+    int isActiveEnvironment;
 };
 
 struct PixelShaderOutput
 {
-    float32_t4 color : SV_TARGET0;
+    float4 color : SV_TARGET0;
 };
 
 // ライトの処理
@@ -54,7 +57,7 @@ PixelShaderOutput main(VertexShaderOutput input)
 {
     PixelShaderOutput output;
     float4 transformedUV = mul(float32_t4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
-    float32_t4 textureColor = gTexture[gMaterial.textureHandle].Sample(gSampler, transformedUV.xy);
+    float4 textureColor = gTexture[gMaterial.textureHandle].Sample(gSampler, transformedUV.xy);
     
     if (textureColor.a == 0.0)
     {
@@ -65,12 +68,12 @@ PixelShaderOutput main(VertexShaderOutput input)
     { // Lightingする場合
         
         // 最終的な色
-        float32_t3 finalColor = float32_t3(0.0f, 0.0f, 0.0f);
+        float3 finalColor = float3(0.0f, 0.0f, 0.0f);
         
         // ライト計算のための共通データを準備
-        float32_t3 normal = normalize(input.normal);
-        float32_t3 toEye = normalize(gCamera.worldPosition - input.worldPosition);
-        float32_t3 baseColor = gMaterial.color.rgb * textureColor.rgb;
+        float3 normal = normalize(input.normal);
+        float3 toEye = normalize(gCamera.worldPosition - input.worldPosition);
+        float3 baseColor = gMaterial.color.rgb * textureColor.rgb;
         
         if (gDirectionalLight.active)
         {
@@ -146,7 +149,7 @@ float32_t3 CalculateShading(
     float32_t3 halfVector = normalize(lightDirection + viewDirection);
     float NDotH = dot(normal, halfVector);
     float specularPow = pow(saturate(NDotH), matData.shininess);
-    float32_t3 specular = lightColor * specularPow * matData.specularColor;
+    float32_t3 specular = lightColor * specularPow * matData.specularColor.xyz;
 
     return diffuse + specular;
 }

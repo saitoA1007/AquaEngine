@@ -8,7 +8,7 @@ void RenderPassController::Initialize(RenderTextureManager* renderTextureManager
 	renderTextureManager_ = renderTextureManager;
 }
 
-void RenderPassController::AddPass(const std::string& name, RenderTextureMode mode, uint32_t wid, uint32_t hei) {
+void RenderPassController::AddPass(const std::string& name, RenderTextureMode mode, uint32_t wid, uint32_t hei, DXGI_FORMAT colorFormat) {
 	// すでに登録されている場合、早期リターン
 	auto getName = renderPassList_.find(name);
 	if (getName != renderPassList_.end()) {
@@ -16,7 +16,7 @@ void RenderPassController::AddPass(const std::string& name, RenderTextureMode mo
 	}
 
 	// renderTextureを作成
-	renderTextureManager_->Create(name, wid, hei,mode);
+	renderTextureManager_->Create(name, wid, hei,mode, colorFormat);
 	RenderTexture* renderTex = renderTextureManager_->GetRenderTexture(name);
 
 	// レンダーパスを作成
@@ -30,7 +30,8 @@ void RenderPassController::PrePass(const std::string& name) {
 	// 登録されていなければエラー
 	auto render = renderPassList_.find(name);
 	if (render == renderPassList_.end()) {
-		assert(false && "Not found RenderPass");
+		std::string errorStr = "Not found RenderPass : name[" + name + "]";
+		assert(false && errorStr.c_str());
 	}
 
 	// 描画前処理
@@ -98,6 +99,16 @@ uint32_t RenderPassController::GetUavIndex(const std::string& name) {
 	return render->second->GetUavIndex();
 }
 
+uint32_t RenderPassController::GetDepthSrvIndex(const std::string& name) {
+	// 登録されていなければエラー
+	auto render = renderPassList_.find(name);
+	if (render == renderPassList_.end()) {
+		assert(false && "Not found RenderPass");
+	}
+
+	return render->second->GetDepthSrvIndex();
+}
+
 void RenderPassController::SetSceneFinalPass(const std::string& name) {
 	// 登録されていなければエラー
 	auto render = renderPassList_.find(name);
@@ -129,4 +140,14 @@ void RenderPassController::SetPresentPass(const std::string& name) {
 
 	presentPassName_ = name;
 	presentPassSrvHandle_ = render->second->GetSrvHandle();
+}
+
+void RenderPassController::SetDrawRange(const std::string& name, const uint32_t& width, const uint32_t& height, const uint32_t& left, const uint32_t& top) {
+	// 登録されていなければエラー
+	auto render = renderPassList_.find(name);
+	if (render == renderPassList_.end()) {
+		assert(false && "Not found RenderPass");
+	}
+
+	render->second->SetDrawRange(width, height, left, top);
 }

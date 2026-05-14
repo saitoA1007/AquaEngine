@@ -1,5 +1,4 @@
-#include"RenderPass.h"
-
+#include "RenderPass.h"
 using namespace GameEngine;
 
 RenderPass::RenderPass(const std::string& name, ID3D12GraphicsCommandList* commandList, RenderTexture* renderTexture) {
@@ -111,4 +110,17 @@ void RenderPass::InsertUavBarrier() {
 
 CD3DX12_GPU_DESCRIPTOR_HANDLE RenderPass::GetSrvHandle() {
 	return renderTexture_->GetSrvGpuHandle();
+}
+
+void RenderPass::SetDrawRange(const uint32_t& width, const uint32_t& height,const uint32_t& left,const uint32_t& top) {
+	// Viewportを作成
+	viewport_.Width = static_cast<FLOAT>(width);
+	viewport_.Height = static_cast<FLOAT>(height);
+	viewport_.MinDepth = 0.0f;
+	viewport_.MaxDepth = 1.0f;
+	// Scissorを作成
+	scissorRect_.left = left;
+	scissorRect_.right = static_cast<LONG>(viewport_.Width);
+	scissorRect_.top = top;
+	scissorRect_.bottom = static_cast<LONG>(viewport_.Height);
 }

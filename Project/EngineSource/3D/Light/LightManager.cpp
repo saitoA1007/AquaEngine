@@ -55,6 +55,10 @@ void  LightManager::SetDirectionalDirction(const Vector3& lightdir) {
     directionalLight_->SetLightDir(lightdir);
 }
 
+void  LightManager::SetDirectionalIntensity(const float& intensity) {
+    directionalLight_->SetLightIntensity(intensity);
+}
+
 void LightManager::SetDirectionalLightActive(const bool& active) {
     directionalLight_->SetActive(active);
 }
