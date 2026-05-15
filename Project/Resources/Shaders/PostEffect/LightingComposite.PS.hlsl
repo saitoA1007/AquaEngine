@@ -20,20 +20,12 @@ float LinearizeDepth(float depth, float nearZ, float farZ)
 PixelShaderOutput main(VertexShaderOutput input) {
     PixelShaderOutput output;
     
-    float nearZ = 0.1f;
-    float farZ = 200.0f;
+    float4 rasterColor = gRasterColor.Sample(gSampler, input.texcoord);
+    float4 rtColor     = gRtColor.Sample(gSampler, input.texcoord);
+    float  rasterDepth = gRasterDepth.Sample(gSampler, input.texcoord).r;
+    float  rtDepth     = gRtDepth.Sample(gSampler, input.texcoord).r;
     
-    float rasterDepth = gRasterDepth.Sample(gSampler, input.texcoord).r;
-    float rtDepth = gRtDepth.Sample(gSampler, input.texcoord).r;
-    
-    float linearRtDepth = LinearizeDepth(rtDepth, nearZ, farZ);
-    linearRtDepth /= 100.0f;
-    
-    float linearRasterDepth = LinearizeDepth(rasterDepth, nearZ, farZ);
-    linearRasterDepth /= 100.0f;
-    
-    // 深度値を比較して手前側を描画する
-    if (linearRasterDepth < linearRtDepth)
+    if (rasterDepth < rtDepth)
     {
         output.color = gRasterColor.Sample(gSampler, input.texcoord);
     }
