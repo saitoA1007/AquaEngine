@@ -29,6 +29,8 @@ void Material::Initialize(const Vector4& color, const Vector3& specularColor,con
 	materialData_->isActiveShadow = false;
 	// 屈折率
 	materialData_->ior = 1.0f;
+	// 粗さの設定
+	materialData_->roughness = std::sqrt(2.0f / (shininess + 2.0f));
 }
 
 void Material::SetUVTransform(Transform uvTransform) {

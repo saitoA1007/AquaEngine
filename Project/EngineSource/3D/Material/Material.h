@@ -24,7 +24,8 @@ namespace GameEngine {
 			float metallic;
 			int32_t isActiveShadow;
 			float ior; // 屈折率
-			float padding2[3];
+			float roughness; // 粗さ
+			float padding2[2];
 		};
 	public:
 		Material() = default;
@@ -94,13 +95,19 @@ namespace GameEngine {
 		void SetUVTransform(Transform uvTransform);
 
 		/// <summary>
-		/// 環境光の度合
+		/// 光沢の設定
 		/// </summary>
 		/// <param name="metallic"></param>
 		void SetMetallic(const float& metallic) { materialData_->metallic = metallic; }
 
 		/// <summary>
-		/// 屈折率を設定
+		/// 粗さを設定。PBRライティングで使用するパラメータ
+		/// </summary>
+		/// <param name="roughness"></param>
+		void SetRoughness(const float& roughness) { materialData_->roughness = roughness; }
+
+		/// <summary>
+		/// 屈折率を設定。レイトレで使用するパラメータ
 		/// </summary>
 		/// <param name="ior"></param>
 		void SetIOR(const float& ior) { materialData_->ior = ior; }
