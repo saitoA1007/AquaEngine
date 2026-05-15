@@ -114,6 +114,13 @@ namespace GameEngine {
 		void SetDefaultIOR(const float& ior, const std::string& materialName = "default");
 
 		/// <summary>
+		/// デフォルトの粗さの設定
+		/// </summary>
+		/// <param name="roughness"></param>
+		/// <param name="materialName"></param>
+		void SetRoughness(const float& roughness, const std::string& materialName = "default");
+
+		/// <summary>
 		/// モデルの名前を取得
 		/// </summary>
 		/// <returns></returns>

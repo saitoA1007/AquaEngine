@@ -13,7 +13,8 @@ struct Material
     float metallic;
     int isActiveShadow;
     float ior;
-    float3 padding1;
+    float roughness;
+    float2 padding1;
 };
 ConstantBuffer<Material> gMaterial : register(b0);
 

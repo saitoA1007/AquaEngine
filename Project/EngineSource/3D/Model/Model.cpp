@@ -88,6 +88,14 @@ void Model::SetDefaultIOR(const float& ior, const std::string& materialName) {
 	material->SetIOR(ior);
 }
 
+void Model::SetRoughness(const float& roughness, const std::string& materialName) {
+	auto it = materialName == "default" ? materials_.begin() : materials_.find(materialName);
+
+	assert(it != materials_.end() && "Material not found");
+	Material* material = it->second.get();
+	material->SetRoughness(roughness);
+}
+
 Material* Model::GetMaterial(const std::string& name) const {
 	auto it = materials_.find(name);
 	if (it != materials_.end()) {
