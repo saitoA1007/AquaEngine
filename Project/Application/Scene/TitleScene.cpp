@@ -53,9 +53,8 @@ void TitleScene::Initialize() {
 
 	//　地面のメッシュデータを取得
 	auto& meshes = model1_->GetMeshesData();
-	terrainCollision_.Build(*meshes[0]);
-	terrainCollision_.BuildGrid(2.0f);
-
+	terrainCollision_.Build(*meshes[0], 2.0f);
+	
 	// 1000回
 	players.resize(8000);
 	for (uint32_t i = 0; i < players.size(); ++i) {

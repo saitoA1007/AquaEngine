@@ -1,13 +1,15 @@
 #include "TerrainCollision.h"
 #include <algorithm>
 #include <cmath>
+#include "MyMath.h"
 
 using namespace GameEngine;
 
-void TerrainCollision::Build(Mesh& mesh)
+void TerrainCollision::Build(Mesh& mesh,const float& cellSize)
 {
 	uint32_t vertCount = mesh.GetTotalVertices();
 	uint32_t indexCount = mesh.GetTotalIndices();
+	// 三角形の総数を取得
 	triangleCount_ = indexCount / 3;
 
 	// 頂点データを取得
@@ -41,18 +43,25 @@ void TerrainCollision::Build(Mesh& mesh)
 			(std::max)({v0.z, v1.z, v2.z})
 		};
 	}
+
+	// グリッド作成
+	BuildGrid(cellSize);
 }
 
-void TerrainCollision::BuildGrid(float cellSize)
+void TerrainCollision::BuildGrid(const float& cellSize)
 {
 	if (vertices_.empty()) return;
 
 	// メッシュ全体のXZ範囲を計算
-	float minX = FLT_MAX, maxX = -FLT_MAX;
-	float minZ = FLT_MAX, maxZ = -FLT_MAX;
+	float minX = FLT_MAX;
+	float maxX = -FLT_MAX;
+	float minZ = FLT_MAX;
+	float maxZ = -FLT_MAX;
 	for (auto& v : vertices_) {
-		minX = (std::min)(minX, v.x); maxX = (std::max)(maxX, v.x);
-		minZ = (std::min)(minZ, v.z); maxZ = (std::max)(maxZ, v.z);
+		minX = (std::min)(minX, v.x);
+		maxX = (std::max)(maxX, v.x);
+		minZ = (std::min)(minZ, v.z);
+		maxZ = (std::max)(maxZ, v.z);
 	}
 
 	grid_.cellSize = cellSize;
@@ -62,7 +71,7 @@ void TerrainCollision::BuildGrid(float cellSize)
 	grid_.cellsZ = static_cast<int>((maxZ - minZ) / cellSize) + 1;
 	grid_.cells.resize(grid_.cellsX * grid_.cellsZ);
 
-	// 各三角形を重なるセルに登録
+	// 重なっているセルに各三角形を登録
 	for (uint32_t i = 0; i < triangleCount_; ++i) {
 		const auto& aabb = triAABBs_[i];
 		int ixMin, izMin, ixMax, izMax;
@@ -85,7 +94,7 @@ void TerrainCollision::ResolveCollision(std::vector<PlayerData>& players) const
 	for (auto& player : players)
 	{
 		GroundResult result = GetGroundHeight(player.position);
-		if (!result.hit) continue;
+		if (!result.hit) { continue; }
 
 		float groundTop = result.groundY + player.height;
 		if (player.position.y < groundTop)
@@ -102,9 +111,9 @@ GroundResult TerrainCollision::GetGroundHeight(const Vector3& position) const
 	result.groundY = 0.0f;
 	result.normal = { 0.0f, 1.0f, 0.0f };
 
-
 	if (vertices_.empty() || indices_.empty()) { return result; }
 
+	// セルを取得
 	int ix, iz;
 	if (!grid_.WorldToCell(position.x, position.z, ix, iz)) { return result; }
 
@@ -122,7 +131,8 @@ GroundResult TerrainCollision::GetGroundHeight(const Vector3& position) const
 		const Vector3& v1 = vertices_[indices_[triIdx * 3 + 1]];
 		const Vector3& v2 = vertices_[indices_[triIdx * 3 + 2]];
 
-		float t; Vector3 normal;
+		float t;
+		Vector3 normal;
 		if (RayTriangleIntersect(rayOrigin, rayDir, v0, v1, v2, t, normal)) {
 			if (t < closestT) {
 				closestT = t;
@@ -146,49 +156,36 @@ bool TerrainCollision::RayTriangleIntersect(
 {
 	constexpr float EPSILON = 1e-6f;
 
-	Vector3 edge1 = { v1.x - v0.x, v1.y - v0.y, v1.z - v0.z };
-	Vector3 edge2 = { v2.x - v0.x, v2.y - v0.y, v2.z - v0.z };
+	Vector3 edge1 = v1 - v0;
+	Vector3 edge2 = v2 - v0;
 
-	// h = cross(rd, edge2)
-	Vector3 h = {
-		rd.y * edge2.z - rd.z * edge2.y,
-		rd.z * edge2.x - rd.x * edge2.z,
-		rd.x * edge2.y - rd.y * edge2.x
-	};
-
-	float a = edge1.x * h.x + edge1.y * h.y + edge1.z * h.z;
-	if (std::abs(a) < EPSILON) return false; // 平行
-
+	// レイと三角形面の傾き
+	Vector3 h = Cross(rd, edge2);
+	float a = Dot(edge1, h);
+	// 平行確認
+	if (std::abs(a) < EPSILON) { return false; }
 	float f = 1.0f / a;
 
-	Vector3 s = { ro.x - v0.x, ro.y - v0.y, ro.z - v0.z };
-	float u = f * (s.x * h.x + s.y * h.y + s.z * h.z);
-	if (u < 0.0f || u > 1.0f) return false;
+	/// 三角形の内側を確認
+	Vector3 s = ro - v0;
+	float u = f * Dot(s, h);
+	if (u < 0.0f || u > 1.0f) { return false; }
 
-	// q = cross(s, edge1)
-	Vector3 q = {
-		s.y * edge1.z - s.z * edge1.y,
-		s.z * edge1.x - s.x * edge1.z,
-		s.x * edge1.y - s.y * edge1.x
-	};
+	Vector3 q = Cross(s, edge1);
+	float v = f * Dot(rd, q);
+	if (v < 0.0f || u + v > 1.0f) { return false; }
 
-	float v = f * (rd.x * q.x + rd.y * q.y + rd.z * q.z);
-	if (v < 0.0f || u + v > 1.0f) return false;
-
-	float t = f * (edge2.x * q.x + edge2.y * q.y + edge2.z * q.z);
-	if (t < EPSILON) return false; // 後方・自己交差を除外
-
+	// レイの進んだ距離
+	float t = f * Dot(edge2, q);
+	// 後方・自己交差を除外
+	if (t < EPSILON) { return false; }
 	outT = t;
 
-	// 法線 = normalize(cross(edge1, edge2))
-	Vector3 n = {
-		edge1.y * edge2.z - edge1.z * edge2.y,
-		edge1.z * edge2.x - edge1.x * edge2.z,
-		edge1.x * edge2.y - edge1.y * edge2.x
-	};
+	// 法線
+	Vector3 n = Cross(edge1, edge2);
 	float len = std::sqrt(n.x * n.x + n.y * n.y + n.z * n.z);
 	if (len > EPSILON) {
-		outNormal = { n.x / len, n.y / len, n.z / len };
+		outNormal = n / len;
 	}
 
 	return true;

@@ -8,10 +8,10 @@ namespace GameEngine {
     // 位置
     struct PlayerData {
         Vector3 position;   // 現在位置
-        float   height;     // 足元からの身長オフセット
+        float   height;     // オフセット
     };
 
-    // 結果
+    // 判定結果
     struct GroundResult {
         bool    hit;
         float   groundY;
@@ -23,6 +23,9 @@ namespace GameEngine {
         float minX, maxX, minZ, maxZ;
     };
 
+    /// <summary>
+    /// 地面との当たり判定
+    /// </summary>
     class TerrainCollision {
     public:
         TerrainCollision() = default;
@@ -32,13 +35,7 @@ namespace GameEngine {
         /// Meshデータを取得
         /// </summary>
         /// <param name="mesh"></param>
-        void Build(Mesh& mesh);
-
-        /// <summary>
-        // グリッド作成
-        /// </summary>
-        /// <param name="cellSize"></param>
-        void BuildGrid(float cellSize);
+        void Build(Mesh& mesh, const float& cellSize);
 
         /// <summary>
         /// 複数プレイヤーの位置をMesh上に吸着させる
@@ -59,22 +56,25 @@ namespace GameEngine {
             float originX = 0;
             float originZ = 0;
             float cellSize = 0;
-            // cells[iz * cellsX + ix]
+            // メモリ効率を考えて1次元配列でセルを管理
             std::vector<std::vector<uint32_t>> cells;
 
+            // 座標を1次元配列に変換
             int CellIndex(int ix, int iz) const { return iz * cellsX + ix; }
 
+            // 指定した座標のセルを求める
             bool WorldToCell(float x, float z, int& ix, int& iz) const {
                 ix = static_cast<int>((x - originX) / cellSize);
                 iz = static_cast<int>((z - originZ) / cellSize);
-                if (ix < 0 || ix >= cellsX || iz < 0 || iz >= cellsZ) return false;
+                if (ix < 0 || ix >= cellsX || iz < 0 || iz >= cellsZ) { return false; }
                 return true;
             }
         };
 
     private:
-        std::vector<Vector3>   vertices_;      // 頂点位置キャッシュ
-        std::vector<uint32_t>  indices_;       // インデックスキャッシュ
+        // 頂点情報
+        std::vector<Vector3> vertices_;
+        std::vector<uint32_t>  indices_;
         uint32_t triangleCount_ = 0;
 
         // 三角形のAABB
@@ -93,5 +93,11 @@ namespace GameEngine {
             const Vector3& v2,
             float& outT,
             Vector3& outNormal) const;
+
+        /// <summary>
+        // グリッド作成
+        /// </summary>
+        /// <param name="cellSize"></param>
+        void BuildGrid(const float& cellSize);
     };
 }
