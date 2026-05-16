@@ -69,6 +69,11 @@ namespace GameEngine {
 		void SetHitGroupIndex(const uint32_t& index) { hitGroupIndex_ = index; };
 		const uint32_t& GetHitGroupIndex() const { return hitGroupIndex_; }
 
+	public:
+
+		std::vector<uint32_t> indexData_;
+		std::vector<VertexData> veretxData_;
+
 	private:
 		VertexBuffer<VertexData> vertexBuffer_;
 		IndexBuffer indexBuffer_;

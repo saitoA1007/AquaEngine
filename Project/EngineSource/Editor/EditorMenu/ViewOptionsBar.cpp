@@ -22,6 +22,8 @@ ViewOptionsBar::ViewOptionsBar(Input* input, RenderQueue* renderQueue, DebugRend
 	renderQueue_->SetDebugCamera(debugCamera_->GetConstantBuffer());
 	// デバック描画機能
 	debugRenderer_ = debugRenderer;
+
+	renderQueue_->debugCam_ = debugCamera_.get();
 }
 
 void ViewOptionsBar::Run() {

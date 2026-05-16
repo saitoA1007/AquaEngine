@@ -35,14 +35,12 @@ namespace GameEngine {
 			indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
 
 			// インデックスデータを生成
-			uint32_t* indexData = nullptr;
-			resource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+			resource_->Map(0, nullptr, reinterpret_cast<void**>(&data_));
 			// インデックスデータをコピー
-			std::memcpy(indexData, indices.data(), sizeof(uint32_t) * totalIndices_);
+			std::memcpy(data_, indices.data(), sizeof(uint32_t) * totalIndices_);
 
 			// UnMapする
 			resource_->Unmap(0, nullptr);
-			indexData = nullptr;
 
 			/// SRVの作成
 			srvIndex_ = srvManager_->AllocateSrvIndex(SrvHeapType::Buffer);
@@ -69,6 +67,8 @@ namespace GameEngine {
 		// インデックス数
 		uint32_t GetTotalIndices() const { return totalIndices_; }
 
+		uint32_t* GetData() { return data_; }
+
 		uint32_t GetSrvIndex() const { return srvIndex_; }
 		CD3DX12_GPU_DESCRIPTOR_HANDLE GetSrvGpuHandle() const { return srvGpuHandle_; }
 	private:
@@ -76,6 +76,8 @@ namespace GameEngine {
 		D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
 		// 頂点数
 		uint32_t totalIndices_ = 0;
+
+		uint32_t* data_ = nullptr;
 
 		uint32_t srvIndex_ = 0;
 		CD3DX12_GPU_DESCRIPTOR_HANDLE srvGpuHandle_{};

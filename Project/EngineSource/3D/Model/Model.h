@@ -127,6 +127,7 @@ namespace GameEngine {
 		const std::string GetModelName() const { return modelName_; }
 
 		const std::vector<std::unique_ptr<Mesh>>& GetMeshes() const { return meshes_; }
+		std::vector<std::unique_ptr<Mesh>>& GetMeshesData() { return meshes_; }
 		Material* GetMaterial(const std::string& name) const;
 
 		// ローカル行列

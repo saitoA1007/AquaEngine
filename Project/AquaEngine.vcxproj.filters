@@ -522,6 +522,7 @@
     <ClCompile Include="EngineSource\Graphics\Core\BufferRefManager.cpp" />
     <ClCompile Include="EngineSource\Graphics\Resources\BufferRefResource.cpp" />
     <ClCompile Include="EngineSource\3D\Model\Skeleton.cpp" />
+    <ClCompile Include="Application\Scene\TerrainCollision.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1016,6 +1017,7 @@
     <ClInclude Include="EngineSource\Graphics\Core\BufferRefManager.h" />
     <ClInclude Include="EngineSource\Graphics\Resources\BufferRefResource.h" />
     <ClInclude Include="EngineSource\3D\Model\Skeleton.h" />
+    <ClInclude Include="Application\Scene\TerrainCollision.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />
@@ -1023,6 +1025,7 @@
     <FxCompile Include="Resources\Shaders\Raytracing\chsObject.hlsl" />
     <FxCompile Include="Resources\Shaders\CS\Skinning.CS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\LightingComposite.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\CS\collision.CS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Externals\imgui\ProggyClean.ttf" />

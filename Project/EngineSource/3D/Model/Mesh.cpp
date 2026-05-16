@@ -145,6 +145,9 @@ void Mesh::CreateModelMesh(ModelData modelData, const uint32_t& index) {
 	indexBuffer_.Create(meshData.indices);
 	// 頂点データを作成
 	vertexBuffer_.Create(meshData.vertices);
+
+	indexData_ = meshData.indices;
+	veretxData_ = meshData.vertices;
 }
 
 void Mesh::CreateBLAS(ID3D12GraphicsCommandList4* cmdList, const bool& isUpdate) {

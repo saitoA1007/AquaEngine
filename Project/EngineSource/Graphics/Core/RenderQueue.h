@@ -10,6 +10,7 @@
 #include "Camera.h"
 #include "LightManager.h"
 #include "DirectionalLight.h"
+#include "DebugCamera.h"
 
 namespace GameEngine {
 
@@ -95,6 +96,8 @@ namespace GameEngine {
 
         // レイトレーシングでのモデル
         void SubmitRaytracingModel(const Model* model, WorldTransform& worldTransform,const uint32_t* materialIndex = nullptr);
+
+        DebugCamera* debugCam_ = nullptr;
 
     private:
         ID3D12GraphicsCommandList4* commandList_ = nullptr;

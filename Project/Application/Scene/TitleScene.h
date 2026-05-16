@@ -1,6 +1,6 @@
 #pragma once
 #include"IScene.h"
-
+#include<vector>
 // エンジン機能をインクルード
 #include "Camera.h"
 #include "Model.h"
@@ -8,6 +8,8 @@
 #include "Animator.h"
 
 #include "Application/Scene/Transition/Fade.h"
+
+#include "TerrainCollision.h"
 
 class TitleScene : public GameEngine::IScene {
 public:
@@ -73,6 +75,10 @@ private: // シーン機能
 	GameEngine::Model* model2_;
 	GameEngine::WorldTransform world2_;
 	GameEngine::WorldTransform world3_;
+
+	GameEngine::TerrainCollision terrainCollision_;
+
+	std::vector<GameEngine::PlayerData> players;
 	
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 	Vector4 color1_ = { 1.0f,1.0f,1.0f,1.0f };
