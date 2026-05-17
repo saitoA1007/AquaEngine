@@ -57,6 +57,11 @@ void BlendBuilder::Initialize() {
 			blendDesc_[i].RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD; // 加算ブレンド
 			blendDesc_[i].RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA; // (1-SrcA)
 			break;
+
+		case kNoBlend:
+			// カラー書き込みをしない
+			blendDesc_[i].RenderTarget[0].RenderTargetWriteMask = 0;
+			break;
 		}
 	}
 }

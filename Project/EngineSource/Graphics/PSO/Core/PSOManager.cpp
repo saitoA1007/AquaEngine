@@ -610,6 +610,7 @@ void PSOManager::DeaultLoadPostEffectPSO() {
     defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/DepthCopy.PS.hlsl";
     defaultPostEffect.depthFunc = D3D12_COMPARISON_FUNC_ALWAYS; // 常に上書き
     defaultPostEffect.numRenderTargets = 0; // カラー出力なし
+    defaultPostEffect.isDepthEnable = true;
     RootSignatureBuilder rsDepthCopyBuilder;
     rsDepthCopyBuilder.Initialize(device_);
     rsDepthCopyBuilder.AddSRVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL);

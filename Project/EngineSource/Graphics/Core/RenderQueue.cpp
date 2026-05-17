@@ -98,11 +98,11 @@ void RenderQueue::Execute() {
     // ライトの更新
     lightManager_.Update();
 
-    // ラスタライズ描画コマンドを解放
-    RasterizeExecute();
-
     // レイトレーシング描画コマンドを解放
     RaytracingExecute();
+
+    // ラスタライズ描画コマンドを解放
+    RasterizeExecute();
 
     // レイトレとラスタライズの描画を合成する
     LightingComposite();
@@ -383,8 +383,19 @@ void RenderQueue::RasterizeExecute() {
         }
 
         enableDrawRasterize_ = true;
-        renderPassController_->PrePass(passName);
-        renderPassController_->ClearRenderPass(passName);
+        if (rasterizeFinalPassName_ == passName) {
+            renderPassController_->PrePass(passName);
+            renderPassController_->ClearRenderPass(passName);
+            renderPassController_->SetOnlyDsvRenderTarget(passName);
+            // レイトレの深度値をコピーする
+            CopyRaytracingDepth();
+
+            // 深度値をコピーした状態で再びターゲット
+            renderPassController_->PrePass(passName);
+        } else {
+            renderPassController_->PrePass(passName);
+            renderPassController_->ClearRenderPass(passName);
+        }
         currentPsoName_.clear();
 
         // 不透明描画コマンドを解放
@@ -518,4 +529,11 @@ void RenderQueue::LightingComposite() {
     renderPassController_->PostPass("LightingCompositePass");
 
     finalPassName_ = "LightingCompositePass";
+}
+
+void RenderQueue::CopyRaytracingDepth() {
+    PreDraw("DepthCopy");
+    commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    commandList_->SetGraphicsRootDescriptorTable(0, srvManager_->GetGPUHandle(renderPassController_->GetSrvIndex("RaytracingPassDepth")));
+    commandList_->DrawInstanced(3, 1, 0, 0);
 }
