@@ -377,12 +377,14 @@ void RenderQueue::RasterizeExecute() {
         bool has2d = draw2dQueueList_.count(passName) > 0;
         if (!hasOpaque && !hasTranslucent && !has2d) {
             renderPassController_->PrePass(passName);
+            renderPassController_->ClearRenderPass(passName);
             renderPassController_->PostPass(passName);
             continue;
         }
 
         enableDrawRasterize_ = true;
         renderPassController_->PrePass(passName);
+        renderPassController_->ClearRenderPass(passName);
         currentPsoName_.clear();
 
         // 不透明描画コマンドを解放
@@ -506,6 +508,7 @@ void RenderQueue::LightingComposite() {
 
     // レイトレとラスタライズの内容を合成する
     renderPassController_->PrePass("LightingCompositePass");
+    renderPassController_->ClearRenderPass("LightingCompositePass");
     PreDraw("LightingComposite");
     commandList_->SetGraphicsRootDescriptorTable(0, srvManager_->GetGPUHandle(renderPassController_->GetSrvIndex(rasterizeFinalPassName_)));
     commandList_->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUHandle(renderPassController_->GetDepthSrvIndex(rasterizeFinalPassName_)));

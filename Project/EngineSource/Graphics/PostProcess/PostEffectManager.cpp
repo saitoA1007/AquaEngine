@@ -48,6 +48,7 @@ void PostEffectManager::Execute() {
         postEffect->Update();
 
         renderPassController_->PrePass(passName);
+        renderPassController_->ClearRenderPass(passName);
 
         // pso設定
         PreDraw(postEffect->GetPsoName());

@@ -24,6 +24,10 @@ namespace GameEngine {
 		void PostPass(const std::string& name);
 		void SwitchToUAV(const std::string& name);
 		void InsertUavBarrier(const std::string& name);
+		// 深度をコピーするため
+		void SetOnlyDsvRenderTarget(const std::string& name);
+		// レンダーパスのクリアをおこなう
+		void ClearRenderPass(const std::string& name);
 
 		// 描画の最終パスの設定
 		void SetSceneFinalPass(const std::string& name);
