@@ -356,7 +356,7 @@ void RenderQueue::SubmitRaytracingModel(const Model* model, WorldTransform& worl
         if (model->IsLoad()) {
             worldTransform.SetWVPMatrix(model->GetLocalMatrix());
         }
-        Matrix4x4 matrix = Transpose(worldTransform.GetWorldMatrix());
+        Matrix4x4 matrix = Math::Transpose(worldTransform.GetWorldMatrix());
         std::memcpy(&data.transform, &matrix, sizeof(float) * 12);
 
         raytracingDrawQueueList_.push_back(std::move(data));

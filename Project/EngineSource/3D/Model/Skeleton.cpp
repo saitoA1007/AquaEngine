@@ -19,7 +19,7 @@ void Skeleton::Create(ID3D12GraphicsCommandList4* cmdList, const SkeletonData& s
 	constBuffer_.Create();
 	// 頂点数を設定
 	auto* data = constBuffer_.GetData();
-	data->numVertices = modelData.meshes[0].vertices.size();
+	data->numVertices = static_cast<uint32_t>(modelData.meshes[0].vertices.size());
 
 	// スケルトンデータを取得
 	skeletonData_ = skeletonData;
@@ -44,7 +44,7 @@ void Skeleton::Create(ID3D12GraphicsCommandList4* cmdList, const SkeletonData& s
 
 	// inverseBindPoseMatrixを格納する場所を作成して、単位行列で埋める
 	skinCluster_.inverseBindPoseMatrices.resize(skeletonData_.joints.size());
-	std::generate(skinCluster_.inverseBindPoseMatrices.begin(), skinCluster_.inverseBindPoseMatrices.end(), MakeIdentity4x4);
+	std::generate(skinCluster_.inverseBindPoseMatrices.begin(), skinCluster_.inverseBindPoseMatrices.end(), Matrix4x4::MakeIdentity);
 
 	// ModelのSkinClusterの情報を解析
 	for (const auto& jointWeight : modelData.skinClusterData) {

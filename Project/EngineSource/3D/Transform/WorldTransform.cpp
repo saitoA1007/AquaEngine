@@ -10,30 +10,30 @@ WorldTransform::~WorldTransform() {
 
 void WorldTransform::Initialize(const Transform& transform) {
 	transform_ = transform;
-	worldMatrix_ = MakeWorldMatrixFromEulerRotation(transform_.translate, transform_.rotate, transform_.scale);
+	worldMatrix_ = Math::MakeWorldMatrixFromEulerRotation(transform_.translate, transform_.rotate, transform_.scale);
 
 	// 定数バッファの作成
 	constBuffer_.Create();
 	transformationMatrixData_ = constBuffer_.GetData();
 
 	// 単位行列を書き込んでおく
-	transformationMatrixData_->World = MakeIdentity4x4();
-	transformationMatrixData_->worldInverseTranspose = MakeIdentity4x4();
+	transformationMatrixData_->World = Matrix4x4::MakeIdentity();
+	transformationMatrixData_->worldInverseTranspose = Matrix4x4::MakeIdentity();
 }
 
 void WorldTransform::UpdateTransformMatrix() {
-	worldMatrix_ = MakeWorldMatrixFromEulerRotation(transform_.translate, transform_.rotate, transform_.scale);
+	worldMatrix_ = Math::MakeWorldMatrixFromEulerRotation(transform_.translate, transform_.rotate, transform_.scale);
 	// 親があれば親のワールド行列を掛ける
 	if (parent_) {
 		worldMatrix_ *= parent_->GetWorldMatrix();
 	}
 	transformationMatrixData_->World = worldMatrix_;
-	transformationMatrixData_->worldInverseTranspose = InverseTranspose(worldMatrix_);
+	transformationMatrixData_->worldInverseTranspose = Math::InverseTranspose(worldMatrix_);
 }
 
 void WorldTransform::SetWVPMatrix(const Matrix4x4& localMatrix) {
-	transformationMatrixData_->World = Multiply(localMatrix,worldMatrix_);
-	transformationMatrixData_->worldInverseTranspose = InverseTranspose(worldMatrix_);
+	transformationMatrixData_->World = localMatrix * worldMatrix_;
+	transformationMatrixData_->worldInverseTranspose = Math::InverseTranspose(worldMatrix_);
 }
 
 Vector3 WorldTransform::GetWorldPosition() const {

@@ -131,7 +131,7 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
         // worldTransformsの更新
         if (particleEmitter_.isBillBoard) {
             // ビルボードを適応する
-            worldTransforms_->transformDatas_[currentNumInstance_].worldMatrix = MakeBillboardMatrix(particles_[i].transform.scale, particles_[i].transform.translate, cameraMatrix);
+            worldTransforms_->transformDatas_[currentNumInstance_].worldMatrix = Math::MakeBillboardMatrix(particles_[i].transform.scale, particles_[i].transform.translate, cameraMatrix);
         } else {
             worldTransforms_->transformDatas_[currentNumInstance_].transform = particles_[i].transform;
         }

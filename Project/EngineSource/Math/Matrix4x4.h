@@ -47,4 +47,13 @@ struct Matrix4x4 {
 		*this = *this * other;
 		return *this;
 	}
+
+	static Matrix4x4 MakeIdentity() {
+		Matrix4x4 matrix = {};
+		matrix.m[0][0] = 1.0f;
+		matrix.m[1][1] = 1.0f;
+		matrix.m[2][2] = 1.0f;
+		matrix.m[3][3] = 1.0f;
+		return matrix;
+	}
 };

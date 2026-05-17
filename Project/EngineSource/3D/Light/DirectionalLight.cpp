@@ -13,7 +13,7 @@ void DirectionalLight::Initialize(const Vector4& color,const Vector3& direction,
 }
 
 void DirectionalLight::SetLightDir(const Vector3& lightdir) {
-	directionalLightData_.direction = Normalize(lightdir);
+	directionalLightData_.direction = Math::Normalize(lightdir);
 }
 
 void DirectionalLight::CreateDirectionalShadowMatrix(const Vector3& targetCenter,float shadowRange) {
@@ -27,7 +27,8 @@ void DirectionalLight::CreateDirectionalShadowMatrix(const Vector3& targetCenter
     //=================================================
 
     // ライトの方向を正規化
-    Vector3 lightDir = Normalize(directionalLightData_.direction);
+    directionalLightData_.direction.Normalize();
+    Vector3 lightDir = directionalLightData_.direction;
    
     // View行列の作成
     float distance = shadowRange * 2.0f;
@@ -44,7 +45,7 @@ void DirectionalLight::CreateDirectionalShadowMatrix(const Vector3& targetCenter
 
     // ライト方向と最も垂直に近い軸を選択
     for (int i = 0; i < 3; ++i) {
-        float dotProduct = std::abs(Dot(lightDir, candidateUps[i]));
+        float dotProduct = std::abs(Math::Dot(lightDir, candidateUps[i]));
         if (dotProduct < minDot) {
             minDot = dotProduct;
             worldUp = candidateUps[i];
@@ -52,11 +53,11 @@ void DirectionalLight::CreateDirectionalShadowMatrix(const Vector3& targetCenter
     }
 
     // 右ベクトルを計算
-    Vector3 right = Normalize(Cross(worldUp, lightDir));
+    Vector3 right = Math::Normalize(Math::Cross(worldUp, lightDir));
     // ライトと右ベクトル直交ベクトルを求める
-    Vector3 up = Normalize(Cross(lightDir, right));
+    Vector3 up = Math::Normalize(Math::Cross(lightDir, right));
    
-    Matrix4x4 worldMatrix = LookAt(lightPos, targetCenter, up);
+    Matrix4x4 worldMatrix = Math::LookAt(lightPos, targetCenter, up);
 
     // Projection行列の作成
     float r = shadowRange;
@@ -65,7 +66,7 @@ void DirectionalLight::CreateDirectionalShadowMatrix(const Vector3& targetCenter
     float b = -shadowRange;
     float nearPlane = 0.1f;
     float farPlane = distance * 2.5f;
-    Matrix4x4 projMatrix = MakeOrthographicMatrix(l, t, r, b, nearPlane, farPlane);
+    Matrix4x4 projMatrix = Math::MakeOrthographicMatrix(l, t, r, b, nearPlane, farPlane);
    
     // シャドウマップのチラつきを補正
     Matrix4x4 vpMatrix = worldMatrix * projMatrix;
@@ -74,7 +75,7 @@ void DirectionalLight::CreateDirectionalShadowMatrix(const Vector3& targetCenter
    
     // ワールド原点をシャドウマップ空間へ変換
     Vector3 shadowOrigin = { 0.0f, 0.0f, 0.0f};
-    shadowOrigin = Transforms(shadowOrigin, vpMatrix);
+    shadowOrigin = Math::Transforms(shadowOrigin, vpMatrix);
    
     // シャドウマップのサイズ
     float shadowMapSize = 2048.0f;

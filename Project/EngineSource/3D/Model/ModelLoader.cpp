@@ -393,8 +393,8 @@ ModelData ModelLoader::LoadModelFile(const std::string& directoryPath, const std
 			aiVector3D scale, translate;
 			aiQuaternion rotate;
 			bindPoseMatrixAssimp.Decompose(scale, rotate, translate);
-			Matrix4x4 bindPoseMatrix = MakeAffineMatrix({ scale.x,scale.y,scale.z }, { rotate.x,-rotate.y,-rotate.z,rotate.w }, { -translate.x,translate.y,translate.z });
-			jointWeightData.inverseBindPoseMatrix = InverseMatrix(bindPoseMatrix);
+			Matrix4x4 bindPoseMatrix = Math::MakeAffineMatrix({ scale.x,scale.y,scale.z }, { rotate.x,-rotate.y,-rotate.z,rotate.w }, { -translate.x,translate.y,translate.z });
+			jointWeightData.inverseBindPoseMatrix = Math::InverseMatrix(bindPoseMatrix);
 
 			for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex) {
 				jointWeightData.vertexWeights.push_back({ bone->mWeights[weightIndex].mWeight,bone->mWeights[weightIndex].mVertexId });
@@ -420,7 +420,7 @@ Node ModelLoader::ReadNode(aiNode* node) {
 	result.transform.scale = { scale.x,scale.y,scale.z };
 	result.transform.rotate = { rotate.x,-rotate.y,-rotate.z,rotate.w }; // x軸を反転、さらに回転方向が逆なので軸を反転する
 	result.transform.translate = { -translate.x,translate.y,translate.z }; // x軸を反転
-	result.localMatrix = MakeAffineMatrix(result.transform.scale, result.transform.rotate, result.transform.translate);
+	result.localMatrix = Math::MakeAffineMatrix(result.transform.scale, result.transform.rotate, result.transform.translate);
 
 	result.name = node->mName.C_Str(); // Node名を格納
 	result.children.resize(node->mNumChildren); // 子供の数だけ確保
@@ -437,7 +437,7 @@ int32_t ModelLoader::CreateJoint(const Node& node, const std::optional<int32_t>&
 	Joint joint;
 	joint.name = node.name;
 	joint.localMatrix = node.localMatrix;
-	joint.skeletonSpaceMatrix = MakeIdentity4x4();
+	joint.skeletonSpaceMatrix = Matrix4x4::MakeIdentity();
 	joint.transform = node.transform;
 	joint.index = static_cast<int32_t>(joints.size()); // 現在登録されている数をIndexに
 	joint.parent = parent;
