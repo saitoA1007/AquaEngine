@@ -63,7 +63,7 @@ void PSOManager::RegisterPSO(const std::string& name, const CreatePSOData& psoDa
     if (psoData.isDepthEnable) {
         depthStencilDesc.DepthEnable = true;
         depthStencilDesc.DepthWriteMask = psoData.depthMask;
-        depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+        depthStencilDesc.DepthFunc = psoData.depthFunc;
     } else {
         depthStencilDesc.DepthEnable = false;
     }
@@ -78,8 +78,10 @@ void PSOManager::RegisterPSO(const std::string& name, const CreatePSOData& psoDa
     psoDesc.PS = { psBlob->GetBufferPointer(), psBlob->GetBufferSize() };
     psoDesc.DepthStencilState = depthStencilDesc;
     psoDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-    psoDesc.NumRenderTargets = 1;
-    psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    psoDesc.NumRenderTargets = psoData.numRenderTargets;
+    if (psoData.numRenderTargets != 0) {
+        psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    }
     psoDesc.PrimitiveTopologyType = psoData.primitiveType;
     psoDesc.SampleDesc.Count = 1;
     psoDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
@@ -195,7 +197,7 @@ void PSOManager::RegisterShadowMapPSO(const std::string& name, const CreatePSODa
     psoDesc.VS = { vsBlob->GetBufferPointer(), vsBlob->GetBufferSize() };
     psoDesc.PS = { nullptr,0 };
     psoDesc.DepthStencilState = depthStencilDesc;
-    psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    psoDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
     psoDesc.NumRenderTargets = 0;
     psoDesc.RTVFormats[0] = DXGI_FORMAT_UNKNOWN;
     psoDesc.PrimitiveTopologyType = psoData.primitiveType;
@@ -602,4 +604,16 @@ void PSOManager::DeaultLoadPostEffectPSO() {
     rsBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
     rsBuilder.CreateRootSignature();
     RegisterPSO("LightingComposite", defaultPostEffect, &rsBuilder, &inputLayoutBuilder);
+
+    // 深度値をコピーするため
+    defaultPostEffect.rootSigName = "DepthCopy";
+    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/DepthCopy.PS.hlsl";
+    defaultPostEffect.depthFunc = D3D12_COMPARISON_FUNC_ALWAYS; // 常に上書き
+    defaultPostEffect.numRenderTargets = 0; // カラー出力なし
+    RootSignatureBuilder rsDepthCopyBuilder;
+    rsDepthCopyBuilder.Initialize(device_);
+    rsDepthCopyBuilder.AddSRVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL);
+    rsDepthCopyBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
+    rsDepthCopyBuilder.CreateRootSignature();
+    RegisterPSO("DepthCopy", defaultPostEffect, &rsDepthCopyBuilder, &inputLayoutBuilder);
 }

@@ -60,6 +60,8 @@ void RenderQueue::Initialize(ID3D12GraphicsCommandList4* commandList, SrvManager
 
     // レイトレとラスタライズの合成用
     RegisterPSO("LightingComposite", psoManager);
+    // 深度コピー用
+    RegisterPSO("DepthCopy", psoManager);
 
     // bufferのsrvIndexのスタート位置を設定
     bufferStartSrvIndex_ = srvManager_->GetStartSrvIndex(SrvHeapType::Buffer);
