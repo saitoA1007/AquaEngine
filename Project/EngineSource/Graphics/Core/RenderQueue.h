@@ -146,9 +146,14 @@ namespace GameEngine {
 
         // 最終的に画面に描画させるパスの名前
         std::string finalPassName_ = "";
-
         // ラスタライズ描画で最終的に描画させるパス
         std::string rasterizeFinalPassName_ = "";
+        // レイトレ描画で最終的に描画させるパス
+        std::string raytracingFinalPassName_ = "";
+
+        // 描画の有効状態
+        bool enableDrawRaytracing_ = false;
+        bool enableDrawRasterize_ = false;
 
     private:
         /// <summary>
@@ -180,12 +185,15 @@ namespace GameEngine {
         void Execute3dRequest(const Draw3dRequest& request);
         void Execute2dRequest(const Draw2dRequest& request);
 
+        // ラスタライズの描画コマンドを解放
+        void RasterizeExecute();
+
         // レイトレーシングの描画
         void DrawRaytracing();
 
         // レイトレの描画コマンドを解放
         void RaytracingExecute();
-
+        
         // レイトレとラスタライズの描画を合成する
         void LightingComposite();
     };

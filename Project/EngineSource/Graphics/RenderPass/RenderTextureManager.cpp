@@ -7,9 +7,9 @@ void RenderTextureManager::Initialize(RtvManager* rtvManager,DsvManager* dsvMana
     RenderTexture::StaticInitialize(rtvManager, dsvManager);
 }
 
-void RenderTextureManager::Create(const std::string& name, uint32_t width, uint32_t height, RenderTextureMode mode, DXGI_FORMAT colorFormat) {
+void RenderTextureManager::Create(const std::string& name, uint32_t width, uint32_t height, RenderTextureMode mode, DXGI_FORMAT colorFormat, Vector4 clearColor) {
     auto renderTexture = std::make_unique<RenderTexture>();
-    renderTexture->Create(width, height, mode, colorFormat);
+    renderTexture->Create(width, height, mode, colorFormat, clearColor);
 
     // 同名が既存ならデストラクタ経由で古いリソースが解放される
     renderTextures_[name] = std::move(renderTexture);

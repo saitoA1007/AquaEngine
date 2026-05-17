@@ -2,6 +2,7 @@
 #include "SrvResource.h"
 #include "RtvManager.h"
 #include "DsvManager.h"
+#include "Vector4.h"
 
 namespace GameEngine {
 
@@ -36,7 +37,8 @@ namespace GameEngine {
 		void Create(
 			uint32_t width, uint32_t height,
 			RenderTextureMode mode = RenderTextureMode::RtvAndDsv,
-			DXGI_FORMAT colorFormat = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB
+			DXGI_FORMAT colorFormat = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
+			Vector4 clearColor = {0.2f,0.2f,0.2f,1.0f}
 		);
 
 		// RTV状態へ遷移
@@ -81,6 +83,8 @@ namespace GameEngine {
 		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle_;
 		// srvハンドル
 		CD3DX12_GPU_DESCRIPTOR_HANDLE srvGpuHandle_;
+		// クリアカラー
+		Vector4 clearColor_ = { 0.2f,0.2f,0.2f,1.0f };
 
 		// UAVリソース
 		uint32_t uavIndex_ = 0;

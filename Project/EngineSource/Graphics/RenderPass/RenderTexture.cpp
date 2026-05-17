@@ -40,10 +40,11 @@ RenderTexture::~RenderTexture() {
 	}
 }
 
-void RenderTexture::Create(uint32_t width, uint32_t height, RenderTextureMode mode, DXGI_FORMAT colorFormat) {
+void RenderTexture::Create(uint32_t width, uint32_t height, RenderTextureMode mode, DXGI_FORMAT colorFormat, Vector4 clearColor) {
 	width_ = width;
 	height_ = height;
 	mode_ = mode;
+	clearColor_ = clearColor;
 
 	switch (mode_) {
 	case RenderTextureMode::RtvOnly:
@@ -180,8 +181,10 @@ void RenderTexture::CreateColorTarget(uint32_t width, uint32_t height, DXGI_FORM
 	// クリアカラー
 	D3D12_CLEAR_VALUE clearValue{};
 	clearValue.Format = format;
-	clearValue.Color[0] = clearValue.Color[1] = clearValue.Color[2] = 0.2f;
-	clearValue.Color[3] = 1.0f;
+	clearValue.Color[0] = clearColor_.x;
+	clearValue.Color[1] = clearColor_.y;
+	clearValue.Color[2] = clearColor_.z;
+	clearValue.Color[3] = clearColor_.w;
 
 	// リソース作成
 	D3D12_RESOURCE_DESC desc = CreateTexture2dDesc(width, height, format, flags);

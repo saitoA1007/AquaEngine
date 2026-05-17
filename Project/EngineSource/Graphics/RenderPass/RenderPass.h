@@ -3,13 +3,14 @@
 #include <string>
 #include "Externals/DirectXTex/d3dx12.h"
 #include "RenderTexture.h"
+#include "Vector4.h"
 
 namespace GameEngine {
 
     class RenderPass {
     public:
 
-        RenderPass(const std::string& name, ID3D12GraphicsCommandList* commandList, RenderTexture* renderTexture);
+        RenderPass(const std::string& name, ID3D12GraphicsCommandList* commandList, RenderTexture* renderTexture, Vector4 clearColor);
 
         // 描画前処理
         void PrePass();
@@ -47,6 +48,9 @@ namespace GameEngine {
         ID3D12GraphicsCommandList* commandList_ = nullptr;
         D3D12_VIEWPORT viewport_{};
         D3D12_RECT scissorRect_{};
+
+        // クリア色
+        float clearColor_[4];
 
         // パスの名前
         std::string name_;
