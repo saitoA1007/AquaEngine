@@ -15,6 +15,8 @@ namespace GameEngine {
         kBlendModeMultily,
         // スクリーン Src * (1-Dest) + Dest * 1
         kBlendModeScreen,
+        // オブジェクトの透明度を保存する通常aブレンド
+        kBlendModeNormalAndSaveObjectAlpha,
 
         // 利用禁止
         kCountOfBlendMode,

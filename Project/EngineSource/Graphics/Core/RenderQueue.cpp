@@ -34,6 +34,8 @@ void RenderQueue::Initialize(ID3D12GraphicsCommandList4* commandList, SrvManager
 
     // ラスタライズの最終描画
     rasterizeFinalPassName_ = "DefaultPass";
+    // レイトレの最終描画
+    raytracingFinalPassName_ = "RaytracingPass";
     // 最終的な描画先を設定
     finalPassName_ = "LightingCompositePass";
     renderPassController_->SetSceneFinalPass(finalPassName_);
@@ -94,70 +96,8 @@ void RenderQueue::Execute() {
     // ライトの更新
     lightManager_.Update();
 
-    for (const auto& passName : passExecuteOrder_) {
-
-        // 不透明、半透明ともにコマンドがなければ飛ばす
-        bool hasOpaque = draw3dQueueList_.count(passName) > 0;
-        bool hasTranslucent = translucentDrawQueueList_.count(passName) > 0;
-        bool has2d = draw2dQueueList_.count(passName) > 0;
-        if (!hasOpaque && !hasTranslucent && !has2d) {
-            renderPassController_->PrePass(passName);
-            renderPassController_->PostPass(passName);
-            continue;
-        }
-
-        renderPassController_->PrePass(passName);
-        currentPsoName_.clear();
-
-        // 不透明描画コマンドを解放
-        if (hasOpaque) {
-            for (auto& [layer, psoMap] : draw3dQueueList_[passName]) {
-                for (auto& [psoName, requests] : psoMap) {
-                    if (requests.empty()) { continue; }
-                    // 描画前処理
-                    PreDraw(psoName);
-                    for (const auto& request : requests) {
-                        // 描画コマンド解放
-                        Execute3dRequest(request);
-                    }
-                }
-            }
-        }
-
-        // 半透明描画コマンドを解放
-        if (hasTranslucent) {
-            auto& translucentList = translucentDrawQueueList_[passName];
-
-            // カメラの距離でソートをおこなう
-            // std::sort(translucentList.begin(), translucentList.end(),
-            //     [](const DrawRequest& a, const DrawRequest& b) {
-            //         return a.sortKey > b.sortKey;
-            //     });
-
-            for (const auto& request : translucentList) {
-                // 描画前処理
-                PreDraw(Get3dPsoName(request.type));
-                // 描画コマンド解放
-                Execute3dRequest(request);
-            }
-        }
-
-        // 2D描画コマンドを解放
-        if (has2d) {
-            for (auto& [layer, psoMap] : draw2dQueueList_[passName]) {
-                for (auto& [psoName, requests] : psoMap) {
-                    if (requests.empty()) { continue; }
-                    // 描画前処理
-                    PreDraw(psoName);
-                    for (const auto& request : requests) {
-                        // 描画コマンド解放
-                        Execute2dRequest(request);
-                    }
-                }
-            }
-        }
-        renderPassController_->PostPass(passName);
-    }
+    // ラスタライズ描画コマンドを解放
+    RasterizeExecute();
 
     // レイトレーシング描画コマンドを解放
     RaytracingExecute();
@@ -166,6 +106,7 @@ void RenderQueue::Execute() {
     LightingComposite();
 
     // 最終的に画面に出すためのパスの設定
+    renderPassController_->SetSceneFinalPass(finalPassName_);
     renderPassController_->SetPresentPass(finalPassName_);
 }
 
@@ -422,6 +363,82 @@ void RenderQueue::Execute2dRequest(const Draw2dRequest& request) {
     }
 }
 
+void RenderQueue::RasterizeExecute() {
+    // 描画のリセット
+    enableDrawRasterize_ = false;
+
+    for (const auto& passName : passExecuteOrder_) {
+
+        // 不透明、半透明ともにコマンドがなければ飛ばす
+        bool hasOpaque = draw3dQueueList_.count(passName) > 0;
+        bool hasTranslucent = translucentDrawQueueList_.count(passName) > 0;
+        bool has2d = draw2dQueueList_.count(passName) > 0;
+        if (!hasOpaque && !hasTranslucent && !has2d) {
+            renderPassController_->PrePass(passName);
+            renderPassController_->PostPass(passName);
+            continue;
+        }
+
+        enableDrawRasterize_ = true;
+        renderPassController_->PrePass(passName);
+        currentPsoName_.clear();
+
+        // 不透明描画コマンドを解放
+        if (hasOpaque) {
+            for (auto& [layer, psoMap] : draw3dQueueList_[passName]) {
+                for (auto& [psoName, requests] : psoMap) {
+                    if (requests.empty()) { continue; }
+                    // 描画前処理
+                    PreDraw(psoName);
+                    for (const auto& request : requests) {
+                        // 描画コマンド解放
+                        Execute3dRequest(request);
+                    }
+                }
+            }
+        }
+
+        // 半透明描画コマンドを解放
+        if (hasTranslucent) {
+            auto& translucentList = translucentDrawQueueList_[passName];
+
+            // カメラの距離でソートをおこなう
+            // std::sort(translucentList.begin(), translucentList.end(),
+            //     [](const DrawRequest& a, const DrawRequest& b) {
+            //         return a.sortKey > b.sortKey;
+            //     });
+
+            for (const auto& request : translucentList) {
+                // 描画前処理
+                PreDraw(Get3dPsoName(request.type));
+                // 描画コマンド解放
+                Execute3dRequest(request);
+            }
+        }
+
+        // 2D描画コマンドを解放
+        if (has2d) {
+            for (auto& [layer, psoMap] : draw2dQueueList_[passName]) {
+                for (auto& [psoName, requests] : psoMap) {
+                    if (requests.empty()) { continue; }
+                    // 描画前処理
+                    PreDraw(psoName);
+                    for (const auto& request : requests) {
+                        // 描画コマンド解放
+                        Execute2dRequest(request);
+                    }
+                }
+            }
+        }
+        renderPassController_->PostPass(passName);
+    }
+
+    // 最終描画先に設定
+    if (enableDrawRasterize_) {
+        finalPassName_ = rasterizeFinalPassName_;
+    }
+}
+
 void RenderQueue::DrawRaytracing() {
     commandList_->SetComputeRootSignature(raytracingPipeline_->GetGlobalRootSignature());
     // TLASのセット
@@ -452,6 +469,15 @@ void RenderQueue::DrawRaytracing() {
 }
 
 void RenderQueue::RaytracingExecute() {
+
+    if (raytracingDrawQueueList_.size() != 0) {
+        enableDrawRaytracing_ = true;
+    } else {
+        // 描画するものがなければ早期リターン
+        enableDrawRaytracing_ = false;
+        return;
+    }
+
     // tlasを更新する
     tlas_.Update(commandList_, raytracingDrawQueueList_);
 
@@ -467,9 +493,15 @@ void RenderQueue::RaytracingExecute() {
     renderPassController_->InsertUavBarrier("RaytracingPassDepth");
     renderPassController_->PostPass("RaytracingPass");
     renderPassController_->PostPass("RaytracingPassDepth");
+
+    // 最終描画先に設定
+    finalPassName_ = raytracingFinalPassName_;
 }
 
 void RenderQueue::LightingComposite() {
+    // 両方とも描画が有効の場合のみ合成
+    if (!enableDrawRaytracing_ || !enableDrawRasterize_) { return; }
+
     // レイトレとラスタライズの内容を合成する
     renderPassController_->PrePass("LightingCompositePass");
     PreDraw("LightingComposite");
@@ -479,4 +511,6 @@ void RenderQueue::LightingComposite() {
     commandList_->SetGraphicsRootDescriptorTable(3, srvManager_->GetGPUHandle(renderPassController_->GetSrvIndex("RaytracingPassDepth")));
     commandList_->DrawInstanced(3, 1, 0, 0);
     renderPassController_->PostPass("LightingCompositePass");
+
+    finalPassName_ = "LightingCompositePass";
 }
