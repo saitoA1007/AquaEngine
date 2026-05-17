@@ -30,7 +30,7 @@ void RenderQueue::Initialize(ID3D12GraphicsCommandList4* commandList, SrvManager
     // 影を描画するパス
     renderPassController_->AddPass("ShadowPass", RenderTextureMode::DsvOnly, 2048, 2048);
     // デフォルトで描画するパス
-    renderPassController_->AddPass("DefaultPass");
+    renderPassController_->AddPass("DefaultPass", RenderTextureMode::RtvAndDsv, 1280, 720, { 0.0f,0.0f,0.0f,0.0f });
 
     // ラスタライズの最終描画
     rasterizeFinalPassName_ = "DefaultPass";

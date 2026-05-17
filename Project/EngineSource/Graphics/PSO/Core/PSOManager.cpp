@@ -376,7 +376,7 @@ void PSOManager::DefaultLoadPSO() {
     default3D.vsPath = L"Resources/Shaders/Rasterize/Object3d.VS.hlsl";
     default3D.psPath = L"Resources/Shaders/Rasterize/Object3d.PS.hlsl";
     default3D.drawMode = DrawModel::FillFront;
-    default3D.blendMode = BlendMode::kBlendModeNormal;
+    default3D.blendMode = BlendMode::kBlendModeNormalAndSaveObjectAlpha;
     default3D.isDepthEnable = true;
     RootSignatureBuilder rootSigBuilder;
     rootSigBuilder.Initialize(device_);
@@ -404,7 +404,7 @@ void PSOManager::DefaultLoadPSO() {
     defaultSprite.vsPath = L"Resources/Shaders/Rasterize/Sprite.VS.hlsl";
     defaultSprite.psPath = L"Resources/Shaders/Rasterize/Sprite.PS.hlsl";
     defaultSprite.drawMode = DrawModel::None;
-    defaultSprite.blendMode = BlendMode::kBlendModeNormal;
+    defaultSprite.blendMode = BlendMode::kBlendModeNormalAndSaveObjectAlpha;
     defaultSprite.isDepthEnable = false;
     RootSignatureBuilder spriteRoot;
     spriteRoot.Initialize(device_);
@@ -424,7 +424,7 @@ void PSOManager::DefaultLoadPSO() {
     instancing3D.vsPath = L"Resources/Shaders/Rasterize/Particle.VS.hlsl";
     instancing3D.psPath = L"Resources/Shaders/Rasterize/Particle.PS.hlsl";
     instancing3D.drawMode = DrawModel::FillFront;
-    instancing3D.blendMode = BlendMode::kBlendModeNormal;
+    instancing3D.blendMode = BlendMode::kBlendModeNormalAndSaveObjectAlpha;
     instancing3D.isDepthEnable = true;
     RootSignatureBuilder instancingRootSigBuilder;
     instancingRootSigBuilder.Initialize(device_);
@@ -446,7 +446,7 @@ void PSOManager::DefaultLoadPSO() {
     grid.vsPath = L"Resources/Shaders/Rasterize/Grid.VS.hlsl";
     grid.psPath = L"Resources/Shaders/Rasterize/Grid.PS.hlsl";
     grid.drawMode = DrawModel::None;
-    grid.blendMode = BlendMode::kBlendModeNormal;
+    grid.blendMode = BlendMode::kBlendModeNormalAndSaveObjectAlpha;
     grid.isDepthEnable = true;
     RootSignatureBuilder gridRootSigBuilder;
     gridRootSigBuilder.Initialize(device_);
@@ -463,7 +463,7 @@ void PSOManager::DefaultLoadPSO() {
     line.vsPath = L"Resources/Shaders/Rasterize/Primitive.VS.hlsl";
     line.psPath = L"Resources/Shaders/Rasterize/Primitive.PS.hlsl";
     line.drawMode = DrawModel::None;
-    line.blendMode = BlendMode::kBlendModeNormal;
+    line.blendMode = BlendMode::kBlendModeNormalAndSaveObjectAlpha;
     line.isDepthEnable = true;
     line.primitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
     RootSignatureBuilder lineRootSigBuilder;
@@ -480,7 +480,7 @@ void PSOManager::DefaultLoadPSO() {
     animation.vsPath = L"Resources/Shaders/Rasterize/SkinningObject3d.VS.hlsl";
     animation.psPath = L"Resources/Shaders/Rasterize/Object3d.PS.hlsl";
     animation.drawMode = DrawModel::FillFront;
-    animation.blendMode = BlendMode::kBlendModeNormal;
+    animation.blendMode = BlendMode::kBlendModeNormalAndSaveObjectAlpha;
     animation.isDepthEnable = true;
     RootSignatureBuilder animationRootSigBuilder;
     animationRootSigBuilder.Initialize(device_);
