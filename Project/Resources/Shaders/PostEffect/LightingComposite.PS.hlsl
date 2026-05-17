@@ -25,13 +25,14 @@ PixelShaderOutput main(VertexShaderOutput input) {
     float  rasterDepth = gRasterDepth.Sample(gSampler, input.texcoord).r;
     float  rtDepth     = gRtDepth.Sample(gSampler, input.texcoord).r;
     
-    if (rasterDepth < rtDepth)
+    // RTカラーをベースにする
+    float3 finalColor = rtColor.rgb;
+    
+    if (rasterDepth <= rtDepth)
     {
-        output.color = gRasterColor.Sample(gSampler, input.texcoord);
+        finalColor = lerp(finalColor, rasterColor.rgb, rasterColor.a);
     }
-    else
-    {
-        output.color = gRtColor.Sample(gSampler, input.texcoord);
-    }
+    
+    output.color = float4(finalColor, 1.0f);
     return output;
 }
