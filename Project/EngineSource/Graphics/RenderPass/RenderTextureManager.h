@@ -21,7 +21,9 @@ namespace GameEngine {
 			const std::string& name,
 			uint32_t width,uint32_t height,
 			RenderTextureMode  mode = RenderTextureMode::RtvAndDsv,
-			DXGI_FORMAT colorFormat = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
+			DXGI_FORMAT colorFormat = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
+			Vector4 clearColor = { 0.2f,0.2f,0.2f,1.0f }
+		);
 
 		/// <summary>
 		/// 登録済みのレンダーテクスチャを取得する

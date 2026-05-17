@@ -22,7 +22,7 @@ void RenderQueue::Initialize(ID3D12GraphicsCommandList4* commandList, SrvManager
     // レイトレーシングで描画するパス
     renderPassController_->AddPass("RaytracingPass", RenderTextureMode::RtvAndUav);
     // レイトレーシング描画の深度情報を記録する。描画に使用しない
-    renderPassController_->AddPass("RaytracingPassDepth", RenderTextureMode::UavOnly, 1280, 720, DXGI_FORMAT_R32_FLOAT);
+    renderPassController_->AddPass("RaytracingPassDepth", RenderTextureMode::UavOnly, 1280, 720,{0.0f,0.0f,0.0f,1.0f}, DXGI_FORMAT_R32_FLOAT);
 
     // レイトレとラスタライズを合成する用のパス
     renderPassController_->AddPass("LightingCompositePass");

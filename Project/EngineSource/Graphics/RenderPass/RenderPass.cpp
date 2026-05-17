@@ -1,11 +1,14 @@
 #include "RenderPass.h"
 using namespace GameEngine;
 
-RenderPass::RenderPass(const std::string& name, ID3D12GraphicsCommandList* commandList, RenderTexture* renderTexture) {
+RenderPass::RenderPass(const std::string& name, ID3D12GraphicsCommandList* commandList, RenderTexture* renderTexture, Vector4 clearColor) {
 	name_ = name;
 	renderTexture_ = renderTexture;
-
 	commandList_ = commandList;
+	clearColor_[0] = clearColor.x;
+	clearColor_[1] = clearColor.y;
+	clearColor_[2] = clearColor.z;
+	clearColor_[3] = clearColor.w;
 
 	// 画面サイズを取得
 	uint32_t width = renderTexture_->GetWidth();
@@ -36,8 +39,7 @@ void RenderPass::PrePass() {
 		commandList_->OMSetRenderTargets(1, &renderTexture_->GetRtvHandle(), false, nullptr);
 
 		// 指定した色で画面全体をクリアする
-		float clearColor[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
-		commandList_->ClearRenderTargetView(renderTexture_->GetRtvHandle(), clearColor, 0, nullptr);
+		commandList_->ClearRenderTargetView(renderTexture_->GetRtvHandle(), clearColor_, 0, nullptr);
 		break;
 	}
 
@@ -58,9 +60,8 @@ void RenderPass::PrePass() {
 		// RTVとDSVをセットする
 		commandList_->OMSetRenderTargets(1, &renderTexture_->GetRtvHandle(), false, &renderTexture_->GetDsvHandle());
 
-		float clearColor[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
 		// 指定した色で画面全体をクリアする
-		commandList_->ClearRenderTargetView(renderTexture_->GetRtvHandle(), clearColor, 0, nullptr);
+		commandList_->ClearRenderTargetView(renderTexture_->GetRtvHandle(), clearColor_, 0, nullptr);
 		// 指定した深度で画面全体をクリアする
 		commandList_->ClearDepthStencilView(renderTexture_->GetDsvHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 		break;
@@ -80,8 +81,7 @@ void RenderPass::PrePass() {
 		commandList_->OMSetRenderTargets(1, &renderTexture_->GetRtvHandle(), false, nullptr);
 
 		// 指定した色で画面全体をクリアする
-		float clearColor[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
-		commandList_->ClearRenderTargetView(renderTexture_->GetRtvHandle(), clearColor, 0, nullptr);
+		commandList_->ClearRenderTargetView(renderTexture_->GetRtvHandle(), clearColor_, 0, nullptr);
 		break;
 	}
 	}

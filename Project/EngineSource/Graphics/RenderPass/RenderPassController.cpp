@@ -8,7 +8,7 @@ void RenderPassController::Initialize(RenderTextureManager* renderTextureManager
 	renderTextureManager_ = renderTextureManager;
 }
 
-void RenderPassController::AddPass(const std::string& name, RenderTextureMode mode, uint32_t wid, uint32_t hei, DXGI_FORMAT colorFormat) {
+void RenderPassController::AddPass(const std::string& name, RenderTextureMode mode, uint32_t wid, uint32_t hei, Vector4 clearColor, DXGI_FORMAT colorFormat) {
 	// すでに登録されている場合、早期リターン
 	auto getName = renderPassList_.find(name);
 	if (getName != renderPassList_.end()) {
@@ -16,11 +16,11 @@ void RenderPassController::AddPass(const std::string& name, RenderTextureMode mo
 	}
 
 	// renderTextureを作成
-	renderTextureManager_->Create(name, wid, hei,mode, colorFormat);
+	renderTextureManager_->Create(name, wid, hei,mode, colorFormat, clearColor);
 	RenderTexture* renderTex = renderTextureManager_->GetRenderTexture(name);
 
 	// レンダーパスを作成
-	std::unique_ptr<RenderPass> tmp = std::make_unique<RenderPass>(name, commandList_, renderTex);
+	std::unique_ptr<RenderPass> tmp = std::make_unique<RenderPass>(name, commandList_, renderTex, clearColor);
 
 	// 登録
 	renderPassList_[name] = std::move(tmp);

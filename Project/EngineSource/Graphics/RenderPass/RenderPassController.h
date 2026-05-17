@@ -17,7 +17,7 @@ namespace GameEngine {
 
 		// パスを作成する
 		void AddPass(const std::string& name, RenderTextureMode mode = RenderTextureMode::RtvAndDsv,uint32_t wid = 1280,uint32_t hei = 720,
-			DXGI_FORMAT colorFormat = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
+			Vector4 clearColor = { 0.2f,0.2f,0.2f,1.0f },DXGI_FORMAT colorFormat = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
 
 		// 描画前に呼び出す(参照する時に切り替えられていなければassertで引っ掛ける)
 		void PrePass(const std::string& name);
