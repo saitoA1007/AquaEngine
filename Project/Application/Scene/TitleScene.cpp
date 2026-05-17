@@ -70,7 +70,7 @@ void TitleScene::Update() {
 
 	ImGui::DragFloat3("lightDir", &dir_.x, 0.1f);
 	ImGui::DragFloat("lightIntensity", &intensity_, 0.1f);
-	dir_ = Normalize(dir_);
+	dir_.Normalize();
 
 	light->SetDirectionalDirction(dir_);
 	light->SetDirectionalIntensity(intensity_);
@@ -108,7 +108,7 @@ void TitleScene::DebugUpdate() {
 
 	ImGui::DragFloat3("lightDir", &dir_.x, 0.1f);
 	ImGui::DragFloat("lightIntensity", &intensity_, 0.1f);
-	dir_ = Normalize(dir_);
+	dir_.Normalize();
 
 	light->SetDirectionalDirction(dir_);
 	light->SetDirectionalIntensity(intensity_);

@@ -16,7 +16,7 @@ void Material::Initialize(const Vector4& color, const Vector3& specularColor,con
 	// Lightingするのでtrueに設定する
 	materialData_->enableLighting = isEnableLighting;
 	// UVTransform行列を初期化
-	materialData_->uvTransform = MakeIdentity4x4();
+	materialData_->uvTransform = Matrix4x4::MakeIdentity();
 	// specularの色を設定
 	materialData_->specularColor = Vector4(specularColor.x, specularColor.y, specularColor.z, 1);
 	// 輝度を設定
@@ -34,7 +34,7 @@ void Material::Initialize(const Vector4& color, const Vector3& specularColor,con
 }
 
 void Material::SetUVTransform(Transform uvTransform) {
-	materialData_->uvTransform = MakeAffineMatrix(uvTransform.scale, uvTransform.rotate, uvTransform.translate);
+	materialData_->uvTransform = Math::MakeAffineMatrix(uvTransform.scale, uvTransform.rotate, uvTransform.translate);
 }
 
 void Material::CheackTranslucent() {

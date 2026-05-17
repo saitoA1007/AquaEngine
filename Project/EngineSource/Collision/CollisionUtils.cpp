@@ -14,7 +14,7 @@ CollisionResult GameEngine::IsSpheresCollision(const Sphere& s1, const Sphere& s
 	CollisionResult result;
 
 	Vector3 diff = s2.center - s1.center;
-	float distance = Length(diff);
+	float distance = diff.Length();
 
 	// 半径の合計より短ければ衝突
 	if (distance < s1.radius + s2.radius) {
@@ -40,7 +40,7 @@ CollisionResult GameEngine::IsSpherePlaneCollision(const Sphere& sphere, const P
 	CollisionResult result;
 
 	// 球の半径より短ければ衝突
-	if (std::fabs(Dot(plane.normal, sphere.center) - plane.distance) <= sphere.radius) {
+	if (std::fabs(Math::Dot(plane.normal, sphere.center) - plane.distance) <= sphere.radius) {
 		result.isHit = true;
 	}
 
@@ -51,7 +51,7 @@ CollisionResult GameEngine::IsSegmentPlaneCollision(const Segment& segment, cons
 	CollisionResult result;
 
 	// 垂直判定を行うために、法線と線の内積を求める
-	float dot = Dot(plane.normal, segment.diff);
+	float dot = Math::Dot(plane.normal, segment.diff);
 
 	// 垂直の時は衝突していないのでfalseを返す
 	if (dot == 0.0f) {
@@ -59,7 +59,7 @@ CollisionResult GameEngine::IsSegmentPlaneCollision(const Segment& segment, cons
 	}
 
 	// tを求める
-	float t = (plane.distance - Dot(plane.normal, segment.origin)) / dot;
+	float t = (plane.distance - Math::Dot(plane.normal, segment.origin)) / dot;
 
 	if (t >= 0.0f && t <= 1.0f) {
 		result.isHit = true;
@@ -73,35 +73,35 @@ CollisionResult GameEngine::IsSegmentTriangleCollision(const Triangle& triangle,
 
 	// 三角形の3つの頂点を使って平面を求める
 	Plane plane;
-	plane.normal = Cross(Subtract(triangle.vertices[1], triangle.vertices[0]), Subtract(triangle.vertices[2], triangle.vertices[1]));
-	plane.distance = Dot(plane.normal, triangle.vertices[0]);
+	plane.normal = Math::Cross(triangle.vertices[1] - triangle.vertices[0], triangle.vertices[2] - triangle.vertices[1]);
+	plane.distance = Math::Dot(plane.normal, triangle.vertices[0]);
 	// 法線を正規化
-	plane.normal = Normalize(plane.normal);
+	plane.normal = Math::Normalize(plane.normal);
 	// 垂直判定を行うために、法線と線の内積を求める
-	float dot = Dot(plane.normal, segment.diff);
+	float dot = Math::Dot(plane.normal, segment.diff);
 
 	// tを求める
-	float t = (plane.distance - Dot(plane.normal, segment.origin)) / dot;
+	float t = (plane.distance - Math::Dot(plane.normal, segment.origin)) / dot;
 	// 衝突点pを求める
 	Vector3 p = Vector3(segment.origin) + Vector3(segment.diff.x * t, segment.diff.y * t, segment.diff.z * t);
 
 	// 各辺を結んだベクトル
-	Vector3 v01 = Subtract(triangle.vertices[1], triangle.vertices[0]);
+	Vector3 v01 = triangle.vertices[1] - triangle.vertices[0];
 	Vector3 v1p = p - triangle.vertices[1];
-	Vector3 v12 = Subtract(triangle.vertices[2], triangle.vertices[1]);
+	Vector3 v12 = triangle.vertices[2] - triangle.vertices[1];
 	Vector3 v2p = p - triangle.vertices[2];
-	Vector3 v20 = Subtract(triangle.vertices[0], triangle.vertices[2]);
+	Vector3 v20 = triangle.vertices[0] - triangle.vertices[2];
 	Vector3 v0p = p - triangle.vertices[0];
 
 	// 各辺を結んだベクトルと、頂点と衝突点pを結んだベクトルのクロス積を取る
-	Vector3 cross01 = Cross(v01, v1p);
-	Vector3 cross12 = Cross(v12, v2p);
-	Vector3 cross20 = Cross(v20, v0p);
+	Vector3 cross01 = Math::Cross(v01, v1p);
+	Vector3 cross12 = Math::Cross(v12, v2p);
+	Vector3 cross20 = Math::Cross(v20, v0p);
 
 	// すべての小三角形のクロス積と法線が同じ方向を向いていたら衝突
-	if (Dot(cross01, plane.normal) >= 0.0f &&
-		Dot(cross12, plane.normal) >= 0.0f &&
-		Dot(cross20, plane.normal) >= 0.0f) {
+	if (Math::Dot(cross01, plane.normal) >= 0.0f &&
+		Math::Dot(cross12, plane.normal) >= 0.0f &&
+		Math::Dot(cross20, plane.normal) >= 0.0f) {
 		result.isHit = true;
 	}
 
@@ -167,7 +167,7 @@ CollisionResult GameEngine::IsAABBSphereCollision(const AABB& aabb, const Sphere
 	};
 
 	Vector3 diff =  sphere.center - closestPoint;
-	float distance = Length(diff);
+	float distance = diff.Length();
 
 	// 距離が半径よりも小さければ衝突
 	if (distance <= sphere.radius) {
@@ -192,9 +192,9 @@ CollisionResult GameEngine::IsAABBSegmentCollision(const AABB& aabb, const Segme
 	CollisionResult result;
 
 	// 各軸のnear,farを求める
-	Vector3 tNear = Min({ (aabb.min.x - segment.origin.x) / segment.diff.x,(aabb.min.y - segment.origin.y) / segment.diff.y,(aabb.min.z - segment.origin.z) / segment.diff.z },
+	Vector3 tNear = Math::Min({ (aabb.min.x - segment.origin.x) / segment.diff.x,(aabb.min.y - segment.origin.y) / segment.diff.y,(aabb.min.z - segment.origin.z) / segment.diff.z },
 		{ (aabb.max.x - segment.origin.x) / segment.diff.x,(aabb.max.y - segment.origin.y) / segment.diff.y,(aabb.max.z - segment.origin.z) / segment.diff.z });
-	Vector3 tFar = Max({ (aabb.min.x - segment.origin.x) / segment.diff.x,(aabb.min.y - segment.origin.y) / segment.diff.y,(aabb.min.z - segment.origin.z) / segment.diff.z },
+	Vector3 tFar = Math::Max({ (aabb.min.x - segment.origin.x) / segment.diff.x,(aabb.min.y - segment.origin.y) / segment.diff.y,(aabb.min.z - segment.origin.z) / segment.diff.z },
 		{ (aabb.max.x - segment.origin.x) / segment.diff.x,(aabb.max.y - segment.origin.y) / segment.diff.y,(aabb.max.z - segment.origin.z) / segment.diff.z });
 
 	// AABBとの衝突点（貫通点）のtが小さい方
@@ -222,9 +222,9 @@ CollisionResult GameEngine::IsOBBSphereCollision(const OBB& obb, const Sphere& s
 
 	// ベクトルをOBBのローカル座標系に変換
 	Vector3 centerInOBBLocalSpace = {
-		Dot(v, obb.orientations[0]),
-		Dot(v, obb.orientations[1]),
-		Dot(v, obb.orientations[2]) 
+		Math::Dot(v, obb.orientations[0]),
+		Math::Dot(v, obb.orientations[1]),
+		Math::Dot(v, obb.orientations[2])
 	};
 
 	// obbのローカル空間の球の位置を求める
@@ -246,7 +246,7 @@ CollisionResult GameEngine::IsOBBSphereCollision(const OBB& obb, const Sphere& s
 
 	// ローカル空間での距離を計算
 	Vector3 diffLocal = centerInOBBLocalSpace - closestPointLocal;
-	float distanceSquared = Dot(diffLocal, diffLocal);
+	float distanceSquared = Math::Dot(diffLocal, diffLocal);
 	float radiusSquared = sphere.radius * sphere.radius;
 
 	if (distanceSquared <= radiusSquared) {
@@ -270,7 +270,7 @@ CollisionResult GameEngine::IsOBBSphereCollision(const OBB& obb, const Sphere& s
 				obb.orientations[1] * normalLocal.y +
 				obb.orientations[2] * normalLocal.z;
 
-			result.contactNormal = Normalize(result.contactNormal);
+			result.contactNormal.Normalize();
 			result.penetrationDepth = sphere.radius - distance;
 		} else {
 			result.contactNormal = {0.0f,0.0f,1.0f};
@@ -289,17 +289,17 @@ CollisionResult GameEngine::IsOBBSegmentCollision(const OBB& obb, const Segment&
 	// 線の始点をOBBのローカル座標系に変換
 	Vector3 vOrigin = segment.origin - obb.center;
 	Vector3 localOrigin = {
-		Dot(vOrigin, obb.orientations[0]),
-		Dot(vOrigin, obb.orientations[1]),
-		Dot(vOrigin, obb.orientations[2]) 
+		Math::Dot(vOrigin, obb.orientations[0]),
+		Math::Dot(vOrigin, obb.orientations[1]),
+		Math::Dot(vOrigin, obb.orientations[2])
 	};
 
 	// 線の終点をOBBのローカル座標系に変換
 	Vector3 vEnd = segmentEnd - obb.center;
 	Vector3 localEnd = {
-		Dot(vEnd, obb.orientations[0]),
-		Dot(vEnd, obb.orientations[1]),
-		Dot(vEnd, obb.orientations[2]) 
+		Math::Dot(vEnd, obb.orientations[0]),
+		Math::Dot(vEnd, obb.orientations[1]),
+		Math::Dot(vEnd, obb.orientations[2])
 	};
 
 	// ローカル空間での線を求める

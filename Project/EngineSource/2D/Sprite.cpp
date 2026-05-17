@@ -10,7 +10,7 @@ Sprite::~Sprite() {
 }
 
 void Sprite::StaticInitialize(int32_t width, int32_t height) {
-	orthoMatrix_ = Multiply(MakeIdentity4x4(), MakeOrthographicMatrix(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, 100.0f));
+	orthoMatrix_ = Matrix4x4::MakeIdentity() * Math::MakeOrthographicMatrix(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, 100.0f);
 }
 
 std::unique_ptr<Sprite> Sprite::Create(const Vector2& position,const Vector2& size,const Vector2& anchorPoint,const Vector4& color,
@@ -24,7 +24,7 @@ std::unique_ptr<Sprite> Sprite::Create(const Vector2& position,const Vector2& si
 	sprite->size_ = size;
 	sprite->anchorPoint_ = anchorPoint;
 	// 座標を元にワールド行列の生成
-	sprite->worldMatrix_ = MakeTranslateMatrix({ position.x,position.y,0.0f });
+	sprite->worldMatrix_ = Math::MakeTranslateMatrix({ position.x,position.y,0.0f });
 
 	// テクスチャのサイズを取得
 	sprite->textureLeftTop_ = leftTop;
@@ -53,17 +53,17 @@ void Sprite::Update() {
 	constBufferData_->textureHandle = textureHandle_;
 
 	// 座標を元にワールド行列の生成
-	worldMatrix_ = MakeAffineMatrix(Vector3(scale_.x, scale_.y, 0.0f), Vector3(0.0f,0.0f,rotate_), Vector3(position_.x, position_.y, 0.0f));
+	worldMatrix_ = Math::MakeAffineMatrix(Vector3(scale_.x, scale_.y, 0.0f), Vector3(0.0f,0.0f,rotate_), Vector3(position_.x, position_.y, 0.0f));
 	// 座標を適用 
-	constBufferData_->WVP = Multiply(worldMatrix_, orthoMatrix_);
+	constBufferData_->WVP = worldMatrix_ * orthoMatrix_;
 }
 
 void Sprite::SetPosition(const Vector2& position) {
 	position_ = position;
 	// 座標を元にワールド行列の生成
-	worldMatrix_ = MakeTranslateMatrix({ position.x,position.y,0.0f });
+	worldMatrix_ = Math::MakeTranslateMatrix({ position.x,position.y,0.0f });
 	// 座標を適用 
-	constBufferData_->WVP = Multiply(worldMatrix_, orthoMatrix_);
+	constBufferData_->WVP = worldMatrix_ * orthoMatrix_;
 }
 
 void Sprite::SetSize(const Vector2& size) {
@@ -89,7 +89,7 @@ void Sprite::SetColor(const Vector4& color) {
 
 void Sprite::SetUvMatrix(const Transform& transform) {
 	// uv行列の設定
-	constBufferData_->uvTransform = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+	constBufferData_->uvTransform = Math::MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 }
 
 void Sprite::CreateMesh() {
@@ -136,9 +136,9 @@ void Sprite::CreateConstBufferData(const Vector4& color) {
 	// 色の設定
 	constBufferData_->color = color;
 	// UVTransform行列を初期化
-	constBufferData_->uvTransform = MakeIdentity4x4();
+	constBufferData_->uvTransform = Matrix4x4::MakeIdentity();
 	// wvp行列を初期化
-	constBufferData_->WVP = Multiply(worldMatrix_, orthoMatrix_);
+	constBufferData_->WVP = worldMatrix_ * orthoMatrix_;
 	// テクスチャ
 	constBufferData_->textureHandle = 0;
 }

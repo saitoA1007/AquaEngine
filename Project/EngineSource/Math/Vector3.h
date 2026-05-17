@@ -1,4 +1,5 @@
 #pragma once
+#include <cmath>
 
 struct Vector3 {
 	float x, y, z;
@@ -15,5 +16,25 @@ struct Vector3 {
 	Vector3 operator-(const float& other) const { return { x - other, y - other, z - other }; }
 	Vector3 operator*(const float& other) const { return { x * other, y * other, z * other }; }
 	Vector3 operator/(const float& other) const { return { x / other, y / other, z / other }; }
-	//Vector3 operator*(float scalar) const { return { x * scalar, y * scalar, z * scalar }; }
+	
+	// ベクトルの長さ
+	float Length() const {
+		return std::sqrt(x * x + y * y + z * z);
+	}
+
+	// ベクトルの長さの2乗
+	float LengthSquared() const {
+		return x * x + y * y + z * z;
+	}
+
+	// 正規化
+	void Normalize() {
+		float len = Length();
+		// ゼロ除算を防ぐためのチェック
+		if (len > 0.0f) {
+			x /= len;
+			y /= len;
+			z /= len;
+		}
+	}
 };

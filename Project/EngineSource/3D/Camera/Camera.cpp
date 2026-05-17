@@ -11,10 +11,10 @@ Camera::~Camera() {
 void Camera::Initialize(const Transform& transform, int kClientWidth, int kClientHeight) {
 	// Matrixの初期化
 	transform_ = transform;
-	worldMatrix_ = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-	viewMatrix_ = InverseMatrix(worldMatrix_);
-	projectionMatrix_ = MakePerspectiveFovMatrix(0.45f, static_cast<float>(kClientWidth) / static_cast<float>(kClientHeight), 0.1f, 200.0f);
-	VPMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
+	worldMatrix_ = Math::MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+	viewMatrix_ = Math::InverseMatrix(worldMatrix_);
+	projectionMatrix_ = Math::MakePerspectiveFovMatrix(0.45f, static_cast<float>(kClientWidth) / static_cast<float>(kClientHeight), 0.1f, 200.0f);
+	VPMatrix_ = viewMatrix_ * projectionMatrix_;
 
 
 	// 定数バッファの作成
@@ -22,43 +22,43 @@ void Camera::Initialize(const Transform& transform, int kClientWidth, int kClien
 	cameraForGPU_ = constBuffer_.GetData();
 	// 単位行列を書き込んでおく
 	cameraForGPU_->worldPosition = GetWorldPosition();
-	cameraForGPU_->vpMatrix = MakeIdentity4x4();
-	cameraForGPU_->mtxViewInv = MakeIdentity4x4();
-	cameraForGPU_->mtxProjInv = MakeIdentity4x4();
+	cameraForGPU_->vpMatrix = Matrix4x4::MakeIdentity();
+	cameraForGPU_->mtxViewInv = Matrix4x4::MakeIdentity();
+	cameraForGPU_->mtxProjInv = Matrix4x4::MakeIdentity();
 }
 
 void Camera::Update() {
-	worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-	viewMatrix_ = InverseMatrix(worldMatrix_);
-	VPMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
+	worldMatrix_ = Math::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	viewMatrix_ = Math::InverseMatrix(worldMatrix_);
+	VPMatrix_ = viewMatrix_ * projectionMatrix_;
 
 	if (cameraForGPU_) {
 		cameraForGPU_->worldPosition = GetWorldPosition();
 		cameraForGPU_->vpMatrix = VPMatrix_;
 		cameraForGPU_->mtxViewInv = worldMatrix_;
-		cameraForGPU_->mtxProjInv = InverseMatrix(projectionMatrix_);
+		cameraForGPU_->mtxProjInv = Math::InverseMatrix(projectionMatrix_);
 	}	
 }
 
 void Camera::UpdateFromWorldMatrix() {
-	viewMatrix_ = InverseMatrix(worldMatrix_);
-	VPMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
+	viewMatrix_ = Math::InverseMatrix(worldMatrix_);
+	VPMatrix_ = viewMatrix_ * projectionMatrix_;
 
 	if (cameraForGPU_) {
 		cameraForGPU_->worldPosition = GetWorldPosition();
 		cameraForGPU_->vpMatrix = VPMatrix_;
 		cameraForGPU_->mtxViewInv = worldMatrix_;
-		cameraForGPU_->mtxProjInv = InverseMatrix(projectionMatrix_);
+		cameraForGPU_->mtxProjInv = Math::InverseMatrix(projectionMatrix_);
 	}
 }
 
 Matrix4x4 Camera::MakeWVPMatrix(Matrix4x4 worldMatrix) {
-	WVPMatrix_ = Multiply(worldMatrix, Multiply(viewMatrix_, projectionMatrix_));
+	WVPMatrix_ = worldMatrix * (viewMatrix_ * projectionMatrix_);
 	return WVPMatrix_;
 }
 
 void Camera::SetProjectionMatrix(float fovY, int kClientWidth, int kClientHeight, float nearPlane, float farPlane) {
-	this->projectionMatrix_ = MakePerspectiveFovMatrix(fovY, static_cast<float>(kClientWidth) / static_cast<float>(kClientHeight), nearPlane, farPlane);
+	this->projectionMatrix_ = Math::MakePerspectiveFovMatrix(fovY, static_cast<float>(kClientWidth) / static_cast<float>(kClientHeight), nearPlane, farPlane);
 }
 
 void Camera::SetViewMatrix(const Matrix4x4& viewMatrix) {
@@ -84,6 +84,6 @@ void Camera::SetCamera(const Camera& camera) {
 		cameraForGPU_->worldPosition = camera.GetWorldPosition();
 		cameraForGPU_->vpMatrix = VPMatrix_;
 		cameraForGPU_->mtxViewInv = worldMatrix_;
-		cameraForGPU_->mtxProjInv = InverseMatrix(camera.GetProjectionMatrix());
+		cameraForGPU_->mtxProjInv = Math::InverseMatrix(camera.GetProjectionMatrix());
 	}
 }

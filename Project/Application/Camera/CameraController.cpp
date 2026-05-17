@@ -49,9 +49,9 @@ void CameraController::Update() {
 }
 
 Matrix4x4 CameraController::LookAt(const Vector3& eye, const Vector3& center, const Vector3& up) {
-	Vector3 f = Normalize(center - eye); // 前方向ベクトル
-	Vector3 s = Normalize(Cross(up, f)); // 右方向ベクトル
-	Vector3 u = Cross(f, s); // 上方向ベクトル
+	Vector3 f = Math::Normalize(center - eye); // 前方向ベクトル
+	Vector3 s = Math::Normalize(Math::Cross(up, f)); // 右方向ベクトル
+	Vector3 u = Math::Cross(f, s); // 上方向ベクトル
 
 	Matrix4x4 result = { {
 		{ s.x,  s.y, s.z, 0 },

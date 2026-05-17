@@ -120,7 +120,7 @@ const Vector2& Input::GetMouseDelta() {
 	mouseDelta_.x = mousePosition_.x - preMousePosition_.x;
 	mouseDelta_.y = mousePosition_.y - preMousePosition_.y;
 	// 正規化
-	mouseDelta_ = Normalize(mouseDelta_);
+	mouseDelta_.Normalize();
 	return mouseDelta_;
 }
 

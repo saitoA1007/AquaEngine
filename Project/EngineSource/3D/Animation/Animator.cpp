@@ -141,7 +141,7 @@ void Animator::ApplyAnimation(SkeletonData& skeleton, const AnimationData& anima
 void Animator::SkeletonUpdate(SkeletonData& skeleton) {
 	// すべてのJointを更新。
 	for (Joint& joint : skeleton.joints) {
-		joint.localMatrix = MakeAffineMatrix(joint.transform.scale, joint.transform.rotate, joint.transform.translate);
+		joint.localMatrix = Math::MakeAffineMatrix(joint.transform.scale, joint.transform.rotate, joint.transform.translate);
 		if (joint.parent) {
 			joint.skeletonSpaceMatrix = joint.localMatrix * skeleton.joints[*joint.parent].skeletonSpaceMatrix;
 		} else {
@@ -154,7 +154,7 @@ void Animator::SkinClusterUpdate(SkinCluster& skinCluster, const SkeletonData& s
 	for (size_t jointIndex = 0; jointIndex < skeleton.joints.size(); ++jointIndex) {
 		assert(jointIndex < skinCluster.inverseBindPoseMatrices.size());
 		skinCluster.mappedPalette[jointIndex].skeletonSpaceMatrix = skinCluster.inverseBindPoseMatrices[jointIndex] * skeleton.joints[jointIndex].skeletonSpaceMatrix;
-		skinCluster.mappedPalette[jointIndex].skeletonSpaceInverseTransposeMatrix = InverseTranspose(skinCluster.mappedPalette[jointIndex].skeletonSpaceMatrix);
+		skinCluster.mappedPalette[jointIndex].skeletonSpaceInverseTransposeMatrix = Math::InverseTranspose(skinCluster.mappedPalette[jointIndex].skeletonSpaceMatrix);
 	}
 }
 
