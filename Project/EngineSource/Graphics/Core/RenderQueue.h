@@ -196,5 +196,8 @@ namespace GameEngine {
         
         // レイトレとラスタライズの描画を合成する
         void LightingComposite();
+
+        // 深度値をコピーする
+        void CopyRaytracingDepth();
     };
 }

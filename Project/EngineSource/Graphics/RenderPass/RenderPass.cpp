@@ -37,9 +37,6 @@ void RenderPass::PrePass() {
 		renderTexture_->TransitionToRenderTarget(commandList_);
 		// RTVのみセットする
 		commandList_->OMSetRenderTargets(1, &renderTexture_->GetRtvHandle(), false, nullptr);
-
-		// 指定した色で画面全体をクリアする
-		commandList_->ClearRenderTargetView(renderTexture_->GetRtvHandle(), clearColor_, 0, nullptr);
 		break;
 	}
 
@@ -48,9 +45,6 @@ void RenderPass::PrePass() {
 		renderTexture_->TransitionToRenderTarget(commandList_);
 		// DSVのみセットする
 		commandList_->OMSetRenderTargets(0, nullptr, false, &renderTexture_->GetDsvHandle());
-
-		// 深度クリア
-		commandList_->ClearDepthStencilView(renderTexture_->GetDsvHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 		break;
 	}
 
@@ -59,11 +53,6 @@ void RenderPass::PrePass() {
 		renderTexture_->TransitionToRenderTarget(commandList_);
 		// RTVとDSVをセットする
 		commandList_->OMSetRenderTargets(1, &renderTexture_->GetRtvHandle(), false, &renderTexture_->GetDsvHandle());
-
-		// 指定した色で画面全体をクリアする
-		commandList_->ClearRenderTargetView(renderTexture_->GetRtvHandle(), clearColor_, 0, nullptr);
-		// 指定した深度で画面全体をクリアする
-		commandList_->ClearDepthStencilView(renderTexture_->GetDsvHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 		break;
 	}
 
@@ -79,9 +68,6 @@ void RenderPass::PrePass() {
 
 		// RTVのみセットする
 		commandList_->OMSetRenderTargets(1, &renderTexture_->GetRtvHandle(), false, nullptr);
-
-		// 指定した色で画面全体をクリアする
-		commandList_->ClearRenderTargetView(renderTexture_->GetRtvHandle(), clearColor_, 0, nullptr);
 		break;
 	}
 	}
@@ -106,6 +92,42 @@ void RenderPass::SwitchToUnorderedAccess() {
 
 void RenderPass::InsertUavBarrier() {
 	renderTexture_->InsertUavBarrier(commandList_);
+}
+
+void RenderPass::SetOnlyDsvRenderTarget() {
+	// DSVのみをセット
+	commandList_->OMSetRenderTargets(0, nullptr, false, &renderTexture_->GetDsvHandle());
+}
+
+void RenderPass::ClearRenderPass() {
+	switch (mode_)
+	{
+	case GameEngine::RenderTextureMode::RtvOnly: {
+		// 指定した色で画面全体をクリアする
+		commandList_->ClearRenderTargetView(renderTexture_->GetRtvHandle(), clearColor_, 0, nullptr);
+		break;
+	}
+
+	case GameEngine::RenderTextureMode::DsvOnly: {
+		// 深度クリア
+		commandList_->ClearDepthStencilView(renderTexture_->GetDsvHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+		break;
+	}
+
+	case GameEngine::RenderTextureMode::RtvAndDsv: {
+		// 指定した色で画面全体をクリアする
+		commandList_->ClearRenderTargetView(renderTexture_->GetRtvHandle(), clearColor_, 0, nullptr);
+		// 指定した深度で画面全体をクリアする
+		commandList_->ClearDepthStencilView(renderTexture_->GetDsvHandle(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+		break;
+	}
+												 
+	case RenderTextureMode::RtvAndUav: {
+		// 指定した色で画面全体をクリアする
+		commandList_->ClearRenderTargetView(renderTexture_->GetRtvHandle(), clearColor_, 0, nullptr);
+		break;
+	}
+	}
 }
 
 CD3DX12_GPU_DESCRIPTOR_HANDLE RenderPass::GetSrvHandle() {

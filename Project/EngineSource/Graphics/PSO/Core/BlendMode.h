@@ -18,6 +18,9 @@ namespace GameEngine {
         // オブジェクトの透明度を保存する通常aブレンド
         kBlendModeNormalAndSaveObjectAlpha,
 
+        // カラー書き込み無効
+        kNoBlend,
+
         // 利用禁止
         kCountOfBlendMode,
     };

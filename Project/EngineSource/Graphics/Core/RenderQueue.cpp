@@ -30,7 +30,7 @@ void RenderQueue::Initialize(ID3D12GraphicsCommandList4* commandList, SrvManager
     // 影を描画するパス
     renderPassController_->AddPass("ShadowPass", RenderTextureMode::DsvOnly, 2048, 2048);
     // デフォルトで描画するパス
-    renderPassController_->AddPass("DefaultPass");
+    renderPassController_->AddPass("DefaultPass", RenderTextureMode::RtvAndDsv, 1280, 720, { 0.0f,0.0f,0.0f,0.0f });
 
     // ラスタライズの最終描画
     rasterizeFinalPassName_ = "DefaultPass";
@@ -60,6 +60,8 @@ void RenderQueue::Initialize(ID3D12GraphicsCommandList4* commandList, SrvManager
 
     // レイトレとラスタライズの合成用
     RegisterPSO("LightingComposite", psoManager);
+    // 深度コピー用
+    RegisterPSO("DepthCopy", psoManager);
 
     // bufferのsrvIndexのスタート位置を設定
     bufferStartSrvIndex_ = srvManager_->GetStartSrvIndex(SrvHeapType::Buffer);
@@ -96,11 +98,11 @@ void RenderQueue::Execute() {
     // ライトの更新
     lightManager_.Update();
 
-    // ラスタライズ描画コマンドを解放
-    RasterizeExecute();
-
     // レイトレーシング描画コマンドを解放
     RaytracingExecute();
+
+    // ラスタライズ描画コマンドを解放
+    RasterizeExecute();
 
     // レイトレとラスタライズの描画を合成する
     LightingComposite();
@@ -375,12 +377,25 @@ void RenderQueue::RasterizeExecute() {
         bool has2d = draw2dQueueList_.count(passName) > 0;
         if (!hasOpaque && !hasTranslucent && !has2d) {
             renderPassController_->PrePass(passName);
+            renderPassController_->ClearRenderPass(passName);
             renderPassController_->PostPass(passName);
             continue;
         }
 
         enableDrawRasterize_ = true;
-        renderPassController_->PrePass(passName);
+        if (rasterizeFinalPassName_ == passName) {
+            renderPassController_->PrePass(passName);
+            renderPassController_->ClearRenderPass(passName);
+            renderPassController_->SetOnlyDsvRenderTarget(passName);
+            // レイトレの深度値をコピーする
+            CopyRaytracingDepth();
+
+            // 深度値をコピーした状態で再びターゲット
+            renderPassController_->PrePass(passName);
+        } else {
+            renderPassController_->PrePass(passName);
+            renderPassController_->ClearRenderPass(passName);
+        }
         currentPsoName_.clear();
 
         // 不透明描画コマンドを解放
@@ -504,6 +519,7 @@ void RenderQueue::LightingComposite() {
 
     // レイトレとラスタライズの内容を合成する
     renderPassController_->PrePass("LightingCompositePass");
+    renderPassController_->ClearRenderPass("LightingCompositePass");
     PreDraw("LightingComposite");
     commandList_->SetGraphicsRootDescriptorTable(0, srvManager_->GetGPUHandle(renderPassController_->GetSrvIndex(rasterizeFinalPassName_)));
     commandList_->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUHandle(renderPassController_->GetDepthSrvIndex(rasterizeFinalPassName_)));
@@ -513,4 +529,11 @@ void RenderQueue::LightingComposite() {
     renderPassController_->PostPass("LightingCompositePass");
 
     finalPassName_ = "LightingCompositePass";
+}
+
+void RenderQueue::CopyRaytracingDepth() {
+    PreDraw("DepthCopy");
+    commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    commandList_->SetGraphicsRootDescriptorTable(0, srvManager_->GetGPUHandle(renderPassController_->GetSrvIndex("RaytracingPassDepth")));
+    commandList_->DrawInstanced(3, 1, 0, 0);
 }

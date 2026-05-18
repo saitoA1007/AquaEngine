@@ -24,6 +24,12 @@ namespace GameEngine {
         // UAV書き込み後にGPU側の書き込みを完了させるバリアを挿入する
         void InsertUavBarrier();
 
+        // 深度をコピーするため
+        void SetOnlyDsvRenderTarget();
+
+        // レンダーパスのクリアをおこなう
+        void ClearRenderPass();
+
         // srvIndexを取得
         uint32_t GetSrvIndex() const { return renderTexture_->GetSrvIndex(); }
         uint32_t GetDepthSrvIndex() const { return renderTexture_->GetDepthSrvIndex(); }
