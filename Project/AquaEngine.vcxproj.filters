@@ -1024,6 +1024,7 @@
     <FxCompile Include="Resources\Shaders\CS\Skinning.CS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\LightingComposite.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\DepthCopy.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\PostEffect\Grayscale\Grayscale.PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Externals\imgui\ProggyClean.ttf" />

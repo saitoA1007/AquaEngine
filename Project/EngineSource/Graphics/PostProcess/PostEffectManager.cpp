@@ -12,20 +12,25 @@ void PostEffectManager::Initialize(ID3D12GraphicsCommandList* commandList, SrvMa
     renderPassController_->AddPass("VignettingPass");
     // ラジアルブラー
     renderPassController_->AddPass("RadialBlurPass");
+    // グレースケール
+    renderPassController_->AddPass("GrayscalePass");
+
     // ブルーム
     //renderPassController_->AddPass("BloomPass");
 
     // 実行順序を設定
-    RegisterPassOrder({ "VignettingPass", "RadialBlurPass" });
+    RegisterPassOrder({"GrayscalePass", "VignettingPass", "RadialBlurPass" });
 
     // psoを登録
     RegisterPSO("Vignetting", psoManager);
     RegisterPSO("RadialBlur", psoManager);
     RegisterPSO("ScanLine", psoManager);
+    RegisterPSO("Grayscale", psoManager);
 
     // エフェクトを追加
     AddPostEffect<Vignetting>("VignettingPass", "Vignetting");
     AddPostEffect<RadialBlur>("RadialBlurPass", "RadialBlur");
+    AddPostEffect<Grayscale>("GrayscalePass", "Grayscale");
 }
 
 void PostEffectManager::Execute() {

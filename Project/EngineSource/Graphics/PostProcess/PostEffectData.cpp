@@ -42,3 +42,15 @@ void ScanLine::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManag
     commandList->SetGraphicsRootConstantBufferView(1, buffer_.GetGpuVirtualAddress());
     commandList->DrawInstanced(3, 1, 0, 0);
 }
+
+Grayscale::Grayscale() {
+    // 作成
+    buffer_.Create();
+    //isActive_ = true;
+}
+
+void Grayscale::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
+    commandList->SetGraphicsRootDescriptorTable(0, srvManager->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+    commandList->SetGraphicsRootConstantBufferView(1, buffer_.GetGpuVirtualAddress());
+    commandList->DrawInstanced(3, 1, 0, 0);
+}
