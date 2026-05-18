@@ -7,11 +7,6 @@ Texture2D<float> gRtDepth : register(t3);
 
 SamplerState gSampler : register(s0);
 
-struct PixelShaderOutput
-{
-    float4 color : SV_TARGET0;
-};
-
 float LinearizeDepth(float depth, float nearZ, float farZ)
 {
     return nearZ * farZ / (farZ - depth * (farZ - nearZ));
@@ -37,7 +32,4 @@ PixelShaderOutput main(VertexShaderOutput input) {
     
     output.color = float4(finalColor, 1.0f);
     return output;
-   
-   output.color = float4(finalColor, 1.0f);
-   return output;
 }

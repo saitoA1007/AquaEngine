@@ -18,7 +18,6 @@ public:
 	// 描画処理
 	void Draw() override;
 
-
 	/// <summary>
 	/// ワールド行列を取得
 	/// </summary>

@@ -81,5 +81,24 @@ namespace GameEngine {
     private:
         ConstantBuffer<ScanLineData> buffer_;
     };
+
+    class Grayscale : public IPostEffect {
+        struct GrayscaleData {
+            uint32_t textureHandle;
+            float padding[3];
+        };
+
+    public:
+        Grayscale();
+
+        void Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) override;
+
+        void SetPassIndex(const uint32_t& index) override {
+            buffer_.GetData()->textureHandle = index;
+        }
+
+    private:
+        ConstantBuffer<GrayscaleData> buffer_;
+    };
 }
 

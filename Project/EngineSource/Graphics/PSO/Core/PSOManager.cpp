@@ -550,22 +550,9 @@ void PSOManager::DefaultLoadPSO() {
 }
 
 void PSOManager::DeaultLoadPostEffectPSO() {
-    // 画像のコピーを描画
-    //CreatePSOData copy;
-    //copy.rootSigName = "DefaultPostEffect";
-    //copy.vsPath = L"Resources/Shaders/PostEffect/FullScreen.VS.hlsl";
-    //copy.psPath = L"Resources/Shaders/PostEffect/Copy.PS.hlsl";
-    //copy.drawMode = DrawModel::FillFront;
-    //copy.blendMode = BlendMode::kBlendModeNone;
-    //copy.isDepthEnable = false;
-    //RootSignatureBuilder copyRootSigBuilder;
-    //copyRootSigBuilder.Initialize(device_);
-    //copyRootSigBuilder.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount) + static_cast<uint32_t>(SrvHeapTypeCount::SystemMaxCount), 0, D3D12_SHADER_VISIBILITY_PIXEL);
-    //copyRootSigBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
-    //copyRootSigBuilder.CreateRootSignature();
+    // ポストエフェクト共通のinputlayoutを作成
     InputLayoutBuilder inputLayoutBuilder;
     inputLayoutBuilder.CreateNone();
-    //RegisterPSO("Copy", copy, &copyRootSigBuilder, &inputLayoutBuilder);
 
     // ヴィネットを作成
     CreatePSOData defaultPostEffect;
@@ -591,6 +578,10 @@ void PSOManager::DeaultLoadPostEffectPSO() {
     // ラジアルブラーを作成
     defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/RadialBlur/RadialBlur.PS.hlsl";
     RegisterPSO("RadialBlur", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
+
+    // グレースケールを作成
+    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/Grayscale/Grayscale.PS.hlsl";
+    RegisterPSO("Grayscale", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 
     // ラスタライズとレイトレの描画を合成する
     defaultPostEffect.rootSigName = "LightingComposite";
