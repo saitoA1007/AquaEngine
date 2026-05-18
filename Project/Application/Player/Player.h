@@ -2,6 +2,7 @@
 #include "IGameObject.h"
 #include "WorldTransform.h"
 #include "InputCommand.h"
+#include "DebugParameter.h"
 
 class Player : public GameEngine::IGameObject {
 public:
@@ -32,15 +33,14 @@ public:
 
 private:
 
-	// ジャンプの高さ
-	float kJumpHeight_ = 4.0f;
-	// ジャンプする時間
-	float kJumpMaxTime_ = 0.65f;
-
 	// 移動速度
 	float kMoveSpeed_ = 0.2f;
 
 private:
+	// パラメータ機能
+	std::unique_ptr<GameEngine::DebugParameter> debugParame_;
+
+	// 入力機能
 	GameEngine::InputCommand* inputCommand_ = nullptr;
 
 	// モデル
@@ -49,12 +49,6 @@ private:
 	// ワールド行列
 	GameEngine::WorldTransform worldTransform_;
 
-	// ジャンプフラグ
-	bool isJump_ = false;
-	
-	// ジャンプタイマー
-	float jumpTimer_ = 0.0f;
-
 private:
 
 	/// <summary>
@@ -62,9 +56,4 @@ private:
 	/// </summary>
 	/// <param name="inputCommand"></param>
 	void ProcessMoveInput(GameEngine::InputCommand* inputCommand);
-
-	/// <summary>
-	/// ジャンプする処理
-	/// </summary>
-	void JumpUpdate();
 };

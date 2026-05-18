@@ -1,11 +1,12 @@
 #include "GameScene.h"
 using namespace GameEngine;
 
+#include "Application/Player/Player.h"
+
 GameScene::~GameScene() {
 }
 
-void GameScene::Initialize() {
-
+GameScene::GameScene() {
 	// 入力コマンド設定
 	InputRegisterCommand();
 
@@ -14,6 +15,15 @@ void GameScene::Initialize() {
 	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720);
 	// 描画に使用するカメラを設定
 	renderQueue_->SetCamera(mainCamera_.get());
+
+	// プレイヤー
+	auto* playerModel = modelManager_->GetNameByModel("Cube");
+	gameObjectManager_->AddObject<Player>(inputCommand_, playerModel);
+}
+
+void GameScene::Initialize() {
+
+	
 }
 
 void GameScene::Update() {

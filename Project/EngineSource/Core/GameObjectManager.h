@@ -10,7 +10,7 @@ namespace GameEngine {
     /// </summary>
     class GameObjectManager {
     public:
-        GameObjectManager() = default;
+        GameObjectManager();
         ~GameObjectManager() = default;
 
         /// <summary>

@@ -2,6 +2,11 @@
 #include <algorithm>
 using namespace GameEngine;
 
+GameObjectManager::GameObjectManager() {
+    // あらかじめメモリを確保
+    objects_.reserve(100);
+}
+
 void GameObjectManager::InitializeAll() {
     for (auto& obj : objects_) {
         obj->Initialize();

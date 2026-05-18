@@ -11,6 +11,7 @@
 
 class TitleScene : public GameEngine::IScene {
 public:
+	TitleScene();
 	~TitleScene();
 
 	/// <summary>

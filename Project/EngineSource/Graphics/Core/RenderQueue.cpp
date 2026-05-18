@@ -5,6 +5,28 @@
 #include "SpriteRenderer.h"
 #include "RaytracingPipeline.h"
 #include "MyMath.h"
+#include <dxgiformat.h>
+#include <string.h>
+#include <d3d12.h>
+#include <d3dcommon.h>
+#include <cassert>
+#include <cstdint>
+#include <string>
+#include <utility>
+#include <Sprite.h>
+#include <Material.h>
+#include <Model.h>
+#include <WorldTransform.h>
+#include <WorldTransforms.h>
+#include "BufferRefManager.h"
+#include "DescriptorCounts.h"
+#include "DrawRequest.h"
+#include "TLAS.h"
+#include <SrvManager.h>
+#include <RenderPassController.h>
+#include <RenderTexture.h>
+#include <GpuResource.h>
+#include <Matrix4x4.h>
 using namespace GameEngine;
 
 RenderQueue::RenderQueue() {
