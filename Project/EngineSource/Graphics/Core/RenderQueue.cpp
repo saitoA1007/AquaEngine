@@ -383,7 +383,7 @@ void RenderQueue::RasterizeExecute() {
         }
 
         enableDrawRasterize_ = true;
-        if (rasterizeFinalPassName_ == passName) {
+        if (enableDrawRaytracing_ && rasterizeFinalPassName_ == passName) {
             renderPassController_->PrePass(passName);
             renderPassController_->ClearRenderPass(passName);
             renderPassController_->SetOnlyDsvRenderTarget(passName);
