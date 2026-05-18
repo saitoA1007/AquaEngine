@@ -8,7 +8,7 @@
 
 class GameScene : public GameEngine::IScene {
 public:
-
+	GameScene();
 	~GameScene();
 
 	/// <summary>

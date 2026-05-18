@@ -88,8 +88,8 @@ void SceneManager::ChangeScene(const std::string& sceneName) {
 	gameParamEditor_->SetActiveScene(currentSceneName_);
 
 	// 前の要素を削除
-	currentScene_.reset();
 	gameObjectManager_->ClearAll();
+	currentScene_.reset();
 
 	// 新しいシーンを作成
 	currentScene_ = sceneRegistry_->CreateScene(sceneName);

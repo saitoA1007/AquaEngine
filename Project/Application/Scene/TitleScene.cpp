@@ -6,7 +6,7 @@ using namespace GameEngine;
 TitleScene::~TitleScene() {
 }
 
-void TitleScene::Initialize() {
+TitleScene::TitleScene() {
 	// メインカメラの初期化
 	mainCamera_ = std::make_unique<Camera>();
 	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720);
@@ -42,6 +42,10 @@ void TitleScene::Initialize() {
 	// 背景画像を設定rostock_laage_airport_4k
 	uint32_t skyboxGH = textureManager_->GetHandleByName("grasslands_sunset_1k.dds");
 	renderQueue_->SetSkyboxTexture(skyboxGH);
+}
+
+void TitleScene::Initialize() {
+	
 }
 
 void TitleScene::Update() {

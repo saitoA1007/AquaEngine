@@ -1,18 +1,24 @@
 #include "SceneSubsystem.h"
 #include "ResourceSubsystem.h"
+#include "GraphicsSubsystem.h"
 #include "Collider.h"
+#include "IGameObject.h"
 using namespace GameEngine;
 
 void SceneSubsystem::Initialize() {
+    auto* renderQueue = context_.graphics->GetRenderQueue();
+
     // 当たり判定
     collisionManager_ = std::make_unique<CollisionManager>();
     Collider::StaticInitialize(collisionManager_.get());
 
-    // シーン生成システム
-    sceneRegistry_ = std::make_unique<SceneRegistry>();
-
     // ゲームオブジェクト管理
     gameObjectManager_ = std::make_unique<GameObjectManager>();
+    // ゲームオブジェクト基底クラスの静的初期化
+    IGameObject::StaticInitialize(renderQueue);
+
+    // シーン生成システム
+    sceneRegistry_ = std::make_unique<SceneRegistry>();
 
     // シーンマネージャ
     sceneManager_ = std::make_unique<SceneManager>();
@@ -56,5 +62,5 @@ std::string SceneSubsystem::GetCurrentSceneName() const {
 }
 
 void SceneSubsystem::Finalize() {
- 
+    sceneManager_.reset();
 }
