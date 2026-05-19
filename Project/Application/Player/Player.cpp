@@ -91,5 +91,5 @@ void Player::Update() {
 void Player::Draw() {
 
 	// モデル描画
-	renderQueue_->SubmitModel(model_, worldTransform_);
+	renderQueue_->SubmitRaytracingModel(model_, worldTransform_);
 }

@@ -167,6 +167,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Scene\GameScene.cpp" />
     <ClCompile Include="Application\Scene\TitleScene.cpp" />
     <ClCompile Include="Application\Scene\Transition\Fade.cpp" />
+    <ClCompile Include="Application\Stage\StageManager.cpp" />
     <ClCompile Include="EngineSource\2D\ImGuiManager.cpp" />
     <ClCompile Include="EngineSource\2D\Sprite.cpp" />
     <ClCompile Include="EngineSource\2D\SpriteRenderer.cpp" />
@@ -379,6 +380,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Scene\Register\SetUpScenes.h" />
     <ClInclude Include="Application\Scene\TitleScene.h" />
     <ClInclude Include="Application\Scene\Transition\Fade.h" />
+    <ClInclude Include="Application\Stage\StageManager.h" />
     <ClInclude Include="EngineSource\2D\ImGuiManager.h" />
     <ClInclude Include="EngineSource\2D\Sprite.h" />
     <ClInclude Include="EngineSource\2D\SpriteRenderer.h" />

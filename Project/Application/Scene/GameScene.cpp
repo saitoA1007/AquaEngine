@@ -17,7 +17,8 @@ GameScene::GameScene() {
 	renderQueue_->SetCamera(mainCamera_.get());
 
 	// プレイヤー
-	auto* playerModel = modelManager_->GetNameByModel("Cube");
+	auto* playerModel = modelManager_->GetNameByModel("Walk");
+	playerModel->SetDefaultIsEnableLight(true);
 	auto player = gameObjectManager_->AddObject<Player>(inputCommand_, playerModel);
 
 	// カメラ操作

@@ -523,6 +523,7 @@
     <ClCompile Include="EngineSource\Graphics\Resources\BufferRefResource.cpp" />
     <ClCompile Include="EngineSource\3D\Model\Skeleton.cpp" />
     <ClCompile Include="Application\Player\PlayerAction.cpp" />
+    <ClCompile Include="Application\Stage\StageManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1018,6 +1019,7 @@
     <ClInclude Include="EngineSource\Graphics\Resources\BufferRefResource.h" />
     <ClInclude Include="EngineSource\3D\Model\Skeleton.h" />
     <ClInclude Include="Application\Player\PlayerAction.h" />
+    <ClInclude Include="Application\Stage\StageManager.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />
