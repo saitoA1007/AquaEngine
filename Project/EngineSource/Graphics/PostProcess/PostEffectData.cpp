@@ -46,7 +46,7 @@ void ScanLine::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManag
 Grayscale::Grayscale() {
     // 作成
     buffer_.Create();
-    isActive_ = true;
+    //isActive_ = true;
 }
 
 void Grayscale::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
