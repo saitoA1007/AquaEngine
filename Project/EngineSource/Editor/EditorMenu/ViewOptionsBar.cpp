@@ -56,6 +56,5 @@ void ViewOptionsBar::Run() {
 		renderQueue_->SubmitGrid(gridModel_, gridWorldTransform_);
 	}
 
-	// デバック描画の表示設定
 	debugRenderer_->SetEnabled(isDebugDraw_);
 }

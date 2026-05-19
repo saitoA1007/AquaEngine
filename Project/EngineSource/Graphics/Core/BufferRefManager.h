@@ -6,7 +6,8 @@
 namespace GameEngine {
 
 	// バッファ情報へのアクセスデータ
-	struct BufferRef {
+	struct BufferRef 
+	{
 		uint32_t type = 0;  // データのタイプ
 		uint32_t index = 0; // マテリアルデータの参照するハンドル
 	};

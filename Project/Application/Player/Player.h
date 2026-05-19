@@ -3,8 +3,9 @@
 #include "WorldTransform.h"
 #include "InputCommand.h"
 #include "DebugParameter.h"
-#include "PlayerAction.h"
+#include "Collider.h"
 
+#include "PlayerAction.h"
 #include "Application/Camera/CameraController.h"
 
 class Player : public GameEngine::IGameObject {
@@ -51,6 +52,9 @@ private:
 	// ワールド行列
 	GameEngine::WorldTransform worldTransform_;
 
+	// 球の当たり判定
+	GameEngine::SphereCollider collider_;
+
 private:
 	// プレイヤー
 	PlayerCommonData commonData_;
@@ -61,4 +65,11 @@ private:
 	PlayerAttackRushAction attackRushAction_;
 	// 跳ね返りアクション
 	PlayerBounceAction bounceAction_;
+
+private:
+
+	// 当たり判定
+	void OnCollisionStay(const GameEngine::CollisionResult& result);
+
+
 };

@@ -10,6 +10,7 @@ DebugRenderer::DebugRenderer() {
     // 大きな頂点バッファを事前に確保
     std::vector<VertexPosColor> vertices(maxVertices_);
     vertexBuffer_.Create(vertices);
+    vertexData_ = vertexBuffer_.GetVertexData();
 }
 
 void DebugRenderer::Clear() {

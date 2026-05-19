@@ -524,6 +524,7 @@
     <ClCompile Include="EngineSource\3D\Model\Skeleton.cpp" />
     <ClCompile Include="Application\Player\PlayerAction.cpp" />
     <ClCompile Include="Application\Stage\StageManager.cpp" />
+    <ClCompile Include="Application\Stage\Wall.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -631,7 +632,7 @@
     <ClInclude Include="EngineSource\Collision\ColliderInfo.h">
       <Filter>EngineSource\Collision</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Collision\CollisionConfig.h">
+    <ClInclude Include="Application\CollisionConfig.h">
       <Filter>EngineSource\Collision</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Collision\CollisionManager.h">
@@ -1020,6 +1021,7 @@
     <ClInclude Include="EngineSource\3D\Model\Skeleton.h" />
     <ClInclude Include="Application\Player\PlayerAction.h" />
     <ClInclude Include="Application\Stage\StageManager.h" />
+    <ClInclude Include="Application\Stage\Wall.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />
