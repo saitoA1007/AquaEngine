@@ -104,6 +104,7 @@ void InspectorWindow::DrawItems(GameParamEditor::Group& group) {
     for (auto& [itemName, itemPtr] : sortedItems) {
         ImGui::PushID(itemName.c_str());
         std::visit(DebugParameterVisitor{ itemName, itemPtr->isDirty }, itemPtr->value);
+        ImGui::Separator();
         ImGui::PopID();
     }
 }

@@ -15,19 +15,22 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model)
 	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-2.0f,1.0f,0.0f} });
 
 	// パラメータ機能
-	//debugParame_ = std::make_unique<DebugParameter>("Player");
-	
+	debugParame_ = std::make_unique<DebugParameter>("Player");
+	// 値を登録
+	moveAction_.RegisterParameter(debugParame_.get());
+
 	// 移動アクション
 	moveAction_.Initialize(&commonData_, inputCommand);
 }
 
 void Player::Initialize() {
 
-
 	commonData_.currentYaw = std::atan2f(commonData_.currentDir.x, commonData_.currentDir.z);
 }
 
 void Player::Update() {
+	// 値の適応
+	debugParame_->ApplyIfDirty();
 
 	// カメベクトルを更新
 	moveAction_.UpdateCameraBasis(camera_->GetWorldMatrix());

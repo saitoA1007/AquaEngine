@@ -5,6 +5,7 @@
 namespace GameEngine {
 	// 前方宣言
 	class InputCommand;
+	class DebugParameter;
 }
 
 // プレイヤーの状態
@@ -38,6 +39,9 @@ class IPlayerAction {
 public:
 	virtual ~IPlayerAction() = default;
 
+	// 値を登録する
+	virtual void RegisterParameter(GameEngine::DebugParameter* param) {};
+
 protected:
 	// プレイヤーの共通状態
 	PlayerCommonData* commonData_ = nullptr;
@@ -49,6 +53,9 @@ public:
 	void Initialize(PlayerCommonData* commonData);
 
 	void Update();
+
+	// パラメータを登録する
+	//void RegisterParameter(GameEngine::DebugParameter* param) override;
 
 private:
 	// 落下速度の上限
@@ -68,6 +75,9 @@ public:
 
 	// カメラ基準のベクトルを更新する
 	void UpdateCameraBasis(const Matrix4x4& cameraWorldMatrix);
+
+	// パラメータを登録する
+	void RegisterParameter(GameEngine::DebugParameter* param) override;
 
 private:
 	// 入力機能
@@ -101,6 +111,8 @@ class PlayerAttackRushAction : public IPlayerAction {
 public:
 	void Initialize(PlayerCommonData* commonData);
 
+	// パラメータを登録する
+	//void RegisterParameter(GameEngine::DebugParameter* param) override;
 };
 
 // 跳ね返りアクション
@@ -108,7 +120,8 @@ class PlayerBounceAction : public IPlayerAction {
 public:
 	void Initialize(PlayerCommonData* commonData);
 
-
+	// パラメータを登録する
+	//void RegisterParameter(GameEngine::DebugParameter* param) override;
 };
 
 // 急降下攻撃アクション
@@ -116,6 +129,8 @@ class PlayerAttackDownAction : public IPlayerAction {
 public:
 	void Initialize(PlayerCommonData* commonData);
 
+	// パラメータを登録する
+	//void RegisterParameter(GameEngine::DebugParameter* param) override;
 };
 
 

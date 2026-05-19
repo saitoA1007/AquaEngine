@@ -3,6 +3,7 @@
 #include "InputCommand.h"
 #include "MyMath.h"
 #include "FpsCounter.h"
+#include "DebugParameter.h"
 using namespace GameEngine;
 
 //=====================================================
@@ -118,6 +119,17 @@ void PlayerMoveAction::ApplyAxis(float& vel, float target, bool isAir) {
 			vel += (vel > 0.0f ? -step : step);
 		}
 	}
+}
+
+void PlayerMoveAction::RegisterParameter(GameEngine::DebugParameter* param) {
+	std::string subGroup = "Move";
+	int index = 0;
+	param->Register("GroundMaxMoveSpeed", kGroundMaxMoveSpeed_, index++, subGroup);
+	param->Register("AirMaxMoveSpeed", kAirMaxMoveSpeed_, index++, subGroup);
+	param->Register("GroundAcceleration", kGroundAcceleration_, index++, subGroup);
+	param->Register("AirAcceleration", kAirAcceleration_, index++, subGroup);
+	param->Register("GroundDeceleration", kGroundDeceleration_, index++, subGroup);
+	param->Register("AirDeceleration", kAirDeceleration_, index++, subGroup);
 }
 
 //=======================================================
