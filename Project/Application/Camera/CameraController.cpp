@@ -2,9 +2,9 @@
 #include "MyMath.h"
 using namespace GameEngine;
 
-CameraController::CameraController(GameEngine::InputCommand* inputCommand, const Vector3* targetPos) {
+CameraController::CameraController(GameEngine::InputCommand* inputCommand, const GameEngine::WorldTransform* targetWorld) {
 	inputCommand_ = inputCommand;
-	targetPos_ = targetPos;
+	targetWorld_ = targetWorld;
 }
 
 void CameraController::Initialize() {
@@ -16,7 +16,7 @@ void CameraController::Initialize() {
 void CameraController::Update() {
 
 	// 注目する位置を取得
-	Vector3 target = *targetPos_;
+	Vector3 target = targetWorld_->GetWorldPosition();
 	target.y = 1.0f;
 
 	// カメラ操作

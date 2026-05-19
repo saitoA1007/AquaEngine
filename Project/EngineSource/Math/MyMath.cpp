@@ -126,6 +126,72 @@ namespace GameEngine {
 			return worldMatrix;
 		}
 
+		Quaternion DirectionToQuaternion(const Vector3& direction, const Vector3& up) {
+			// 基準となる前方向ベクトル
+			const Vector3 kForward = { 0.0f, 0.0f, 1.0f };
+
+			// 方向ベクトルを正規化
+			float len = direction.Length();
+			// 0ベクトル確認
+			if (len < 1e-6f) {
+				return Quaternion::Identity();
+			}
+			Vector3 dir = {
+				direction.x / len,
+				direction.y / len,
+				direction.z / len
+			};
+
+			float dot = Math::Dot(kForward, dir);
+
+			// 既に同じ方向を向いている場合単位Quaternionを返す
+			if (dot >= 1.0f - 1e-6f) {
+				return Quaternion::Identity();
+			}
+
+			// ほぼ逆方向の場合upベクトルを軸に180度回転させる
+			if (dot <= -1.0f + 1e-6f) {
+				Vector3 axis = Math::Cross(up, kForward);
+				// upも平行な場合はX軸を代替軸にする
+				if (Math::Length(axis) < 1e-6f) {
+					axis = Math::Cross({ 1.0f, 0.0f, 0.0f }, kForward);
+				}
+				axis = Math::Normalize(axis);
+				return Math::MakeRotateAxisAngleQuaternion(axis, static_cast<float>(M_PI));
+			}
+
+			// kForwardからdirへの回転軸と角度を求める
+			Vector3 axis = Math::Normalize(Math::Cross(kForward, dir));
+			float angle = std::acos(dot);
+			return Math::MakeRotateAxisAngleQuaternion(axis, angle);
+		}
+
+		Vector3 DirectionToEuler(const Vector3& direction) {
+			// 方向ベクトルを正規化
+			float len = Math::Length(direction);
+			// 0ベクトル確認
+			if (len < 1e-6f) {
+				return { 0.0f, 0.0f, 0.0f };
+			}
+			Vector3 dir = {
+				direction.x / len,
+				direction.y / len,
+				direction.z / len
+			};
+
+			// Pitch
+			float clampedY = std::clamp(dir.y, -1.0f, 1.0f);
+			float pitch = -std::asinf(clampedY);
+
+			// Yaw
+			float yaw = std::atan2(dir.x, dir.z);
+
+			// Roll
+			float roll = 0.0f;
+
+			return { pitch, yaw, roll };
+		}
+
 		float Length(const Vector3& v) {
 			return std::sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
 		}
@@ -179,6 +245,31 @@ namespace GameEngine {
 			// ワールド->スクリーン座標変換(3Dから2Dへ)
 			Vector3 screenPos = Math::Transforms(worldPosition, viewProjectionViewportMatrix);
 			return  screenPos;
+		}
+
+		Vector3 PitchToDirection(float pitch) {
+			return { 0.0f, std::sinf(pitch), std::cosf(pitch) };
+		}
+
+		Vector3 YawToDirection(float yaw) {
+			return { std::sinf(yaw), 0.0f, std::cosf(yaw) };
+		}
+
+		Vector3 RollToDirection(float roll) {
+			return { std::sinf(roll), std::cosf(roll), 0.0f };
+		}
+
+		float LerpShortAngle(float a, float b, float t) {
+			float diff = b - a;
+			// -2pi-2piに補正する
+			diff = std::fmodf(diff, M_PI *2.0f);
+			// -pi-piに補正する
+			if (diff < -M_PI) {
+				diff += M_PI *2.0f;
+			} else if (diff > M_PI) {
+				diff -= M_PI *2.0f;
+			}
+			return a + diff * t;
 		}
 
 		Vector3 Max(Vector3 pos1, Vector3 pos2) {

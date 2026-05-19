@@ -38,6 +38,12 @@ namespace GameEngine {
 		// クウォータニオンによる回転行列を作成
 		Matrix4x4 MakeWorldMatrixFromEulerRotation(const Vector3 position, const Vector3& rotateEuler, const Vector3& scale);
 
+		// 目標ベクトルへへ最短回転
+		Quaternion DirectionToQuaternion(const Vector3& direction, const Vector3& up = { 0.0f, 1.0f, 0.0f });
+
+		// 方向からオイラー回転を求める
+		Vector3 DirectionToEuler(const Vector3& direction);
+
 		// ベクトルの長さを求める
 		float Length(const Vector3& v);
 		float Length(const Vector2& v);
@@ -54,6 +60,14 @@ namespace GameEngine {
 
 		// ワールドスクリーン座標変換(ワールド->スクリーン変換)
 		Vector3 Project(const Vector3& worldPosition, const Vector2& viewport, const float& viewportWidth, const float& viewportHeight, const Matrix4x4& viewProjection);
+
+		// ラジアン角度から方向ベクトルを求める
+		Vector3 PitchToDirection(float pitch);
+		Vector3 YawToDirection(float yaw);
+		Vector3 RollToDirection(float roll);
+
+		// 最短経路で角度を補間する
+		float LerpShortAngle(float a, float b, float t);
 
 		// 最大値
 		Vector3 Max(Vector3 pos1, Vector3 pos2);

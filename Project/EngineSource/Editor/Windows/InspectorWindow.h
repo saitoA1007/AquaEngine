@@ -29,28 +29,39 @@ namespace GameEngine {
 		bool& isDirty;
 		explicit DebugParameterVisitor(const std::string& name,bool& dirty) : itemName(name), isDirty(dirty){}
 
+		// ## 付きのIDを生成するヘルパー
+		std::string HiddenLabel() const {
+			return "##" + itemName;
+		}
+
 		void operator()(int32_t& value) const {
-			if(ImGui::DragInt(itemName.c_str(), &value, 1)){ isDirty = true; }
+			ImGui::Text("%s", itemName.c_str());
+			if(ImGui::DragInt(HiddenLabel().c_str(), &value, 1)){ isDirty = true; }
 		}
 
 		void operator()(uint32_t& value) const {
-			if(ImGui::DragScalar(itemName.c_str(), ImGuiDataType_U32, &value, 1.0f)){ isDirty = true; }
+			ImGui::Text("%s", itemName.c_str());
+			if(ImGui::DragScalar(HiddenLabel().c_str(), ImGuiDataType_U32, &value, 1.0f)){ isDirty = true; }
 		}
 
 		void operator()(float& value) const {
-			if(ImGui::DragFloat(itemName.c_str(), &value, 0.01f)){ isDirty = true; }
+			ImGui::Text("%s", itemName.c_str());
+			if(ImGui::DragFloat(HiddenLabel().c_str(), &value, 0.01f)){ isDirty = true; }
 		}
 
 		void operator()(Vector2& value) const {
-			if(ImGui::DragFloat2(itemName.c_str(), reinterpret_cast<float*>(&value), 0.01f)){ isDirty = true; }
+			ImGui::Text("%s", itemName.c_str());
+			if(ImGui::DragFloat2(HiddenLabel().c_str(), reinterpret_cast<float*>(&value), 0.01f)){ isDirty = true; }
 		}
 
 		void operator()(Vector3& value) const {
-			if(ImGui::DragFloat3(itemName.c_str(), reinterpret_cast<float*>(&value), 0.01f)){ isDirty = true; }
+			ImGui::Text("%s", itemName.c_str());
+			if(ImGui::DragFloat3(HiddenLabel().c_str(), reinterpret_cast<float*>(&value), 0.01f)){ isDirty = true; }
 		}
 
 		void operator()(Vector4& value) const {
-			if(ImGui::ColorEdit4(itemName.c_str(), reinterpret_cast<float*>(&value))){ isDirty = true; }
+			ImGui::Text("%s", itemName.c_str());
+			if(ImGui::ColorEdit4(HiddenLabel().c_str(), reinterpret_cast<float*>(&value))){ isDirty = true; }
 		}
 
 		void operator()(Range3& value) const {
@@ -86,13 +97,13 @@ namespace GameEngine {
 		}
 
 		void operator()(std::string& value) const {
-			ImGui::Text(itemName.c_str(), &value);
+			ImGui::Text("%s", value.c_str());
 		}
 
 		// 対応出来ない型がきた場合の処理
 		template<typename T>
 		void operator()(T& value) const {
-			ImGui::TextColored(ImVec4(1, 0, 0, 1), "[%s] は未対応の型です", itemName.c_str());
+			ImGui::TextColored(ImVec4(1, 0, 0, 1), "[%s] は未対応の型です", HiddenLabel().c_str());
 		}
 	};
 }

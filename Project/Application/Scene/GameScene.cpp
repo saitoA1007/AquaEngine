@@ -17,8 +17,13 @@ GameScene::GameScene() {
 	renderQueue_->SetCamera(mainCamera_.get());
 
 	// プレイヤー
-	auto* playerModel = modelManager_->GetNameByModel("Cube");
-	gameObjectManager_->AddObject<Player>(inputCommand_, playerModel);
+	auto* playerModel = modelManager_->GetNameByModel("Walk");
+	playerModel->SetDefaultIsEnableLight(true);
+	auto player = gameObjectManager_->AddObject<Player>(inputCommand_, playerModel);
+
+	// カメラ操作
+	cameraController_ = gameObjectManager_->AddObject<CameraController>(inputCommand_, &player->GetWorldTransform());
+	player->SetCamera(cameraController_);
 }
 
 void GameScene::Initialize() {
@@ -29,7 +34,9 @@ void GameScene::Initialize() {
 void GameScene::Update() {
 
 	// カメラの更新処理
-	mainCamera_->Update();
+	//mainCamera_->Update();
+
+	mainCamera_->SetCamera(cameraController_->GetCamera());
 }
 
 void GameScene::Draw() {

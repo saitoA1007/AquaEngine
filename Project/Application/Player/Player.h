@@ -3,6 +3,9 @@
 #include "WorldTransform.h"
 #include "InputCommand.h"
 #include "DebugParameter.h"
+#include "PlayerAction.h"
+
+#include "Application/Camera/CameraController.h"
 
 class Player : public GameEngine::IGameObject {
 public:
@@ -30,29 +33,32 @@ public:
 	/// <returns></returns>
 	Vector3 GetPlayerPos() { return worldTransform_.GetWorldPosition(); }
 
-private:
-
-	// 移動速度
-	float kMoveSpeed_ = 0.2f;
+	// カメラのワールド行列を取得
+	void SetCamera(CameraController* camera) {
+		camera_ = camera;
+	}
 
 private:
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;
-
 	// 入力機能
 	GameEngine::InputCommand* inputCommand_ = nullptr;
-
 	// モデル
 	GameEngine::Model* model_ = nullptr;
+	// カメラ機能
+	CameraController* camera_ = nullptr;
 
 	// ワールド行列
 	GameEngine::WorldTransform worldTransform_;
 
 private:
+	// プレイヤー
+	PlayerCommonData commonData_;
 
-	/// <summary>
-	/// プレイヤーの入力処理
-	/// </summary>
-	/// <param name="inputCommand"></param>
-	void ProcessMoveInput(GameEngine::InputCommand* inputCommand);
+	// 移動アクション
+	PlayerMoveAction moveAction_;
+	// 突進アクション
+	PlayerAttackRushAction attackRushAction_;
+	// 跳ね返りアクション
+	PlayerBounceAction bounceAction_;
 };

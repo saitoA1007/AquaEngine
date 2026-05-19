@@ -2,10 +2,11 @@
 #include "IGameObject.h"
 #include "Camera.h"
 #include "InputCommand.h"
+#include "WorldTransform.h"
 
 class CameraController : public GameEngine::IGameObject {
 public:
-	CameraController(GameEngine::InputCommand* inputCommand, const Vector3* targetPos);
+	CameraController(GameEngine::InputCommand* inputCommand, const GameEngine::WorldTransform* targetWorld);
 	~CameraController() = default;
 
 	// 初期化処理
@@ -20,10 +21,11 @@ public:
 	/// <returns></returns>
 	GameEngine::Camera& GetCamera() const { return *camera_.get(); }
 
-private:
-	const Vector3* targetPos_ = nullptr;
-	GameEngine::InputCommand* inputCommand_ = nullptr;
+	Matrix4x4 GetWorldMatrix() const { return camera_->GetWorldMatrix(); }
 
+private:
+	GameEngine::InputCommand* inputCommand_ = nullptr;
+	const GameEngine::WorldTransform* targetWorld_ = nullptr;
 	// カメラ
 	std::unique_ptr<GameEngine::Camera> camera_;
 	Vector3 position_ = { 0.0f,4.0f,-10.0f };
