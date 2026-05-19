@@ -1,5 +1,6 @@
 #define NOMINMAX
 #include "PlayerAction.h"
+#include <algorithm>
 #include "InputCommand.h"
 #include "MyMath.h"
 #include "FpsCounter.h"
@@ -146,6 +147,36 @@ void PlayerAttackRushAction::Initialize(PlayerCommonData* commonData) {
 
 void PlayerBounceAction::Initialize(PlayerCommonData* commonData) {
 	commonData_ = commonData;
+}
+
+void PlayerBounceAction::WallBounce(Vector3& pos,const Vector3& bounceDirection, const float& penetrationDepth) {
+
+	// 壁に衝突していたら押し戻す
+	Vector3 nXZ = { bounceDirection.x, 0.0f, bounceDirection.z };
+	if (nXZ.x != 0.0f || nXZ.z != 0.0f) { nXZ.Normalize(); }
+	float depth = std::max(penetrationDepth, 0.0f);
+	Vector3 correction = { nXZ.x * depth, 0.0f, nXZ.z * depth };
+	pos.x += correction.x;
+	pos.z += correction.z;
+
+	// 速度と方向を変更する
+	Vector3 velXZ = { commonData_->velocity.x, 0.0f, commonData_->velocity.z };
+	float dot = velXZ.x * nXZ.x + velXZ.z * nXZ.z;
+	if (dot < 0.0f) {
+		Vector3 reflected = {
+			velXZ.x - 2.0f * dot * nXZ.x,
+			0.0f,
+			velXZ.z - 2.0f * dot * nXZ.z
+		};
+		commonData_->velocity.x = reflected.x * kWallBounceReflectFactor_;
+		commonData_->velocity.z = reflected.z * kWallBounceReflectFactor_;
+		Vector3 newDir = { reflected.x, 0.0f, reflected.z };
+		float len = Math::Length(newDir);
+		if (len > 0.00001f) {
+			commonData_->targetDir = Math::Normalize(newDir);
+		}
+	}
+
 }
 
 //=======================================================

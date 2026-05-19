@@ -4,6 +4,12 @@
 #include "DebugRenderer.h"
 using namespace GameEngine;
 
+CollisionManager::~CollisionManager() {
+	// Colliderのデストラクタが呼ばれても安全なようにnullを入れる
+	Collider::StaticInitialize(nullptr);
+	colliders_.clear();
+}
+
 void CollisionManager::CheckAllCollisions() {
 
 	// 現フレームの衝突リストをクリア

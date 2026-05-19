@@ -25,7 +25,7 @@ namespace GameEngine {
 
 	public:
 		CollisionManager() = default;
-		~CollisionManager() = default;
+		~CollisionManager();
 
 		/// <summary>
 		/// 全ての当たり判定を行う

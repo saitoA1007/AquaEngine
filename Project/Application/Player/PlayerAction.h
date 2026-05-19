@@ -122,6 +122,24 @@ public:
 
 	// パラメータを登録する
 	//void RegisterParameter(GameEngine::DebugParameter* param) override;
+
+	void WallBounce(Vector3& pos,const Vector3& bounceDirection,const float& penetrationDepth);
+
+private:
+	// 跳ね上がり後の高さ
+	float kWallBounceUpSpeed_ = 10.0f;
+	// 跳ね上がり後の壁から離れる距離
+	float kWallBounceAwaySpeed_ = 5.0f;
+	// 跳ね返り直後の硬直時間
+	float kWallBounceLockTime_ = 0.8f;
+
+	// 速さに応じた跳ね返りの倍率の最低値
+	float kWallBounceMinSpeedFactor_ = 0.5f;
+	// 速さに応じた跳ね返りの倍率の最大値
+	float kWallBounceMaxSpeedFactor_ = 1.5f;
+
+	// 壁に衝突した際の跳ね返りの倍率
+	float kWallBounceReflectFactor_ = 1.0f;
 };
 
 // 急降下攻撃アクション

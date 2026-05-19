@@ -109,6 +109,7 @@ void Engine::MainLoop() {
 
         PreDraw();
         scene_->Draw();
+        graphics_->GetRenderQueue()->SubmitDebugLine(graphics_->GetDebugRenderer());
         graphics_->GetRenderQueue()->Execute();
         // ポストエフェクトを実行
         graphics_->GetPostEffectManager()->Execute();
@@ -129,7 +130,9 @@ void Engine::PreUpdate() {
     graphics_->BeginFrame();
 
 #ifdef USE_IMGUI
+    // デバック描画をリセット
     graphics_->GetDebugRenderer()->Clear();
+    // エディターの更新処理
     editor_->Update();
 
     isActiveUpdate_ = editor_->IsActiveUpdate();

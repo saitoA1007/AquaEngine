@@ -1,10 +1,12 @@
+#define NOMINMAX
 #include "Player.h"
 #include <algorithm>
+#include "LogManager.h"
 #include "EasingManager.h"
 #include "MyMath.h"
 #include "FPSCounter.h"
 #include "Model.h"
-#include <numbers>
+#include "Application/CollisionConfig.h"
 using namespace GameEngine;
 
 Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model) {
@@ -19,8 +21,26 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model)
 	// 値を登録
 	moveAction_.RegisterParameter(debugParame_.get());
 
+	// 当たり判定の実装
+	collider_.SetRadius(1.0f);
+	collider_.SetWorldPosition(worldTransform_.transform_.translate);
+	collider_.SetCollisionAttribute(kCollisionAttributePlayer);
+	collider_.SetCollisionMask(~kCollisionAttributePlayer);
+	// データを登録
+	UserData userData;
+	userData.typeID = static_cast<uint32_t>(CollisionTypeID::Player);
+	userData.object = this;
+	collider_.SetUserData(userData);
+	// コールバック登録
+	collider_.SetOnCollisionCallback([this](const CollisionResult& result) {
+		this->OnCollisionStay(result); 
+		});
+
+
 	// 移動アクション
 	moveAction_.Initialize(&commonData_, inputCommand);
+	// 跳ね返りアクション
+	bounceAction_.Initialize(&commonData_);
 }
 
 void Player::Initialize() {
@@ -86,10 +106,23 @@ void Player::Update() {
 
 	// 行列の更新
 	worldTransform_.UpdateTransformMatrix();
+	// 当たり判定の更新
+	collider_.SetWorldPosition(worldTransform_.GetWorldPosition());
 }
 
 void Player::Draw() {
 
 	// モデル描画
 	renderQueue_->SubmitRaytracingModel(model_, worldTransform_);
+}
+
+void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
+
+	bool isWall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Wall));
+	
+	// 壁の衝突処理
+	if (isWall) {
+		Log("Player is hit Wall");
+		bounceAction_.WallBounce(worldTransform_.transform_.translate, result.contactNormal, result.penetrationDepth);
+	}
 }

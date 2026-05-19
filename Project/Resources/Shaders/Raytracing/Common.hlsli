@@ -27,9 +27,9 @@ struct Camera
     float4x4 mtxProjInv; // プロジェクション逆行列
 };
 
-struct MaterialRef
+struct BufferRef
 {
-    uint type; // マテリアルデータのタイプ
+    uint type; // バッファデータのタイプ
     uint MaterialIndex; // マテリアルデータの参照するハンドル
 };
 
@@ -38,7 +38,7 @@ RWTexture2D<float4> gOutput : register(u0);
 RWTexture2D<float> gDepthOutput : register(u1);
 RaytracingAccelerationStructure gRtScene : register(t0, space0);
 Texture2D<float4> gTexture[] : register(t0, space1);
-StructuredBuffer<MaterialRef> gBufferRefs : register(t0, space2);
+StructuredBuffer<BufferRef> gBufferRefs : register(t0, space2);
 ByteAddressBuffer gBufferData[] : register(t0, space3);
 TextureCube<float4> gBackgroundTexture : register(t1, space0);
 SamplerState gSampler : register(s0);

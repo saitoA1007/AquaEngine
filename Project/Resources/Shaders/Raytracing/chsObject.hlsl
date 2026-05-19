@@ -80,7 +80,7 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     
     // アクセスデータを取得
     uint refHandle = InstanceID();
-    MaterialRef ref = gBufferRefs[refHandle];
+    BufferRef ref = gBufferRefs[refHandle];
     // マテリアルデータを取得
     MaterialData material = gBufferData[ref.MaterialIndex].Load<MaterialData>(0);
     

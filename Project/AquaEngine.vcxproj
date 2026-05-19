@@ -168,6 +168,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Scene\TitleScene.cpp" />
     <ClCompile Include="Application\Scene\Transition\Fade.cpp" />
     <ClCompile Include="Application\Stage\StageManager.cpp" />
+    <ClCompile Include="Application\Stage\Wall.cpp" />
     <ClCompile Include="EngineSource\2D\ImGuiManager.cpp" />
     <ClCompile Include="EngineSource\2D\Sprite.cpp" />
     <ClCompile Include="EngineSource\2D\SpriteRenderer.cpp" />
@@ -381,6 +382,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Scene\TitleScene.h" />
     <ClInclude Include="Application\Scene\Transition\Fade.h" />
     <ClInclude Include="Application\Stage\StageManager.h" />
+    <ClInclude Include="Application\Stage\Wall.h" />
     <ClInclude Include="EngineSource\2D\ImGuiManager.h" />
     <ClInclude Include="EngineSource\2D\Sprite.h" />
     <ClInclude Include="EngineSource\2D\SpriteRenderer.h" />
@@ -428,7 +430,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Audio\AudioManager.h" />
     <ClInclude Include="EngineSource\Collision\Collider.h" />
     <ClInclude Include="EngineSource\Collision\ColliderInfo.h" />
-    <ClInclude Include="EngineSource\Collision\CollisionConfig.h" />
+    <ClInclude Include="Application\CollisionConfig.h" />
     <ClInclude Include="EngineSource\Collision\CollisionManager.h" />
     <ClInclude Include="EngineSource\Collision\CollisionResult.h" />
     <ClInclude Include="EngineSource\Collision\CollisionUtils.h" />

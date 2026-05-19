@@ -2,6 +2,7 @@
 using namespace GameEngine;
 
 #include "Application/Player/Player.h"
+#include "Application/Stage/StageManager.h"
 
 GameScene::~GameScene() {
 }
@@ -24,6 +25,10 @@ GameScene::GameScene() {
 	// カメラ操作
 	cameraController_ = gameObjectManager_->AddObject<CameraController>(inputCommand_, &player->GetWorldTransform());
 	player->SetCamera(cameraController_);
+
+	// ステージ
+	auto* wallModel = modelManager_->GetNameByModel("Cube");
+	gameObjectManager_->AddObject<StageManager>(gameObjectManager_, wallModel);
 }
 
 void GameScene::Initialize() {
