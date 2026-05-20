@@ -16,9 +16,10 @@ ConstantBuffer<Camera> gCamera : register(b1);
 
 struct VertexShaderInput
 {
-    float32_t4 position : POSITION0;
-    float32_t2 texcoord : TEXCOORD0;
-    float32_t3 normal : NORMAL0;
+    float4 position : POSITION0;
+    float2 texcoord : TEXCOORD0;
+    float3 normal : NORMAL0;
+    float3 tangent : TANGENT0;
 };
 
 VertexShaderOutput main(VertexShaderInput input)

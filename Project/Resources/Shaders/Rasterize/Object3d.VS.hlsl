@@ -2,23 +2,24 @@
 
 struct TransformationMatrix
 {
-    float32_t4x4 World;
-    float32_t4x4 WorldInverseTranspose;
+    float4x4 World;
+    float4x4 WorldInverseTranspose;
 };
 ConstantBuffer<TransformationMatrix> gTransformationMatrix : register(b0);
 
 struct Camera
 {
-    float32_t3 worldPosition;
-    float32_t4x4 vpMatrix;
+    float3 worldPosition;
+    float4x4 vpMatrix;
 };
 ConstantBuffer<Camera> gCamera : register(b1);
 
 struct VertexShaderInput
 {
-    float32_t4 position : POSITION0;
-    float32_t2 texcoord : TEXCOORD0;
-    float32_t3 normal : NORMAL0;
+    float4 position : POSITION0;
+    float2 texcoord : TEXCOORD0;
+    float3 normal : NORMAL0;
+    float3 tangent : TANGENT0;
 };
 
 VertexShaderOutput main(VertexShaderInput input)

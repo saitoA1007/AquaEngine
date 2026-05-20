@@ -5,6 +5,7 @@ struct VertexData
     float4 position;
     float2 texcoord;
     float3 normal;
+    float3 tangent;
 };
 
 struct VertexInfluence
@@ -43,6 +44,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
         // Skinning後の頂点を計算する
         VertexData skinned;
         skinned.texcoord = input.texcoord;
+        skinned.tangent = input.tangent;
     
         // 位置を変換
         skinned.position = mul(input.position, gMatrixPalette[influence.index.x].skeletonSpaceMatrix) * influence.weight.x;

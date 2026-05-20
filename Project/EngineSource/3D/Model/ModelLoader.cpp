@@ -278,7 +278,7 @@ ModelData ModelLoader::LoadModelFile(const std::string& directoryPath, const std
 	// ファイルを読み込み
 	Assimp::Importer importer;
 	std::string filePath = directoryPath + "/" + filename + "/" + objFilename;
-	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_Triangulate | aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
+	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_Triangulate | aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 	assert(scene && scene->HasMeshes()); // メッシュがないのは対応しない
 
 	// アニメーションデータの確認をする
@@ -370,6 +370,16 @@ ModelData ModelLoader::LoadModelFile(const std::string& directoryPath, const std
 			} else {
 				// UVがない場合、XZ平面に投影したUVを仮生成
 				vertex.texcoord = { (position.x + 1.0f) * 0.5f, (position.z + 1.0f) * 0.5f };
+			}
+
+			// 接戦の適応
+			if (mesh->HasTangentsAndBitangents()) {
+				aiVector3D& aiTangent = mesh->mTangents[vertexIndex];
+				// 右手->左手に変換する
+				vertex.tangent = { -aiTangent.x, aiTangent.y, aiTangent.z };
+			} else {
+				// 接線がない場合のデフォルト値
+				vertex.tangent = { 0.0f, 0.0f, 0.0f };
 			}
 
 			meshData.vertices[vertexIndex] = vertex;

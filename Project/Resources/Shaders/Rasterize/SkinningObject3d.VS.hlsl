@@ -2,25 +2,26 @@
 
 struct TransformationMatrix
 {
-    float32_t4x4 World;
-    float32_t4x4 WorldInverseTranspose;
+    float4x4 World;
+    float4x4 WorldInverseTranspose;
 };
 ConstantBuffer<TransformationMatrix> gTransformationMatrix : register(b0);
 
 struct Camera
 {
-    float32_t3 worldPosition;
-    float32_t4x4 vpMatrix;
+    float3 worldPosition;
+    float4x4 vpMatrix;
 };
 ConstantBuffer<Camera> gCamera : register(b1);
 
 struct VertexShaderInput
 {
-    float32_t4 position : POSITION0;
-    float32_t2 texcoord : TEXCOORD0;
-    float32_t3 normal : NORMAL0;
-    float32_t4 weight : WEIGHT0;
-    int32_t4 index : INDEX0;
+    float4 position : POSITION0;
+    float2 texcoord : TEXCOORD0;
+    float3 normal : NORMAL0;
+    float3 tangent : TANGENT0;
+    float4 weight : WEIGHT0;
+    int4 index : INDEX0;
 };
 
 struct Well
@@ -34,8 +35,8 @@ Skinned Skinning(VertexShaderInput input) {
     Skinned skinned;
     
      // 初期化
-    skinned.position = float32_t4(0.0f, 0.0f, 0.0f, 0.0f);
-    skinned.normal = float32_t3(0.0f, 0.0f, 0.0f);
+    skinned.position = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    skinned.normal = float3(0.0f, 0.0f, 0.0f);
     
     // 位置を変換
     skinned.position = mul(input.position, gMatrixPalette[input.index.x].skeletonSpaceMatrix) * input.weight.x;
@@ -62,6 +63,6 @@ VertexShaderOutput main(VertexShaderInput input)
     output.position = mul(worldPos, gCamera.vpMatrix);
     output.worldPosition = mul(skinned.position, gTransformationMatrix.World).xyz;
     output.texcoord = input.texcoord;
-    output.normal = normalize(mul(skinned.normal, (float32_t3x3)gTransformationMatrix.WorldInverseTranspose)); 
+    output.normal = normalize(mul(skinned.normal, (float3x3)gTransformationMatrix.WorldInverseTranspose)); 
     return output;
 }

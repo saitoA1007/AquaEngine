@@ -10,9 +10,9 @@
 #include <d3d12.h>
 #include <d3dcommon.h>
 #include <cassert>
-#include <cstdint>
-#include <string>
-#include <utility>
+//#include <cstdint>
+//#include <string>
+//#include <utility>
 #include <Sprite.h>
 #include <Material.h>
 #include <Model.h>
@@ -317,7 +317,7 @@ void RenderQueue::SubmitRaytracingModel(const Model* model, WorldTransform& worl
         } else {
             data.instanceID = *materialIndex;
         }
-
+        
         if (model->IsLoad()) {
             worldTransform.SetWVPMatrix(model->GetLocalMatrix());
         }

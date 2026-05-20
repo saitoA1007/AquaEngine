@@ -179,6 +179,12 @@ void PlayerBounceAction::WallBounce(Vector3& pos,const Vector3& bounceDirection,
 
 }
 
+void PlayerBounceAction::RegisterParameter(GameEngine::DebugParameter* param) {
+	std::string subGroup = "Bounce";
+	int index = 0;
+	param->Register("WallBounceReflectFactor", kWallBounceReflectFactor_, index++, subGroup);
+}
+
 //=======================================================
 // プレイヤーの急降下攻撃アクション
 //=======================================================
