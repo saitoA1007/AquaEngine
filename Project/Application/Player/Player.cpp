@@ -20,6 +20,7 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model)
 	debugParame_ = std::make_unique<DebugParameter>("Player");
 	// 値を登録
 	moveAction_.RegisterParameter(debugParame_.get());
+	bounceAction_.RegisterParameter(debugParame_.get());
 
 	// 当たり判定の実装
 	collider_.SetRadius(1.0f);
@@ -44,8 +45,12 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model)
 }
 
 void Player::Initialize() {
-
+	// ステータスを初期化
+	commonData_ = PlayerCommonData{};
 	commonData_.currentYaw = std::atan2f(commonData_.currentDir.x, commonData_.currentDir.z);
+
+	// 位置を初期化
+	worldTransform_.transform_.translate = { 0.0f,0.0f,0.0f };
 }
 
 void Player::Update() {

@@ -22,16 +22,16 @@ enum class PlayerState {
 
 // プレイヤーの共通データ
 struct PlayerCommonData {
-	Vector3 velocity;
+	Vector3 velocity = {0.0f,0.0f,0.0f};
 	// 現在向いている方向
-	Vector3 currentDir;
+	Vector3 currentDir = {0.0f,0.0f,1.0f};
 	// 最終的に向く方向
 	Vector3 targetDir = { 0.0f, 0.0f, 1.0f };
 	// 現在の方向
 	float currentYaw = 0.0f;
 
 	// プレイヤーの状態
-	PlayerState state;
+	PlayerState state = PlayerState::kNone;
 };
 
 // プレイヤーアクションの基底クラス
@@ -120,10 +120,10 @@ class PlayerBounceAction : public IPlayerAction {
 public:
 	void Initialize(PlayerCommonData* commonData);
 
-	// パラメータを登録する
-	//void RegisterParameter(GameEngine::DebugParameter* param) override;
-
 	void WallBounce(Vector3& pos,const Vector3& bounceDirection,const float& penetrationDepth);
+
+	// パラメータを登録する
+	void RegisterParameter(GameEngine::DebugParameter* param) override;
 
 private:
 	// 跳ね上がり後の高さ
