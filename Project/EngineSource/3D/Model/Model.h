@@ -121,6 +121,13 @@ namespace GameEngine {
 		void SetRoughness(const float& roughness, const std::string& materialName = "default");
 
 		/// <summary>
+		/// デフォルトのノーマルマップの設定
+		/// </summary>
+		/// <param name="texture"></param>
+		/// <param name="materialName"></param>
+		void SetDefaultNormalTexture(const uint32_t& texture, const std::string& materialName = "default");
+
+		/// <summary>
 		/// モデルの名前を取得
 		/// </summary>
 		/// <returns></returns>

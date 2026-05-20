@@ -152,4 +152,19 @@ float3 CalculateIBL(float3 albedo, float3 reflectColor, float3 N, float3 V, floa
     
     return kD_env * ambient + F_env * reflectStrength * tintedReflect;
 }
+
+// ノーマルマップから法線を取得
+float3 GetNormalFromMap(float4 normalMapColor, float3 normal, float4 tangent)
+{
+    // [0,1]範囲を[-1,1]範囲にリマップ
+    float3 textureNormal = normalMapColor.rgb * 2.0f - 1.0f;
+    
+    // 従法線の計算
+    float3 binormal = normalize(cross(normal, tangent.xyz) * tangent.w);
+
+    // 接空間からワールド空間への変換行列
+    float3x3 tbn = float3x3(tangent.xyz, binormal, normal);
+    
+    return normalize(mul(textureNormal, tbn));
+}
 #endif

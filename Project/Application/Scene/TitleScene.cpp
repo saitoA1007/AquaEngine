@@ -32,6 +32,9 @@ TitleScene::TitleScene() {
 	model1_->SetDefaultTextureHandle(grassGH);
 	world1_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,-1.0f,0.0f} });
 
+	uint32_t normalGH = textureManager_->GetHandleByName("testNormal.png");
+	model1_->SetDefaultNormalTexture(normalGH);
+
 	// cube
 	model2_ = modelManager_->GetNameByModel("Cube");
 	model2_->SetDefaultIsEnableLight(true);

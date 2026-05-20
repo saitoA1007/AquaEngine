@@ -31,6 +31,8 @@ void Material::Initialize(const Vector4& color, const Vector3& specularColor,con
 	materialData_->ior = 1.0f;
 	// 粗さの設定
 	materialData_->roughness = std::sqrt(2.0f / (shininess + 2.0f));
+	// ノーマルマップ用のテクスチャ
+	materialData_->normalTextureHandle = 0;
 }
 
 void Material::SetUVTransform(Transform uvTransform) {
