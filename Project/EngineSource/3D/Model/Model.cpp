@@ -96,6 +96,14 @@ void Model::SetRoughness(const float& roughness, const std::string& materialName
 	material->SetRoughness(roughness);
 }
 
+void Model::SetDefaultNormalTexture(const uint32_t& texture, const std::string& materialName) {
+	auto it = materialName == "default" ? materials_.begin() : materials_.find(materialName);
+
+	assert(it != materials_.end() && "Material not found");
+	Material* material = it->second.get();
+	material->SetNormalTexture(texture);
+}
+
 Material* Model::GetMaterial(const std::string& name) const {
 	auto it = materials_.find(name);
 	if (it != materials_.end()) {
@@ -105,3 +113,4 @@ Material* Model::GetMaterial(const std::string& name) const {
 	assert(it != materials_.end() && "Material not found");
 	return nullptr;
 }
+

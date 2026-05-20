@@ -79,6 +79,15 @@ float3 CalcHitAttribute3(float3 vertexAttribute[3], float2 barycentrics)
     return ret;
 }
 
+float4 CalcHitAttribute4(float4 vertexAttribute[3], float2 barycentrics)
+{
+    float4 ret;
+    ret = vertexAttribute[0];
+    ret += barycentrics.x * (vertexAttribute[1] - vertexAttribute[0]);
+    ret += barycentrics.y * (vertexAttribute[2] - vertexAttribute[0]);
+    return ret;
+}
+
 // レイの再帰チェック
 inline bool checkRecursiveLimit(inout Payload payload)
 {
@@ -94,18 +103,16 @@ inline bool checkRecursiveLimit(inout Payload payload)
 }
 
 // 反射関数
-float3 Reflection(float3 vertexPosition, float3 vertexNormal, int recursive)
+float3 Reflection(float3 worldPosition, float3 worldNormal, int recursive)
 {
-    float3 worldPos = mul(float4(vertexPosition, 1), ObjectToWorld4x3());
-    float3 worldNormal = mul(vertexNormal, (float3x3) ObjectToWorld4x3());
-    float3 worldRayDir = WorldRayDirection();
-    float3 reflectDir = reflect(worldRayDir, worldNormal);
+    float3 worldRayDir = normalize(WorldRayDirection());
+    float3 reflectDir = reflect(worldRayDir, normalize(worldNormal));
 
     RAY_FLAG flags = RAY_FLAG_NONE;
     uint rayMask = 0xFF;
 
     RayDesc rayDesc;
-    rayDesc.Origin = worldPos;
+    rayDesc.Origin = worldPosition;
     rayDesc.Direction = reflectDir;
     rayDesc.TMin = 0.001f;
     rayDesc.TMax = 100000;
@@ -126,13 +133,9 @@ float3 Reflection(float3 vertexPosition, float3 vertexNormal, int recursive)
 }
 
 // 透明度表現で使用する屈折関数
-float3 TranslucentRefraction(float3 vertexPosition, float3 vertexNormal, int recursive, float ior)
-{
-    float4x3 mtx = ObjectToWorld4x3();
-    float3 worldPos = mul(float4(vertexPosition, 1), mtx);
-    float3 worldNormal = mul(vertexNormal, (float3x3) mtx);
+float3 TranslucentRefraction(float3 worldPosition, float3 worldNormal, int recursive, float ior)
+{  
     float3 worldRayDir = normalize(WorldRayDirection());
-    worldNormal = normalize(worldNormal);
 
     float nr = dot(worldNormal, worldRayDir);
     float3 refracted;
@@ -151,7 +154,7 @@ float3 TranslucentRefraction(float3 vertexPosition, float3 vertexNormal, int rec
 
     if (length(refracted) < 0.01)
     {
-        return Reflection(vertexPosition, vertexNormal, recursive);
+        return Reflection(worldPosition, worldNormal, recursive);
     }
     else
     {
@@ -160,7 +163,7 @@ float3 TranslucentRefraction(float3 vertexPosition, float3 vertexNormal, int rec
         uint rayMask = 0xFF;
 
         RayDesc rayDesc;
-        rayDesc.Origin = worldPos;
+        rayDesc.Origin = worldPosition;
         rayDesc.Direction = refracted;
         rayDesc.TMin = 0.001f;
         rayDesc.TMax = 100000;

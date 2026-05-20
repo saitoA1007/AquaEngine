@@ -5,7 +5,7 @@ struct VertexData
     float4 position;
     float2 texcoord;
     float3 normal;
-    float3 tangent;
+    float4 tangent;
 };
 
 struct VertexInfluence

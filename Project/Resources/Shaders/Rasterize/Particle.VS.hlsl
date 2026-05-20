@@ -21,7 +21,7 @@ struct VertexShaderInput
     float4 position : POSITION0;
     float2 texcoord : TEXCOORD0;
     float3 normal : NORMAL0;
-    float3 tangent : TANGENT0;
+    float4 tangent : TANGENT0;
 };
 
 VertexShaderOutput main(VertexShaderInput input, uint32_t instanceId : SV_InstanceID)

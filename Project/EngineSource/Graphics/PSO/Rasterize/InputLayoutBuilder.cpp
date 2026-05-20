@@ -33,7 +33,7 @@ void InputLayoutBuilder::CreateDefaultObjElement() {
 	CreateInputElement("POSITION", 0,0, DXGI_FORMAT_R32G32B32A32_FLOAT);
 	CreateInputElement("TEXCOORD", 0, 0, DXGI_FORMAT_R32G32_FLOAT);
 	CreateInputElement("NORMAL", 0, 0, DXGI_FORMAT_R32G32B32_FLOAT);
-    CreateInputElement("TANGENT", 0, 0, DXGI_FORMAT_R32G32B32_FLOAT);
+    CreateInputElement("TANGENT", 0, 0, DXGI_FORMAT_R32G32B32A32_FLOAT);
     SetSemanticName();
 	CreateInputLayoutDesc();
 }
@@ -59,7 +59,7 @@ void InputLayoutBuilder::CreateDefaultAnimationElement() {
 	CreateInputElement("POSITION", 0, 0, DXGI_FORMAT_R32G32B32A32_FLOAT);
 	CreateInputElement("TEXCOORD", 0, 0, DXGI_FORMAT_R32G32_FLOAT);
 	CreateInputElement("NORMAL", 0, 0, DXGI_FORMAT_R32G32B32_FLOAT);
-    CreateInputElement("TANGENT", 0, 0, DXGI_FORMAT_R32G32B32_FLOAT);
+    CreateInputElement("TANGENT", 0, 0, DXGI_FORMAT_R32G32B32A32_FLOAT);
 	CreateInputElement("WEIGHT", 0, 1, DXGI_FORMAT_R32G32B32A32_FLOAT);
 	CreateInputElement("INDEX", 0, 1, DXGI_FORMAT_R32G32B32A32_SINT);
     SetSemanticName();

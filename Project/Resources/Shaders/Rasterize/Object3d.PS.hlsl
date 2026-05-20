@@ -14,7 +14,8 @@ struct Material
     int isActiveShadow;
     float ior;
     float roughness;
-    float2 padding1;
+    uint normalTextureHandle;
+    float padding1;
 };
 ConstantBuffer<Material> gMaterial : register(b0);
 

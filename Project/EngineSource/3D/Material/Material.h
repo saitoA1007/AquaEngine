@@ -25,7 +25,8 @@ namespace GameEngine {
 			int32_t isActiveShadow;
 			float ior; // 屈折率
 			float roughness; // 粗さ
-			float padding2[2];
+			uint32_t normalTextureHandle;
+			float padding2;
 		};
 	public:
 		Material() = default;
@@ -111,6 +112,12 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="ior"></param>
 		void SetIOR(const float& ior) { materialData_->ior = ior; }
+
+		/// <summary>
+		/// ノーマルマップのテクスチャを設定
+		/// </summary>
+		/// <param name="texture"></param>
+		void SetNormalTexture(const uint32_t& texture) { materialData_->normalTextureHandle = texture; }
 
 		void SetTextureHandle(const uint32_t& tex) {materialData_->textureHandle = tex;}
 

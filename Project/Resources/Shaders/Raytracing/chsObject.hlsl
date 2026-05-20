@@ -5,7 +5,7 @@ struct VertexData {
     float4 position;
     float2 texcoord;
     float3 normal;
-    float3 tangent;
+    float4 tangent;
 };
 
 struct MaterialData {
@@ -25,7 +25,8 @@ struct MaterialData {
     
     float ior;
     float roughness;
-    float2 padding1;
+    uint normalTextureHandle;
+    float padding1;
 };
 
 StructuredBuffer<uint> indexBuffer : register(t0, space4);
@@ -37,12 +38,14 @@ VertexData GetHitVertex(MyAttribute attrib) {
     float3 positions[3];
     float2 texcoords[3];
     float3 normals[3];
+    float4 tangent[3];
 
     for (int i = 0; i < 3; ++i) {
         uint index = indexBuffer[start + i];
         positions[i] = vertexBuffer[index].position.xyz;
         normals[i] = vertexBuffer[index].normal;
         texcoords[i] = vertexBuffer[index].texcoord;
+        tangent[i] = vertexBuffer[index].tangent;
     }
     
     VertexData v = (VertexData) 0;
@@ -51,6 +54,7 @@ VertexData GetHitVertex(MyAttribute attrib) {
     v.texcoord = CalcHitAttribute2(texcoords, attrib.barys);
     v.normal = CalcHitAttribute3(normals, attrib.barys);
     v.normal = normalize(v.normal);
+    v.tangent = CalcHitAttribute4(tangent, attrib.barys);
     return v;
 }
 
@@ -61,12 +65,26 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
         return;
     }
     
+    // アクセスデータを取得
+    uint refHandle = InstanceID();
+    BufferRef ref = gBufferRefs[refHandle];
+    // マテリアルデータを取得
+    MaterialData material = gBufferData[ref.MaterialIndex].Load<MaterialData>(0);
+    
     // 頂点データを取得する
     VertexData vtx = GetHitVertex(attrib);
     
+    float3 localNormal = vtx.normal;
+    // ノーマルマップがあれば法線に適応
+    if (material.normalTextureHandle != 0)
+    {
+        float4 normalMapColor = gTexture[material.normalTextureHandle].SampleLevel(gSampler, vtx.texcoord, 0);
+        vtx.tangent.xyz = normalize(vtx.tangent.xyz);
+        localNormal = GetNormalFromMap(normalMapColor, vtx.normal, vtx.tangent);
+    }
     // ワールド空間に変換
     float3 worldPosition = mul(vtx.position, ObjectToWorld4x3());
-    float3 worldNormal = mul(vtx.normal, (float3x3)ObjectToWorld4x3());
+    float3 worldNormal = mul(localNormal, (float3x3) ObjectToWorld4x3());
     worldNormal = normalize(worldNormal);
     
     // 深度情報を書き込む
@@ -78,12 +96,6 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     
      // 裏面の法線を視線側に向け直す
     if (dot(worldNormal, viewDir) < 0.0f) { worldNormal = -worldNormal;}
-    
-    // アクセスデータを取得
-    uint refHandle = InstanceID();
-    BufferRef ref = gBufferRefs[refHandle];
-    // マテリアルデータを取得
-    MaterialData material = gBufferData[ref.MaterialIndex].Load<MaterialData>(0);
     
     // テクスチャカラーを取得
     float4 textureColor = gTexture[material.textureHandle].SampleLevel(gSampler, vtx.texcoord, 0);
@@ -105,7 +117,7 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     float3 directLight = CalculateBRDF(albedoColor, worldNormal, viewDir, lightDir, lightColor, material.roughness, material.metallic);
     
     // 反射レイを飛ばして反射色を取得
-    float3 reflectColor = Reflection(vtx.position.xyz, vtx.normal, payload.recursive);
+    float3 reflectColor = Reflection(worldPosition, worldNormal, payload.recursive);
     
     // 環境光
     float3 indirectLight = CalculateIBL(albedoColor, reflectColor, worldNormal, viewDir, material.metallic, material.roughness);
@@ -115,7 +127,7 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     {   
         /// 屈折
         // 屈折レイを飛ばす
-        float3 refractColor = TranslucentRefraction(vtx.position.xyz, vtx.normal, payload.recursive, material.ior);
+        float3 refractColor = TranslucentRefraction(worldPosition, worldNormal, payload.recursive, material.ior);
         // オブジェクトの色を取得
         float3 objectColor = directLight + indirectLight;
         
