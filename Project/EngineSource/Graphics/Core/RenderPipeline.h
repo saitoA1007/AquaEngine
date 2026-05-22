@@ -6,6 +6,7 @@
 #include "RenderPass/RenderPassController.h"
 #include "PostProcess/CopyPSO.h"
 #include "PostProcess/PostEffectManager.h"
+#include "SceneRenderManager.h"
 
 namespace GameEngine {
 
@@ -27,7 +28,7 @@ namespace GameEngine {
         /// <param name="width">画面幅</param>
         /// <param name="height">画面高さ</param>
         /// <param name="srvManager">SRVマネージャー</param>
-        void Initialize(GraphicsDevice* graphicsDevice, PostEffectManager* postEffectManager, RenderPassController* renderPassController);
+        void Initialize(GraphicsDevice* graphicsDevice, SceneRenderManager* sceneRenderManager, PostEffectManager* postEffectManager, RenderPassController* renderPassController);
 
         /// <summary>
         /// 描画開始処理
@@ -57,8 +58,12 @@ namespace GameEngine {
         // Fps管理機能
         std::unique_ptr<FrameRateController> frameRateController_;
 
-        RenderPassController* renderPassController_ = nullptr;
+        // シーン描画管理
+        SceneRenderManager* sceneRenderManager_ = nullptr;
+        // ポストエフェクト描画管理
+        PostEffectManager* postEffectManager_ = nullptr;
 
+        RenderPassController* renderPassController_ = nullptr;
         CopyPSO* copyPSO_ = nullptr;
 
     private:

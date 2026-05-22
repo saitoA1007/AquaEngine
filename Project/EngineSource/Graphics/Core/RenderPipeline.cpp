@@ -4,11 +4,14 @@
 #include "ResourceGarbageCollector.h"
 using namespace GameEngine;
 
-void RenderPipeline::Initialize(GraphicsDevice* graphicsDevice, PostEffectManager* postEffectManager, RenderPassController* renderPassController) {
+void RenderPipeline::Initialize(GraphicsDevice* graphicsDevice, SceneRenderManager* sceneRenderManager, PostEffectManager* postEffectManager, RenderPassController* renderPassController) {
     LogManager::GetInstance().Log("RenderPipeline start Initialize");
 
+    // シーン描画管理
+    sceneRenderManager_ = sceneRenderManager;
+
     // ポストエフェクトの管理
-    postEffectManager;
+    postEffectManager_ = postEffectManager;
 
     renderPassController_ = renderPassController;
 
@@ -26,9 +29,18 @@ void RenderPipeline::BeginFrame() {
       // ヒープを設定する
     ID3D12DescriptorHeap* descriptorHeaps[] = { graphicsDevice_->GetSrvManager()->GetSRVHeap() };
     graphicsDevice_->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps);
+
+    // クリア
+    sceneRenderManager_->Begin();
 }
 
 void RenderPipeline::EndFrame(ImGuiManager* imGuiManager) {
+
+    // シーン描画を実行
+    sceneRenderManager_->Execute();
+
+    // ポストエフェクトを実行
+    postEffectManager_->Execute();
 
     /// 最終結果を描画する
     // バックバッファをレンダーターゲットに遷移

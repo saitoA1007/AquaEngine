@@ -21,6 +21,7 @@ namespace GameEngine {
 
 		// 描画前に呼び出す(参照する時に切り替えられていなければassertで引っ掛ける)
 		void PrePass(const std::string& name);
+		void PrePass(std::vector<std::string> names,const std::string dsvName = "");
 		void PostPass(const std::string& name);
 		void SwitchToUAV(const std::string& name);
 		void InsertUavBarrier(const std::string& name);

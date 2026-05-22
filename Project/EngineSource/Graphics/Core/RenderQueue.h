@@ -3,20 +3,15 @@
 #include <map>
 #include <unordered_map>
 
-#include "PSO/Core/DrawPSOData.h"
 #include "DrawRequest.h"
 #include "RenderPass/RenderPassController.h"
-#include "TLAS.h"
+
 #include "Camera.h"
 #include "LightManager.h"
 #include "DirectionalLight.h"
+#include "TLAS.h"
 
 namespace GameEngine {
-
-    // 前方宣言
-    class PSOManager;
-    class BufferRefManager;
-    class RaytracingPipeline;
 
     /// <summary>
     /// 溜めた描画コマンドを解放する機能
@@ -27,15 +22,10 @@ namespace GameEngine {
         ~RenderQueue() = default;
 
         // 初期化処理
-        void Initialize(ID3D12GraphicsCommandList4* commandList, SrvManager* srvManager, PSOManager* psoManager, RenderPassController* renderPassController,
-            RaytracingPipeline* raytracingPipeline, BufferRefManager* bufferRefManager);
+        void Initialize();
 
-        // フレーム開始前処理
-        void Begin();
-
-        // 描画コマンドを解放する
-        void Execute();
-
+        void Update();
+     
     public:
 
         void SetCamera(Camera* camera) {
@@ -50,11 +40,13 @@ namespace GameEngine {
             useDebugCamera_ = useDebugCamera;
         }
 
-        // tlasを取得
-        TLAS* GetTLAS() { return &tlas_; }
+        const bool& GetUseDebugCamera() const { return useDebugCamera_; }
 
         // カメラリソースを取得
         GpuResource* GetCameraResource() { return mainCamera_.GetConstantBuffer(); }
+
+        // デバックカメラリソースを取得
+        GpuResource* GetDebugCameraResource() { return debugCameraResource_; }
 
         // ライトリソースを取得
         GpuResource* GetLightResource() { return lightManager_.GetConstantBuffer(); }
@@ -66,6 +58,8 @@ namespace GameEngine {
         void SetSkyboxTexture(const uint32_t& texture) {
             skyboxTextureIndex_ = texture;
         }
+
+        const uint32_t& GetSkyboxTexture() const { return skyboxTextureIndex_; }
 
     public:
 
@@ -96,12 +90,32 @@ namespace GameEngine {
         // レイトレーシングでのモデル
         void SubmitRaytracingModel(const Model* model, WorldTransform& worldTransform,const uint32_t* materialIndex = nullptr);
 
+        // psoの名前を取得
+        const char* Get3dPsoName(Draw3dType type);
+        const char* Get2dPsoName(Draw2dType type);
+
+        // 描画コマンドのクリア
+        void Clear() {
+            draw2dQueueList_.clear();
+            draw3dQueueList_.clear();
+            translucentDrawQueueList_.clear();
+            raytracingDrawQueueList_.clear();
+        }
+
+        const std::map<std::string, std::map<RenderLayer, std::unordered_map<std::string, std::vector<Draw3dRequest>>>>& GetDraw3dQueue() const { return draw3dQueueList_; }
+        const std::map<std::string, std::vector<Draw3dRequest>>& GetTranslucentQueue() const { return translucentDrawQueueList_; }
+        const std::map<std::string, std::map<RenderLayer, std::unordered_map<std::string, std::vector<Draw2dRequest>>>>& GetDraw2dQueue() const { return draw2dQueueList_; }
+        const std::vector<TLASInstanceData>& GetRaytracingQueue()  const { return raytracingDrawQueueList_; }
+
+        /// レイトレーシングに積まれた描画コマンドが存在するか
+        bool HasRaytracingDrawCalls() const { return !raytracingDrawQueueList_.empty(); }
+
     private:
-        ID3D12GraphicsCommandList4* commandList_ = nullptr;
-        RenderPassController* renderPassController_ = nullptr;
-        RaytracingPipeline* raytracingPipeline_ = nullptr;
-        SrvManager* srvManager_ = nullptr;
-        BufferRefManager* bufferRefManager_ = nullptr;
+        // コピー、ムーブは禁止
+        RenderQueue(const RenderQueue&) = delete;
+        RenderQueue& operator=(const RenderQueue&) = delete;
+        RenderQueue(RenderQueue&&) = default;
+        RenderQueue& operator=(RenderQueue&&) = default;
 
         // 2D描画コマンドのスタックメモリ [描画パス]->[PSO]->[描画コマンド]
         std::map<std::string, std::map<RenderLayer, std::unordered_map<std::string, std::vector<Draw2dRequest>>>> draw2dQueueList_;
@@ -125,79 +139,5 @@ namespace GameEngine {
 
         // デバックカメラを使用するか
         bool useDebugCamera_ = false;
-
-        // 描画パスの実行順
-        std::vector<std::string> passExecuteOrder_;
-
-        // 現在のpso
-        std::string currentPsoName_;
-
-        // psoのリスト
-        std::unordered_map<std::string, DrawPsoData> psoList_;
-
-        // レイトレーシング用の描画モデル管理
-        TLAS tlas_;
-
-        // レイトレーシングでの最大描画数
-        uint32_t maxRayInstanceNum_ = 200;
-
-        // bufferが存在しているsrvのスタート位置
-        uint32_t bufferStartSrvIndex_ = 0;
-
-        // 最終的に画面に描画させるパスの名前
-        std::string finalPassName_ = "";
-        // ラスタライズ描画で最終的に描画させるパス
-        std::string rasterizeFinalPassName_ = "";
-        // レイトレ描画で最終的に描画させるパス
-        std::string raytracingFinalPassName_ = "";
-
-        // 描画の有効状態
-        bool enableDrawRaytracing_ = false;
-        bool enableDrawRasterize_ = false;
-
-    private:
-        /// <summary>
-        /// PSOManagerから名前を指定して動的に登録する。
-        /// </summary>
-        void RegisterPSO(const std::string& name, PSOManager* psoManager);
-
-        // 文字列キーでPSOをセット
-        void PreDraw(const std::string& psoName);
-
-        // パスの実行順を登録（Initialize時に呼ぶ）
-        void RegisterPassOrder(const std::vector<std::string>& order) {
-            passExecuteOrder_ = order;
-        }
-
-        // 描画コマンドのクリア
-        void Clear() {
-            draw3dQueueList_.clear();
-            translucentDrawQueueList_.clear();
-            currentPsoName_.clear();
-            raytracingDrawQueueList_.clear();
-        }
-
-        // psoの名前を取得
-        const char* Get3dPsoName(Draw3dType type);
-        const char* Get2dPsoName(Draw2dType type);
-
-        // 描画コマンドを解放
-        void Execute3dRequest(const Draw3dRequest& request);
-        void Execute2dRequest(const Draw2dRequest& request);
-
-        // ラスタライズの描画コマンドを解放
-        void RasterizeExecute();
-
-        // レイトレーシングの描画
-        void DrawRaytracing();
-
-        // レイトレの描画コマンドを解放
-        void RaytracingExecute();
-        
-        // レイトレとラスタライズの描画を合成する
-        void LightingComposite();
-
-        // 深度値をコピーする
-        void CopyRaytracingDepth();
     };
 }
