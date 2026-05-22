@@ -90,8 +90,11 @@ void TLAS::Update(ID3D12GraphicsCommandList4* cmdList, const std::vector<TLASIns
 
     uint32_t activeCount = static_cast<uint32_t>(instances.size());
 
+    // 0であれば早期リターン
+    if (activeCount == 0) { return; }
+
     // 有効なインスタンスの状態を書き込む
-    for (uint32_t i = 0; i < instances.size(); ++i) {
+    for (uint32_t i = 0; i < activeCount; ++i) {
         instanceDescs_[i].InstanceID = instances[i].instanceID;
         instanceDescs_[i].InstanceContributionToHitGroupIndex = instances[i].hitGroupIndexOffset;
         instanceDescs_[i].Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
@@ -107,10 +110,13 @@ void TLAS::Update(ID3D12GraphicsCommandList4* cmdList, const std::vector<TLASIns
     }
 
     // 使用していないスロットを無効
-    for (uint32_t i = activeCount; i < maxInstanceCount_; ++i) {
-        // レイキャストで無視される
-        instanceDescs_[i].InstanceMask = 0x00; 
-    }
+    //for (uint32_t i = activeCount; i < maxInstanceCount_; ++i) {
+    //    // レイキャストで無視される
+    //    instanceDescs_[i].InstanceMask = 0x00; 
+    //}
+
+    // 有効数でビルドを構築
+    inputs_.NumDescs = activeCount;
 
     // TLASの再ビルドを実行する
     D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC buildDesc{};

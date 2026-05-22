@@ -11,6 +11,7 @@
 #include "DebugRenderer.h"
 #include "RenderTextureManager.h"
 #include "BufferRefManager.h"
+#include "SceneRenderManager.h"
 
 // あとで削除するべき処理
 #include "PostProcess/CopyPSO.h"
@@ -58,8 +59,10 @@ namespace GameEngine {
         std::unique_ptr<DXC> dxc_;
         // 描画の流れを管理
         std::unique_ptr<RenderPipeline> renderPipeline_;
-        // 描画処理管理機能
+        // 描画処理
         std::unique_ptr<RenderQueue> renderQueue_;
+        // シーンの描画管理機能
+        std::unique_ptr<SceneRenderManager> sceneRenderManager_;
         // ポストエフェクト
         std::unique_ptr<PostEffectManager> postEffectManager_;
         // デバック描画機能

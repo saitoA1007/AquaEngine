@@ -525,6 +525,7 @@
     <ClCompile Include="Application\Player\PlayerAction.cpp" />
     <ClCompile Include="Application\Stage\StageManager.cpp" />
     <ClCompile Include="Application\Stage\Wall.cpp" />
+    <ClCompile Include="EngineSource\Graphics\Core\SceneRenderManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1022,6 +1023,7 @@
     <ClInclude Include="Application\Player\PlayerAction.h" />
     <ClInclude Include="Application\Stage\StageManager.h" />
     <ClInclude Include="Application\Stage\Wall.h" />
+    <ClInclude Include="EngineSource\Graphics\Core\SceneRenderManager.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />
@@ -1031,6 +1033,9 @@
     <FxCompile Include="Resources\Shaders\PostEffect\LightingComposite.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\DepthCopy.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\Grayscale\Grayscale.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\Rasterize\WBOITAccumulate.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\PostEffect\WBOITResolve.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\Rasterize\WBOITAccumulate.VS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Externals\imgui\ProggyClean.ttf" />
@@ -1040,6 +1045,7 @@
     <None Include="Externals\imgui\imgui_extra_math.inl" />
     <None Include="Externals\imgui\imgui_node_editor_internal.inl" />
     <None Include="Resources\Shaders\Raytracing\Common.hlsli" />
+    <None Include="Resources\Shaders\Rasterize\WBOIT.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />

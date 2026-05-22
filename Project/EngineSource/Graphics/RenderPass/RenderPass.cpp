@@ -35,24 +35,18 @@ void RenderPass::PrePass() {
 	case GameEngine::RenderTextureMode::RtvOnly: {
 		// 書き込み状態に遷移
 		renderTexture_->TransitionToRenderTarget(commandList_);
-		// RTVのみセットする
-		commandList_->OMSetRenderTargets(1, &renderTexture_->GetRtvHandle(), false, nullptr);
 		break;
 	}
 
 	case GameEngine::RenderTextureMode::DsvOnly: {
 		// 書き込み状態に遷移
 		renderTexture_->TransitionToRenderTarget(commandList_);
-		// DSVのみセットする
-		commandList_->OMSetRenderTargets(0, nullptr, false, &renderTexture_->GetDsvHandle());
 		break;
 	}
 
 	case GameEngine::RenderTextureMode::RtvAndDsv: {
 		// 書き込み状態に遷移
 		renderTexture_->TransitionToRenderTarget(commandList_);
-		// RTVとDSVをセットする
-		commandList_->OMSetRenderTargets(1, &renderTexture_->GetRtvHandle(), false, &renderTexture_->GetDsvHandle());
 		break;
 	}
 
@@ -65,7 +59,33 @@ void RenderPass::PrePass() {
 	case RenderTextureMode::RtvAndUav: {
 		// まずRTV状態で描画パスを開始する
 		renderTexture_->TransitionToRenderTarget(commandList_);
+		break;
+	}
+	}
+}
 
+void RenderPass::SetRenderTarget() {
+	switch (mode_)
+	{
+	case GameEngine::RenderTextureMode::RtvOnly: {
+		// RTVのみセットする
+		commandList_->OMSetRenderTargets(1, &renderTexture_->GetRtvHandle(), false, nullptr);
+		break;
+	}
+
+	case GameEngine::RenderTextureMode::DsvOnly: {
+		// DSVのみセットする
+		commandList_->OMSetRenderTargets(0, nullptr, false, &renderTexture_->GetDsvHandle());
+		break;
+	}
+
+	case GameEngine::RenderTextureMode::RtvAndDsv: {
+		// RTVとDSVをセットする
+		commandList_->OMSetRenderTargets(1, &renderTexture_->GetRtvHandle(), false, &renderTexture_->GetDsvHandle());
+		break;
+	}
+
+	case RenderTextureMode::RtvAndUav: {
 		// RTVのみセットする
 		commandList_->OMSetRenderTargets(1, &renderTexture_->GetRtvHandle(), false, nullptr);
 		break;
@@ -77,7 +97,7 @@ void RenderPass::PrePass() {
 		commandList_->RSSetViewports(1, &viewport_);
 		// Scirssorを設定
 		commandList_->RSSetScissorRects(1, &scissorRect_);
-	}	
+	}
 }
 
 void RenderPass::PostPass() {

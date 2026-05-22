@@ -36,6 +36,47 @@ void RenderPassController::PrePass(const std::string& name) {
 
 	// 描画前処理
 	render->second->PrePass();
+	render->second->SetRenderTarget();
+}
+
+void RenderPassController::PrePass(std::vector<std::string> names, const std::string dsvName) {
+
+	std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> renderHandleList;
+	renderHandleList.resize(names.size());
+
+	for (uint32_t i = 0; i < names.size(); ++i) {
+
+		// 登録されていなければエラー
+		auto render = renderPassList_.find(names[i]);
+		if (render == renderPassList_.end()) {
+			std::string errorStr = "Not found RenderPass : name[" + names[i] + "]";
+			assert(false && errorStr.c_str());
+		}
+
+		// 描画前処理
+		render->second->PrePass();
+		// ハンドルを取得
+		renderHandleList[i] = render->second->GetRtvHandle();
+	}
+
+	// 参照する深度があれば使用
+	if (dsvName != "") {
+		// 登録されていなければエラー
+		auto render = renderPassList_.find(dsvName);
+		if (render == renderPassList_.end()) {
+			std::string errorStr = "Not found RenderPass : name[" + dsvName + "]";
+			assert(false && errorStr.c_str());
+		}
+
+		D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle;
+		dsvHandle = render->second->GetDsvHandle();
+
+		// マルチレンダーターゲットを設定
+		commandList_->OMSetRenderTargets(renderHandleList.size(), renderHandleList.data(), false, &dsvHandle);
+	} else {
+		// マルチレンダーターゲットを設定
+		commandList_->OMSetRenderTargets(renderHandleList.size(), renderHandleList.data(), false, nullptr);
+	}
 }
 
 void RenderPassController::PostPass(const std::string& name) {

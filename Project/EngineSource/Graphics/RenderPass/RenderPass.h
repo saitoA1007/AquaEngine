@@ -15,6 +15,9 @@ namespace GameEngine {
         // 描画前処理
         void PrePass();
 
+        // ターゲットを設定する
+        void SetRenderTarget();
+
         // 描画後処理
         void PostPass();
 
@@ -36,6 +39,9 @@ namespace GameEngine {
         uint32_t GetUavIndex() const { return renderTexture_->GetUavIndex(); }
 
         CD3DX12_GPU_DESCRIPTOR_HANDLE GetSrvHandle();
+
+        const D3D12_CPU_DESCRIPTOR_HANDLE& GetRtvHandle() const { return renderTexture_->GetRtvHandle(); }
+        const D3D12_CPU_DESCRIPTOR_HANDLE& GetDsvHandle() const { return renderTexture_->GetDsvHandle(); }
 
         // 名前を取得
         const std::string GetName() const { return name_; }

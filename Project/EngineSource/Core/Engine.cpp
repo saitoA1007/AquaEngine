@@ -110,9 +110,6 @@ void Engine::MainLoop() {
         PreDraw();
         scene_->Draw();
         graphics_->GetRenderQueue()->SubmitDebugLine(graphics_->GetDebugRenderer());
-        graphics_->GetRenderQueue()->Execute();
-        // ポストエフェクトを実行
-        graphics_->GetPostEffectManager()->Execute();
         PostDraw();
     }
 }
@@ -124,7 +121,6 @@ void Engine::PreUpdate() {
     input_->Update(); // 入力処理
 
     graphics_->GetImGuiManager()->BeginFrame();
-    graphics_->GetRenderQueue()->Begin();
 
     // ヒープを設定する
     graphics_->BeginFrame();
