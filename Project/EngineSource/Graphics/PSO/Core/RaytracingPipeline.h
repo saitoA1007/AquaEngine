@@ -6,8 +6,6 @@
 
 namespace GameEngine {
 
-	class ModelManager;
-
 	namespace AppHitGroups {
 		static const std::wstring DefaultModel = L"DefaultModel";
 	}
@@ -21,7 +19,7 @@ namespace GameEngine {
 		void Initialize(ID3D12Device5* device, SrvManager* srvManager, DXC* dxc);
 
 		// シェーダーテーブルを作成
-		void CreateShaderTable(ModelManager* modelManager);
+		void CreateShaderTable();
 
 	public:
 
@@ -51,16 +49,11 @@ namespace GameEngine {
 
 		// ルートシグネチャ
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignatureGlobal_;
-		Microsoft::WRL::ComPtr<ID3D12RootSignature> rsRayGen_;
-		Microsoft::WRL::ComPtr<ID3D12RootSignature> rsModel_;
 
 	private:
 
 		// グローバルルートシグネチャを作成
 		void CreateGlobalRootsignature();
-
-		// ローカルルートシグネチャを作成
-		void CreateLocalRootsignature();
 
 		// ステートオブジェクトを作成
 		void CreateStateObject();

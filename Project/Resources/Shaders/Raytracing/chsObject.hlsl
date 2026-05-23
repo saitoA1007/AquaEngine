@@ -29,23 +29,26 @@ struct MaterialData {
     float padding1;
 };
 
-StructuredBuffer<uint> indexBuffer : register(t0, space4);
-StructuredBuffer<VertexData> vertexBuffer : register(t1, space4);
+static const uint VERTEX_STRIDE = 52;
 
-VertexData GetHitVertex(MyAttribute attrib) {
+VertexData GetHitVertex(MyAttribute attrib, uint vertexHandle, uint indexHandle)
+{
     uint start = PrimitiveIndex() * 3;
     
     float3 positions[3];
     float2 texcoords[3];
     float3 normals[3];
-    float4 tangent[3];
+    float4 tangents[3];
 
     for (int i = 0; i < 3; ++i) {
-        uint index = indexBuffer[start + i];
-        positions[i] = vertexBuffer[index].position.xyz;
-        normals[i] = vertexBuffer[index].normal;
-        texcoords[i] = vertexBuffer[index].texcoord;
-        tangent[i] = vertexBuffer[index].tangent;
+        uint index = gBufferData[indexHandle].Load<uint>((start + i) * 4);
+        
+        VertexData v = gBufferData[vertexHandle].Load<VertexData>(index * VERTEX_STRIDE);
+        
+        positions[i] = v.position.xyz;
+        normals[i] = v.normal;
+        texcoords[i] = v.texcoord;
+        tangents[i] = v.tangent;
     }
     
     VertexData v = (VertexData) 0;
@@ -54,7 +57,7 @@ VertexData GetHitVertex(MyAttribute attrib) {
     v.texcoord = CalcHitAttribute2(texcoords, attrib.barys);
     v.normal = CalcHitAttribute3(normals, attrib.barys);
     v.normal = normalize(v.normal);
-    v.tangent = CalcHitAttribute4(tangent, attrib.barys);
+    v.tangent = CalcHitAttribute4(tangents, attrib.barys);
     return v;
 }
 
@@ -72,7 +75,7 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     MaterialData material = gBufferData[ref.MaterialIndex].Load<MaterialData>(0);
     
     // 頂点データを取得する
-    VertexData vtx = GetHitVertex(attrib);
+    VertexData vtx = GetHitVertex(attrib, ref.vertexHandle, ref.indexHandle);
     
     float3 localNormal = vtx.normal;
     // ノーマルマップがあれば法線に適応

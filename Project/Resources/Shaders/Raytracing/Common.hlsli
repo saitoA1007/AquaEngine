@@ -31,6 +31,9 @@ struct BufferRef
 {
     uint type; // バッファデータのタイプ
     uint MaterialIndex; // マテリアルデータの参照するハンドル
+    
+    uint indexHandle; // モデルのインデックス
+    uint vertexHandle; // モデルの頂点
 };
 
 // Global Root Signature

@@ -158,11 +158,23 @@ void RenderQueue::SubmitRaytracingModel(const Model* model, WorldTransform& worl
         TLASInstanceData data;
 
         data.blas = mesh->GetBLAS();
-        data.hitGroupIndexOffset = mesh->GetHitGroupIndex();
+
+        // 屈折するかや透明かなどの情報から使用するシェーダーを判断するようにする
+        data.hitGroupIndexOffset = 0;
 
         if (materialIndex == nullptr) {
             // マテリアルを設定
-            const Material* drawMaterial = model->GetMaterial(mesh->GetMaterialName());
+            Material* drawMaterial = model->GetMaterial(mesh->GetMaterialName());
+            auto& refBuffer = drawMaterial->GetMaterialBuffer();
+            auto* refData = refBuffer.GetRefData();
+            refData->indexHandle = mesh->GetIndexBufferSrvIndex() - refBuffer.GetBufferStartIndex();
+            // アニメーションの有無で参照する頂点データを変更
+            if (model->IsSkeleton()) {
+                auto* skeleton = model->GetSkeleton();
+                refData->vertexHandle = skeleton->GetOutputVertexBufferSrvIndex() - refBuffer.GetBufferStartIndex();
+            } else {
+                refData->vertexHandle = mesh->GetVertexBufferSrvIndex() - refBuffer.GetBufferStartIndex();
+            }
 
             data.instanceID = drawMaterial->GetMaterialRefIndex();
         } else {
