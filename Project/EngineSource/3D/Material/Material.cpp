@@ -8,7 +8,7 @@ Material::~Material() {
 
 void Material::Initialize(const Vector4& color, const Vector3& specularColor,const float& shininess,const bool& isEnableLighting) {
 	// マテリアルデータを作成
-	materialBuffer_.Create(static_cast<uint32_t>(BufferType::kDefalutMaterial));
+	materialBuffer_.CreateTypeless();
 	materialData_ = materialBuffer_.GetData();
 
 	// 白色に設定
@@ -37,12 +37,4 @@ void Material::Initialize(const Vector4& color, const Vector3& specularColor,con
 
 void Material::SetUVTransform(Transform uvTransform) {
 	materialData_->uvTransform = Math::MakeAffineMatrix(uvTransform.scale, uvTransform.rotate, uvTransform.translate);
-}
-
-void Material::CheackTranslucent() {
-	if (materialData_->color.w != 1.0f) {
-		materialBuffer_.SetBufferType(static_cast<uint32_t>(BufferType::kDefalutMaterialTranslucent));
-	} else {
-		materialBuffer_.SetBufferType(static_cast<uint32_t>(BufferType::kDefalutMaterial));
-	}	
 }

@@ -1009,7 +1009,6 @@
       <Filter>Externals\imgui</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.h" />
-    <ClInclude Include="EngineSource\Graphics\Buffers\MaterialBuffer.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\RayLibShaderCompiler.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderRecord.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderTable.h" />
@@ -1024,6 +1023,7 @@
     <ClInclude Include="Application\Stage\StageManager.h" />
     <ClInclude Include="Application\Stage\Wall.h" />
     <ClInclude Include="EngineSource\Graphics\Core\SceneRenderManager.h" />
+    <ClInclude Include="EngineSource\Graphics\Buffers\RefBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />

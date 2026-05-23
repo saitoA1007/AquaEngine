@@ -53,6 +53,33 @@ namespace GameEngine {
 			isCreated_ = true;
 		}
 
+		void CreateTypeless(uint32_t numElements = 1, SrvHeapType type = SrvHeapType::Buffer) {
+			numElements_ = numElements;
+
+			// 4バイト境界に切り上げたサイズを計算
+			uint32_t bufferSize = ((sizeof(T) * numElements) + 3) & ~3;
+
+			// リソースを作成
+			resource_ = CreateBufferResource(device_, bufferSize);
+			resource_->Map(0, nullptr, reinterpret_cast<void**>(&data_));
+
+			// SRVのインデックスを取得
+			srvIndex_ = srvManager_->AllocateSrvIndex(type);
+			// SRVの作成
+			D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+			srvDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+			srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+			srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+			srvDesc.Buffer.FirstElement = 0;
+			srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_RAW;
+			srvDesc.Buffer.NumElements = bufferSize / 4;
+			srvHandleCPU_ = srvManager_->GetCPUHandle(srvIndex_);
+			srvHandleGPU_ = srvManager_->GetGPUHandle(srvIndex_);
+			device_->CreateShaderResourceView(resource_.Get(), &srvDesc, srvHandleCPU_);
+
+			isCreated_ = true;
+		}
+
 		T* GetData() const { return data_; }
 		const uint32_t& GetSrvIndex() const { return srvIndex_; }
 		uint32_t GetNumElements() const { return numElements_; }

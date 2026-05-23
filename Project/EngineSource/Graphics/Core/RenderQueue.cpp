@@ -151,42 +151,63 @@ void RenderQueue::SubmitDebugLine(const DebugRenderer* debugRenderer, const std:
     draw3dQueueList_[passName][request.layer][Get3dPsoName(request.type)].push_back(request);
 }
 
-void RenderQueue::SubmitRaytracingModel(const Model* model, WorldTransform& worldTransform, const uint32_t* materialIndex) {
+void RenderQueue::SubmitRaytracingModel(Model* model, WorldTransform& worldTransform, RefBuffer* customRefBuffer) {
     // 登録
-    auto& meshes = model->GetMeshes();
-    for (auto& mesh : meshes) {
+    const auto& meshes = model->GetMeshes();
+    auto& refBuffers = model->GetRefBuffers();
+
+    // 読み込んだモデルのローカル行列を設定
+    if (model->IsLoad()) {
+        worldTransform.SetWVPMatrix(model->GetLocalMatrix());
+    }
+
+    for (uint32_t i = 0; i < meshes.size(); ++i) {
+        const auto& mesh = meshes[i];
+        auto& refBuffer = refBuffers[i];
+        uint32_t refIndex = 0;
         TLASInstanceData data;
 
+        // blasを登録
         data.blas = mesh->GetBLAS();
 
         // 屈折するかや透明かなどの情報から使用するシェーダーを判断するようにする
         data.hitGroupIndexOffset = 0;
 
-        if (materialIndex == nullptr) {
-            // マテリアルを設定
+        if (customRefBuffer == nullptr) {
+            // デフォルトのマテリアルを設定
             Material* drawMaterial = model->GetMaterial(mesh->GetMaterialName());
-            auto& refBuffer = drawMaterial->GetMaterialBuffer();
-            auto* refData = refBuffer.GetRefData();
-            refData->indexHandle = mesh->GetIndexBufferSrvIndex() - refBuffer.GetBufferStartIndex();
-            // アニメーションの有無で参照する頂点データを変更
+            auto& materialBuffer = drawMaterial->GetMaterialBuffer();
+            uint32_t type = static_cast<uint32_t>(BufferType::kDefalutMaterial);
+            // 半透明であればを分岐
+            float alpha = materialBuffer.GetData()->color.w;
+            if (alpha < 1.0f) {
+                type = static_cast<uint32_t>(BufferType::kDefalutMaterialTranslucent);
+            }
+            refBuffer.SetBufferMaterial(type, materialBuffer.GetSrvIndex());
+            refIndex = refBuffer.GetRefIndex();
+        } else {
+            // スケルトンがあれば参照するデータを変える
+            uint32_t vertexHandle = 0;
             if (model->IsSkeleton()) {
-                auto* skeleton = model->GetSkeleton();
-                refData->vertexHandle = skeleton->GetOutputVertexBufferSrvIndex() - refBuffer.GetBufferStartIndex();
+                const auto& skeleton = model->GetSkeleton();
+                vertexHandle = skeleton->GetOutputVertexBufferSrvIndex();
             } else {
-                refData->vertexHandle = mesh->GetVertexBufferSrvIndex() - refBuffer.GetBufferStartIndex();
+                vertexHandle = mesh->GetVertexBufferSrvIndex();
             }
 
-            data.instanceID = drawMaterial->GetMaterialRefIndex();
-        } else {
-            data.instanceID = *materialIndex;
+            // モデルデータを設定
+            customRefBuffer->SetModelData(vertexHandle, mesh->GetIndexBufferSrvIndex());
+            refIndex = customRefBuffer->GetRefIndex();
         }
-        
-        if (model->IsLoad()) {
-            worldTransform.SetWVPMatrix(model->GetLocalMatrix());
-        }
+
+        // 使用するデータを設定
+        data.instanceID = refIndex;
+
+        // 座標を設定
         Matrix4x4 matrix = Math::Transpose(worldTransform.GetWorldMatrix());
         std::memcpy(&data.transform, &matrix, sizeof(float) * 12);
 
+        // データを登録
         raytracingDrawQueueList_.push_back(std::move(data));
     }
 }

@@ -41,7 +41,7 @@ void GraphicsSubsystem::Initialize() {
     bufferRefManager_->Initialize();
 
     // アクセスデータ管理機能を登録する
-    BufferRefResource::StaticInitialize(bufferRefManager_.get());
+    BufferRefResource::StaticInitialize(bufferRefManager_.get(), graphicsDevice_->GetSrvManager()->GetStartSrvIndex(SrvHeapType::Buffer));
 
     // レンダーテクスチャ機能を生成
     renderTextureManager_ = std::make_unique<RenderTextureManager>();

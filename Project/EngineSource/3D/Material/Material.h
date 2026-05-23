@@ -3,7 +3,7 @@
 #include "Vector3.h"
 #include "Matrix4x4.h"
 #include "Transform.h"
-#include "MaterialBuffer.h"
+#include "StructuredBuffer.h"
 
 namespace GameEngine {
 
@@ -49,8 +49,6 @@ namespace GameEngine {
 		/// <param name="color"></param>
 		void SetColor(Vector4 color) {
 			materialData_->color = color;
-			// 透明度確認
-			CheackTranslucent();
 		}
 
 		/// <summary>
@@ -130,17 +128,13 @@ namespace GameEngine {
 		MaterialData* GetMaterialData() { return materialData_; }
 
 		D3D12_GPU_VIRTUAL_ADDRESS GetGpuVirtualAddress() const { return materialBuffer_.GetGpuVirtualAddress(); }
-		MaterialBuffer<MaterialData>& GetMaterialBuffer() { return materialBuffer_; }
+		StructuredBuffer<MaterialData>& GetMaterialBuffer() { return materialBuffer_; }
 
-		// マテリアルデータ参照用IDを取得
-		const uint32_t& GetMaterialRefIndex() const { return materialBuffer_.GetRefIndex(); };
-
-		// 半透明であるかを確認する
-		void CheackTranslucent();
+		const uint32_t& GetMaterialSrvIndex() const { return materialBuffer_.GetSrvIndex(); }
 
 	private:
 		// マテリアルデータ
-		MaterialBuffer<MaterialData> materialBuffer_;
+		StructuredBuffer<MaterialData> materialBuffer_;
 
 		// マテリアルにデータを書き込む
 		MaterialData* materialData_ = nullptr;
