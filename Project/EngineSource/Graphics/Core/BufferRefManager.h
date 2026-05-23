@@ -9,7 +9,7 @@ namespace GameEngine {
 	struct BufferRef 
 	{
 		uint32_t type = 0;  // データのタイプ
-		uint32_t index = 0; // マテリアルデータの参照するハンドル
+		uint32_t materialIndex = 0; // マテリアルデータの参照するハンドル
 
 		uint32_t indexHandle; // インデックス
 		uint32_t vertexHandle; // 頂点

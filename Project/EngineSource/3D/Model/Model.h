@@ -1,13 +1,12 @@
 #pragma once
 #include <vector>
-#include <optional>
 #include <unordered_map>
 
 #include "Mesh.h"
 #include "Material.h"
 #include "TransformationMatrix.h"
-#include "AnimationData.h"
 #include "Skeleton.h"
+#include "RefBuffer.h"
 
 namespace GameEngine {
 	
@@ -44,6 +43,32 @@ namespace GameEngine {
 		void SetSkeleton(std::unique_ptr<Skeleton> skeleton) {
 			isSkeleton_ = true;
 			skeleton_ = std::move(skeleton);
+		}
+
+		// 参照用データを作成
+		void CreateRefBuffer() {
+
+			// 参照の値を取得
+			refBuffers_.resize(meshes_.size());
+
+			// 参照用のデータを作成
+			for (uint32_t i = 0; i < meshes_.size(); ++i) {
+				refBuffers_[i].Create();
+				uint32_t vertexHandle = 0;
+				// スケルトンがあれば参照するデータを変える
+				if (isSkeleton_) {
+					vertexHandle = skeleton_->GetOutputVertexBufferSrvIndex();
+				} else {
+					vertexHandle = meshes_[i]->GetVertexBufferSrvIndex();
+				}		
+
+				// モデルデータを設定
+				refBuffers_[i].SetModelData(vertexHandle, meshes_[i]->GetIndexBufferSrvIndex());
+
+				// マテリアルデータを設定
+				Material* drawMaterial = materials_[meshes_[i]->GetMaterialName()].get();
+				refBuffers_[i].SetBufferMaterial(static_cast<uint32_t>(BufferType::kDefalutMaterial), drawMaterial->GetMaterialSrvIndex());
+			}
 		}
 
 	public:
@@ -147,6 +172,10 @@ namespace GameEngine {
 		// ボーンデータを取得
 		Skeleton* GetSkeleton() { return skeleton_.get(); }
 		const Skeleton* GetSkeleton() const { return skeleton_.get(); }
+
+		// 参照用バッファ
+		std::vector<RefBuffer>& GetRefBuffers() {return refBuffers_; }
+
 	private:
 		Model(Model&) = delete;
 		Model& operator=(Model&) = delete;
@@ -159,6 +188,9 @@ namespace GameEngine {
 
 		// ボーンデータ
 		std::unique_ptr<Skeleton> skeleton_;
+
+		// 参照用バッファ
+		std::vector<RefBuffer> refBuffers_;
 
 		// Nodeのローカル行列を保持しておく変数
 		Matrix4x4 localMatrix_;

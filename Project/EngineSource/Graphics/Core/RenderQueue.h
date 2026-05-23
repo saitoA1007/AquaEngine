@@ -6,6 +6,7 @@
 #include "DrawRequest.h"
 #include "RenderPass/RenderPassController.h"
 
+#include "RefBuffer.h"
 #include "Camera.h"
 #include "LightManager.h"
 #include "DirectionalLight.h"
@@ -88,7 +89,7 @@ namespace GameEngine {
         void SubmitDebugLine(const DebugRenderer* debugRenderer, const std::string& passName = "DefaultPass");
 
         // レイトレーシングでのモデル
-        void SubmitRaytracingModel(const Model* model, WorldTransform& worldTransform,const uint32_t* materialIndex = nullptr);
+        void SubmitRaytracingModel(Model* model, WorldTransform& worldTransform, RefBuffer* customRefBuffer = nullptr);
 
         // psoの名前を取得
         const char* Get3dPsoName(Draw3dType type);

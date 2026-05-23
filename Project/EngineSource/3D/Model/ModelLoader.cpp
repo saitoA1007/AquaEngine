@@ -128,6 +128,9 @@ std::unique_ptr<Model> ModelLoader::CreateModel(const std::string& objFilename, 
 		model->SetSkeleton(std::move(skeleton));
 	}
 
+	// 参照用バッファを作成
+	model->CreateRefBuffer();
+
 	LogManager::GetInstance().Log("End create model");
 
 	return model;
