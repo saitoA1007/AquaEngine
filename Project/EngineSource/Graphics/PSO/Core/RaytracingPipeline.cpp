@@ -1,5 +1,4 @@
 #include "RaytracingPipeline.h"
-#include "ModelManager.h"
 #include "EngineSource/Graphics/PSO/Core/RootSignatureBuilder.h"
 using namespace GameEngine;
 
@@ -12,10 +11,12 @@ void RaytracingPipeline::Initialize(ID3D12Device5* device, SrvManager* srvManage
 
 	// ルートシグネチャを作成する
 	CreateGlobalRootsignature();
-	CreateLocalRootsignature();
 
 	// ステートオブジェクトを作成する
 	CreateStateObject();
+
+	// シェーダーテーブルを作成
+	CreateShaderTable();
 }
 
 void RaytracingPipeline::CreateGlobalRootsignature() {
@@ -38,23 +39,6 @@ void RaytracingPipeline::CreateGlobalRootsignature() {
 	builder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_ALL);
 	builder.CreateRootSignature();
 	rootSignatureGlobal_ = builder.MoveOwnerRootSignature();
-}
-
-void RaytracingPipeline::CreateLocalRootsignature() {
-
-	// raygen用
-	RootSignatureBuilder raygenBuilder;
-	raygenBuilder.Initialize(device_);
-	raygenBuilder.CreateRootSignature(D3D12_ROOT_SIGNATURE_FLAG_LOCAL_ROOT_SIGNATURE);
-	rsRayGen_ = raygenBuilder.MoveOwnerRootSignature();
-
-	// Object用
-	RootSignatureBuilder objectBuilder;
-	objectBuilder.Initialize(device_);
-	objectBuilder.AddSRVDescriptorTable(0, 1, 4, D3D12_SHADER_VISIBILITY_ALL);
-	objectBuilder.AddSRVDescriptorTable(1, 1, 4, D3D12_SHADER_VISIBILITY_ALL);
-	objectBuilder.CreateRootSignature(D3D12_ROOT_SIGNATURE_FLAG_LOCAL_ROOT_SIGNATURE);
-	rsModel_ = objectBuilder.MoveOwnerRootSignature();
 }
 
 void RaytracingPipeline::CreateStateObject() {
@@ -82,15 +66,11 @@ void RaytracingPipeline::CreateStateObject() {
 	// グローバルルートシグネチャを設定
 	stateObjectBuilder_.SetGlobalRootSignature(rootSignatureGlobal_.Get());
 
-	// ローカルルートシグネチャとシェーダーを関連づける
-	stateObjectBuilder_.AddLocalRootSignature(rsRayGen_.Get(), { L"MainRayGen" });
-	stateObjectBuilder_.AddLocalRootSignature(rsModel_.Get(), { AppHitGroups::DefaultModel });
-
 	// 生成する
 	stateObject_ = stateObjectBuilder_.Build(device_);
 }
 
-void RaytracingPipeline::CreateShaderTable(ModelManager* modelManager) {
+void RaytracingPipeline::CreateShaderTable() {
 
 	Microsoft::WRL::ComPtr<ID3D12StateObjectProperties> rtsoProps;
 	stateObject_.As(&rtsoProps);
@@ -126,40 +106,17 @@ void RaytracingPipeline::CreateShaderTable(ModelManager* modelManager) {
 		shadowRecord.SetIdentifier(shadowId);
 		shaderTableBuilder_.Miss().AddRecord(std::move(shadowRecord));
 	}
-
-	// ヒットグループ番号
-	uint32_t hitGroupIndex = 0;
+	
 	// hitGroup
 	{
-		auto& models = modelManager->GetModels();
-
 		auto id = rtsoProps->GetShaderIdentifier(AppHitGroups::DefaultModel.c_str());
 		if (id == nullptr) {
 			assert(false && "Not found ShaderIdentifier");
 		}
 
-		for (auto& [key, data] : models) {
-			for (auto& mesh : data.model->GetMeshes()) {
-				mesh->SetHitGroupIndex(hitGroupIndex);
-				auto& index = mesh->GetIndexBuffer();
-
-				ShaderRecord record;
-				auto& table = record.SetIdentifier(id);
-				table.AppendDescriptor(index.GetSrvGpuHandle());
-
-				if (data.model->IsSkeleton()) {
-					auto* skeleton = data.model->GetSkeleton();
-					table.AppendDescriptor(skeleton->GetOutputVertexBuffer()->GetSrvGpuHandle());
-				} else {
-					auto& vertex = mesh->GetVertexBuffer();
-					table.AppendDescriptor(vertex.GetSrvGpuHandle());
-				}
-
-				shaderTableBuilder_.HitGroup().AddRecord(std::move(record));
-
-				hitGroupIndex++;
-			}
-		}
+		ShaderRecord record;
+		auto& table = record.SetIdentifier(id);
+		shaderTableBuilder_.HitGroup().AddRecord(std::move(record));
 	}
 
 	// テーブルを設定する

@@ -61,6 +61,7 @@ namespace GameEngine {
 
 			// bufferのスタート位置を取得
 			uint32_t bufferStartIndex  = srvManager_->GetStartSrvIndex(SrvHeapType::Buffer);
+			bufferStartIndex_ = bufferStartIndex;
 
 			// マテリアルのsrv番号を設定
 			refData_->type = type; // タイプを設定
@@ -74,6 +75,10 @@ namespace GameEngine {
 		T* GetData() const { return data_; }
 		const uint32_t& GetSrvIndex() const { return srvIndex_; }
 		const CD3DX12_GPU_DESCRIPTOR_HANDLE& GetSrvHandleGPU() const { return srvHandleGPU_; }
+
+		BufferRef* GetRefData() const { return refData_; }
+
+		const uint32_t& GetBufferStartIndex() const { return bufferStartIndex_; }
 
 		// バッファの使用タイプを設定
 		void SetBufferType(const uint32_t& type) {
@@ -91,6 +96,8 @@ namespace GameEngine {
 		CD3DX12_CPU_DESCRIPTOR_HANDLE srvHandleCPU_;
 		// GPUのシェーダリソースビューのハンドル
 		CD3DX12_GPU_DESCRIPTOR_HANDLE srvHandleGPU_;
+
+		uint32_t bufferStartIndex_ = 0;
 
 		bool isCreated_ = false;
 	};

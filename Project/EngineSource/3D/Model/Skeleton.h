@@ -28,6 +28,8 @@ namespace GameEngine {
 		
 		const uint32_t& GetVerticesNum() const { return verticesNum_; }
 
+		const uint32_t& GetOutputVertexBufferSrvIndex() const { return outputvertexBuffer_.GetSrvIndex(); }
+
 	private:
 		uint32_t verticesNum_ = 0;
 

@@ -62,12 +62,12 @@ namespace GameEngine {
 		const VertexBuffer<VertexData>& GetVertexBuffer() const { return vertexBuffer_; }
 		const IndexBuffer& GetIndexBuffer() const { return indexBuffer_; }
 
+		// srvIndex
+		const uint32_t& GetVertexBufferSrvIndex() const { return vertexBuffer_.GetSrvIndex(); }
+		const uint32_t& GetIndexBufferSrvIndex() const { return indexBuffer_.GetSrvIndex(); }
+
 		// blasを取得
 		BLAS* GetBLAS() const { return blas_.get(); }
-
-		// ヒットグループ
-		void SetHitGroupIndex(const uint32_t& index) { hitGroupIndex_ = index; };
-		const uint32_t& GetHitGroupIndex() const { return hitGroupIndex_; }
 
 	private:
 		VertexBuffer<VertexData> vertexBuffer_;
@@ -75,9 +75,6 @@ namespace GameEngine {
 
 		// blas
 		std::unique_ptr<BLAS> blas_;
-
-		// モデルが持つHitGroupの位置。この値は登録順によって可変する
-		uint32_t hitGroupIndex_ = 0;
 
 		std::string materialName_ = "default";
 	};
