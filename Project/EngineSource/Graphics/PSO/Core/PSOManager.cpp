@@ -579,9 +579,9 @@ void PSOManager::DeaultLoadPostEffectPSO() {
     defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/RadialBlur/RadialBlur.PS.hlsl";
     RegisterPSO("RadialBlur", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 
-    // グレースケールを作成
-    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/Grayscale/Grayscale.PS.hlsl";
-    RegisterPSO("Grayscale", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
+    // ぼかしを作成
+    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/Smoothing/BoxFilter5x5.PS.hlsl";
+    RegisterPSO("BoxFilter5x5", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 
     // ラスタライズとレイトレの描画を合成する
     defaultPostEffect.rootSigName = "LightingComposite";

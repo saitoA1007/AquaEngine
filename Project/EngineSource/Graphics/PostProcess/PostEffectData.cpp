@@ -6,7 +6,6 @@ Vignetting::Vignetting() {
     buffer_.Create();
     buffer_.GetData()->intensity = 16.0f;
     buffer_.GetData()->time = 0.15f;
-    isActive_ = true;
 }
 
 void Vignetting::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
@@ -47,10 +46,21 @@ void ScanLine::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManag
 Grayscale::Grayscale() {
     // 作成
     buffer_.Create();
-    //isActive_ = true;
 }
 
 void Grayscale::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
+    commandList->SetGraphicsRootDescriptorTable(0, srvManager->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+    commandList->SetGraphicsRootConstantBufferView(1, buffer_.GetGpuVirtualAddress());
+    commandList->DrawInstanced(3, 1, 0, 0);
+}
+
+BoxFilter5x5::BoxFilter5x5() {
+    // 作成
+    buffer_.Create();
+    isActive_ = true;
+}
+
+void BoxFilter5x5::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
     commandList->SetGraphicsRootDescriptorTable(0, srvManager->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
     commandList->SetGraphicsRootConstantBufferView(1, buffer_.GetGpuVirtualAddress());
     commandList->DrawInstanced(3, 1, 0, 0);

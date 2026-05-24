@@ -100,5 +100,24 @@ namespace GameEngine {
     private:
         ConstantBuffer<GrayscaleData> buffer_;
     };
+
+    class BoxFilter5x5 : public IPostEffect {
+        struct BoxFilter5x5Data {
+            uint32_t textureHandle;
+            float padding[3];
+        };
+
+    public:
+        BoxFilter5x5();
+
+        void Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) override;
+
+        void SetPassIndex(const uint32_t& index) override {
+            buffer_.GetData()->textureHandle = index;
+        }
+
+    private:
+        ConstantBuffer<BoxFilter5x5Data> buffer_;
+    };
 }
 
