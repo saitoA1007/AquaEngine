@@ -125,7 +125,7 @@ void ModelRenderer::DrawInstancing(const Model* model, const uint32_t& numInstan
 	}
 }
 
-void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTransform, const GpuResource* material) {
+void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTransform, GpuResource* lightGroupResource, const GpuResource* material) {
 	
 	// メッシュを取得
 	const std::vector<std::unique_ptr<Mesh>>& meshes = model->GetMeshes();
@@ -155,6 +155,10 @@ void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTrans
 
 		commandList_->SetGraphicsRootDescriptorTable(3, skeleton->GetSkinClusterData()->wellBuffer.GetSrvHandleGPU());
 		commandList_->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
+
+		commandList_->SetGraphicsRootConstantBufferView(5, lightGroupResource->GetGpuVirtualAddress());
+		commandList_->SetGraphicsRootDescriptorTable(6, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+		commandList_->SetGraphicsRootDescriptorTable(7, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 
 		if (meshes[i]->GetTotalIndices() != 0) {
 			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), 1, 0, 0, 0);

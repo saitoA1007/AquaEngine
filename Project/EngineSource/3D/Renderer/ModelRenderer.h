@@ -74,7 +74,7 @@ namespace GameEngine {
 		/// <param name="worldTransform"></param>
 		/// <param name="VPMatrix"></param>
 		/// <param name="material"></param>
-		static void DrawAnimation(const Model* model, WorldTransform& worldTransform, const GpuResource* material = nullptr);
+		static void DrawAnimation(const Model* model, WorldTransform& worldTransform, GpuResource* lightGroupResource,const GpuResource* material = nullptr);
 
 		/// <summary>
 		/// モデルに光源を適応させる

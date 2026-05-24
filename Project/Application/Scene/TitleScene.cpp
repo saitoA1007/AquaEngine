@@ -1,6 +1,5 @@
 #include "TitleScene.h"
 #include "ImguiManager.h"
-#include "GameParamEditor.h"
 using namespace GameEngine;
 
 TitleScene::~TitleScene() {
@@ -13,16 +12,16 @@ TitleScene::TitleScene() {
 	mainCamera_->Update();
 
 	// プレイヤーモデルを生成
-	model_ = modelManager_->GetNameByModel("Walk");
+	model_ = modelManager_->GetNameByModel("AnimatedCube");
 	model_->SetDefaultIsEnableLight(true);
 	model_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
-	world_.Initialize({ {2.0f,2.0f,2.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
+	world_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 
-	// 歩くアニメーションデータを取得する
-	walkAnimationData_ = animationManager_->GetNameByAnimations("Walk");
-	// 歩くアニメーションの再生を管理する
-	walkAnimator_ = std::make_unique<Animator>();
-	walkAnimator_->Initialize(model_, &walkAnimationData_["Armature|mixamo.com|Layer0"]);
+	// アニメーションデータを取得する
+	cubeAnimationData_ = animationManager_->GetNameByAnimations("AnimatedCube");
+	// アニメーションの再生を管理する
+	cubeAnimator_ = std::make_unique<Animator>();
+	cubeAnimator_->Initialize(model_, &cubeAnimationData_["animation_AnimatedCube"]);
 
 	// 地面
 	model1_ = modelManager_->GetNameByModel("Terrain");
@@ -65,7 +64,7 @@ void TitleScene::Update() {
 	primitiveEffect_.Update(mainCamera_->GetWorldMatrix());
 
 	// アニメーションの更新処理
-	walkAnimator_->ComputeUpdate();
+	cubeAnimator_->Update();
 }
 
 void TitleScene::DebugUpdate() {
@@ -112,7 +111,7 @@ void TitleScene::Draw() {
 	renderQueue_->SetCamera(mainCamera_.get());
 
 	// テストモデルを描画
-	//renderQueue_->SubmitRaytracingModel(model_, world_);
+	renderQueue_->SubmitAnimation(model_, world_);
 	renderQueue_->SubmitRaytracingModel(model1_, world1_);
 	renderQueue_->SubmitRaytracingModel(model2_, world2_);
 	renderQueue_->SubmitModel(model2_, world3_);

@@ -87,8 +87,13 @@ void RenderQueue::SubmitInstancing(const Model* model, uint32_t numInstances, Wo
 
 void RenderQueue::SubmitAnimation(const Model* model, WorldTransform& worldTransform, const float& alpha, const GpuResource* material, const std::string& passName) {
     Draw3dRequest request;
-    request.type = Draw3dType::Animation;
-    request.layer = RenderLayer::Animation;
+    if (model->IsSkeleton()) {
+        request.type = Draw3dType::Animation;
+        request.layer = RenderLayer::Animation;
+    } else {
+        request.type = Draw3dType::Default;
+        request.layer = RenderLayer::Opaque;
+    }
     request.passName = passName;
     request.model = model;
     request.worldTransform = &worldTransform;

@@ -95,7 +95,7 @@ std::unique_ptr<Model> ModelLoader::CreateModel(const std::string& objFilename, 
 	}
 
 	// Meshを元にBLASを作成する。アニメーションがあればBLASを更新用に作成
-	model->AddBLAS(cmdList_, modelData.isAnimation_);
+	model->AddBLAS(cmdList_, modelData.isSkeleton);
 
 	// マテリアルを作成
 	for (uint32_t index = 0; index < modelData.materials.size(); ++index) {
@@ -114,10 +114,10 @@ std::unique_ptr<Model> ModelLoader::CreateModel(const std::string& objFilename, 
 	}
 
 	// 外部からモデルをロードした時に必要な情報を取得
-	model->SetLoadModelData(modelData.rootNode.name, modelData.rootNode.localMatrix);
+	model->SetLoadModelData(modelData.rootNode.name, modelData.rootNode.localMatrix, modelData.rootNode);
 
 	// ボーンのデータが存在している場合、読み込む
-	if (modelData.isAnimation_) {
+	if (modelData.isSkeleton) {
 		LogManager::GetInstance().Log(objFilename + " : Load animationData");
 		// ボーン情報を取得する
 		SkeletonData skeletonBone = CreateSkeleton(modelData.rootNode);
@@ -286,6 +286,7 @@ ModelData ModelLoader::LoadModelFile(const std::string& directoryPath, const std
 
 	// アニメーションデータの確認をする
 	modelData.isAnimation_ = (scene->mNumAnimations != 0) ? true : false;
+	uint32_t isSkeleton = false;
 
 	// Material解析
 	for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {
@@ -402,10 +403,12 @@ ModelData ModelLoader::LoadModelFile(const std::string& directoryPath, const std
 			}
 		}
 
+		// スケルトンを取得
 		for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) {
 			aiBone* bone = mesh->mBones[boneIndex];
 			std::string jointName = bone->mName.C_Str();
 			JointWeightData& jointWeightData = modelData.skinClusterData[jointName];
+			isSkeleton = true;
 
 			aiMatrix4x4 bindPoseMatrixAssimp = bone->mOffsetMatrix.Inverse();
 			aiVector3D scale, translate;
@@ -424,6 +427,8 @@ ModelData ModelLoader::LoadModelFile(const std::string& directoryPath, const std
 
 	// シーン全体の階層構造を作る
 	modelData.rootNode = ReadNode(scene->mRootNode);
+	// ボーンデータを確認
+	modelData.isSkeleton = isSkeleton;
 
 	return modelData;
 }
