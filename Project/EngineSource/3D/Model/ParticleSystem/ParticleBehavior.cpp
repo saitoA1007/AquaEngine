@@ -24,21 +24,41 @@ void ParticleBehavior::Initialize(const std::string& name,uint32_t maxNum, uint3
         particle.lifeTime = 0.0f;
     }
 
-#ifdef _DEBUG
-    // パラメータを登録する
-    RegisterBebugParam();
-#endif
-    // 保存したデータを取得する
-    ApplyDebugParam();
+    // パラメータ機能
+    debugParame_ = std::make_unique<DebugParameter>(name);
+    // 登録
+    int index = 0;
+    std::string subGroup = "Emitter";
+    debugParame_->Register("SpawnMaxCount", particleEmitter_.spawnMaxCount, index++, subGroup);
+    debugParame_->Register("SpawnCoolTime", particleEmitter_.spawnCoolTime, index++, subGroup);
+    debugParame_->Register("IsLoop", particleEmitter_.isLoop, index++, subGroup);
+    debugParame_->Register("IsBillBoard", particleEmitter_.isBillBoard, index++, subGroup);
+    subGroup = "Particle";
+    index = 0;
+    debugParame_->Register("LifeTime", particleEmitter_.lifeTime, index++, subGroup);
+    debugParame_->Register("FieldAcceleration", particleEmitter_.fieldAcceleration, index++, subGroup);
+    debugParame_->Register("VelocityRange", particleEmitter_.velocityRange, index++, subGroup);
+    debugParame_->Register("SpawnRange", particleEmitter_.posRange, index++, subGroup);
+    debugParame_->Register("ScaleRange", particleEmitter_.scaleRange, index++, subGroup);
+    debugParame_->Register("ColorRange", particleEmitter_.colorRange, index++, subGroup);
+
+    // 出現範囲を抑える
+    if (maxNumInstance_ <= particleEmitter_.spawnMaxCount) {
+        particleEmitter_.spawnMaxCount = maxNumInstance_;
+    }
+
+    // 値の適応
+    debugParame_->Apply();
 }
 
 void ParticleBehavior::Update(const Matrix4x4& cameraMatrix) {
+    // 値の適応
+    debugParame_->ApplyIfDirty();
 
-#ifdef _DEBUG
-    // デバック結果を適応する
-    ApplyDebugParam();
-#endif
-
+    // 出現範囲を抑える
+    if (maxNumInstance_ <= particleEmitter_.spawnMaxCount) {
+        particleEmitter_.spawnMaxCount = maxNumInstance_;
+    }
 
     // パーティクルの発生を管理する
     if (particleEmitter_.isLoop) {
@@ -144,37 +164,5 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
     // 行列の更新処理
     if (!particleEmitter_.isBillBoard) {
         worldTransforms_->UpdateTransformMatrix(currentNumInstance_);
-    }
-}
-
-void ParticleBehavior::RegisterBebugParam() {
-    //int index = 0;
-    //GameParamEditor::GetInstance()->AddItem(name_, "SpawnMaxCount", particleEmitter_.spawnMaxCount, index++);
-    //GameParamEditor::GetInstance()->AddItem(name_, "SpawnCoolTime", particleEmitter_.spawnCoolTime, index++);
-    //GameParamEditor::GetInstance()->AddItem(name_, "IsLoop", particleEmitter_.isLoop, index++);
-    //GameParamEditor::GetInstance()->AddItem(name_, "IsBillBoard", particleEmitter_.isBillBoard, index++);
-    //GameParamEditor::GetInstance()->AddItem(name_, "LifeTime", particleEmitter_.lifeTime, index++);
-    //GameParamEditor::GetInstance()->AddItem(name_, "FieldAcceleration", particleEmitter_.fieldAcceleration, index++);
-    //GameParamEditor::GetInstance()->AddItem(name_, "VelocityRange", particleEmitter_.velocityRange, index++);
-    //GameParamEditor::GetInstance()->AddItem(name_, "SpawnRange", particleEmitter_.posRange, index++);
-    //GameParamEditor::GetInstance()->AddItem(name_, "ScaleRange", particleEmitter_.scaleRange, index++);
-    //GameParamEditor::GetInstance()->AddItem(name_, "ColorRange", particleEmitter_.colorRange, index++);
-}
-
-void ParticleBehavior::ApplyDebugParam() {
-    //particleEmitter_.spawnMaxCount = GameParamEditor::GetInstance()->GetValue<uint32_t>(name_, "SpawnMaxCount");
-    //particleEmitter_.spawnCoolTime = GameParamEditor::GetInstance()->GetValue<float>(name_, "SpawnCoolTime");
-    //particleEmitter_.isLoop = GameParamEditor::GetInstance()->GetValue<bool>(name_, "IsLoop");
-    //particleEmitter_.isBillBoard = GameParamEditor::GetInstance()->GetValue<bool>(name_, "IsBillBoard");
-    //particleEmitter_.lifeTime = GameParamEditor::GetInstance()->GetValue<float>(name_, "LifeTime");
-    //particleEmitter_.fieldAcceleration = GameParamEditor::GetInstance()->GetValue<Vector3>(name_, "FieldAcceleration");
-    //particleEmitter_.velocityRange = GameParamEditor::GetInstance()->GetValue<Range3>(name_, "VelocityRange");
-    //particleEmitter_.posRange = GameParamEditor::GetInstance()->GetValue<Range3>(name_, "SpawnRange");
-    //particleEmitter_.scaleRange = GameParamEditor::GetInstance()->GetValue<Range3>(name_, "ScaleRange");
-    //particleEmitter_.colorRange = GameParamEditor::GetInstance()->GetValue<Range4>(name_, "ColorRange");
-
-    // 出現範囲を抑える
-    if (maxNumInstance_ <= particleEmitter_.spawnMaxCount) {
-        particleEmitter_.spawnMaxCount = maxNumInstance_;
     }
 }

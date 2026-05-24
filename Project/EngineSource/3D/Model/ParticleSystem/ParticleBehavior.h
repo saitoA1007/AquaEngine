@@ -1,8 +1,9 @@
 #pragma once
-#include"ParticleData.h"
+#include <vector>
+#include "ParticleData.h"
 #include "Matrix4x4.h"
 #include "WorldTransforms.h"
-#include <vector>
+#include "DebugParameter.h"
 
 namespace GameEngine{
 
@@ -65,6 +66,9 @@ namespace GameEngine{
 		void SetParticleEmitter(const ParticelEmitter& particelEmitter) { particleEmitter_ = particelEmitter; }
 
 	private:
+		// パラメータ機能
+		std::unique_ptr<DebugParameter> debugParame_;
+
 		// パーティクルの配列
 		std::vector<ParticleData> particles_;           
 		// 描画用のトランスフォーム
@@ -105,16 +109,6 @@ namespace GameEngine{
 		/// 移動処理
 		/// </summary>
 		void Move(const Matrix4x4& cameraMatrix);
-
-		/// <summary>
-		/// デバックした値を登録
-		/// </summary>
-		void RegisterBebugParam();
-
-		/// <summary>
-		/// デバックした値を取得
-		/// </summary>
-		void ApplyDebugParam();
 	};
 }
 
