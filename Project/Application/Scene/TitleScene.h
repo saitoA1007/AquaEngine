@@ -6,6 +6,7 @@
 #include "Model.h"
 #include "WorldTransform.h"
 #include "Animator.h"
+#include "ParticleSystem/ParticleBehavior.h"
 
 #include "Application/Scene/Transition/Fade.h"
 
@@ -60,6 +61,10 @@ private: // シーン機能
 
 	// メインカメラ
 	std::unique_ptr<GameEngine::Camera> mainCamera_;
+
+	// プリミティブのエフェクト
+	GameEngine::ParticleBehavior primitiveEffect_;
+	GameEngine::Model* effectModel_ = nullptr;
 
 	GameEngine::Model* model_;
 	GameEngine::WorldTransform world_;

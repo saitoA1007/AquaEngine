@@ -45,6 +45,11 @@ TitleScene::TitleScene() {
 	// 背景画像を設定rostock_laage_airport_4k
 	uint32_t skyboxGH = textureManager_->GetHandleByName("grasslands_sunset_1k.dds");
 	renderQueue_->SetSkyboxTexture(skyboxGH);
+
+	uint32_t effectGH = textureManager_->GetHandleByName("circle.png");
+	primitiveEffect_.Initialize("PrimitiveEffect",16, effectGH);
+	// エフェクト用モデル
+	effectModel_ = modelManager_->GetNameByModel("Plane");
 }
 
 void TitleScene::Initialize() {
@@ -55,6 +60,9 @@ void TitleScene::Update() {
 
 	// カメラの更新処理
 	mainCamera_->Update();
+
+	// エフェクトを更新
+	primitiveEffect_.Update(mainCamera_->GetWorldMatrix());
 
 	// アニメーションの更新処理
 	walkAnimator_->ComputeUpdate();
@@ -104,8 +112,11 @@ void TitleScene::Draw() {
 	renderQueue_->SetCamera(mainCamera_.get());
 
 	// テストモデルを描画
-	renderQueue_->SubmitRaytracingModel(model_, world_);
+	//renderQueue_->SubmitRaytracingModel(model_, world_);
 	renderQueue_->SubmitRaytracingModel(model1_, world1_);
 	renderQueue_->SubmitRaytracingModel(model2_, world2_);
 	renderQueue_->SubmitModel(model2_, world3_);
+
+	// エフェクトを描画
+	//renderQueue_->SubmitInstancing(effectModel_, primitiveEffect_.GetCurrentNumInstance(), *primitiveEffect_.GetWorldTransforms(),0.0f);
 }
