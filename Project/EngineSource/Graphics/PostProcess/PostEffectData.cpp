@@ -6,6 +6,7 @@ Vignetting::Vignetting() {
     buffer_.Create();
     buffer_.GetData()->intensity = 16.0f;
     buffer_.GetData()->time = 0.15f;
+    isActive_ = true;
 }
 
 void Vignetting::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
