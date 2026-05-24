@@ -140,7 +140,7 @@ void SceneRenderManager::Execute3dRequest(const Draw3dRequest& request) {
         break;
 
     case Draw3dType::Animation:
-        ModelRenderer::DrawAnimation(request.model, *request.worldTransform, request.material);
+        ModelRenderer::DrawAnimation(request.model, *request.worldTransform, renderQueue_->GetLightResource(), request.material);
         break;
 
     case Draw3dType::Skybox:

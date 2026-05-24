@@ -33,10 +33,11 @@ namespace GameEngine {
 		}
 
 		// 外部読み込み用のデータを設定
-		void SetLoadModelData(const std::string& modelName, const Matrix4x4& localMatrix) {
+		void SetLoadModelData(const std::string& modelName, const Matrix4x4& localMatrix,const Node& node) {
 			isLoad_ = true;
 			modelName_ = modelName;
 			localMatrix_ = localMatrix;
+			node_ = node;
 		}
 
 		// ボーンデータを追加
@@ -162,7 +163,10 @@ namespace GameEngine {
 		Material* GetMaterial(const std::string& name) const;
 
 		// ローカル行列
-		Matrix4x4 GetLocalMatrix() const {return localMatrix_;}
+		Matrix4x4 GetLocalMatrix() const {return node_.localMatrix;}
+
+		// ノードを取得
+		Node& GetNodes() { return node_; }
 
 		// ロードしているか
 		const bool IsLoad() const { return isLoad_; }
@@ -194,6 +198,7 @@ namespace GameEngine {
 
 		// Nodeのローカル行列を保持しておく変数
 		Matrix4x4 localMatrix_;
+		Node node_;
 		// 外部からロードされたか
 		bool isLoad_ = false;
 		bool isSkeleton_ = false;

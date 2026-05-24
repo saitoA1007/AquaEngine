@@ -56,6 +56,7 @@ struct ModelData {
 	Node rootNode;
 	std::map<std::string, JointWeightData> skinClusterData;
 	bool isAnimation_ = false;
+	bool isSkeleton = false;
 };
 
 struct GridVertexData {

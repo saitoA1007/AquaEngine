@@ -42,6 +42,8 @@ void ResourceSubsystem::LoadAllResources() {
 	// アニメーションデータをロード
 	animationManager_->RegisterAnimation("Walk", "walk.gltf");
 
+	animationManager_->RegisterAnimation("AnimatedCube", "AnimatedCube.gltf");
+
 	// 音声データを全てロードする
 	AudioManager::GetInstance().LoadAllAudio();
 }

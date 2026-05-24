@@ -40,14 +40,25 @@ void Animator::Update() {
 }
 
 void Animator::Update(const float& time) {
-	// アニメーションの更新をおこない、骨ごとのLocal情報を更新する
-	ApplyAnimation(*skeleton_, *animationData_, time);
 
-	// 現在の骨ごとのLocal情報を基にSkeletonSpaceの情報を更新する
-	SkeletonUpdate(*skeleton_);
+	if (model_->IsSkeleton()) {
+		// アニメーションの更新をおこない、骨ごとのLocal情報を更新する
+		ApplyAnimation(*skeleton_, *animationData_, time);
 
-	// SkeletonSpaceの情報を基に、SkinClusterのMatrixPaletteを更新する
-	SkinClusterUpdate(*skinCluster_, *skeleton_);
+		// 現在の骨ごとのLocal情報を基にSkeletonSpaceの情報を更新する
+		SkeletonUpdate(*skeleton_);
+
+		// SkeletonSpaceの情報を基に、SkinClusterのMatrixPaletteを更新する
+		SkinClusterUpdate(*skinCluster_, *skeleton_);
+	} else {
+		Node& rootNode = model_->GetNodes();
+
+		// 全ノードにアニメーション値をサンプリング
+		ApplyNodeAnimation(rootNode, *animationData_, time);
+
+		// ノードを更新
+		NodeHierarchyUpdate(model_);
+	}
 }
 
 void Animator::ComputeUpdate() {
@@ -59,22 +70,13 @@ void Animator::ComputeUpdate() {
 		timer_ = (std::min)(timer_, animationData_->duration);
 	}
 
-	// アニメーションの更新処理
-	Update(timer_);
-
-	// コンピュートシェーダーで頂点を更新
-	UpdateCompute();
+	// コンピュートシェーダーを使用したアニメーションの更新
+	ComputeUpdate(timer_);
 }
 
 void Animator::ComputeUpdate(const float& time) {
-	// アニメーションの更新をおこない、骨ごとのLocal情報を更新する
-	ApplyAnimation(*skeleton_, *animationData_, time);
-
-	// 現在の骨ごとのLocal情報を基にSkeletonSpaceの情報を更新する
-	SkeletonUpdate(*skeleton_);
-
-	// SkeletonSpaceの情報を基に、SkinClusterのMatrixPaletteを更新する
-	SkinClusterUpdate(*skinCluster_, *skeleton_);
+	// アニメーションの更新処理
+	Update(time);
 
 	// コンピュートシェーダーで頂点を更新
 	UpdateCompute();
@@ -126,6 +128,35 @@ Quaternion Animator::CalculateValue(const std::vector<KeyframeQuaternion>& keyfr
 	return (*keyframes.rbegin()).value;
 }
 
+void Animator::ApplyNodeAnimation(Node& node, const AnimationData& animation, float animationTime) {
+	
+	if (auto it = animation.nodeAnimations.find(node.name); it != animation.nodeAnimations.end()) {
+		const NodeAnimation& rootNodeAnimation = (*it).second;
+		// ノードのトランスフォームを更新
+		node.transform.translate = CalculateValue(rootNodeAnimation.translate, animationTime);
+		node.transform.rotate = CalculateValue(rootNodeAnimation.rotate, animationTime);
+		node.transform.scale = CalculateValue(rootNodeAnimation.scale, animationTime);
+	}
+
+	// 子ノードも更新
+	for (auto& child : node.children) {
+		ApplyNodeAnimation(child, animation, animationTime);
+	}
+}
+
+void Animator::NodeHierarchyUpdate(Model* model) {
+	auto& node = model->GetNodes();
+
+	Matrix4x4 local = Math::MakeAffineMatrix(node.transform.scale, node.transform.rotate, node.transform.translate);
+
+	for (auto& child : node.children) {
+		local *= Math::MakeAffineMatrix(child.transform.scale, child.transform.rotate, child.transform.translate);
+	}
+
+	// アフィニティ行列の作成
+	node.localMatrix = local;
+}
+
 void Animator::ApplyAnimation(SkeletonData& skeleton, const AnimationData& animation, float animationTime) {
 	for (Joint& joint : skeleton.joints) {
 		// 対象のJointのAnimationがあれば、値の適応を行う。
@@ -159,13 +190,14 @@ void Animator::SkinClusterUpdate(SkinCluster& skinCluster, const SkeletonData& s
 }
 
 void Animator::SetModelData(Model* model) {
+	model_ = model;
 	if (model->IsSkeleton()) {
-		model_ = model;
 		auto* skeleton = model->GetSkeleton();
 		skinCluster_ = skeleton->GetSkinCluster();
 		skeleton_ = skeleton->GetSkeletonData();
 	} else {
-		assert(false && "Not found Model Bone");
+		skinCluster_ = nullptr;
+		skeleton_ = nullptr;
 	}
 }
 

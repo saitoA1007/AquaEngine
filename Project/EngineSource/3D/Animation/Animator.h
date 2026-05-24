@@ -111,6 +111,20 @@ namespace GameEngine {
 		static Quaternion CalculateValue(const std::vector<KeyframeQuaternion>& keyframes, float time);
 
 		/// <summary>
+		/// ノードに対してアニメーションを適応する
+		/// </summary>
+		/// <param name="model"></param>
+		/// <param name="animation"></param>
+		/// <param name="animationTime"></param>
+		void ApplyNodeAnimation(Node& node, const AnimationData& animation, float animationTime);
+
+		/// <summary>
+		/// ノードを更新
+		/// </summary>
+		/// <param name="model"></param>
+		void NodeHierarchyUpdate(Model* model);
+
+		/// <summary>
 		/// skeletonに対してアニメーションを適応する
 		/// </summary>
 		/// <param name="skeleton"></param>
