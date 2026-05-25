@@ -57,7 +57,6 @@ void Grayscale::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvMana
 BoxFilter5x5::BoxFilter5x5() {
     // 作成
     buffer_.Create();
-    isActive_ = true;
 }
 
 void BoxFilter5x5::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {

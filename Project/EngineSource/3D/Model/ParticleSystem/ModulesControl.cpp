@@ -1,0 +1,56 @@
+#include"ModulesControl.h"
+using namespace GameEngine;
+
+ModulesControl::ModulesControl(DebugParameter* param) {
+    param_ = param;
+
+    std::string mainGroup = "Emitter";
+
+    // モジュールを登録
+    RegisterModule<VelocityEmitModule>(mainGroup, "VelocityEmit");
+    RegisterModule<RotateEmitModule>(mainGroup, "RotateEmit");
+    RegisterModule<ScaleEmitModule>(mainGroup, "ScaleEmit");
+
+    mainGroup = "Particle";
+    RegisterModule<VelocityOverLifeTimeModule>(mainGroup, "VelocityOverLifeTime");
+    RegisterModule<SizeOverLifeTimeModule>(mainGroup, "SizeOverLifeTime");
+    RegisterModule<AlphaOverLifeTimeModule>(mainGroup, "AlphaOverLifeTime");
+}
+
+void ModulesControl::Update() {
+
+    // モジュール管理
+    for (auto& [name, moduleData] : enableModules_) {
+
+        if (moduleData.isActive) {
+            if (moduleData.isCreated) { continue; }
+
+            // モジュールを作成する
+            modules_[name] = moduleData.maker();
+            modules_[name]->SetGroupName(moduleData.mainGroupName,name);
+            modules_[name]->Register(param_);
+            moduleData.isCreated = true;
+        } else {
+            if (!moduleData.isCreated) { continue; }
+
+            // モジュールの登録を解除する
+            modules_[name]->Remove(param_);
+            modules_.erase(name);
+            moduleData.isCreated = false;
+        }
+    }
+}
+
+void ModulesControl::ParticleCreate(ParticleData& particleData) {
+    // パーティクルを作成
+    for (auto& [name, module] : modules_) {
+        module->Create(particleData);
+    }
+}
+
+void ModulesControl::ParticleUpdate(ParticleData& particleData, float time) {
+    // パーティクルを更新
+    for (auto& [name, module] : modules_) {
+        module->Update(particleData, time);
+    }
+}

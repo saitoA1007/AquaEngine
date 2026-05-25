@@ -3,12 +3,15 @@
 #include "ParticleData.h"
 #include "Matrix4x4.h"
 #include "WorldTransforms.h"
+#include "ParticleModules.h"
 #include "DebugParameter.h"
+#include "ModulesControl.h"
 
 namespace GameEngine{
 
 	class ParticleBehavior {
 	public:
+		ParticleBehavior(const std::string& name, uint32_t maxNum, uint32_t textureHandle);
 
 		/// <summary>
 		/// 初期化
@@ -16,7 +19,7 @@ namespace GameEngine{
 		/// <param name="maxNum"></param>
 		/// <param name="textureHandle"></param>
 		/// <param name="particleEmitter"></param>
-		void Initialize(const std::string& name,uint32_t maxNum, uint32_t textureHandle);
+		void Initialize();
 
 		/// <summary>
 		/// 更新処理
@@ -59,38 +62,43 @@ namespace GameEngine{
 		/// <param name="pos"></param>
 		void SetEmitterPos(const Vector3& pos) { emitterPos_ = pos; }
 
-		/// <summary>
-		/// パーティクルのパラメータを設定
-		/// </summary>
-		/// <param name="particelEmitter"></param>
-		void SetParticleEmitter(const ParticelEmitter& particelEmitter) { particleEmitter_ = particelEmitter; }
-
 	private:
 		// パラメータ機能
 		std::unique_ptr<DebugParameter> debugParame_;
 
+		// 描画用のトランスフォーム
+		std::unique_ptr<WorldTransforms> worldTransforms_;
+
+		// モジュールの管理
+		std::unique_ptr<ModulesControl> modulesControl_;
+
+		// 使用テクスチャ
+		uint32_t textureHandle_ = 0;
+
+
 		// パーティクルの配列
 		std::vector<ParticleData> particles_;           
-		// 描画用のトランスフォーム
-		std::unique_ptr<WorldTransforms> worldTransforms_;  
+		uint32_t activeCount_ = 0;
 		// 最大パーティクル数
 		uint32_t maxNumInstance_ = 0;                 
 		// 現在のパーティクルの数
 		uint32_t currentNumInstance_ = 0;
 
-		uint32_t textureHandle_ = 0;
-
 		// 発生位置
 		Vector3 emitterPos_ = { 0.0f,0.0f,0.0f };
 
-		// パーティクルのデータ
-		ParticelEmitter particleEmitter_;
+		bool isPlay_ = false;
+		bool isStop_ = false;
+		float playTimer_ = 0.0f;
 
 		// 発生する時間
 		float spawnTimer_ = 0.0f;
 
 		// パーティクルの名前
 		std::string name_;
+
+		// メインモジュール
+		MainModule main_;
 
 	private:
 

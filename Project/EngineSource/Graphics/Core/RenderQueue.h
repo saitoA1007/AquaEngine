@@ -12,6 +12,8 @@
 #include "DirectionalLight.h"
 #include "TLAS.h"
 
+#include "PSO/Core/BlendMode.h"
+
 namespace GameEngine {
 
     /// <summary>
@@ -71,7 +73,7 @@ namespace GameEngine {
         void SubmitModel(const Model* model,WorldTransform& worldTransform,const float& alpha = 1.0f, const GpuResource* material = nullptr, const std::string& passName = "DefaultPass");
 
         /// インスタンシング描画
-        void SubmitInstancing(const Model* model,uint32_t numInstances, WorldTransforms& worldTransforms, const float& alpha = 1.0f, const GpuResource* material = nullptr, const std::string& passName = "DefaultPass");
+        void SubmitInstancing(const Model* model,uint32_t numInstances, WorldTransforms& worldTransforms, const float& alpha = 1.0f, BlendMode blendMode = BlendMode::kBlendModeNormal, const GpuResource* material = nullptr, const std::string& passName = "DefaultPass");
 
         /// スケルタルアニメーション
         void SubmitAnimation(const Model* model, WorldTransform& worldTransform, const float& alpha = 1.0f, const GpuResource* material = nullptr, const std::string& passName = "DefaultPass");

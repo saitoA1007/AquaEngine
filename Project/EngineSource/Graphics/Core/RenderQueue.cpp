@@ -66,10 +66,26 @@ void RenderQueue::SubmitModel(const Model* model, WorldTransform& worldTransform
     }
 }
 
-void RenderQueue::SubmitInstancing(const Model* model, uint32_t numInstances, WorldTransforms& worldTransforms, const float& alpha, const GpuResource* material, const std::string& passName) {
+void RenderQueue::SubmitInstancing(const Model* model, uint32_t numInstances, WorldTransforms& worldTransforms, const float& alpha, BlendMode blendMode, const GpuResource* material, const std::string& passName) {
     Draw3dRequest request;
-    request.type = Draw3dType::Instancing;
     request.layer = RenderLayer::Opaque;
+    // ブレンド設定
+    switch (blendMode)
+    {
+    case GameEngine::kBlendModeNormal:
+    default:
+        request.type = Draw3dType::Instancing;
+        break;
+
+    case GameEngine::kBlendModeNone:
+    case GameEngine::kBlendModeAdd:
+    case GameEngine::kBlendModeSubtract:
+    case GameEngine::kBlendModeMultily:
+    case GameEngine::kBlendModeScreen:
+        request.type = Draw3dType::InstancingAdd;
+        break;
+    }
+
     request.passName = passName;
     request.model = model;
     request.numInstances = numInstances;
