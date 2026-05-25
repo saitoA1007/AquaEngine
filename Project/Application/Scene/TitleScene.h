@@ -63,7 +63,7 @@ private: // シーン機能
 	std::unique_ptr<GameEngine::Camera> mainCamera_;
 
 	// プリミティブのエフェクト
-	GameEngine::ParticleBehavior primitiveEffect_;
+	std::unique_ptr<GameEngine::ParticleBehavior> primitiveEffect_;
 	GameEngine::Model* effectModel_ = nullptr;
 
 	GameEngine::Model* model_;

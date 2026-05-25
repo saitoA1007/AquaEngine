@@ -46,7 +46,7 @@ TitleScene::TitleScene() {
 	renderQueue_->SetSkyboxTexture(skyboxGH);
 
 	uint32_t effectGH = textureManager_->GetHandleByName("circle.png");
-	primitiveEffect_.Initialize("PrimitiveEffect",16, effectGH);
+	primitiveEffect_ = std::make_unique<ParticleBehavior>("PrimitiveEffect", 16, effectGH);
 	// エフェクト用モデル
 	effectModel_ = modelManager_->GetNameByModel("Plane");
 }
@@ -61,7 +61,7 @@ void TitleScene::Update() {
 	mainCamera_->Update();
 
 	// エフェクトを更新
-	primitiveEffect_.Update(mainCamera_->GetWorldMatrix());
+	primitiveEffect_->Update(mainCamera_->GetWorldMatrix());
 
 	// アニメーションの更新処理
 	cubeAnimator_->Update();
@@ -111,11 +111,11 @@ void TitleScene::Draw() {
 	renderQueue_->SetCamera(mainCamera_.get());
 
 	// テストモデルを描画
-	renderQueue_->SubmitAnimation(model_, world_);
+	//renderQueue_->SubmitAnimation(model_, world_);
 	renderQueue_->SubmitRaytracingModel(model1_, world1_);
 	renderQueue_->SubmitRaytracingModel(model2_, world2_);
 	renderQueue_->SubmitModel(model2_, world3_);
 
 	// エフェクトを描画
-	//renderQueue_->SubmitInstancing(effectModel_, primitiveEffect_.GetCurrentNumInstance(), *primitiveEffect_.GetWorldTransforms(),0.0f);
+	renderQueue_->SubmitInstancing(effectModel_, primitiveEffect_->GetCurrentNumInstance(), *primitiveEffect_->GetWorldTransforms(),0.0f, BlendMode::kBlendModeNormal);
 }

@@ -90,14 +90,14 @@ namespace GameEngine {
 		/// <param name="key"></param>
 		/// <param name="value"></param>
 		template<typename T>
-		void AddItem(const std::string& path, const std::string& key, const T& value, int priority = INT_MAX) {
+		bool AddItem(const std::string& path, const std::string& key, const T& value, int priority = INT_MAX) {
 			// グループの参照を取得
 			Group& group = ResolveOrCreateGroup(path);
 
 			// すでに登録されていれば優先順位だけ更新
 			if (group.items.find(key) != group.items.end()) {
 				group.items[key].priority = priority;
-				return;
+				return false;
 			}
 
 			// ルートグループにシーン名を設定
@@ -113,6 +113,7 @@ namespace GameEngine {
 			newItem.priority = priority;
 			// 設定した項目をstd::mapに追加
 			group.items[key] = newItem;
+			return true;
 		}
 
 		/// <summary>
@@ -153,6 +154,15 @@ namespace GameEngine {
 			return std::get<T>(it->second.value);
 		}
 
+		// 指定したキーのアイテムポインタを取得する
+		Item* FindItemMutable(const std::string& path, const std::string& key) {
+			Group* group = FindGroupMutable(path);
+			if (!group) return nullptr;
+			auto it = group->items.find(key);
+			if (it == group->items.end()) return nullptr;
+			return &(it->second);
+		}
+
 		/// <summary>
 		/// 値が変更されたか確認する
 		/// </summary>
@@ -186,6 +196,55 @@ namespace GameEngine {
 			for (auto& [key, item] : group->items) {
 				item.isDirty = false;
 			}
+		}
+
+		// 登録した値を解除する
+		void RemoveItem(const std::string& path, const std::string& key) {
+			// 指定されたパスのグループを取得（なければ終了）
+			Group* group = FindGroupMutable(path);
+			if (!group) { return; }
+
+			// グループ内から該当するキーの項目を検索
+			auto it = group->items.find(key);
+			if (it != group->items.end()) {
+				// mapから削除
+				group->items.erase(it);
+			}
+		}
+
+		// 登録したグループを解除する
+		void RemoveGroup(const std::string& path) {
+			auto segments = SplitPath(path);
+			if (segments.empty()) { return; }
+
+			// ルートグループを削除する場合
+			if (segments.size() == 1) {
+				auto it = datas_.find(segments[0]);
+				if (it != datas_.end()) {
+					datas_.erase(it);
+					return;
+				}
+				return;
+			}
+
+			// サブグループを削除する場合、親グループまでたどる
+			auto it = datas_.find(segments[0]);
+			if (it == datas_.end()) { return; }
+
+			Group* current = &it->second;
+			for (size_t i = 1; i < segments.size() - 1; ++i) {
+				auto itChild = current->children.find(segments[i]);
+				if (itChild == current->children.end()) { return; }
+				current = &itChild->second;
+			}
+
+			// 末尾に指定されたグループ名を親のchildrenから削除する
+			auto itTarget = current->children.find(segments.back());
+			if (itTarget != current->children.end()) {
+				current->children.erase(itTarget);
+				return;
+			}
+			return;
 		}
 
 	private:

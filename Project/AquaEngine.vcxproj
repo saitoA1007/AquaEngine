@@ -181,6 +181,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\3D\Animation\AnimationManager.cpp" />
     <ClCompile Include="EngineSource\3D\Animation\Animator.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ModelComponent.cpp" />
+    <ClCompile Include="EngineSource\3D\Model\ParticleSystem\ModulesControl.cpp" />
     <ClCompile Include="EngineSource\3D\Model\Skeleton.cpp" />
     <ClCompile Include="EngineSource\3D\Renderer\DebugRenderer.cpp" />
     <ClCompile Include="EngineSource\3D\Material\Material.cpp" />
@@ -397,6 +398,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\3D\Animation\AnimationManager.h" />
     <ClInclude Include="EngineSource\3D\Animation\Animator.h" />
     <ClInclude Include="EngineSource\3D\Model\ModelComponent.h" />
+    <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ModulesControl.h" />
+    <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleModules.h" />
     <ClInclude Include="EngineSource\3D\Model\Skeleton.h" />
     <ClInclude Include="EngineSource\3D\Renderer\DebugRenderer.h" />
     <ClInclude Include="EngineSource\3D\Material\Material.h" />
