@@ -101,7 +101,7 @@ namespace GameEngine {
 		/// <summary>
 		/// postEffectで使用するPSOを作成
 		/// </summary>
-		void DeaultLoadPostEffectPSO();
+		void DefaultLoadPostEffectPSO();
 
 	public:
 
