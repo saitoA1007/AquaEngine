@@ -527,6 +527,8 @@
     <ClCompile Include="Application\Stage\Wall.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\SceneRenderManager.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ParticleSystem\ModulesControl.cpp" />
+    <ClCompile Include="EngineSource\Editor\ParticleParamEditor.cpp" />
+    <ClCompile Include="EngineSource\Editor\ParticleParamEntry.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1027,6 +1029,8 @@
     <ClInclude Include="EngineSource\Graphics\Buffers\RefBuffer.h" />
     <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleModules.h" />
     <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ModulesControl.h" />
+    <ClInclude Include="EngineSource\Editor\ParticleParamEditor.h" />
+    <ClInclude Include="EngineSource\Editor\ParticleParamEntry.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />
