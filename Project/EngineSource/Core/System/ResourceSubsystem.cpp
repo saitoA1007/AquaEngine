@@ -23,8 +23,6 @@ void ResourceSubsystem::Initialize() {
 
 	// パラメータファイルの読み込み
 	gameParamEditor_ = std::make_unique<GameParamEditor>();
-	// 全てのパラメータファイルを読み込み
-	gameParamEditor_->LoadFiles();
 	DebugParameter::StaticInitialize(gameParamEditor_.get());
 
 	// 全てのリソースをロードする
@@ -32,6 +30,10 @@ void ResourceSubsystem::Initialize() {
 }
 
 void ResourceSubsystem::LoadAllResources() {
+
+	// 全てのパラメータファイルを読み込み
+	gameParamEditor_->LoadFiles();
+
 	// 画像データを全てロードする
 	textureManager_->LoadAllTexture();
 

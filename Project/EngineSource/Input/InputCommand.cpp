@@ -45,7 +45,7 @@ void InputCommand::UnregisterCommand(const std::string& commandName) {
 	}	
 }
 
-bool InputCommand::IsCommandAcitve(const std::string& commandName) const {
+bool InputCommand::IsCommandActive(const std::string& commandName) const {
 	// 指定したコマンドが存在していれば、押されている状態を返す
 	auto command = inputCommandStates_.find(commandName);
 
