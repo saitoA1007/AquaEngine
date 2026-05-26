@@ -56,27 +56,24 @@ namespace GameEngine {
 		void Register(DebugParameter* param) override {
 			int index = 1;
 			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
-			param->Register("Min", minVelocity_, index++, subGroup + "/Velocity");
-			param->Register("Max", maxVelocity_, index++, subGroup + "/Velocity");
+			param->Register("RangeVelocity", velocityRange_, index++, subGroup);
 		}
 
 		void Remove(DebugParameter* param) override {
 			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
-			param->RemoveItem("Min", subGroup + "/Velocity");
-			param->RemoveItem("Max", subGroup + "/Velocity");
+			param->RemoveItem("RangeVelocity", subGroup);
 		}
 
 		void Create(ParticleData& particleData) override {
 			particleData.velocity = {
-				RandomGenerator::Get(minVelocity_.x, maxVelocity_.x),
-				RandomGenerator::Get(minVelocity_.y, maxVelocity_.y),
-				RandomGenerator::Get(minVelocity_.z, maxVelocity_.z),
+				RandomGenerator::Get(velocityRange_.min.x, velocityRange_.max.x),
+				RandomGenerator::Get(velocityRange_.min.y, velocityRange_.max.y),
+				RandomGenerator::Get(velocityRange_.min.z, velocityRange_.max.z),
 			};
 		}
 
 	private:
-		Vector3 minVelocity_;
-		Vector3 maxVelocity_;
+		Range3 velocityRange_;
 	};
 
 	// 回転の生成
@@ -87,27 +84,24 @@ namespace GameEngine {
 		void Register(DebugParameter* param) override {
 			int index = 1;
 			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
-			param->Register("Min", minRotate_, index++, subGroup + "/Rotate");
-			param->Register("Max", maxRotate_, index++, subGroup + "/Rotate");
+			param->Register("RangeRotate", rotateRange_, index++, subGroup);
 		}
 
 		void Remove(DebugParameter* param) override {
 			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
-			param->RemoveItem("Min", subGroup + "/Rotate");
-			param->RemoveItem("Max", subGroup + "/Rotate");
+			param->RemoveItem("RangeRotate", subGroup);
 		}
 
 		void Create(ParticleData& particleData) override {
 			particleData.transform.rotate = {
-				RandomGenerator::Get(minRotate_.x, maxRotate_.x),
-				RandomGenerator::Get(minRotate_.y, maxRotate_.y),
-				RandomGenerator::Get(minRotate_.z, maxRotate_.z),
+				RandomGenerator::Get(rotateRange_.min.x, rotateRange_.max.x),
+				RandomGenerator::Get(rotateRange_.min.y, rotateRange_.max.y),
+				RandomGenerator::Get(rotateRange_.min.z, rotateRange_.max.z),
 			};
 		}
 
 	private:
-		Vector3 minRotate_;
-		Vector3 maxRotate_;
+		Range3 rotateRange_;
 	};
 
 	// サイズの生成
@@ -118,27 +112,24 @@ namespace GameEngine {
 		void Register(DebugParameter* param) override {
 			int index = 1;
 			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
-			param->Register("Min", minScale_, index++, subGroup + "/Scale");
-			param->Register("Max", maxScale_, index++, subGroup + "/Scale");
+			param->Register("RangeScale", scaleRange_, index++, subGroup);
 		}
 
 		void Remove(DebugParameter* param) override {
 			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
-			param->RemoveItem("Min", subGroup + "/Scale");
-			param->RemoveItem("Max", subGroup + "/Scale");
+			param->RemoveItem("RangeScale", subGroup);
 		}
 
 		void Create(ParticleData& particleData) override {
 			particleData.transform.scale = {
-				RandomGenerator::Get(minScale_.x, maxScale_.x),
-				RandomGenerator::Get(minScale_.y, maxScale_.y),
-				RandomGenerator::Get(minScale_.z, maxScale_.z),
+				RandomGenerator::Get(scaleRange_.min.x, scaleRange_.max.x),
+				RandomGenerator::Get(scaleRange_.min.y, scaleRange_.max.y),
+				RandomGenerator::Get(scaleRange_.min.z, scaleRange_.max.z),
 			};
 		}
 		
 	private:
-		Vector3 minScale_;
-		Vector3 maxScale_;
+		Range3 scaleRange_;
 	};
 
 	struct ShapeModule {
