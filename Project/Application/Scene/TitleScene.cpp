@@ -78,9 +78,9 @@ void TitleScene::DebugUpdate() {
 	ImGui::DragFloat("P_metalic", &metalic_, 0.01f, 0.0f, 1.0f);
 	ImGui::DragFloat("grassMetalic", &metalic1_, 0.01f, 0.0f, 1.0f);
 	ImGui::DragFloat("CubeMetalic", &metalic2_, 0.01f, 0.0f, 1.0f);
-	ImGui::DragFloat("P_shininess", &shininess_, 0.1f, 0.0f, 1.0f);
-	ImGui::DragFloat("CubeShininess", &shininess1_, 0.1f, 0.0f, 1.0f);
-	ImGui::DragFloat("GrassShininess", &shininess2_, 0.1f, 0.0f, 1.0f);
+	ImGui::DragFloat("P_shininess", &roughness_, 0.1f, 0.0f, 1.0f);
+	ImGui::DragFloat("CubeShininess", &roughness1_, 0.1f, 0.0f, 1.0f);
+	ImGui::DragFloat("GrassShininess", &roughness2_, 0.1f, 0.0f, 1.0f);
 	ImGui::DragFloat("P_IOR", &ior_, 0.1f);
 	ImGui::DragFloat("CubeIOR", &ior1_, 0.1f);
 
@@ -96,9 +96,9 @@ void TitleScene::DebugUpdate() {
 	model_->SetDefaultMetallic(metalic_);
 	model1_->SetDefaultMetallic(metalic1_);
 	model2_->SetDefaultMetallic(metalic2_);
-	model_->SetRoughness(shininess_);
-	model2_->SetRoughness(shininess1_);
-	model1_->SetRoughness(shininess2_);
+	model_->SetRoughness(roughness_);
+	model2_->SetRoughness(roughness1_);
+	model1_->SetRoughness(roughness2_);
 	model_->SetDefaultIOR(ior_);
 	model2_->SetDefaultIOR(ior1_);
 	ImGui::End();

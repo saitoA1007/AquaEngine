@@ -68,6 +68,25 @@ std::unique_ptr<Model> ModelLoader::CreateGridPlane(const Vector2& size) {
 }
 
 [[nodiscard]]
+std::unique_ptr<Model> ModelLoader::CreateRing(uint32_t ringDivide, float outerRadius, float innerRadius) {
+	// インスタンスを生成
+	std::unique_ptr<Model> model = std::make_unique<Model>();
+
+	// メッシュを作成
+	auto tmpMesh = std::make_unique<Mesh>();
+	tmpMesh->CreateRingMesh(ringDivide, outerRadius, innerRadius);
+	model->AddMesh(std::move(tmpMesh));
+
+	// マテリアルを作成
+	std::unique_ptr<Material> tmpMaterial = std::make_unique<Material>();
+	tmpMaterial->Initialize({ 1.0f,1.0f,1.0f,1.0f }, { 1.0f,1.0f,1.0f }, 500.0f, false);
+	std::string materialName = tmpMesh->GetMaterialName();
+	model->AddMaterial(materialName, std::move(tmpMaterial));
+
+	return model;
+}
+
+[[nodiscard]]
 std::unique_ptr<Model> ModelLoader::CreateModel(const std::string& objFilename, const std::string& filename) {
 
 	LogManager::GetInstance().Log("Start create model");

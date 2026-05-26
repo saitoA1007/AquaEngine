@@ -85,9 +85,9 @@ private: // シーン機能
 	float metalic_ = 0.01f;
 	float metalic1_ = 0.01f;
 	float metalic2_ = 0.01f;
-	float shininess_ = 1.0f;
-	float shininess1_ = 1.0f;
-	float shininess2_ = 1.0f;
+	float roughness_ = 1.0f;
+	float roughness1_ = 1.0f;
+	float roughness2_ = 1.0f;
 	float ior_ = 1.0f;
 	float ior1_ = 1.0f;
 

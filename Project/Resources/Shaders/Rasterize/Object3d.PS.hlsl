@@ -111,7 +111,8 @@ PixelShaderOutput main(VertexShaderOutput input)
         {
             float32_t3 reflectedVector = CalculateEnvironmentMap(input.worldPosition, normal, gCamera.worldPosition);
             float32_t4 environmentColor = gCubeTexture[environmentTexture].Sample(gSampler, reflectedVector);
-            finalColor += environmentColor.rgb * gMaterial.metallic;
+            // 環境マップの映り込みの度合いは粗さのパラメータを使用しておこなわれる。そちらの方がライティングにおいて適している。
+            finalColor += environmentColor.rgb * gMaterial.roughness;
         }
         
         // 最終的な色を設定

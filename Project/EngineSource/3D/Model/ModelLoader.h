@@ -46,6 +46,12 @@ namespace GameEngine {
         std::unique_ptr<Model> CreateGridPlane(const Vector2& size);
 
         /// <summary>
+        /// リングモデルを生成する
+        /// </summary>
+        [[nodiscard]]
+        std::unique_ptr<Model> CreateRing(uint32_t ringDivide, float outerRadius, float innerRadius);
+
+        /// <summary>
         /// アニメーションデータを読み込み
         /// </summary>
         [[nodiscard]]
