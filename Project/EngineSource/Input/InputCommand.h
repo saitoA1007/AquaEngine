@@ -60,7 +60,7 @@ namespace GameEngine {
 		/// 指定したコマンドが押されているかをチェック
 		/// </summary>
 		/// <returns></returns>
-		bool IsCommandAcitve(const std::string& commandName) const;
+		bool IsCommandActive(const std::string& commandName) const;
 
 		/// <summary>
 		/// 全てのコマンドを削除

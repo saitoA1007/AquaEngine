@@ -111,7 +111,7 @@ void TitleScene::Draw() {
 	renderQueue_->SetCamera(mainCamera_.get());
 
 	// テストモデルを描画
-	renderQueue_->SubmitAnimation(model_, world_);
+	//renderQueue_->SubmitAnimation(model_, world_);
 	renderQueue_->SubmitRaytracingModel(model1_, world1_);
 	renderQueue_->SubmitRaytracingModel(model2_, world2_);
 	renderQueue_->SubmitModel(model2_, world3_);

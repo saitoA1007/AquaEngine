@@ -20,11 +20,11 @@ void CameraController::Update() {
 	target.y = 1.0f;
 
 	// カメラ操作
-	if (inputCommand_->IsCommandAcitve("CameraMoveLeft")) {
+	if (inputCommand_->IsCommandActive("CameraMoveLeft")) {
 		rotateMove_.x += 0.02f;
 	}
 
-	if (inputCommand_->IsCommandAcitve("CameraMoveRight")) {
+	if (inputCommand_->IsCommandActive("CameraMoveRight")) {
 		rotateMove_.x -= 0.02f;
 	}
 

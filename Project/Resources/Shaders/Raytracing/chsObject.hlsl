@@ -76,12 +76,14 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     
     // 頂点データを取得する
     VertexData vtx = GetHitVertex(attrib, ref.vertexHandle, ref.indexHandle);
+    // uvをトランスフォーム
+    float4 transformedUV = mul(float4(vtx.texcoord, 0.0f, 1.0f), material.uvTransform);
     
     float3 localNormal = vtx.normal;
     // ノーマルマップがあれば法線に適応
     if (material.normalTextureHandle != 0)
     {
-        float4 normalMapColor = gTexture[material.normalTextureHandle].SampleLevel(gSampler, vtx.texcoord, 0);
+        float4 normalMapColor = gTexture[material.normalTextureHandle].SampleLevel(gSampler, transformedUV.xy, 0);
         vtx.tangent.xyz = normalize(vtx.tangent.xyz);
         localNormal = GetNormalFromMap(normalMapColor, vtx.normal, vtx.tangent);
     }
@@ -101,7 +103,7 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     if (dot(worldNormal, viewDir) < 0.0f) { worldNormal = -worldNormal;}
     
     // テクスチャカラーを取得
-    float4 textureColor = gTexture[material.textureHandle].SampleLevel(gSampler, vtx.texcoord, 0);
+    float4 textureColor = gTexture[material.textureHandle].SampleLevel(gSampler, transformedUV.xy, 0);
     // アルベド色を取得
     float3 albedoColor = material.color.rgb * textureColor.rgb;
     

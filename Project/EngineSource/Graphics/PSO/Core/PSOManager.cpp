@@ -549,7 +549,7 @@ void PSOManager::DefaultLoadPSO() {
     LogManager::GetInstance().Log("Default PSOs loaded");
 }
 
-void PSOManager::DeaultLoadPostEffectPSO() {
+void PSOManager::DefaultLoadPostEffectPSO() {
     // ポストエフェクト共通のinputlayoutを作成
     InputLayoutBuilder inputLayoutBuilder;
     inputLayoutBuilder.CreateNone();

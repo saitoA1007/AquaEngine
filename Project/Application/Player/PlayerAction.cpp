@@ -39,10 +39,10 @@ void PlayerMoveAction::ProcessMoveInput() {
 	Vector3 desiredVelXZ = { 0,0,0 };
 
 	// 移動の操作
-	if (inputCommand_->IsCommandAcitve("MoveUp")) { dir -= cameraForwardXZ_; }
-	if (inputCommand_->IsCommandAcitve("MoveDown")) { dir += cameraForwardXZ_; }
-	if (inputCommand_->IsCommandAcitve("MoveLeft")) { dir -= cameraRightXZ_; }
-	if (inputCommand_->IsCommandAcitve("MoveRight")) { dir += cameraRightXZ_; }
+	if (inputCommand_->IsCommandActive("MoveUp")) { dir -= cameraForwardXZ_; }
+	if (inputCommand_->IsCommandActive("MoveDown")) { dir += cameraForwardXZ_; }
+	if (inputCommand_->IsCommandActive("MoveLeft")) { dir -= cameraRightXZ_; }
+	if (inputCommand_->IsCommandActive("MoveRight")) { dir += cameraRightXZ_; }
 
 	if (dir.x != 0.0f || dir.z != 0.0f) {
 		dir.y = 0.0f;

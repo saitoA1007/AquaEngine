@@ -60,6 +60,7 @@ namespace GameEngine {
         // 背景画像ハンドルを設定する
         void SetSkyboxTexture(const uint32_t& texture) {
             skyboxTextureIndex_ = texture;
+            lightManager_.SetEnvironmentTexture(texture);
         }
 
         const uint32_t& GetSkyboxTexture() const { return skyboxTextureIndex_; }

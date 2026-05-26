@@ -30,7 +30,7 @@ void GraphicsSubsystem::Initialize() {
     psoManager_ = std::make_unique<PSOManager>();
     psoManager_->Initialize(graphicsDevice_->GetDevice(), dxc_.get());
     psoManager_->DefaultLoadPSO();
-    psoManager_->DeaultLoadPostEffectPSO();
+    psoManager_->DefaultLoadPostEffectPSO();
 
     // GPUリソースの静的初期化
     GpuResource::StaticInitialize(graphicsDevice_->GetDevice());
