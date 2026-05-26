@@ -125,6 +125,13 @@ namespace GameEngine {
 		void NodeHierarchyUpdate(Model* model);
 
 		/// <summary>
+		/// 再帰処理用のノード更新
+		/// </summary>
+		/// <param name="node"></param>
+		/// <param name="parentMatrix"></param>
+		void NodeHierarchyUpdate(Node& node, const Matrix4x4& parentMatrix);
+
+		/// <summary>
 		/// skeletonに対してアニメーションを適応する
 		/// </summary>
 		/// <param name="skeleton"></param>

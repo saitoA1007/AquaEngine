@@ -96,7 +96,8 @@ Vector3 Animator::CalculateValue(const std::vector<KeyframeVector3>& keyframes, 
 		// indexとnextIndexの2つのkeyframeを取得して範囲内に時刻があるかを判定
 		if (keyframes[index].time <= time && time <= keyframes[nextIndex].time) {
 			// 範囲内を補間する
-			float t = ((time - keyframes[index].time) / (keyframes[nextIndex].time - keyframes[index].time));
+			float denom = keyframes[nextIndex].time - keyframes[index].time;
+			float t = (denom == 0.0f) ? 0.0f : ((time - keyframes[index].time) / denom);
 			return Lerp(keyframes[index].value, keyframes[nextIndex].value, t);
 		}
 	}
@@ -119,7 +120,8 @@ Quaternion Animator::CalculateValue(const std::vector<KeyframeQuaternion>& keyfr
 		// indexとnextIndexの2つのkeyframeを取得して範囲内に時刻があるかを判定
 		if (keyframes[index].time <= time && time <= keyframes[nextIndex].time) {
 			// 範囲内を補間する
-			float t = ((time - keyframes[index].time) / (keyframes[nextIndex].time - keyframes[index].time));
+			float denom = keyframes[nextIndex].time - keyframes[index].time;
+			float t = (denom == 0.0f) ? 0.0f : ((time - keyframes[index].time) / denom);
 			return Slerp(keyframes[index].value, keyframes[nextIndex].value, t);
 		}
 	}
@@ -145,16 +147,28 @@ void Animator::ApplyNodeAnimation(Node& node, const AnimationData& animation, fl
 }
 
 void Animator::NodeHierarchyUpdate(Model* model) {
-	auto& node = model->GetNodes();
+	auto& rootNode = model->GetNodes();
 
+	// 親行列
+	rootNode.localMatrix = Math::MakeAffineMatrix(rootNode.transform.scale, rootNode.transform.rotate, rootNode.transform.translate);
+
+	// 子ノードに対して再帰的に行列計算を行う
+	for (auto& child : rootNode.children) {
+		NodeHierarchyUpdate(child, rootNode.localMatrix);
+	}
+}
+
+void Animator::NodeHierarchyUpdate(Node& node, const Matrix4x4& parentMatrix) {
+	// 自身のローカル行列を計算
 	Matrix4x4 local = Math::MakeAffineMatrix(node.transform.scale, node.transform.rotate, node.transform.translate);
 
-	for (auto& child : node.children) {
-		local *= Math::MakeAffineMatrix(child.transform.scale, child.transform.rotate, child.transform.translate);
-	}
+	// 親の行列を掛け合わせて、自身のグローバルな累積行列を計算
+	node.localMatrix = local * parentMatrix;
 
-	// アフィニティ行列の作成
-	node.localMatrix = local;
+	// さらにその子ノードへ、計算した独自の localMatrix を親の行列として伝播させる
+	for (auto& child : node.children) {
+		NodeHierarchyUpdate(child, node.localMatrix);
+	}
 }
 
 void Animator::ApplyAnimation(SkeletonData& skeleton, const AnimationData& animation, float animationTime) {
