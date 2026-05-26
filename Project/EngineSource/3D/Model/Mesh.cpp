@@ -133,6 +133,68 @@ void Mesh::CreateSphereMesh(uint32_t subdivision) {
 	vertexBuffer_.Create(vertices);
 }
 
+void Mesh::CreateRingMesh(uint32_t ringDivide, float outerRadius, float innerRadius) {
+
+	// 頂点データ
+	std::vector<VertexData> vertices;
+	vertices.reserve((ringDivide + 1) * 2);
+
+	// インデックスデータ
+	std::vector<uint32_t> indices;
+	indices.reserve(ringDivide * 6);
+
+	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / static_cast<float>(ringDivide);
+
+	// 頂点データを生成する
+	for (uint32_t i = 0; i < ringDivide; ++i) {
+		float angle = static_cast<float>(i) * radianPerDivide;
+		float sin = std::sinf(angle);
+		float cos = std::cosf(angle);
+
+		// u座標
+		float u = static_cast<float>(i) / static_cast<float>(ringDivide);
+
+		// 内側の頂点
+		VertexData innerVertex;
+		innerVertex.position = { cos * innerRadius,sin * innerRadius,0.0f };
+		innerVertex.texcoord = { u,1.0f };
+		innerVertex.normal = { 0.0f, 0.0f, 1.0f };
+		vertices.push_back(innerVertex);
+
+		// 外側の頂点
+		VertexData outerVertex;
+		outerVertex.position = { cos * outerRadius,sin * outerRadius,0.0f };
+		outerVertex.texcoord = { u,0.0f };
+		outerVertex.normal = { 0.0f,0.0f,0.0f };
+		vertices.push_back(outerVertex);
+	}
+
+	// インデックスデータを生成する
+	for (uint32_t i = 0; i < ringDivide; ++i) {
+		// 現在のインデックス番号
+		uint32_t innerCurr = i * 2;
+		uint32_t outerCurr = i * 2 + 1;
+		// 次のインデックス番号
+		uint32_t innerNext = (i + 1) * 2;
+		uint32_t outerNext = (i + 1) * 2 + 1;
+
+		// 三角形1枚目
+		indices.push_back(innerCurr);
+		indices.push_back(outerCurr);
+		indices.push_back(innerNext);
+
+		// 三角形2枚目
+		indices.push_back(innerNext);
+		indices.push_back(outerCurr);
+		indices.push_back(outerNext);
+	}
+
+	// インデックスデータを作成
+	indexBuffer_.Create(indices);
+	// 頂点データを作成
+	vertexBuffer_.Create(vertices);
+}
+
 void Mesh::CreateModelMesh(ModelData modelData, const uint32_t& index) {
 
 	// 要素が無ければエラー

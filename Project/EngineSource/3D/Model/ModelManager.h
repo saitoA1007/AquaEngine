@@ -44,6 +44,11 @@ namespace GameEngine {
 		void RegisterGridPlaneModel(const std::string& modelName,const Vector2& size);
 
 		/// <summary>
+		/// リングモデルを登録
+		/// </summary>
+		void RegisterRingModel(const std::string& modelName, uint32_t ringDivide, float outerRadius, float innerRadius);
+
+		/// <summary>
 		/// 登録を外す
 		/// </summary>
 		/// <param name="handle"></param>

@@ -35,6 +35,14 @@ namespace GameEngine {
 		void CreateSphereMesh(uint32_t subdivision);
 
 		/// <summary>
+		/// リングを作成する
+		/// </summary>
+		/// <param name="kRingDivide"></param>
+		/// <param name="outerRadius"></param>
+		/// <param name="innerRadius"></param>
+		void CreateRingMesh(uint32_t ringDivide, float outerRadius, float innerRadius);
+
+		/// <summary>
 		/// モデルデータを読み込んでメッシュを作成する
 		/// </summary>
 		/// <param name="modelData">読み込んだモデルデータ</param>
