@@ -47,18 +47,18 @@ struct PixelShaderOutput
 };
 
 // ライトの処理
-float32_t3 CalculateShading(float32_t3 lightDirection, float32_t3 lightColor, float32_t3 normal, float32_t3 viewDirection, float32_t3 materialColor, Material matData);
-float32_t3 CalculateDirectionalLight(DirectionalLight light,float32_t3 normal,float32_t3 viewDirection,float32_t3 materialColor,Material matData);
-float32_t3 CalculatePointLight(PointLight light,float32_t3 worldPosition,float32_t3 normal,float32_t3 viewDirection,float32_t3 materialColor,Material matData);
-float32_t3 CalculateSpotLight(SpotLight light, float32_t3 worldPosition, float32_t3 normal, float32_t3 viewDirection, float32_t3 materialColor, Material matData);
-float32_t3 CalculateEnvironmentMap(float32_t3 worldPosition, float32_t3 normal, float32_t3 cameraPosition);
+float3 CalculateShading(float3 lightDirection, float3 lightColor, float3 normal, float3 viewDirection, float3 materialColor, Material matData);
+float3 CalculateDirectionalLight(DirectionalLight light,float3 normal,float3 viewDirection,float3 materialColor,Material matData);
+float3 CalculatePointLight(PointLight light,float3 worldPosition,float3 normal,float3 viewDirection,float3 materialColor,Material matData);
+float3 CalculateSpotLight(SpotLight light, float3 worldPosition, float3 normal, float3 viewDirection, float3 materialColor, Material matData);
+float3 CalculateEnvironmentMap(float3 worldPosition, float3 normal, float3 cameraPosition);
 // 影を計算する
-float32_t CalculateShadow(float32_t4 shadowCoord);
+float CalculateShadow(float4 shadowCoord);
 
 PixelShaderOutput main(VertexShaderOutput input)
 {
     PixelShaderOutput output;
-    float4 transformedUV = mul(float32_t4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
+    float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
     float4 textureColor = gTexture[gMaterial.textureHandle].Sample(gSampler, transformedUV.xy);
     
     if (textureColor.a == 0.0)
@@ -87,7 +87,7 @@ PixelShaderOutput main(VertexShaderOutput input)
                 float4 world = float4(input.worldPosition, 1.0f);
                 float4 shadowCoord = mul(world, gDirectionalLight.vpMatrix);
                 // 影の計算を実行
-                float32_t shadowFactor = CalculateShadow(shadowCoord);
+                float shadowFactor = CalculateShadow(shadowCoord);
                 
                 float shadowAtten = 1.0f - 0.8f; // 影部分の明るさ
                 finalShadow = shadowFactor + shadowAtten * (1.0f - shadowFactor);
@@ -109,8 +109,8 @@ PixelShaderOutput main(VertexShaderOutput input)
         // 環境マップを適応
         if (isActiveEnvironment)
         {
-            float32_t3 reflectedVector = CalculateEnvironmentMap(input.worldPosition, normal, gCamera.worldPosition);
-            float32_t4 environmentColor = gCubeTexture[environmentTexture].Sample(gSampler, reflectedVector);
+            float3 reflectedVector = CalculateEnvironmentMap(input.worldPosition, normal, gCamera.worldPosition);
+            float4 environmentColor = gCubeTexture[environmentTexture].Sample(gSampler, reflectedVector);
             // 環境マップの映り込みの度合いは粗さのパラメータを使用しておこなわれる。そちらの方がライティングにおいて適している。
             finalColor += environmentColor.rgb * gMaterial.roughness;
         }
@@ -135,101 +135,101 @@ PixelShaderOutput main(VertexShaderOutput input)
 }
 
 // Blinn-Phong + Half-Lambertの計算
-float32_t3 CalculateShading(
-    float32_t3 lightDirection, // ライトへの方向ベクトル
-    float32_t3 lightColor,     // ライトの色 * 強度
-    float32_t3 normal,         // 法線
-    float32_t3 viewDirection,  // カメラへの方向
-    float32_t3 materialColor,  // マテリアル色 * テクスチャ色
+float3 CalculateShading(
+    float3 lightDirection, // ライトへの方向ベクトル
+    float3 lightColor,     // ライトの色 * 強度
+    float3 normal,         // 法線
+    float3 viewDirection,  // カメラへの方向
+    float3 materialColor,  // マテリアル色 * テクスチャ色
     Material matData)          // マテリアル構造体
 {
     // Diffuse(Half-Lambert)
     float NdotL = dot(normal, lightDirection);
     float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
-    float32_t3 diffuse = materialColor * lightColor * cos;
+    float3 diffuse = materialColor * lightColor * cos;
 
     // Specular(Blinn-Phong)
-    float32_t3 halfVector = normalize(lightDirection + viewDirection);
+    float3 halfVector = normalize(lightDirection + viewDirection);
     float NDotH = dot(normal, halfVector);
     float specularPow = pow(saturate(NDotH), matData.shininess);
-    float32_t3 specular = lightColor * specularPow * matData.specularColor.xyz;
+    float3 specular = lightColor * specularPow * matData.specularColor.xyz;
 
     return diffuse + specular;
 }
 
 // DirectionalLightの計算
-float32_t3 CalculateDirectionalLight(
+float3 CalculateDirectionalLight(
     DirectionalLight light,
-    float32_t3 normal,
-    float32_t3 viewDirection,
-    float32_t3 materialColor,
+    float3 normal,
+    float3 viewDirection,
+    float3 materialColor,
     Material matData)
 {
     // 平行光源なので、ライトへの方向は -direction
-    float32_t3 lightDir = normalize(-light.direction);
-    float32_t3 lightColorIntensity = light.color.rgb * light.intensity;
+    float3 lightDir = normalize(-light.direction);
+    float3 lightColorIntensity = light.color.rgb * light.intensity;
 
     return CalculateShading(lightDir, lightColorIntensity, normal, viewDirection, materialColor, matData);
 }
 
 // PointLightの計算
-float32_t3 CalculatePointLight(
+float3 CalculatePointLight(
     PointLight light,
-    float32_t3 worldPosition,
-    float32_t3 normal,
-    float32_t3 viewDirection,
-    float32_t3 materialColor,
+    float3 worldPosition,
+    float3 normal,
+    float3 viewDirection,
+    float3 materialColor,
     Material matData)
 {
     // ポイントライトへの方向ベクトルと距離
-    float32_t3 directionToLight = light.position - worldPosition;
-    float32_t distance = length(directionToLight);
-    float32_t3 lightDir = normalize(directionToLight);
+    float3 directionToLight = light.position - worldPosition;
+    float distance = length(directionToLight);
+    float3 lightDir = normalize(directionToLight);
     // 距離減衰
-    float32_t factor = pow(saturate(-distance / light.radius + 1.0), light.decay);
-    float32_t3 lightColorIntensity = light.color.rgb * light.intensity * factor;
+    float factor = pow(saturate(-distance / light.radius + 1.0), light.decay);
+    float3 lightColorIntensity = light.color.rgb * light.intensity * factor;
 
     return CalculateShading(lightDir, lightColorIntensity, normal, viewDirection, materialColor, matData);
 }
 
 // SpotLightの計算
-float32_t3 CalculateSpotLight(
+float3 CalculateSpotLight(
     SpotLight light,
-    float32_t3 worldPosition,
-    float32_t3 normal,
-    float32_t3 viewDirection,
-    float32_t3 materialColor,
+    float3 worldPosition,
+    float3 normal,
+    float3 viewDirection,
+    float3 materialColor,
     Material matData)
 {
     // スポットライト光源位置への方向
-    float32_t3 directionToLight = light.position - worldPosition;
-    float32_t distance = length(directionToLight);
-    float32_t3 lightDirOnSurface = normalize(directionToLight);
+    float3 directionToLight = light.position - worldPosition;
+    float distance = length(directionToLight);
+    float3 lightDirOnSurface = normalize(directionToLight);
     // 角度減衰
-    float32_t cosAngle = dot(-lightDirOnSurface, normalize(light.direction));
-    float32_t falloffFactor = saturate((cosAngle - light.cosAngle) / (light.cosFalloffStart - light.cosAngle));
+    float cosAngle = dot(-lightDirOnSurface, normalize(light.direction));
+    float falloffFactor = saturate((cosAngle - light.cosAngle) / (light.cosFalloffStart - light.cosAngle));
     // 距離減衰
     float attenuationFactor = pow(1.0f / distance, light.decay) * saturate(1.0f - distance / light.distance);
     // 最終的な強さ
-    float32_t3 lightColorIntensity = light.color.rgb * light.intensity * attenuationFactor * falloffFactor;
+    float3 lightColorIntensity = light.color.rgb * light.intensity * attenuationFactor * falloffFactor;
 
-    float32_t3 shadingDir = normalize(-light.direction);
+    float3 shadingDir = normalize(-light.direction);
     
     return CalculateShading(shadingDir, lightColorIntensity, normal, viewDirection, materialColor, matData);
 }
 
 // 環境マップの計算
-float32_t3 CalculateEnvironmentMap(float32_t3 worldPosition, float32_t3 normal, float32_t3 cameraPosition)
+float3 CalculateEnvironmentMap(float3 worldPosition, float3 normal, float3 cameraPosition)
 {
-    float32_t3 cameraToPosition = normalize(worldPosition - cameraPosition);
-    float32_t3 reflectedVector = reflect(cameraToPosition, normal);
+    float3 cameraToPosition = normalize(worldPosition - cameraPosition);
+    float3 reflectedVector = reflect(cameraToPosition, normal);
     return reflectedVector;
 }
 
-float32_t CalculateShadow(float32_t4 shadowCoord)
+float CalculateShadow(float4 shadowCoord)
 {
     // 透視投影除算
-    float32_t3 projectCoord = shadowCoord.xyz / shadowCoord.w;
+    float3 projectCoord = shadowCoord.xyz / shadowCoord.w;
 
     // uv座標に変換
     projectCoord.x = projectCoord.x * 0.5f + 0.5f;
@@ -243,7 +243,7 @@ float32_t CalculateShadow(float32_t4 shadowCoord)
         return 1.0f;
     }
 
-    float32_t bias = 0.001f;
+    float bias = 0.001f;
     float currentDepth = projectCoord.z - bias;
     
     // ShadowMapサンプリング

@@ -33,10 +33,9 @@ namespace GameEngine {
 		}
 
 		// 外部読み込み用のデータを設定
-		void SetLoadModelData(const std::string& modelName, const Matrix4x4& localMatrix,const Node& node) {
+		void SetLoadModelData(const Node& node) {
 			isLoad_ = true;
-			modelName_ = modelName;
-			localMatrix_ = localMatrix;
+			modelName_ = node.name;
 			node_ = node;
 		}
 
@@ -197,7 +196,6 @@ namespace GameEngine {
 		std::vector<RefBuffer> refBuffers_;
 
 		// Nodeのローカル行列を保持しておく変数
-		Matrix4x4 localMatrix_;
 		Node node_;
 		// 外部からロードされたか
 		bool isLoad_ = false;

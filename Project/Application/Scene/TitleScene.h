@@ -73,6 +73,10 @@ private: // シーン機能
 	// アニメーションを再生するクラス
 	std::unique_ptr<GameEngine::Animator> cubeAnimator_;
 
+	GameEngine::Model* ringModel_;
+	GameEngine::WorldTransform ringWorld_;
+	Transform ringUvTransform_;
+
 	GameEngine::Model* model1_;
 	GameEngine::WorldTransform world1_;
 

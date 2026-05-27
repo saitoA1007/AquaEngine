@@ -156,16 +156,16 @@ void Mesh::CreateRingMesh(uint32_t ringDivide, float outerRadius, float innerRad
 
 		// 内側の頂点
 		VertexData innerVertex;
-		innerVertex.position = { cos * innerRadius,sin * innerRadius,0.0f };
+		innerVertex.position = { cos * innerRadius,sin * innerRadius,0.0f,1.0f };
 		innerVertex.texcoord = { u,1.0f };
 		innerVertex.normal = { 0.0f, 0.0f, 1.0f };
 		vertices.push_back(innerVertex);
 
 		// 外側の頂点
 		VertexData outerVertex;
-		outerVertex.position = { cos * outerRadius,sin * outerRadius,0.0f };
+		outerVertex.position = { cos * outerRadius,sin * outerRadius,0.0f,1.0f };
 		outerVertex.texcoord = { u,0.0f };
-		outerVertex.normal = { 0.0f,0.0f,0.0f };
+		outerVertex.normal = { 0.0f,0.0f,1.0f };
 		vertices.push_back(outerVertex);
 	}
 
@@ -175,14 +175,14 @@ void Mesh::CreateRingMesh(uint32_t ringDivide, float outerRadius, float innerRad
 		uint32_t innerCurr = i * 2;
 		uint32_t outerCurr = i * 2 + 1;
 		// 次のインデックス番号
-		uint32_t innerNext = (i + 1) * 2;
-		uint32_t outerNext = (i + 1) * 2 + 1;
-
+		uint32_t innerNext = ((i + 1) % ringDivide) * 2;
+		uint32_t outerNext = ((i + 1) % ringDivide) * 2 + 1;
+	
 		// 三角形1枚目
 		indices.push_back(innerCurr);
 		indices.push_back(outerCurr);
 		indices.push_back(innerNext);
-
+	
 		// 三角形2枚目
 		indices.push_back(innerNext);
 		indices.push_back(outerCurr);
