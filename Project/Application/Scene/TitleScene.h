@@ -69,9 +69,9 @@ private: // シーン機能
 	GameEngine::Model* model_;
 	GameEngine::WorldTransform world_;
 	// アニメーションデータ
-	std::map<std::string, AnimationData> cubeAnimationData_;
+	std::map<std::string, AnimationData> walkAnimationData_;
 	// アニメーションを再生するクラス
-	std::unique_ptr<GameEngine::Animator> cubeAnimator_;
+	std::unique_ptr<GameEngine::Animator> walkAnimator_;
 
 	GameEngine::Model* ringModel_;
 	GameEngine::WorldTransform ringWorld_;

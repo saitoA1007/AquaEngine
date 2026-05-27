@@ -6,6 +6,7 @@
 #include "FPSCounter.h"
 #include "Model.h"
 #include "PSOManager.h"
+#include "DebugRenderer.h"
 using namespace GameEngine;
 
 ID3D12GraphicsCommandList4* Animator::commandList_ = nullptr;
@@ -241,4 +242,39 @@ void Animator::UpdateCompute() {
 
 	// BLASを更新する
 	mesh->GetBLAS()->Update(commandList_, outputBuffer->GetView());
+}
+
+void Animator::DebugDraw(DebugRenderer* debugRenderer, float sphereRadius, const Vector4& color) {
+	if (!model_->IsSkeleton()) {
+		return;
+	}
+
+	for (const auto& joint : skeleton_->joints) {
+		// 行列から現在の関節のワールド空間位置を取得
+		Vector3 jointPos = {
+			joint.skeletonSpaceMatrix.m[3][0],
+			joint.skeletonSpaceMatrix.m[3][1],
+			joint.skeletonSpaceMatrix.m[3][2]
+		};
+
+		// 関節を球としてデバッグ描画に登録
+		Sphere jointSphere = { jointPos, sphereRadius };
+		debugRenderer->AddSphere(jointSphere, color);
+
+		// 親の関節が存在する場合、親と自分を繋ぐ線を引く
+		if (joint.parent) {
+			// 親のJoint情報を取得
+			const auto& parentJoint = skeleton_->joints[*joint.parent];
+
+			// 親の位置を抽出
+			Vector3 parentPos = {
+				parentJoint.skeletonSpaceMatrix.m[3][0],
+				parentJoint.skeletonSpaceMatrix.m[3][1],
+				parentJoint.skeletonSpaceMatrix.m[3][2]
+			};
+
+			// 自分と親を繋ぐ線を描画に登録
+			debugRenderer->AddLine(jointPos, parentPos, color);
+		}
+	}
 }

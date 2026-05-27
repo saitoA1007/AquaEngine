@@ -152,7 +152,6 @@ void Engine::PreUpdate() {
 }
 
 void Engine::PostUpdate() {
-    graphics_->GetDebugRenderer()->Update();
     graphics_->GetImGuiManager()->EndFrame();
 }
 
@@ -161,6 +160,7 @@ void Engine::PreDraw() {
 }
 
 void Engine::PostDraw() { 
+    graphics_->GetDebugRenderer()->Update();
     graphics_->EndFrame();
 }
 

@@ -12,16 +12,16 @@ TitleScene::TitleScene() {
 	mainCamera_->Update();
 
 	// プレイヤーモデルを生成
-	model_ = modelManager_->GetNameByModel("AnimatedCube");
+	model_ = modelManager_->GetNameByModel("Walk");
 	model_->SetDefaultIsEnableLight(true);
 	model_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
 	world_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 
 	// アニメーションデータを取得する
-	cubeAnimationData_ = animationManager_->GetNameByAnimations("AnimatedCube");
+	walkAnimationData_ = animationManager_->GetNameByAnimations("Walk");
 	// アニメーションの再生を管理する
-	cubeAnimator_ = std::make_unique<Animator>();
-	cubeAnimator_->Initialize(model_, &cubeAnimationData_["animation_AnimatedCube"]);
+	walkAnimator_ = std::make_unique<Animator>();
+	walkAnimator_->Initialize(model_, &walkAnimationData_["Armature|mixamo.com|Layer0"]);
 
 	// 地面
 	model1_ = modelManager_->GetNameByModel("Terrain");
@@ -71,7 +71,7 @@ void TitleScene::Update() {
 	primitiveEffect_->Update(mainCamera_->GetWorldMatrix());
 
 	// アニメーションの更新処理
-	cubeAnimator_->Update();
+	walkAnimator_->Update();
 }
 
 void TitleScene::DebugUpdate() {
@@ -127,6 +127,9 @@ void TitleScene::Draw() {
 	// 描画に使用するカメラを設定
 	renderQueue_->SetCamera(mainCamera_.get());
 
+	// ボーンのデバック描画
+	walkAnimator_->DebugDraw(debugRenderer_);
+
 	// テストモデルを描画
 	//renderQueue_->SubmitAnimation(model_, world_);
 	renderQueue_->SubmitRaytracingModel(model1_, world1_);
@@ -134,8 +137,8 @@ void TitleScene::Draw() {
 	renderQueue_->SubmitModel(model2_, world3_);
 
 	// リングを描画
-	renderQueue_->SubmitModel(ringModel_, ringWorld_);
+	//renderQueue_->SubmitModel(ringModel_, ringWorld_);
 
 	// エフェクトを描画
-	renderQueue_->SubmitInstancing(effectModel_, primitiveEffect_->GetCurrentNumInstance(), *primitiveEffect_->GetWorldTransforms(),0.0f, BlendMode::kBlendModeNormal);
+	//renderQueue_->SubmitInstancing(effectModel_, primitiveEffect_->GetCurrentNumInstance(), *primitiveEffect_->GetWorldTransforms(),0.0f, BlendMode::kBlendModeNormal);
 }
