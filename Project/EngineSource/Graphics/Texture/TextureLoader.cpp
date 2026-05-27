@@ -58,6 +58,10 @@ Microsoft::WRL::ComPtr<ID3D12Resource> TextureLoader::CreateTextureResource(ID3D
 		nullptr, // Clear最適値。使わないのでnullptr
 		IID_PPV_ARGS(&resource)); // 作成するResourceポインタへのポインタ
 	assert(SUCCEEDED(hr));
+
+	// デバック用に名前を設定
+	resource->SetName(L"TextureResource_Debug");
+
 	return resource;
 }
 

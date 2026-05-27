@@ -75,13 +75,19 @@ std::unique_ptr<Model> ModelLoader::CreateRing(uint32_t ringDivide, float outerR
 	// メッシュを作成
 	auto tmpMesh = std::make_unique<Mesh>();
 	tmpMesh->CreateRingMesh(ringDivide, outerRadius, innerRadius);
-	model->AddMesh(std::move(tmpMesh));
 
 	// マテリアルを作成
 	std::unique_ptr<Material> tmpMaterial = std::make_unique<Material>();
 	tmpMaterial->Initialize({ 1.0f,1.0f,1.0f,1.0f }, { 1.0f,1.0f,1.0f }, 500.0f, false);
 	std::string materialName = tmpMesh->GetMaterialName();
+
+	model->AddMesh(std::move(tmpMesh));
 	model->AddMaterial(materialName, std::move(tmpMaterial));
+	// blasを作成
+	model->AddBLAS(cmdList_, false);
+
+	// レイトレでの参照用
+	model->CreateRefBuffer();
 
 	return model;
 }
@@ -133,7 +139,7 @@ std::unique_ptr<Model> ModelLoader::CreateModel(const std::string& objFilename, 
 	}
 
 	// 外部からモデルをロードした時に必要な情報を取得
-	model->SetLoadModelData(modelData.rootNode.name, modelData.rootNode.localMatrix, modelData.rootNode);
+	model->SetLoadModelData(modelData.rootNode);
 
 	// ボーンのデータが存在している場合、読み込む
 	if (modelData.isSkeleton) {

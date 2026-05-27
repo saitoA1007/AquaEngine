@@ -39,6 +39,7 @@ void ResourceSubsystem::LoadAllResources() {
 
 	// モデルデータを全てロードする
 	modelManager_->RegisterGridPlaneModel("Grid", { 200.0f, 200.0f });
+	modelManager_->RegisterRingModel("Ring", 32, 1.0f, 0.2f);
 	modelManager_->LoadAllModel();
 
 	// アニメーションデータをロード

@@ -150,7 +150,7 @@ namespace GameEngine {
 			Vector3 centerPos = particleData.transform.translate;
 
 			switch (emitterShape_.type) {
-			case EmitShapeType::Sphere:
+			case EmitShapeType::Sphere: {
 				Vector3 randomDir;
 				while (true) {
 					// 立方体の中でランダムに点を取り、球の中に入るまで繰り返す
@@ -168,11 +168,12 @@ namespace GameEngine {
 					particleData.transform.translate = centerPos + randomDir * emitterShape_.radius;
 				}
 				break;
-			
-			case EmitShapeType::Hemisphere:
+			}
+				
+			case EmitShapeType::Hemisphere: {
 				Vector3 randomDir;
 				while (true) {
-					randomDir = RandomGenerator::Get(Vector3(-1, -1, -1), Vector3(1, 1, 1));
+					randomDir = RandomGenerator::GetVector3(Vector3(-1, -1, -1), Vector3(1, 1, 1));
 					// 阪急
 					if (randomDir.LengthSquared() <= 1.0f && randomDir.LengthSquared() > 0.0001f && randomDir.y >= 0.0f) {
 						break;
@@ -187,11 +188,13 @@ namespace GameEngine {
 					particleData.transform.translate = centerPos + randomDir * emitterShape_.radius;
 				}
 				break;
-			
-			case EmitShapeType::Box:
+			}
+				
+			case EmitShapeType::Box: {
 				Vector3 half = emitterShape_.boxSize * 0.5f;
 				particleData.transform.translate = RandomGenerator::GetVector3(centerPos - half, centerPos + half);
 				break;
+			}	
 			}
 		}
 

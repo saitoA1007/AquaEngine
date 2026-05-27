@@ -49,6 +49,13 @@ TitleScene::TitleScene() {
 	primitiveEffect_ = std::make_unique<ParticleBehavior>("PrimitiveEffect", 16, effectGH);
 	// エフェクト用モデル
 	effectModel_ = modelManager_->GetNameByModel("Plane");
+
+	// リング
+	ringModel_ = modelManager_->GetNameByModel("Ring");
+	uint32_t lineGH = textureManager_->GetHandleByName("gradationLine.png");
+	ringModel_->SetDefaultTextureHandle(lineGH);
+	ringWorld_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,3.2f,0.0f},{0.0f,2.0f,0.0f} });
+	ringUvTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 }
 
 void TitleScene::Initialize() {
@@ -70,6 +77,16 @@ void TitleScene::Update() {
 void TitleScene::DebugUpdate() {
 #ifdef USE_IMGUI
 	auto* light = renderQueue_->GetLightManager();
+
+	ImGui::Begin("Ring");
+	ImGui::DragFloat3("pos", &ringWorld_.transform_.translate.x);
+	ImGui::DragFloat3("rotate", &ringWorld_.transform_.rotate.x);
+	ImGui::DragFloat3("scale", &ringWorld_.transform_.scale.x);
+	ImGui::DragFloat3("UVrotate", &ringUvTransform_.rotate.x);
+	ImGui::DragFloat3("UVscale", &ringUvTransform_.scale.x);
+	ImGui::End();
+	ringWorld_.UpdateTransformMatrix();
+	ringModel_->SetDefaultUVMatrix(ringUvTransform_);
 
 	ImGui::Begin("test");
 
@@ -113,8 +130,11 @@ void TitleScene::Draw() {
 	// テストモデルを描画
 	//renderQueue_->SubmitAnimation(model_, world_);
 	renderQueue_->SubmitRaytracingModel(model1_, world1_);
-	renderQueue_->SubmitRaytracingModel(model2_, world2_);
+	//renderQueue_->SubmitRaytracingModel(model2_, world2_);
 	renderQueue_->SubmitModel(model2_, world3_);
+
+	// リングを描画
+	renderQueue_->SubmitModel(ringModel_, ringWorld_);
 
 	// エフェクトを描画
 	renderQueue_->SubmitInstancing(effectModel_, primitiveEffect_->GetCurrentNumInstance(), *primitiveEffect_->GetWorldTransforms(),0.0f, BlendMode::kBlendModeNormal);
