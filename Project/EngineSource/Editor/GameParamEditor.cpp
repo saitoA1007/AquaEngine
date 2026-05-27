@@ -124,6 +124,22 @@ void GameParamEditor::DeserializeGroupFromJson(Group& group, const json& node) {
 						{ maxArray[0], maxArray[1], maxArray[2], maxArray[3] }
 					};
 				}
+			} else if (itItem->contains("ShapeType") && itItem->contains("radius")) {
+				EmitterShape shape{};
+				std::string typeStr = itItem->at("ShapeType").get<std::string>();
+				for (int i = 0; i < kEmitShapeTypeCount; ++i) {
+					if (typeStr == EmitShapeTypeNames[i]) {
+						shape.type = static_cast<EmitShapeType>(i);
+						break;
+					}
+				}
+				if (itItem->contains("radius"))        shape.radius = itItem->at("radius").get<float>();
+				if (itItem->contains("emitFromShell")) shape.emitFromShell = itItem->at("emitFromShell").get<bool>();
+				if (itItem->contains("boxSize")) {
+					const auto& s = itItem->at("boxSize");
+					shape.boxSize = { s[0], s[1], s[2] };
+				}
+				group.items[itemName].value = shape;
 			} else {
 				// それ以外のオブジェクトはサブグループとして再帰的に読み込む
 				DeserializeGroupFromJson(group.children[itemName], *itItem);

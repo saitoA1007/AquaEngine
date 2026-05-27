@@ -29,3 +29,11 @@ Vector3 RandomGenerator::GetVector3(float min, float max) {
         Get<float>(min, max)
     );
 }
+
+Vector3 RandomGenerator::GetVector3(Vector3 min, Vector3 max) {
+    return Vector3(
+        Get<float>(min.x, max.x),
+        Get<float>(min.y, max.y),
+        Get<float>(min.z, max.z)
+    );
+}

@@ -12,6 +12,8 @@
 #include <json.hpp>
 #include "MyMath.h"
 
+#include "ParticleSystem/ParticleData.h"
+
 namespace GameEngine {
 
 	class GameParamEditor final {
@@ -19,7 +21,8 @@ namespace GameEngine {
 
 		// 項目
 		struct Item {
-			std::variant<int32_t, uint32_t, float, Vector2, Vector3, Vector4, Range3, Range4, bool, std::string> value;
+			std::variant<int32_t, uint32_t, float, Vector2, Vector3, Vector4, Range3, Range4, bool, std::string,
+				EmitterShape> value;
 			int priority = INT_MAX; // 優先順位
 			bool isDirty = false; // ImGuiで値が変更されたか
 		};
@@ -294,6 +297,13 @@ namespace GameEngine {
 
 			void operator()(const Vector2& value) const {
 				jsonData = nlohmann::json::array({ value.x, value.y });
+			}
+
+			void operator()(const EmitterShape& shape) const {
+				jsonData["ShapeType"] = EmitShapeTypeNames[static_cast<int>(shape.type)];
+				jsonData["radius"] = shape.radius;
+				jsonData["emitFromShell"] = shape.emitFromShell;
+				jsonData["boxSize"] = { shape.boxSize.x, shape.boxSize.y, shape.boxSize.z };
 			}
 
 			template<typename T>

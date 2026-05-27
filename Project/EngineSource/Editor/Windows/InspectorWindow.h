@@ -92,6 +92,40 @@ namespace GameEngine {
 			}
 		}
 
+		void operator()(EmitterShape& value) const {
+			if (ImGui::TreeNode(itemName.c_str())) {
+
+				// 形状選択
+				int typeIdx = static_cast<int>(value.type);
+				if (ImGui::Combo("Shape", &typeIdx, EmitShapeTypeNames, kEmitShapeTypeCount)) {
+					value.type = static_cast<EmitShapeType>(typeIdx);
+					isDirty = true;
+				}
+
+				// 形状ごとのパラメータ
+				switch (value.type) {
+				case EmitShapeType::Point:
+					ImGui::TextDisabled("No parameters");
+					break;
+
+				case EmitShapeType::Sphere:
+				case EmitShapeType::Hemisphere:
+					if (ImGui::DragFloat("Radius", &value.radius, 0.01f, 0.0f, FLT_MAX))
+						isDirty = true;
+					if (ImGui::Checkbox("EmitFromShell", &value.emitFromShell))
+						isDirty = true;
+					break;
+
+				case EmitShapeType::Box:
+					if (ImGui::DragFloat3("BoxSize", &value.boxSize.x, 0.01f, 0.0f, FLT_MAX))
+						isDirty = true;
+					break;
+				}
+
+				ImGui::TreePop();
+			}
+		}
+
 		void operator()(bool& value) const {
 			if (ImGui::Checkbox(itemName.c_str(), &value)) { isDirty = true; }
 		}

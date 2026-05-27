@@ -201,8 +201,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Core\System\SceneSubsystem.cpp" />
     <ClCompile Include="EngineSource\Editor\DebugParameter.cpp" />
     <ClCompile Include="EngineSource\Editor\JsonSerializer.cpp" />
-    <ClCompile Include="EngineSource\Editor\ParticleParamEditor.cpp" />
-    <ClCompile Include="EngineSource\Editor\ParticleParamEntry.cpp" />
     <ClCompile Include="EngineSource\Graphics\Buffers\BLAS.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\BufferRefManager.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\SceneRenderManager.cpp" />
@@ -421,8 +419,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Core\System\SceneSubsystem.h" />
     <ClInclude Include="EngineSource\Editor\DebugParameter.h" />
     <ClInclude Include="EngineSource\Editor\JsonSerializer.h" />
-    <ClInclude Include="EngineSource\Editor\ParticleParamEditor.h" />
-    <ClInclude Include="EngineSource\Editor\ParticleParamEntry.h" />
     <ClInclude Include="EngineSource\Graphics\Buffers\BLAS.h" />
     <ClInclude Include="EngineSource\Graphics\Buffers\RefBuffer.h" />
     <ClInclude Include="EngineSource\Graphics\Core\BufferRefManager.h" />

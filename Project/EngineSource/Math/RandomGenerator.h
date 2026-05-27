@@ -15,7 +15,7 @@ public:
 	static T Get(T min, T max);
 
 	static Vector3 GetVector3(float min, float max);
-
+	static Vector3 GetVector3(Vector3 min, Vector3 max);
 private:
 
 	static std::mt19937 randomEngine_;

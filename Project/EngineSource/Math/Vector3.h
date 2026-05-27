@@ -28,7 +28,7 @@ struct Vector3 {
 	}
 
 	// 正規化
-	void Normalize() {
+	Vector3 Normalize() {
 		float len = Length();
 		// ゼロ除算を防ぐためのチェック
 		if (len > 0.0f) {
@@ -36,5 +36,6 @@ struct Vector3 {
 			y /= len;
 			z /= len;
 		}
+		return Vector3(x, y, z);
 	}
 };

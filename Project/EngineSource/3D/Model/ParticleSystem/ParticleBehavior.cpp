@@ -100,6 +100,7 @@ ParticleData ParticleBehavior::MakeNewParticle() {
     tmpParticleData.startColor = tmpParticleData.color;
     tmpParticleData.startSize =  main_.scale;
     tmpParticleData.startSpeed = tmpParticleData.velocity;
+    tmpParticleData.dir = { 0.0f,0.0f,0.0f };
 
     // 生存時間
     tmpParticleData.currentTime = 0.0f;

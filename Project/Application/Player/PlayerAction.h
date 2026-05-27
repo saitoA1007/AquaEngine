@@ -40,7 +40,7 @@ public:
 	virtual ~IPlayerAction() = default;
 
 	// 値を登録する
-	virtual void RegisterParameter(GameEngine::DebugParameter* param) {};
+	virtual void RegisterParameter([[maybe_unused]]GameEngine::DebugParameter* param) {};
 
 protected:
 	// プレイヤーの共通状態
