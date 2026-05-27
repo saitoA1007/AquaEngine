@@ -7,6 +7,7 @@ namespace GameEngine {
 	// モデル
 	class Model;
 	class PSOManager;
+	class DebugRenderer;
 
 	class Animator {
 	public:
@@ -46,6 +47,14 @@ namespace GameEngine {
 		/// </summary>
 		/// <param name="time"></param>
 		void ComputeUpdate(const float& time);
+
+		/// <summary>
+		///  ボーンのデバック描画
+		/// </summary>
+		/// <param name="debugRenderer"></param>
+		/// <param name="sphereRadius"></param>
+		/// <param name="color"></param>
+		void DebugDraw(DebugRenderer* debugRenderer, float sphereRadius = 0.05f, const Vector4& color = {0.0f,1.0f,1.0f,1.0f});
 
 	public:
 
