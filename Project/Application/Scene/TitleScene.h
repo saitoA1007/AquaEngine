@@ -6,7 +6,7 @@
 #include "Model.h"
 #include "WorldTransform.h"
 #include "Animator.h"
-#include "ParticleSystem/ParticleBehavior.h"
+#include "ParticleBehavior.h"
 
 #include "Application/Scene/Transition/Fade.h"
 

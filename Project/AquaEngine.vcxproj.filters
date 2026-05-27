@@ -231,7 +231,7 @@
     <ClCompile Include="EngineSource\3D\Model\ModelManager.cpp">
       <Filter>EngineSource\3D\Model</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\3D\Model\ParticleSystem\ParticleBehavior.cpp">
+    <ClCompile Include="EngineSource\3D\ParticleSystem\ParticleBehavior.cpp">
       <Filter>EngineSource\3D\Model\ParticleSystem</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\3D\Renderer\DebugRenderer.cpp">
@@ -526,7 +526,7 @@
     <ClCompile Include="Application\Stage\StageManager.cpp" />
     <ClCompile Include="Application\Stage\Wall.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\SceneRenderManager.cpp" />
-    <ClCompile Include="EngineSource\3D\Model\ParticleSystem\ModulesControl.cpp" />
+    <ClCompile Include="EngineSource\3D\ParticleSystem\ModulesControl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -607,10 +607,10 @@
     <ClInclude Include="EngineSource\3D\Model\VertexData.h">
       <Filter>EngineSource\3D\Model</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleBehavior.h">
+    <ClInclude Include="EngineSource\3D\ParticleSystem\ParticleBehavior.h">
       <Filter>EngineSource\3D\Model\ParticleSystem</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleData.h">
+    <ClInclude Include="EngineSource\3D\ParticleSystem\ParticleData.h">
       <Filter>EngineSource\3D\Model\ParticleSystem</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\3D\Renderer\DebugRenderer.h">
@@ -1025,8 +1025,8 @@
     <ClInclude Include="Application\Stage\Wall.h" />
     <ClInclude Include="EngineSource\Graphics\Core\SceneRenderManager.h" />
     <ClInclude Include="EngineSource\Graphics\Buffers\RefBuffer.h" />
-    <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ParticleModules.h" />
-    <ClInclude Include="EngineSource\3D\Model\ParticleSystem\ModulesControl.h" />
+    <ClInclude Include="EngineSource\3D\ParticleSystem\ParticleModules.h" />
+    <ClInclude Include="EngineSource\3D\ParticleSystem\ModulesControl.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />

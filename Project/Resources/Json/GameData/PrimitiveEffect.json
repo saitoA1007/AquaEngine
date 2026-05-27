@@ -39,6 +39,19 @@
             "ScaleEmit": {
                 "Enable": false
             },
+            "ShapeEmit": {
+                "Enable": true,
+                "Shape": {
+                    "_ShapeType": "Box",
+                    "_boxSize": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "_emitFromShell": false,
+                    "_radius": 1.0
+                }
+            },
             "SpawnCoolTime": 1.0,
             "SpawnMaxCount": 1,
             "VelocityEmit": {
