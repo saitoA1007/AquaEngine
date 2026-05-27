@@ -110,9 +110,9 @@ void GameParamEditor::DeserializeGroupFromJson(Group& group, const json& node) {
 			}
 			break;
 		case json::value_t::object:
-			if (itItem->contains("Min") && itItem->contains("Max")) {
-				const auto& minArray = itItem->at("Min");
-				const auto& maxArray = itItem->at("Max");
+			if (itItem->contains("_Min") && itItem->contains("_Max")) {
+				const auto& minArray = itItem->at("_Min");
+				const auto& maxArray = itItem->at("_Max");
 				if (minArray.size() == 3) {
 					group.items[itemName].value = Range3{
 						{ minArray[0], minArray[1], minArray[2] },
@@ -124,19 +124,19 @@ void GameParamEditor::DeserializeGroupFromJson(Group& group, const json& node) {
 						{ maxArray[0], maxArray[1], maxArray[2], maxArray[3] }
 					};
 				}
-			} else if (itItem->contains("ShapeType") && itItem->contains("radius")) {
+			} else if (itItem->contains("_ShapeType") && itItem->contains("_radius")) {
 				EmitterShape shape{};
-				std::string typeStr = itItem->at("ShapeType").get<std::string>();
+				std::string typeStr = itItem->at("_ShapeType").get<std::string>();
 				for (int i = 0; i < kEmitShapeTypeCount; ++i) {
 					if (typeStr == EmitShapeTypeNames[i]) {
 						shape.type = static_cast<EmitShapeType>(i);
 						break;
 					}
 				}
-				if (itItem->contains("radius"))        shape.radius = itItem->at("radius").get<float>();
-				if (itItem->contains("emitFromShell")) shape.emitFromShell = itItem->at("emitFromShell").get<bool>();
-				if (itItem->contains("boxSize")) {
-					const auto& s = itItem->at("boxSize");
+				if (itItem->contains("_radius")) { shape.radius = itItem->at("_radius").get<float>(); }
+				if (itItem->contains("_emitFromShell")) { shape.emitFromShell = itItem->at("_emitFromShell").get<bool>(); }
+				if (itItem->contains("_boxSize")) {
+					const auto& s = itItem->at("_boxSize");
 					shape.boxSize = { s[0], s[1], s[2] };
 				}
 				group.items[itemName].value = shape;

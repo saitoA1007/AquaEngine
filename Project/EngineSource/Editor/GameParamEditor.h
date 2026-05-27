@@ -8,11 +8,10 @@
 #include "Vector3.h"
 #include "Vector2.h"
 #include "Range.h"
+#include "ParticleData.h"
 
 #include <json.hpp>
 #include "MyMath.h"
-
-#include "ParticleSystem/ParticleData.h"
 
 namespace GameEngine {
 
@@ -275,15 +274,15 @@ namespace GameEngine {
 
 			void operator()(const Range3& value) const {
 				jsonData = nlohmann::json::object({
-					{ "Min", nlohmann::json::array({ value.min.x, value.min.y, value.min.z }) },
-					{ "Max", nlohmann::json::array({ value.max.x, value.max.y, value.max.z }) }
+					{ "_Min", nlohmann::json::array({ value.min.x, value.min.y, value.min.z }) },
+					{ "_Max", nlohmann::json::array({ value.max.x, value.max.y, value.max.z }) }
 					});
 			}
 
 			void operator()(const Range4& value) const {
 				jsonData = nlohmann::json::object({
-					{ "Min", nlohmann::json::array({ value.min.x, value.min.y, value.min.z, value.min.w}) },
-					{ "Max", nlohmann::json::array({ value.max.x, value.max.y, value.max.z, value.max.w}) }
+					{ "_Min", nlohmann::json::array({ value.min.x, value.min.y, value.min.z, value.min.w}) },
+					{ "_Max", nlohmann::json::array({ value.max.x, value.max.y, value.max.z, value.max.w}) }
 					});
 			}
 
@@ -300,10 +299,10 @@ namespace GameEngine {
 			}
 
 			void operator()(const EmitterShape& shape) const {
-				jsonData["ShapeType"] = EmitShapeTypeNames[static_cast<int>(shape.type)];
-				jsonData["radius"] = shape.radius;
-				jsonData["emitFromShell"] = shape.emitFromShell;
-				jsonData["boxSize"] = { shape.boxSize.x, shape.boxSize.y, shape.boxSize.z };
+				jsonData["_ShapeType"] = EmitShapeTypeNames[static_cast<int>(shape.type)];
+				jsonData["_radius"] = shape.radius;
+				jsonData["_emitFromShell"] = shape.emitFromShell;
+				jsonData["_boxSize"] = { shape.boxSize.x, shape.boxSize.y, shape.boxSize.z };
 			}
 
 			template<typename T>
