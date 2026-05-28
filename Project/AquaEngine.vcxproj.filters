@@ -1041,6 +1041,7 @@
     <FxCompile Include="Resources\Shaders\Rasterize\WBOITAccumulate.VS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\Smoothing\BoxFilter3x3.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\Smoothing\BoxFilter5x5.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\PostEffect\Smoothing\GaussianFilter.PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Externals\imgui\ProggyClean.ttf" />

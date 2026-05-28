@@ -54,12 +54,16 @@ void Grayscale::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvMana
     commandList->DrawInstanced(3, 1, 0, 0);
 }
 
-BoxFilter5x5::BoxFilter5x5() {
+GaussianBlur::GaussianBlur() {
     // 作成
     buffer_.Create();
+    // 標準偏差
+    buffer_.GetData()->sd = 2.0f;
+    // 有効
+    isActive_ = true;
 }
 
-void BoxFilter5x5::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
+void GaussianBlur::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
     commandList->SetGraphicsRootDescriptorTable(0, srvManager->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
     commandList->SetGraphicsRootConstantBufferView(1, buffer_.GetGpuVirtualAddress());
     commandList->DrawInstanced(3, 1, 0, 0);

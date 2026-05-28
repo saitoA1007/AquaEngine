@@ -101,14 +101,15 @@ namespace GameEngine {
         ConstantBuffer<GrayscaleData> buffer_;
     };
 
-    class BoxFilter5x5 : public IPostEffect {
-        struct BoxFilter5x5Data {
+    class GaussianBlur : public IPostEffect {
+        struct GaussianBlurData {
             uint32_t textureHandle;
-            float padding[3];
+            float sd; // 標準偏差
+            float padding[2];
         };
 
     public:
-        BoxFilter5x5();
+        GaussianBlur();
 
         void Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) override;
 
@@ -117,7 +118,7 @@ namespace GameEngine {
         }
 
     private:
-        ConstantBuffer<BoxFilter5x5Data> buffer_;
+        ConstantBuffer<GaussianBlurData> buffer_;
     };
 }
 

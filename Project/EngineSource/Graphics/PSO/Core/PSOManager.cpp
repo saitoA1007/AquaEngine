@@ -580,8 +580,8 @@ void PSOManager::DefaultLoadPostEffectPSO() {
     RegisterPSO("RadialBlur", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 
     // ぼかしを作成
-    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/Smoothing/BoxFilter5x5.PS.hlsl";
-    RegisterPSO("BoxFilter5x5", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
+    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/Smoothing/GaussianFilter.PS.hlsl";
+    RegisterPSO("GaussianBlur", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 
     // ラスタライズとレイトレの描画を合成する
     defaultPostEffect.rootSigName = "LightingComposite";
