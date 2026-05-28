@@ -12,24 +12,24 @@ void PostEffectManager::Initialize(ID3D12GraphicsCommandList* commandList, SrvMa
     renderPassController_->AddPass("VignettingPass");
     // ラジアルブラー
     renderPassController_->AddPass("RadialBlurPass");
-    // 5x5ぼかし
-    renderPassController_->AddPass("BoxFilter5x5Pass");
+    // ガウスぼかし
+    renderPassController_->AddPass("GaussianBlurPass");
     // ブルーム
     //renderPassController_->AddPass("BloomPass");
 
     // 実行順序を設定
-    RegisterPassOrder({"BoxFilter5x5Pass", "VignettingPass", "RadialBlurPass"});
+    RegisterPassOrder({"GaussianBlurPass", "VignettingPass", "RadialBlurPass"});
 
     // psoを登録
     RegisterPSO("Vignetting", psoManager);
     RegisterPSO("RadialBlur", psoManager);
     RegisterPSO("ScanLine", psoManager);
-    RegisterPSO("BoxFilter5x5", psoManager);
+    RegisterPSO("GaussianBlur", psoManager);
 
     // エフェクトを追加
     AddPostEffect<Vignetting>("VignettingPass", "Vignetting");
     AddPostEffect<RadialBlur>("RadialBlurPass", "RadialBlur");
-    AddPostEffect<BoxFilter5x5>("BoxFilter5x5Pass", "BoxFilter5x5");
+    AddPostEffect<GaussianBlur>("GaussianBlurPass", "GaussianBlur");
 }
 
 void PostEffectManager::Execute() {
