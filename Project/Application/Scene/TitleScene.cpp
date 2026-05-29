@@ -140,5 +140,5 @@ void TitleScene::Draw() {
 	//renderQueue_->SubmitModel(ringModel_, ringWorld_);
 
 	// エフェクトを描画
-	renderQueue_->SubmitInstancingWboit(effectModel_, primitiveEffect_->GetCurrentNumInstance(), *primitiveEffect_->GetWorldTransforms(),0.0f, BlendMode::kBlendModeNormal);
+	renderQueue_->SubmitInstancing(effectModel_, primitiveEffect_->GetCurrentNumInstance(), *primitiveEffect_->GetWorldTransforms(),0.0f, BlendMode::kBlendModeAdd);
 }

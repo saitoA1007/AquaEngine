@@ -1,11 +1,9 @@
 #pragma once
-#pragma once
-#include"Vector2.h"
-#include<iostream>
 #define DIRECTINPUT_VERSION 0x0800 // DirectInputのバージョン指定
+#include "Vector2.h"
 #include <dinput.h>
 #include <wrl.h>
-#include<array>
+#include <array>
 #include <Xinput.h>
 
 namespace GameEngine {
@@ -40,6 +38,13 @@ namespace GameEngine {
 		bool TriggerKey(BYTE keyNumber) const;
 
 		/// <summary>
+		/// キーのリリースをチェック
+		/// </summary>
+		/// <param name="keyNumber">キー番号(DIK_?)</param>
+		/// <returns>離された瞬間か</returns>
+		bool ReleaseKey(BYTE keyNumber) const;
+
+		/// <summary>
 		/// マウスの押下をチェック
 		/// </summary>
 		/// <param name="buttonNumber">マウスボタン番号(左:0,右:1,中:2,拡張マウスボタン:3~7)</param>
@@ -52,6 +57,13 @@ namespace GameEngine {
 		/// <param name="buttonNumber">マウスボタン番号(左:0,右:1,中:2,拡張マウスボタン:3~7)</param>
 		/// <returns>トリガーか</returns>
 		bool TriggerMouse(int32_t buttonNumber) const;
+
+		/// <summary>
+		/// マウスのリリースをチェック
+		/// </summary>
+		/// <param name="buttonNumber">マウスボタン番号(左:0,右:1,中:2,拡張マウスボタン:3~7)</param>
+		/// <returns>離された瞬間か</returns>
+		bool ReleaseMouse(int32_t buttonNumber) const;
 
 		/// <summary>
 		/// マウスの位置を取得する（ウィンドウ座標系）
@@ -86,6 +98,13 @@ namespace GameEngine {
 		bool TriggerPad(WORD button) const;
 
 		/// <summary>
+		/// パッドのリリースをチェック
+		/// </summary>
+		/// <param name="button"></param>
+		/// <returns>離された瞬間か</returns>
+		bool ReleasePad(WORD button) const;
+
+		/// <summary>
 		/// パッドの左スティック座標を取得
 		/// </summary>
 		/// <returns></returns>
@@ -105,11 +124,42 @@ namespace GameEngine {
 		bool GetPushPadLeftTrigger(const float& value = static_cast<float>(XINPUT_GAMEPAD_TRIGGER_THRESHOLD));
 
 		/// <summary>
+		/// LeftTriggerのトリガー（押した瞬間）をチェック(デフォルト値は30.0f)
+		/// </summary>
+		bool GetTriggerPadLeftTrigger(const float& value = static_cast<float>(XINPUT_GAMEPAD_TRIGGER_THRESHOLD));
+
+		/// <summary>
+		/// LeftTriggerのリリースをチェック (デフォルト値は30.0f)
+		/// </summary>
+		/// <param name="value">押下判定に用いたしきい値</param>
+		/// <returns>離された瞬間か</returns>
+		bool GetReleasePadLeftTrigger(const float& value = static_cast<float>(XINPUT_GAMEPAD_TRIGGER_THRESHOLD));
+
+		/// <summary>
 		/// RightTriggerの押下をチェック (デフォルト値は30.0f)
 		/// </summary>
 		/// <param name="value">どこから押下を判定するかの値。範囲 : (0~255), 0:完全に離している, 255:完全に引き切る</param>
 		/// <returns></returns>
 		bool GetPushPadRightTrigger(const float& value = static_cast<float>(XINPUT_GAMEPAD_TRIGGER_THRESHOLD));
+
+		/// <summary>
+		/// RightTriggerのトリガー（押した瞬間）をチェック(デフォルト値は30.0f)
+		/// </summary>
+		bool GetTriggerPadRightTrigger(const float& value = static_cast<float>(XINPUT_GAMEPAD_TRIGGER_THRESHOLD));
+
+		/// <summary>
+		/// RightTriggerのリリースをチェック (デフォルト値は30.0f)
+		/// </summary>
+		/// <param name="value">押下判定に用いたしきい値</param>
+		/// <returns>離された瞬間か</returns>
+		bool GetReleasePadRightTrigger(const float& value = static_cast<float>(XINPUT_GAMEPAD_TRIGGER_THRESHOLD));
+
+		/// <summary>
+		/// 振動させる
+		/// </summary>
+		/// <param name="leftMotorSpeed">0~1に正規化済み</param>
+		/// <param name="rightMotorSpeed">0~1に正規化済み</param>
+		void SetVibration(float leftMotorSpeed, float rightMotorSpeed);
 
 		/// <summary>
 		/// パッドの接続を確認

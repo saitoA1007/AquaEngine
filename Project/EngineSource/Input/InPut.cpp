@@ -1,12 +1,13 @@
 #define NOMINMAX
-#include"InPut.h"
-#include<cassert>
+#include "InPut.h"
+#include <cassert>
+#include <algorithm>
 
 #pragma comment(lib,"dinput8.lib")
 #pragma comment(lib,"dxguid.lib")
 #pragma comment(lib, "xinput.lib")
 
-#include"MyMath.h"
+#include "MyMath.h"
 
 using namespace GameEngine;
 
@@ -95,6 +96,15 @@ bool Input::TriggerKey(BYTE keyNumber) const {
 	}
 }
 
+bool Input::ReleaseKey(BYTE keyNumber) const {
+	// 前フレーム押されていた かつ 今フレーム離された
+	if (keys_[keyNumber] == 0x00 && preKeys_[keyNumber] == 0x80) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
 bool Input::PushMouse(int32_t mouseNumber) const {
 	if (mouse_.rgbButtons[mouseNumber] == 0x80) {
 		return true;
@@ -105,6 +115,14 @@ bool Input::PushMouse(int32_t mouseNumber) const {
 
 bool Input::TriggerMouse(int32_t buttonNumber) const {
 	if (mouse_.rgbButtons[buttonNumber] == 0x80 && preMouse_.rgbButtons[buttonNumber] == 0x00) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool Input::ReleaseMouse(int32_t buttonNumber) const {
+	if (mouse_.rgbButtons[buttonNumber] == 0x00 && preMouse_.rgbButtons[buttonNumber] == 0x80) {
 		return true;
 	} else {
 		return false;
@@ -139,6 +157,15 @@ bool Input::PushPad(WORD button) const {
 bool Input::TriggerPad(WORD button) const {
 	if ((controllerState_.Gamepad.wButtons & button) != 0 &&
 		(preControllerState_.Gamepad.wButtons & button) == 0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool Input::ReleasePad(WORD button) const {
+	if ((controllerState_.Gamepad.wButtons & button) == 0 &&
+		(preControllerState_.Gamepad.wButtons & button) != 0) {
 		return true;
 	} else {
 		return false;
@@ -199,6 +226,26 @@ bool Input::GetPushPadLeftTrigger(const float& value) {
 	return false;
 }
 
+bool Input::GetTriggerPadLeftTrigger(const float& value) {
+	float lt = static_cast<float>(controllerState_.Gamepad.bLeftTrigger);
+	float preLt = static_cast<float>(preControllerState_.Gamepad.bLeftTrigger);
+	// 今フレーム閾値を超えている かつ 前フレーム閾値以下
+	if (lt > value && preLt <= value) {
+		return true;
+	}
+	return false;
+}
+
+bool Input::GetReleasePadLeftTrigger(const float& value) {
+	float lt = static_cast<float>(controllerState_.Gamepad.bLeftTrigger);
+	float preLt = static_cast<float>(preControllerState_.Gamepad.bLeftTrigger);
+	// 前フレーム閾値を超えていた かつ 今フレーム閾値以下
+	if (lt <= value && preLt > value) {
+		return true;
+	}
+	return false;
+}
+
 bool Input::GetPushPadRightTrigger(const float& value) {
 
 	float rt = static_cast<float>(controllerState_.Gamepad.bRightTrigger);
@@ -207,6 +254,39 @@ bool Input::GetPushPadRightTrigger(const float& value) {
 		return true;
 	}
 	return false;
+}
+
+bool Input::GetTriggerPadRightTrigger(const float& value) {
+	float rt = static_cast<float>(controllerState_.Gamepad.bRightTrigger);
+	float preRt = static_cast<float>(preControllerState_.Gamepad.bRightTrigger);
+	// 今フレーム閾値を超えている かつ 前フレーム閾値以下
+	if (rt > value && preRt <= value) {
+		return true;
+	}
+	return false;
+}
+
+bool Input::GetReleasePadRightTrigger(const float& value) {
+	float rt = static_cast<float>(controllerState_.Gamepad.bRightTrigger);
+	float preRt = static_cast<float>(preControllerState_.Gamepad.bRightTrigger);
+	if (rt <= value && preRt > value) {
+		return true;
+	}
+	return false;
+}
+
+void Input::SetVibration(float leftMotorSpeed, float rightMotorSpeed) {
+	leftMotorSpeed = std::clamp(leftMotorSpeed, 0.0f, 1.0f);
+	rightMotorSpeed = std::clamp(rightMotorSpeed, 0.0f, 1.0f);
+
+	WORD leftSpeed = static_cast<WORD>(leftMotorSpeed * 65535.0f);
+	WORD rightSpeed = static_cast<WORD>(rightMotorSpeed * 65535.0f);
+
+	XINPUT_VIBRATION vibration;
+	ZeroMemory(&vibration, sizeof(XINPUT_VIBRATION));
+	vibration.wLeftMotorSpeed = leftSpeed;   // 左
+	vibration.wRightMotorSpeed = rightSpeed; // 右
+	XInputSetState(0, &vibration);
 }
 
 bool Input::IsPadConnected() const {

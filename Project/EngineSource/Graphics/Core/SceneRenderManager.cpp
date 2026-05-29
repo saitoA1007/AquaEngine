@@ -237,9 +237,10 @@ void SceneRenderManager::RasterizeExecute() {
 
         // 不透明、半透明ともにコマンドがなければ飛ばす
         bool hasOpaque = draw3dQueueList.count(passName) > 0;
-        //bool hasTranslucent = translucentDrawQueueList.count(passName) > 0;
+        bool hasTranslucent = translucentDrawQueueList.count(passName) > 0;
+        if (hasTranslucent && passName == "WBOITAccumulatePass") { hasTranslucent = false; }
         bool has2d = draw2dQueueList.count(passName) > 0;
-        if (!hasOpaque && !has2d) {
+        if (!hasOpaque && !hasTranslucent && !has2d) {
             renderPassController_->PrePass(passName);
             renderPassController_->ClearRenderPass(passName);
             renderPassController_->PostPass(passName);
@@ -278,22 +279,22 @@ void SceneRenderManager::RasterizeExecute() {
         }
 
         // 半透明描画コマンドを解放
-        //if (hasTranslucent) {
-        //    auto& translucentList = translucentDrawQueueList[passName];
-        //
-        //    // カメラの距離でソートをおこなう
-        //    // std::sort(translucentList.begin(), translucentList.end(),
-        //    //     [](const DrawRequest& a, const DrawRequest& b) {
-        //    //         return a.sortKey > b.sortKey;
-        //    //     });
-        //
-        //    for (const auto& request : translucentList) {
-        //        // 描画前処理
-        //        PreDraw(renderQueue_->Get3dPsoName(request.type));
-        //        // 描画コマンド解放
-        //        Execute3dRequest(request);
-        //    }
-        //}
+        if (hasTranslucent) {
+            auto& translucentList = translucentDrawQueueList[passName];
+        
+            // カメラの距離でソートをおこなう
+            // std::sort(translucentList.begin(), translucentList.end(),
+            //     [](const DrawRequest& a, const DrawRequest& b) {
+            //         return a.sortKey > b.sortKey;
+            //     });
+        
+            for (const auto& request : translucentList) {
+                // 描画前処理
+                PreDraw(renderQueue_->Get3dPsoName(request.type));
+                // 描画コマンド解放
+                Execute3dRequest(request);
+            }
+        }
 
         // 2D描画コマンドを解放
         if (has2d) {

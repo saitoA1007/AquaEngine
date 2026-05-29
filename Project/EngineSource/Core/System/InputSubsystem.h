@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include "IEngineSubsystem.h"
 #include "EngineContext.h"
 

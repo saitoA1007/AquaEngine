@@ -10,14 +10,31 @@ namespace GameEngine {
 
 	// 入力する状態
 	enum class InputState {
-		KeyPush,
-		KeyTrigger,
+		// キー
+		KeyPush,    // 押しっぱなし
+		KeyTrigger, // 押した瞬間
+		KeyRelease, // 離した瞬間
+
+		// マウス
 		MousePush,
 		MouseTrigger,
+		MouseRelease,
+
+		// パッド
 		PadPush,
 		PadTrigger,
+		PadRelease,
+
 		PadLeftStick,  // パッドの左スティック
 		PadRightStick, // パッドの右スティック
+
+		PadPushLeftTrigger,     // L2 押しっぱなし
+		PadTriggerLeftTrigger,  // L2 押した瞬間
+		PadReleaseLeftTrigger,  // L2 離した瞬間
+
+		PadPushRightTrigger,    // R2 押しっぱなし
+		PadTriggerRightTrigger, // R2 押した瞬間
+		PadReleaseRightTrigger, // R2 離した瞬間
 	};
 
 	// コマンドを入力する状態
@@ -66,6 +83,13 @@ namespace GameEngine {
 		/// 全てのコマンドを削除
 		/// </summary>
 		void ClearAllCommands();
+
+		/// <summary>
+		/// 振動させる(0~1の範囲を入れる)
+		/// </summary>
+		/// <param name="left">左モーター : 低周波</param>
+		/// <param name="right">右モーター : 高周波</param>
+		void PlayPadVibration(float left, float right);
 
 	private:
 		InputCommand(const InputCommand&) = delete;
