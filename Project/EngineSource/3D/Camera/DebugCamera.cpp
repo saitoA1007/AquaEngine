@@ -27,6 +27,8 @@ void DebugCamera::Initialize(const Vector3& translate,int width, int height) {
 	cameraForGPU_->vpMatrix = Matrix4x4::MakeIdentity();
 	cameraForGPU_->mtxViewInv = Matrix4x4::MakeIdentity();
 	cameraForGPU_->mtxProjInv = Matrix4x4::MakeIdentity();
+	cameraForGPU_->viewMatrix = Matrix4x4::MakeIdentity();
+	cameraForGPU_->projectionMatrix = Matrix4x4::MakeIdentity();
 
 	// 球面座標系で移動
 	translate_.x = targetPos_.x + distance_ * std::sinf(mouseMove_.y) * std::sinf(mouseMove_.x);
@@ -103,6 +105,8 @@ void DebugCamera::Update() {
 	cameraForGPU_->vpMatrix = GetVPMatrix();
 	cameraForGPU_->mtxViewInv = worldMatrix_;
 	cameraForGPU_->mtxProjInv = Math::InverseMatrix(projectionMatrix_);
+	cameraForGPU_->viewMatrix = viewMatrix_;
+	cameraForGPU_->projectionMatrix = projectionMatrix_;
 
 	// 初期位置にリセットする
 	if (input_->PushKey(DIK_G) && input_->PushKey(DIK_LCONTROL)) {

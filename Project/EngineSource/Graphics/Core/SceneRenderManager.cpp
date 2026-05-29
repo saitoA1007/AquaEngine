@@ -41,7 +41,9 @@ void SceneRenderManager::Initialize(ID3D12GraphicsCommandList4* commandList, Srv
 
     // WBOITに使用するパスを作成。半透明描画に使用
     renderPassController_->AddPass("WBOITAccumulatePass", RenderTextureMode::RtvOnly, 1280, 720, { 0.0f,0.0f,0.0f,0.0f }, DXGI_FORMAT_R16G16B16A16_FLOAT);
-    renderPassController_->AddPass("WBOITResolvePass", RenderTextureMode::RtvOnly, 1280, 720, { 0.0f,0.0f,0.0f,1.0f }, DXGI_FORMAT_R8_UNORM);
+    renderPassController_->AddPass("WBOITResolvePass", RenderTextureMode::RtvOnly, 1280, 720, { 1.0f,1.0f,1.0f,1.0f }, DXGI_FORMAT_R8_UNORM);
+
+    renderPassController_->AddPass("CompositePass");
 
     // 実行順序を設定
     RegisterPassOrder({ "ShadowPass", "DefaultPass" });
@@ -59,6 +61,9 @@ void SceneRenderManager::Initialize(ID3D12GraphicsCommandList4* commandList, Srv
 
     RegisterPSO("DefaultSprite", psoManager);
     RegisterPSO("AdditiveSprite", psoManager);
+
+    RegisterPSO("wboit3D", psoManager);
+    RegisterPSO("wboitResolve", psoManager);
 
     // レイトレとラスタライズの合成用
     RegisterPSO("LightingComposite", psoManager);
@@ -89,8 +94,13 @@ void SceneRenderManager::Execute() {
     // ラスタライズ描画コマンドを解放
     RasterizeExecute();
 
+    // 半透明描画
+    RasterizeTranslucentExecute();
+
     // レイトレとラスタライズの描画を合成する
     LightingComposite();
+
+    Composite();
 
     // 最終的に画面に出すためのパスの設定
     renderPassController_->SetSceneFinalPass(finalPassName_);
@@ -135,8 +145,11 @@ void SceneRenderManager::Execute3dRequest(const Draw3dRequest& request) {
 
     case Draw3dType::Instancing:
     case Draw3dType::InstancingAdd:
-        ModelRenderer::DrawInstancing(
-            request.model, request.numInstances, *request.worldTransforms, request.material);
+        ModelRenderer::DrawInstancing(request.model, request.numInstances, *request.worldTransforms, request.material);
+        break;
+
+    case Draw3dType::InstancingWboit:
+        ModelRenderer::DrawWboitInstancing(request.model, request.numInstances, *request.worldTransforms, renderQueue_->GetWboitResource(), request.material);
         break;
 
     case Draw3dType::Animation:
@@ -224,9 +237,9 @@ void SceneRenderManager::RasterizeExecute() {
 
         // 不透明、半透明ともにコマンドがなければ飛ばす
         bool hasOpaque = draw3dQueueList.count(passName) > 0;
-        bool hasTranslucent = translucentDrawQueueList.count(passName) > 0;
+        //bool hasTranslucent = translucentDrawQueueList.count(passName) > 0;
         bool has2d = draw2dQueueList.count(passName) > 0;
-        if (!hasOpaque && !hasTranslucent && !has2d) {
+        if (!hasOpaque && !has2d) {
             renderPassController_->PrePass(passName);
             renderPassController_->ClearRenderPass(passName);
             renderPassController_->PostPass(passName);
@@ -265,22 +278,22 @@ void SceneRenderManager::RasterizeExecute() {
         }
 
         // 半透明描画コマンドを解放
-        if (hasTranslucent) {
-            auto& translucentList = translucentDrawQueueList[passName];
-
-            // カメラの距離でソートをおこなう
-            // std::sort(translucentList.begin(), translucentList.end(),
-            //     [](const DrawRequest& a, const DrawRequest& b) {
-            //         return a.sortKey > b.sortKey;
-            //     });
-
-            for (const auto& request : translucentList) {
-                // 描画前処理
-                PreDraw(renderQueue_->Get3dPsoName(request.type));
-                // 描画コマンド解放
-                Execute3dRequest(request);
-            }
-        }
+        //if (hasTranslucent) {
+        //    auto& translucentList = translucentDrawQueueList[passName];
+        //
+        //    // カメラの距離でソートをおこなう
+        //    // std::sort(translucentList.begin(), translucentList.end(),
+        //    //     [](const DrawRequest& a, const DrawRequest& b) {
+        //    //         return a.sortKey > b.sortKey;
+        //    //     });
+        //
+        //    for (const auto& request : translucentList) {
+        //        // 描画前処理
+        //        PreDraw(renderQueue_->Get3dPsoName(request.type));
+        //        // 描画コマンド解放
+        //        Execute3dRequest(request);
+        //    }
+        //}
 
         // 2D描画コマンドを解放
         if (has2d) {
@@ -306,6 +319,8 @@ void SceneRenderManager::RasterizeExecute() {
 }
 
 void SceneRenderManager::RasterizeTranslucentExecute() {
+    enableDrawRasterizeTranslucent_ = false;
+
     std::string passName = "WBOITAccumulatePass";
 
     auto translucentDrawQueueList = renderQueue_->GetTranslucentQueue();
@@ -316,11 +331,12 @@ void SceneRenderManager::RasterizeTranslucentExecute() {
     if (hasTranslucent) {
         auto& translucentList = translucentDrawQueueList[passName];
 
+        std::vector<std::string> passList = { "WBOITAccumulatePass", "WBOITResolvePass" };
+        renderPassController_->PrePass(rasterizeFinalPassName_);
+        renderPassController_->PrePass(passList, rasterizeFinalPassName_);
+
         renderPassController_->ClearRenderPass(passName);
         renderPassController_->ClearRenderPass("WBOITResolvePass");
-
-        std::vector<std::string> passList = { "WBOITAccumulatePass","WBOITResolvePass" };
-        renderPassController_->PrePass(passList, rasterizeFinalPassName_);
 
         for (const auto& request : translucentList) {
             // 描画前処理
@@ -328,8 +344,13 @@ void SceneRenderManager::RasterizeTranslucentExecute() {
             // 描画コマンド解放
             Execute3dRequest(request);
         }
+        // リソースの状態を遷移
+        for (const auto& pass : passList) {
+            renderPassController_->PostPass(pass);
+        }
+        renderPassController_->PostPass(rasterizeFinalPassName_);
 
-        renderPassController_->PostPass(passName);
+        enableDrawRasterizeTranslucent_ = true;
     } else {
         renderPassController_->PrePass(passName);
         renderPassController_->ClearRenderPass(passName);
@@ -393,4 +414,20 @@ void SceneRenderManager::CopyRaytracingDepth() {
     commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     commandList_->SetGraphicsRootDescriptorTable(0, srvManager_->GetGPUHandle(renderPassController_->GetSrvIndex("RaytracingPassDepth")));
     commandList_->DrawInstanced(3, 1, 0, 0);
+}
+
+void SceneRenderManager::Composite() {
+    if (!enableDrawRasterizeTranslucent_) { return; }
+
+    renderPassController_->PrePass("CompositePass");
+    renderPassController_->ClearRenderPass("CompositePass");
+    PreDraw("wboitResolve");
+    commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    commandList_->SetGraphicsRootDescriptorTable(0, srvManager_->GetGPUHandle(renderPassController_->GetSrvIndex("WBOITAccumulatePass")));
+    commandList_->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUHandle(renderPassController_->GetSrvIndex("WBOITResolvePass")));
+    commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetGPUHandle(renderPassController_->GetSrvIndex(finalPassName_)));
+    commandList_->DrawInstanced(3, 1, 0, 0);
+    renderPassController_->PostPass("CompositePass");
+
+    finalPassName_ = "CompositePass";
 }

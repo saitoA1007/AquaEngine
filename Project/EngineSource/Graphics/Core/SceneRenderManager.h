@@ -64,6 +64,7 @@ namespace GameEngine {
 		// 描画の有効状態
 		bool enableDrawRaytracing_ = false;
 		bool enableDrawRasterize_ = false;
+		bool enableDrawRasterizeTranslucent_ = false;
 
 	private:
 
@@ -101,5 +102,7 @@ namespace GameEngine {
 
 		// 深度値をコピーする
 		void CopyRaytracingDepth();
+
+		void Composite();
 	};
 }

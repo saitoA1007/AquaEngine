@@ -32,7 +32,7 @@ PixelShaderOutput main(VertexShaderOutput input)
         return output;
     }
 
-    // 平均カラー (重み付き正規化)
+    // 平均カラー
     float3 avgColor = accum.rgb / weightedAlphaSum;
 
     // 全フラグメントを通過した後の透過率
@@ -41,10 +41,7 @@ PixelShaderOutput main(VertexShaderOutput input)
     // 最終合成
     float4 background = gBackgroundTex.Load(coord);
     float3 finalColor = lerp(background.rgb, avgColor, 1.0f - T);
-
-    // 出力アルファ
-    float finalAlpha = 1.0f - T;
     
-    output.color = float4(finalColor, finalAlpha);
+    output.color = float4(finalColor, 1.0f);
     return output;
 }

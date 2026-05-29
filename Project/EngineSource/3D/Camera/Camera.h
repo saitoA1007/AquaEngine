@@ -51,7 +51,7 @@ namespace GameEngine {
 		/// <returns></returns>
 		Matrix4x4 GetWorldMatrix() const { return worldMatrix_; }
 
-		Matrix4x4 GetViewMatrix() { return viewMatrix_; }
+		Matrix4x4 GetViewMatrix() const { return viewMatrix_; }
 		void SetViewMatrix(const Matrix4x4& viewMatrix);
 
 		/// <summary>

@@ -50,7 +50,6 @@ float ComputeWeight(float zNorm, float alpha, float depthPow, float weightMin, f
     return alpha * clamp(w, weightMin, weightMax);
 }
 
-[earlydepthstencil]
 PSAccumOut main(PSAccumIn input)
 {  
     PSAccumOut output;

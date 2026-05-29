@@ -57,6 +57,8 @@ namespace GameEngine {
 		/// <param name="material"></param>
 		static void DrawInstancing(const Model* model, const uint32_t& numInstance, WorldTransforms& worldTransforms, const GpuResource* material = nullptr);
 
+		static void DrawWboitInstancing(const Model* model, const uint32_t& numInstance, WorldTransforms& worldTransforms, const GpuResource* wboit,const GpuResource* material = nullptr);
+
 		/// <summary>
 		/// グリッドを描画
 		/// </summary>

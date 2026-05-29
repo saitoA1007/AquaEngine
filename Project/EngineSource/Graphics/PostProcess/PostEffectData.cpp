@@ -59,8 +59,6 @@ GaussianBlur::GaussianBlur() {
     buffer_.Create();
     // 標準偏差
     buffer_.GetData()->sd = 2.0f;
-    // 有効
-    isActive_ = true;
 }
 
 void GaussianBlur::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {

@@ -21,6 +21,17 @@ namespace GameEngine {
     /// </summary>
     class RenderQueue {
     public:
+        struct WBOITData {
+            float nearPlane; // ニアプレーン距離
+            float farPlane; // ファープレーン距離
+            float alphaThreshold; // 棄却アルファ閾値
+            float depthPow; // 深度感度指数
+
+            float weightMin; // 重みの下限
+            float weightMax; // 重みの上限
+            float pad[2];
+        };
+    public:
         RenderQueue();
         ~RenderQueue() = default;
 
@@ -57,6 +68,9 @@ namespace GameEngine {
         // ライト管理機能を取得
         LightManager* GetLightManager() { return &lightManager_; }
 
+        // wboitリソースを取得
+        GpuResource* GetWboitResource() { return &wboitData_; }
+
         // 背景画像ハンドルを設定する
         void SetSkyboxTexture(const uint32_t& texture) {
             skyboxTextureIndex_ = texture;
@@ -75,6 +89,8 @@ namespace GameEngine {
 
         /// インスタンシング描画
         void SubmitInstancing(const Model* model,uint32_t numInstances, WorldTransforms& worldTransforms, const float& alpha = 1.0f, BlendMode blendMode = BlendMode::kBlendModeNormal, const GpuResource* material = nullptr, const std::string& passName = "DefaultPass");
+
+        void SubmitInstancingWboit(const Model* model,uint32_t numInstances, WorldTransforms& worldTransforms, const float& alpha = 1.0f, BlendMode blendMode = BlendMode::kBlendModeNormal, const GpuResource* material = nullptr, const std::string& passName = "WBOITAccumulatePass");
 
         /// スケルタルアニメーション
         void SubmitAnimation(const Model* model, WorldTransform& worldTransform, const float& alpha = 1.0f, const GpuResource* material = nullptr, const std::string& passName = "DefaultPass");
@@ -140,6 +156,9 @@ namespace GameEngine {
         DirectionalLight::DirectionalLightData directionalData_;
         // 背景画像ハンドル
         uint32_t skyboxTextureIndex_ = 0;
+
+        // wboitデータ
+        ConstantBuffer<WBOITData> wboitData_;
 
         // デバックカメラを使用するか
         bool useDebugCamera_ = false;
