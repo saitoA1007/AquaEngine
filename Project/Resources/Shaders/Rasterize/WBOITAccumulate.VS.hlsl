@@ -37,7 +37,7 @@ PSAccumIn main(VertexShaderInput input, uint instanceId : SV_InstanceID)
     float4 viewPos = mul(worldPos, gCamera.mtxView);
     float4 clipPos = mul(viewPos, gCamera.mtxProj);
     
-    output.position = worldPos;
+    output.position = clipPos;
     output.texcoord = input.texcoord;
     output.color = gParticle[instanceId].color;
     output.textureHandle = gParticle[instanceId].textureHandle;

@@ -1,9 +1,10 @@
 #pragma once
-#include<d3d12.h>
-#include<dxcapi.h>
-#include<stdint.h>
+#include <d3d12.h>
+#include <dxcapi.h>
+#include <stdint.h>
+#include <vector>
 
-#include"BlendMode.h"
+#include "BlendMode.h"
 
 namespace GameEngine {
 
@@ -21,6 +22,8 @@ namespace GameEngine {
 		/// <param name="blendMode"></param>
 		/// <returns></returns>
 		D3D12_BLEND_DESC GetBlendDesc(BlendMode blendMode);
+
+		D3D12_BLEND_DESC CreateBlendDesc(std::vector<BlendMode> blendModes);
 
 	private:
 

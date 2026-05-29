@@ -125,6 +125,47 @@ void ModelRenderer::DrawInstancing(const Model* model, const uint32_t& numInstan
 	}
 }
 
+void ModelRenderer::DrawWboitInstancing(const Model* model, const uint32_t& numInstance, WorldTransforms& worldTransforms, const GpuResource* wboit, const GpuResource* material) {
+	// 描画するのが0以下の場合は早期リターン
+	if (numInstance <= 0) { return; }
+
+	// カメラ座標に変換
+	if (model->IsLoad()) {
+		worldTransforms.SetWVPMatrix(numInstance, model->GetLocalMatrix());
+	} else {
+		worldTransforms.SetWVPMatrix(numInstance);
+	}
+
+	// メッシュを取得
+	const std::vector<std::unique_ptr<Mesh>>& meshes = model->GetMeshes();
+
+	for (uint32_t i = 0; i < meshes.size(); ++i) {
+		commandList_->IASetVertexBuffers(0, 1, &meshes[i]->GetVertexBufferView());
+		commandList_->IASetIndexBuffer(&meshes[i]->GetIndexBufferView());
+		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		commandList_->SetGraphicsRootConstantBufferView(0, cameraResource_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootDescriptorTable(1, worldTransforms.GetInstancingSrvGPU());
+		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+		commandList_->SetGraphicsRootConstantBufferView(3, wboit->GetGpuVirtualAddress());
+
+		// マテリアルが設定されていなければデフォルトのマテリアルを使う
+		if (material == nullptr) {
+			// マテリアルを設定
+			const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
+			commandList_->SetGraphicsRootConstantBufferView(4, drawMaterial->GetGpuVirtualAddress());
+		} else {
+			commandList_->SetGraphicsRootConstantBufferView(4, material->GetGpuVirtualAddress());
+		}
+		
+		if (meshes[i]->GetTotalIndices() != 0) {
+			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), numInstance, 0, 0, 0);
+		} else {
+			commandList_->DrawInstanced(meshes[i]->GetTotalVertices(), numInstance, 0, 0);
+		}
+	}
+}
+
 void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTransform, GpuResource* lightGroupResource, const GpuResource* material) {
 	
 	// メッシュを取得

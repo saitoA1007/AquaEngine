@@ -49,7 +49,8 @@ ParticleBehavior::ParticleBehavior(const std::string& name, uint32_t maxNum, uin
 
     // 値の適応
     debugParame_->Apply();
-
+    modulesControl_->Update();
+    debugParame_->Apply();
 }
 
 void ParticleBehavior::Initialize() {

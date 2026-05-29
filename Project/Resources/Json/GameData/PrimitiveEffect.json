@@ -22,19 +22,7 @@
             "IsLoop": true,
             "LifeTime": 1.0,
             "RotateEmit": {
-                "Enable": true,
-                "RangeRotate": {
-                    "Max": [
-                        0.0,
-                        0.0,
-                        2.940000057220459
-                    ],
-                    "Min": [
-                        0.0,
-                        0.0,
-                        0.0
-                    ]
-                }
+                "Enable": false
             },
             "ScaleEmit": {
                 "Enable": false
@@ -53,14 +41,27 @@
                 }
             },
             "SpawnCoolTime": 1.0,
-            "SpawnMaxCount": 1,
+            "SpawnMaxCount": 8,
             "VelocityEmit": {
-                "Enable": false
+                "Enable": true,
+                "RangeVelocity": {
+                    "_Max": [
+                        2.6500000953674316,
+                        2.9700000286102295,
+                        0.0
+                    ],
+                    "_Min": [
+                        -1.0399999618530273,
+                        -1.7699999809265137,
+                        0.0
+                    ]
+                }
             }
         },
         "Particle": {
             "AlphaOverLifeTime": {
-                "Enable": false
+                "Enable": true,
+                "EndAlpha": 0.0
             },
             "SizeOverLifeTime": {
                 "Enable": false

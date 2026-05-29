@@ -73,14 +73,14 @@ void PSOManager::RegisterPSO(const std::string& name, const CreatePSOData& psoDa
     psoDesc.pRootSignature = rootSignatureList_[psoData.rootSigName].rootSignature.Get();
     psoDesc.InputLayout = inputLayout->GetInputLayoutDesc();
     psoDesc.RasterizerState = rasterizerBuiler_.GetRasterizerDesc(psoData.drawMode);
-    psoDesc.BlendState = blendBuilder_.GetBlendDesc(psoData.blendMode);
+    psoDesc.BlendState = blendBuilder_.CreateBlendDesc(psoData.blendMode);
     psoDesc.VS = { vsBlob->GetBufferPointer(), vsBlob->GetBufferSize() };
     psoDesc.PS = { psBlob->GetBufferPointer(), psBlob->GetBufferSize() };
     psoDesc.DepthStencilState = depthStencilDesc;
     psoDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
     psoDesc.NumRenderTargets = psoData.numRenderTargets;
-    if (psoData.numRenderTargets != 0) {
-        psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    for (uint32_t i = 0; i < psoData.numRenderTargets; ++i) {
+        psoDesc.RTVFormats[i] = psoData.rtvFormats[i];
     }
     psoDesc.PrimitiveTopologyType = psoData.primitiveType;
     psoDesc.SampleDesc.Count = 1;
@@ -193,7 +193,7 @@ void PSOManager::RegisterShadowMapPSO(const std::string& name, const CreatePSODa
     psoDesc.pRootSignature = rootSignatureList_[psoData.rootSigName].rootSignature.Get();
     psoDesc.InputLayout = inputLayout->GetInputLayoutDesc();
     psoDesc.RasterizerState = rast;
-    psoDesc.BlendState = blendBuilder_.GetBlendDesc(psoData.blendMode);
+    psoDesc.BlendState = blendBuilder_.GetBlendDesc(psoData.blendMode[0]);
     psoDesc.VS = { vsBlob->GetBufferPointer(), vsBlob->GetBufferSize() };
     psoDesc.PS = { nullptr,0 };
     psoDesc.DepthStencilState = depthStencilDesc;
@@ -298,7 +298,7 @@ void PSOManager::CreatePSO(const std::string& psoName, const CreatePSOData& psoD
     psoDesc.VS = { vsBlob->GetBufferPointer(), vsBlob->GetBufferSize() };
     psoDesc.PS = { psBlob->GetBufferPointer(), psBlob->GetBufferSize() };
     // BlendState
-    psoDesc.BlendState = blendBuilder_.GetBlendDesc(psoData.blendMode);
+    psoDesc.BlendState = blendBuilder_.GetBlendDesc(psoData.blendMode[0]);
     // RasterizerState
     psoDesc.RasterizerState = rasterizerBuiler_.GetRasterizerDesc(psoData.drawMode);
     // DepthStencilState
@@ -376,7 +376,7 @@ void PSOManager::DefaultLoadPSO() {
     default3D.vsPath = L"Resources/Shaders/Rasterize/Object3d.VS.hlsl";
     default3D.psPath = L"Resources/Shaders/Rasterize/Object3d.PS.hlsl";
     default3D.drawMode = DrawModel::FillFront;
-    default3D.blendMode = BlendMode::kBlendModeNormalAndSaveObjectAlpha;
+    default3D.blendMode = { BlendMode::kBlendModeNormalAndSaveObjectAlpha };
     default3D.isDepthEnable = true;
     RootSignatureBuilder rootSigBuilder;
     rootSigBuilder.Initialize(device_);
@@ -395,7 +395,7 @@ void PSOManager::DefaultLoadPSO() {
     RegisterPSO("Default3D", default3D, &rootSigBuilder, &inputLayoutBuilder);
 
     // 加算合成用PSO
-    default3D.blendMode = BlendMode::kBlendModeAdd;
+    default3D.blendMode = { BlendMode::kBlendModeAdd };
     RegisterPSO("Additive3D", default3D, &rootSigBuilder, &inputLayoutBuilder);
 
     // デフォルトのスプライト用PSO
@@ -404,7 +404,7 @@ void PSOManager::DefaultLoadPSO() {
     defaultSprite.vsPath = L"Resources/Shaders/Rasterize/Sprite.VS.hlsl";
     defaultSprite.psPath = L"Resources/Shaders/Rasterize/Sprite.PS.hlsl";
     defaultSprite.drawMode = DrawModel::None;
-    defaultSprite.blendMode = BlendMode::kBlendModeNormalAndSaveObjectAlpha;
+    defaultSprite.blendMode = { BlendMode::kBlendModeNormalAndSaveObjectAlpha };
     defaultSprite.isDepthEnable = false;
     RootSignatureBuilder spriteRoot;
     spriteRoot.Initialize(device_);
@@ -415,7 +415,7 @@ void PSOManager::DefaultLoadPSO() {
     InputLayoutBuilder spriteInput;
     spriteInput.CreateDefaultSpriteElement();
     RegisterPSO("DefaultSprite", defaultSprite,&spriteRoot,&spriteInput);
-    defaultSprite.blendMode = BlendMode::kBlendModeAdd;
+    defaultSprite.blendMode = { BlendMode::kBlendModeAdd };
     RegisterPSO("AdditiveSprite", defaultSprite, &spriteRoot,&spriteInput);
 
     // インスタンシング描画用PSO
@@ -424,7 +424,7 @@ void PSOManager::DefaultLoadPSO() {
     instancing3D.vsPath = L"Resources/Shaders/Rasterize/Particle.VS.hlsl";
     instancing3D.psPath = L"Resources/Shaders/Rasterize/Particle.PS.hlsl";
     instancing3D.drawMode = DrawModel::FillFront;
-    instancing3D.blendMode = BlendMode::kBlendModeNormalAndSaveObjectAlpha;
+    instancing3D.blendMode = { BlendMode::kBlendModeNormalAndSaveObjectAlpha };
     instancing3D.isDepthEnable = true;
     RootSignatureBuilder instancingRootSigBuilder;
     instancingRootSigBuilder.Initialize(device_);
@@ -437,7 +437,7 @@ void PSOManager::DefaultLoadPSO() {
     RegisterPSO("Instancing3D", instancing3D, &instancingRootSigBuilder, &inputLayoutBuilder);
 
     // インスタンシング描画の加算合成用PSO
-    instancing3D.blendMode = BlendMode::kBlendModeAdd;
+    instancing3D.blendMode = { BlendMode::kBlendModeAdd };
     RegisterPSO("AdditiveInstancing3D", instancing3D, &instancingRootSigBuilder, &inputLayoutBuilder);
 
     // グリッド描画用のPSO
@@ -446,7 +446,7 @@ void PSOManager::DefaultLoadPSO() {
     grid.vsPath = L"Resources/Shaders/Rasterize/Grid.VS.hlsl";
     grid.psPath = L"Resources/Shaders/Rasterize/Grid.PS.hlsl";
     grid.drawMode = DrawModel::None;
-    grid.blendMode = BlendMode::kBlendModeNormalAndSaveObjectAlpha;
+    grid.blendMode = { BlendMode::kBlendModeNormalAndSaveObjectAlpha };
     grid.isDepthEnable = true;
     RootSignatureBuilder gridRootSigBuilder;
     gridRootSigBuilder.Initialize(device_);
@@ -463,7 +463,7 @@ void PSOManager::DefaultLoadPSO() {
     line.vsPath = L"Resources/Shaders/Rasterize/Primitive.VS.hlsl";
     line.psPath = L"Resources/Shaders/Rasterize/Primitive.PS.hlsl";
     line.drawMode = DrawModel::None;
-    line.blendMode = BlendMode::kBlendModeNormalAndSaveObjectAlpha;
+    line.blendMode = { BlendMode::kBlendModeNormalAndSaveObjectAlpha };
     line.isDepthEnable = true;
     line.primitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
     RootSignatureBuilder lineRootSigBuilder;
@@ -480,7 +480,7 @@ void PSOManager::DefaultLoadPSO() {
     animation.vsPath = L"Resources/Shaders/Rasterize/SkinningObject3d.VS.hlsl";
     animation.psPath = L"Resources/Shaders/Rasterize/Object3d.PS.hlsl";
     animation.drawMode = DrawModel::FillFront;
-    animation.blendMode = BlendMode::kBlendModeNormalAndSaveObjectAlpha;
+    animation.blendMode = { BlendMode::kBlendModeNormalAndSaveObjectAlpha };
     animation.isDepthEnable = true;
     RootSignatureBuilder animationRootSigBuilder;
     animationRootSigBuilder.Initialize(device_);
@@ -505,7 +505,7 @@ void PSOManager::DefaultLoadPSO() {
     skybox.vsPath = L"Resources/Shaders/Rasterize/Skybox.VS.hlsl";
     skybox.psPath = L"Resources/Shaders/Rasterize/Skybox.PS.hlsl";
     skybox.drawMode = DrawModel::FillFront;
-    skybox.blendMode = BlendMode::kBlendModeNormal;
+    skybox.blendMode = { BlendMode::kBlendModeNormal };
     skybox.isDepthEnable = true;
     skybox.depthMask = D3D12_DEPTH_WRITE_MASK::D3D12_DEPTH_WRITE_MASK_ZERO;
     RootSignatureBuilder skyRoot;
@@ -524,7 +524,7 @@ void PSOManager::DefaultLoadPSO() {
     CreatePSOData shadowMap;
     shadowMap.rootSigName = "ShadowMap";
     shadowMap.vsPath = L"Resources/Shaders/Rasterize/ShadowMap.VS.hlsl";
-    shadowMap.blendMode = BlendMode::kBlendModeNormal;
+    shadowMap.blendMode = { BlendMode::kBlendModeNormal };
     RootSignatureBuilder shadowMapRootSigBuilder;
     shadowMapRootSigBuilder.Initialize(device_);
     shadowMapRootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX);
@@ -546,6 +546,29 @@ void PSOManager::DefaultLoadPSO() {
     animationCsRs.CreateRootSignature();
     RegisterComputePSO("ComputeAnimation", computeAnimation, &animationCsRs);
 
+
+    // wboit描画用PSO
+    CreatePSOData wboit3D;
+    wboit3D.rootSigName = "wboit3D";
+    wboit3D.vsPath = L"Resources/Shaders/Rasterize/WBOITAccumulate.VS.hlsl";
+    wboit3D.psPath = L"Resources/Shaders/Rasterize/WBOITAccumulate.PS.hlsl";
+    wboit3D.drawMode = DrawModel::FillFront;
+    wboit3D.blendMode = { BlendMode::kBlendModeWboitAccumulation, BlendMode::kBlendModeWboitRevealage };
+    wboit3D.isDepthEnable = true;
+    wboit3D.depthMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+    wboit3D.numRenderTargets = 2;
+    wboit3D.rtvFormats = { DXGI_FORMAT_R16G16B16A16_FLOAT,DXGI_FORMAT_R8_UNORM };
+    RootSignatureBuilder wboitRootSigBuilder;
+    wboitRootSigBuilder.Initialize(device_);
+    wboitRootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX);
+    wboitRootSigBuilder.AddSRVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX);
+    wboitRootSigBuilder.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 0, D3D12_SHADER_VISIBILITY_PIXEL);
+    wboitRootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_PIXEL);
+    wboitRootSigBuilder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_PIXEL);
+    wboitRootSigBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
+    wboitRootSigBuilder.CreateRootSignature();
+    RegisterPSO("wboit3D", wboit3D, &wboitRootSigBuilder, &inputLayoutBuilder);
+
     LogManager::GetInstance().Log("Default PSOs loaded");
 }
 
@@ -560,7 +583,7 @@ void PSOManager::DefaultLoadPostEffectPSO() {
     defaultPostEffect.vsPath = L"Resources/Shaders/PostEffect/FullScreen.VS.hlsl";
     defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/Vignetting/Vignetting.PS.hlsl";
     defaultPostEffect.drawMode = DrawModel::FillFront;
-    defaultPostEffect.blendMode = BlendMode::kBlendModeNone;
+    defaultPostEffect.blendMode = { BlendMode::kBlendModeNone };
     defaultPostEffect.isDepthEnable = false;
     RootSignatureBuilder rootSigBuilder;
     rootSigBuilder.Initialize(device_);
@@ -595,6 +618,18 @@ void PSOManager::DefaultLoadPostEffectPSO() {
     rsBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
     rsBuilder.CreateRootSignature();
     RegisterPSO("LightingComposite", defaultPostEffect, &rsBuilder, &inputLayoutBuilder);
+
+    // wboitとの合成用
+    defaultPostEffect.rootSigName = "wboitResolve";
+    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/WBOITResolve.PS.hlsl";
+    RootSignatureBuilder rsWboitBuilder;
+    rsWboitBuilder.Initialize(device_);
+    rsWboitBuilder.AddSRVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL);
+    rsWboitBuilder.AddSRVDescriptorTable(1, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL);
+    rsWboitBuilder.AddSRVDescriptorTable(2, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL);
+    rsWboitBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
+    rsWboitBuilder.CreateRootSignature();
+    RegisterPSO("wboitResolve", defaultPostEffect, &rsWboitBuilder, &inputLayoutBuilder);
 
     // 深度値をコピーするため
     defaultPostEffect.rootSigName = "DepthCopy";

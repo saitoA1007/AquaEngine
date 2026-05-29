@@ -26,6 +26,16 @@ void RenderQueue::Initialize() {
     // ライトの設定
     lightManager_.Initialize(true, false, false);
     lightManager_.SetDirectionalData(directionalData_);
+
+    // wboitのデータ
+    wboitData_.Create();
+    auto* wboitData =  wboitData_.GetData();
+    wboitData->nearPlane = 0.01f; // ニアプレーン距離
+    wboitData->farPlane = 200.0f; // ファープレーン距離
+    wboitData->alphaThreshold = 1.0f / 255.0f; // 棄却アルファ閾値
+    wboitData->depthPow = 4.0f; // 深度感度指数
+    wboitData->weightMin = 0.01f; // 重みの下限
+    wboitData->weightMax = 1000.0f; // 重みの上限
 }
 
 void RenderQueue::Update() {
@@ -83,6 +93,41 @@ void RenderQueue::SubmitInstancing(const Model* model, uint32_t numInstances, Wo
     case GameEngine::kBlendModeMultily:
     case GameEngine::kBlendModeScreen:
         request.type = Draw3dType::InstancingAdd;
+        break;
+    }
+
+    request.passName = passName;
+    request.model = model;
+    request.numInstances = numInstances;
+    request.worldTransforms = &worldTransforms;
+    request.material = material;
+
+    if (alpha == 1.0f) {
+        // 不透明描画に登録
+        draw3dQueueList_[passName][request.layer][Get3dPsoName(request.type)].push_back(request);
+    } else {
+        // 半透明描画に登録
+        translucentDrawQueueList_[passName].push_back(request);
+    }
+}
+
+void RenderQueue::SubmitInstancingWboit(const Model* model, uint32_t numInstances, WorldTransforms& worldTransforms, const float& alpha, BlendMode blendMode, const GpuResource* material, const std::string& passName) {
+    Draw3dRequest request;
+    request.layer = RenderLayer::Opaque;
+    // ブレンド設定
+    switch (blendMode)
+    {
+    case GameEngine::kBlendModeNormal:
+    default:
+        request.type = Draw3dType::InstancingWboit;
+        break;
+
+    case GameEngine::kBlendModeNone:
+    case GameEngine::kBlendModeAdd:
+    case GameEngine::kBlendModeSubtract:
+    case GameEngine::kBlendModeMultily:
+    case GameEngine::kBlendModeScreen:
+        request.type = Draw3dType::InstancingWboit;
         break;
     }
 
@@ -239,6 +284,7 @@ const char* RenderQueue::Get3dPsoName(Draw3dType type) {
     case Draw3dType::DefaultAdd: { return "Default3D"; }
     case Draw3dType::Instancing: { return "Instancing3D"; }
     case Draw3dType::InstancingAdd: { return "AdditiveInstancing3D"; }
+    case Draw3dType::InstancingWboit: { return "wboit3D"; }
     case Draw3dType::Animation: { return "Animation"; }
     case Draw3dType::Skybox: { return "Skybox"; }
     case Draw3dType::ShadowMap: { return "ShadowMap"; }

@@ -28,6 +28,7 @@ namespace GameEngine {
         DefaultAdd,
         Instancing,     // インスタンシング描画用
         InstancingAdd,
+        InstancingWboit,
         Animation,      // アニメーション描画用
         Skybox,         // スカイボックスの描画用
         ShadowMap,      // シャドウマップ用

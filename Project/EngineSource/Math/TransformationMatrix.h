@@ -22,4 +22,6 @@ struct alignas(16) CameraForGPU {
 	Matrix4x4 vpMatrix;
 	Matrix4x4 mtxViewInv; // ビュー逆行列
 	Matrix4x4 mtxProjInv; // プロジェクション逆行列
+	Matrix4x4 viewMatrix;
+	Matrix4x4 projectionMatrix;
 };
