@@ -109,10 +109,39 @@ private:
 // 突進アクション
 class PlayerAttackRushAction : public IPlayerAction {
 public:
-	void Initialize(PlayerCommonData* commonData);
+	void Initialize(PlayerCommonData* commonData, GameEngine::InputCommand* inputCommand);
 
 	// パラメータを登録する
 	//void RegisterParameter(GameEngine::DebugParameter* param) override;
+
+	void Update();
+
+private:
+	// 入力機能
+	GameEngine::InputCommand* inputCommand_ = nullptr;
+
+private:
+	// 突撃予備動作最大時間
+	float kPreRushMaxTime_ = 0.5f;
+	// 突撃最大速度
+	float kRushMaxSpeed_ = 32.0f;
+	// 突進時硬直最大時間
+	float kRushLockMaxTime_ = 1.0f;
+	// 突進溜め最大時間
+	float kRushChargeMaxTime_ = 2.0f;
+	// 突進の強さLv1になるまでの時間の割合
+	float kRushChargeLevel1Ratio_ = 0.0f;
+	// 突進の強さLv2になるまでの時間の割合
+	float kRushChargeLevel2Ratio_ = 0.5f;
+	// 突進の強さLv3になるまでの時間の割合
+	float kRushChargeLevel3Ratio_ = 1.0f;
+	// 突進時クールタイム（秒。硬直終了後に次の突進が可能になるまでの時間）
+	float kRushCooldownTime_ = 0.5f;
+
+	// 突撃の強さ
+	float kRushStrengthLevel1_ = 0.5f;
+	float kRushStrengthLevel2_ = 0.8f;
+	float kRushStrengthLevel3_ = 1.0f;
 };
 
 // 跳ね返りアクション

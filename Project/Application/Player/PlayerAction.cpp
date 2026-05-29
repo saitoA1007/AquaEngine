@@ -36,7 +36,7 @@ void PlayerMoveAction::ProcessMoveInput() {
 
 	Vector3 dir = { 0,0,0 };
 	// XZの目標速度
-	Vector3 desiredVelXZ = { 0,0,0 };
+	Vector3 desiredVelocityXZ = { 0,0,0 };
 
 	// 移動の操作
 	if (inputCommand_->IsCommandActive("MoveUp")) { dir -= cameraForwardXZ_; }
@@ -58,17 +58,17 @@ void PlayerMoveAction::ProcessMoveInput() {
 		float proj = horiz.x * dir.x + horiz.z * dir.z;
 		float horizLen = Math::Length(horiz);
 		if (horizLen >= maxSpeed) {
-			desiredVelXZ = dir * proj;
+			desiredVelocityXZ = dir * proj;
 		} else {
-			desiredVelXZ += dir * acceleration;
+			desiredVelocityXZ += dir * acceleration;
 		}
 	}
 	// 目標方向
 	commonData_->targetDir = dir;
 	
 	// 加速,減速を適応
-	ApplyAxis(commonData_->velocity.x, desiredVelXZ.x, isJump);
-	ApplyAxis(commonData_->velocity.z, desiredVelXZ.z, isJump);
+	ApplyAxis(commonData_->velocity.x, desiredVelocityXZ.x, isJump);
+	ApplyAxis(commonData_->velocity.z, desiredVelocityXZ.z, isJump);
 }
 
 void PlayerMoveAction::UpdateCameraBasis(const Matrix4x4& cameraWorldMatrix) {
@@ -137,8 +137,18 @@ void PlayerMoveAction::RegisterParameter(GameEngine::DebugParameter* param) {
 // プレイヤーの突進アクション
 //=======================================================
 
-void PlayerAttackRushAction::Initialize(PlayerCommonData* commonData) {
+void PlayerAttackRushAction::Initialize(PlayerCommonData* commonData, GameEngine::InputCommand* inputCommand) {
 	commonData_ = commonData;
+	inputCommand_ = inputCommand;
+}
+
+void PlayerAttackRushAction::Update() {
+
+	if (inputCommand_->IsCommandActive("RushCharge")) {
+
+	}
+
+
 }
 
 //=======================================================
@@ -152,21 +162,21 @@ void PlayerBounceAction::Initialize(PlayerCommonData* commonData) {
 void PlayerBounceAction::WallBounce(Vector3& pos,const Vector3& bounceDirection, const float& penetrationDepth) {
 
 	// 壁に衝突していたら押し戻す
-	Vector3 nXZ = { bounceDirection.x, 0.0f, bounceDirection.z };
-	if (nXZ.x != 0.0f || nXZ.z != 0.0f) { nXZ.Normalize(); }
+	Vector3 dirXZ = { bounceDirection.x, 0.0f, bounceDirection.z };
+	if (dirXZ.x != 0.0f || dirXZ.z != 0.0f) { dirXZ.Normalize(); }
 	float depth = std::max(penetrationDepth, 0.0f);
-	Vector3 correction = { nXZ.x * depth, 0.0f, nXZ.z * depth };
+	Vector3 correction = { dirXZ.x * depth, 0.0f, dirXZ.z * depth };
 	pos.x += correction.x;
 	pos.z += correction.z;
 
 	// 速度と方向を変更する
-	Vector3 velXZ = { commonData_->velocity.x, 0.0f, commonData_->velocity.z };
-	float dot = velXZ.x * nXZ.x + velXZ.z * nXZ.z;
+	Vector3 velocityXZ = { commonData_->velocity.x, 0.0f, commonData_->velocity.z };
+	float dot = velocityXZ.x * dirXZ.x + velocityXZ.z * dirXZ.z;
 	if (dot < 0.0f) {
 		Vector3 reflected = {
-			velXZ.x - 2.0f * dot * nXZ.x,
+			velocityXZ.x - 2.0f * dot * dirXZ.x,
 			0.0f,
-			velXZ.z - 2.0f * dot * nXZ.z
+			velocityXZ.z - 2.0f * dot * dirXZ.z
 		};
 		commonData_->velocity.x = reflected.x * kWallBounceReflectFactor_;
 		commonData_->velocity.z = reflected.z * kWallBounceReflectFactor_;

@@ -73,6 +73,10 @@ bool InputCommand::CheckCondition(const InputCondition& condition) {
 		return input_->TriggerKey(static_cast<BYTE>(condition.code));
 		break;
 
+	case GameEngine::InputState::KeyRelease:
+		return input_->ReleaseKey(static_cast<BYTE>(condition.code));
+		break;
+
 	case GameEngine::InputState::MousePush:
 		return input_->PushMouse(condition.code);
 		break;
@@ -81,12 +85,20 @@ bool InputCommand::CheckCondition(const InputCondition& condition) {
 		return input_->TriggerMouse(condition.code);
 		break;
 
+	case GameEngine::InputState::MouseRelease:
+		return input_->ReleaseMouse(condition.code);
+		break;
+
 	case GameEngine::InputState::PadPush:
 		return input_->PushPad(static_cast<WORD>(condition.code));
 		break;
 
 	case GameEngine::InputState::PadTrigger:
 		return input_->TriggerPad(static_cast<WORD>(condition.code));
+		break;
+
+	case GameEngine::InputState::PadRelease:
+		return input_->ReleasePad(static_cast<WORD>(condition.code));
 		break;
 
 	case GameEngine::InputState::PadLeftStick: {
@@ -100,6 +112,43 @@ bool InputCommand::CheckCondition(const InputCondition& condition) {
 		Vector2 stick = input_->GetRightStick();
 		float dot = stick.x * condition.direction.x + stick.y * condition.direction.y;
 		return dot > condition.threshold;
+		break;
+	}
+
+	case GameEngine::InputState::PadPushLeftTrigger: {
+		// XInputのトリガー範囲は0-255なので、threshold(0.0-1.0)を変換する
+		float triggerThreshold = condition.threshold * 255.0f;
+		return input_->GetPushPadLeftTrigger(triggerThreshold);
+		break;
+	}
+
+	case GameEngine::InputState::PadTriggerLeftTrigger: {
+		float triggerThreshold = condition.threshold * 255.0f;
+		return input_->GetTriggerPadLeftTrigger(triggerThreshold);
+		break;
+	}
+
+	case GameEngine::InputState::PadReleaseLeftTrigger: {
+		float triggerThreshold = condition.threshold * 255.0f;
+		return input_->GetReleasePadLeftTrigger(triggerThreshold);
+		break;
+	}
+
+	case GameEngine::InputState::PadPushRightTrigger: {
+		float triggerThreshold = condition.threshold * 255.0f;
+		return input_->GetPushPadRightTrigger(triggerThreshold);
+		break;
+	}
+
+	case GameEngine::InputState::PadTriggerRightTrigger: {
+		float triggerThreshold = condition.threshold * 255.0f;
+		return input_->GetTriggerPadRightTrigger(triggerThreshold);
+		break;
+	}
+
+	case GameEngine::InputState::PadReleaseRightTrigger: {
+		float triggerThreshold = condition.threshold * 255.0f;
+		return input_->GetReleasePadRightTrigger(triggerThreshold);
 		break;
 	}
 
