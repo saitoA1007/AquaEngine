@@ -133,6 +133,16 @@ D3D12_BLEND_DESC BlendBuilder::CreateBlendDesc(std::vector<BlendMode> blendModes
 			blendDesc.RenderTarget[i].DestBlend = D3D12_BLEND_INV_SRC_ALPHA; // (1-SrcA)
 			break;
 
+		case kBlendModeAddAndSaveObjectAlpha:
+			blendDesc.RenderTarget[i].SrcBlendAlpha = D3D12_BLEND_ONE; // アルファ値のソース
+			blendDesc.RenderTarget[i].BlendOpAlpha = D3D12_BLEND_OP_ADD; // アルファ値の加算ブレンド
+			blendDesc.RenderTarget[i].DestBlendAlpha = D3D12_BLEND_INV_SRC_ALPHA; // アルファ値のデスティネーション
+
+			blendDesc.RenderTarget[i].SrcBlend = D3D12_BLEND_SRC_ALPHA; // SrcA
+			blendDesc.RenderTarget[i].BlendOp = D3D12_BLEND_OP_ADD; // 加算ブレンド
+			blendDesc.RenderTarget[i].DestBlend = D3D12_BLEND_ONE; // (1-SrcA)
+			break;
+
 		case kBlendModeWboitAccumulation:
 			blendDesc.RenderTarget[i].SrcBlendAlpha = D3D12_BLEND_ONE;
 			blendDesc.RenderTarget[i].BlendOpAlpha = D3D12_BLEND_OP_ADD;

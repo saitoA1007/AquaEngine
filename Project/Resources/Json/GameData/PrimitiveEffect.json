@@ -22,15 +22,39 @@
             "IsLoop": true,
             "LifeTime": 1.0,
             "RotateEmit": {
-                "Enable": false
+                "Enable": true,
+                "RangeRotate": {
+                    "_Max": [
+                        0.0,
+                        0.0,
+                        5.760000228881836
+                    ],
+                    "_Min": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ]
+                }
             },
             "ScaleEmit": {
-                "Enable": false
+                "Enable": true,
+                "RangeScale": {
+                    "_Max": [
+                        0.05000000074505806,
+                        1.0,
+                        0.0
+                    ],
+                    "_Min": [
+                        0.009999999776482582,
+                        0.5,
+                        0.0
+                    ]
+                }
             },
             "ShapeEmit": {
                 "Enable": true,
                 "Shape": {
-                    "_ShapeType": "Box",
+                    "_ShapeType": "Point",
                     "_boxSize": [
                         1.0,
                         1.0,
@@ -43,19 +67,7 @@
             "SpawnCoolTime": 1.0,
             "SpawnMaxCount": 8,
             "VelocityEmit": {
-                "Enable": true,
-                "RangeVelocity": {
-                    "_Max": [
-                        2.6500000953674316,
-                        2.9700000286102295,
-                        0.0
-                    ],
-                    "_Min": [
-                        -1.0399999618530273,
-                        -1.7699999809265137,
-                        0.0
-                    ]
-                }
+                "Enable": false
             }
         },
         "Particle": {
