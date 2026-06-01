@@ -8,7 +8,7 @@ TLAS::~TLAS() {
         resource_.Reset();
         instanceBuffer_.Reset();
         if (srvManager_) {
-            srvManager_->ReleseIndex(srvIndex_);
+            srvManager_->ReleaseIndex(srvIndex_);
         }
     }  
 }

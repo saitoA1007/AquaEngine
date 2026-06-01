@@ -15,7 +15,7 @@ namespace GameEngine {
 			if (isCreated_) {
 				// SRV インデックス解放
 				if (srvManager_) {
-					srvManager_->ReleseIndex(srvIndex_);
+					srvManager_->ReleaseIndex(srvIndex_);
 				}
 				isCreated_ = false;
 			}

@@ -23,7 +23,7 @@ namespace GameEngine {
 		/// インデックスを削除
 		/// </summary>
 		/// <param name="index"></param>
-		void ReleseIndex(const uint32_t& index);
+		void ReleaseIndex(const uint32_t& index);
 
 		D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle(const uint32_t& index) const;
 

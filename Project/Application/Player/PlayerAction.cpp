@@ -5,6 +5,7 @@
 #include "MyMath.h"
 #include "FpsCounter.h"
 #include "DebugParameter.h"
+#include "LogManager.h"
 using namespace GameEngine;
 
 //=====================================================
@@ -66,9 +67,28 @@ void PlayerMoveAction::ProcessMoveInput() {
 	// 目標方向
 	commonData_->targetDir = dir;
 	
-	// 加速,減速を適応
-	ApplyAxis(commonData_->velocity.x, desiredVelocityXZ.x, isJump);
-	ApplyAxis(commonData_->velocity.z, desiredVelocityXZ.z, isJump);
+	// ノーマルとジャンプ状態以外は移動を無効化
+	if (commonData_->state != PlayerState::kNone && commonData_->state != PlayerState::kJump) {
+		desiredVelocityXZ = Vector3(0.0f, 0.0f, 0.0f);
+	}
+
+	// 加速,減速
+	Vector3 target = { 0,0,0 };
+	float deltaSpeed = 0.0f;
+	if (desiredVelocityXZ.x == 0.0f && desiredVelocityXZ.z == 0.0f) {
+		// 減速
+		const float deceleration = isJump ? kAirDeceleration_ : kGroundDeceleration_;
+		deltaSpeed = deceleration * FpsCounter::deltaTime;
+	} else {
+		// 加速
+		const float acceleration = isJump ? kAirAcceleration_ : kGroundAcceleration_;
+		deltaSpeed = acceleration * FpsCounter::deltaTime;
+		target = desiredVelocityXZ;
+	}
+
+	// 適応
+	commonData_->velocity.x = MoveTowards(commonData_->velocity.x, target.x, deltaSpeed);
+	commonData_->velocity.z = MoveTowards(commonData_->velocity.z, target.z, deltaSpeed);
 }
 
 void PlayerMoveAction::UpdateCameraBasis(const Matrix4x4& cameraWorldMatrix) {
@@ -98,28 +118,14 @@ void PlayerMoveAction::UpdateCameraBasis(const Matrix4x4& cameraWorldMatrix) {
 	cameraRightXZ_ = right;
 }
 
-void PlayerMoveAction::ApplyAxis(float& vel, float target, bool isAir) {
-	const float acceleration = isAir ? kAirAcceleration_ : kGroundAcceleration_;
-	const float deceleration = isAir ? kAirDeceleration_ : kGroundDeceleration_;
+float PlayerMoveAction::MoveTowards(float current, float target, float maxDelta) {
+	const float diff = target - current;
 
-	// 目標方向へ加速
-	if (target != 0.0f) {
-		const float diff = target - vel;
-		const float step = acceleration * FpsCounter::deltaTime;
-		if (std::fabsf(diff) <= step) {
-			vel = target;
-		} else {
-			vel += (diff > 0.0f ? step : -step);
-		}
-	} else {
-		const float speed = std::fabs(vel);
-		const float step = deceleration * FpsCounter::deltaTime;
-		if (speed <= step) {
-			vel = 0.0f;
-		} else {
-			vel += (vel > 0.0f ? -step : step);
-		}
+	if (std::fabs(diff) <= maxDelta) {
+		return target;
 	}
+
+	return current + (diff > 0.0f ? maxDelta : -maxDelta);
 }
 
 void PlayerMoveAction::RegisterParameter(GameEngine::DebugParameter* param) {
@@ -142,13 +148,104 @@ void PlayerAttackRushAction::Initialize(PlayerCommonData* commonData, GameEngine
 	inputCommand_ = inputCommand;
 }
 
-void PlayerAttackRushAction::Update() {
-
+void PlayerAttackRushAction::ProcessInput() {
+	// ため状態
 	if (inputCommand_->IsCommandActive("RushCharge")) {
-
+		if (commonData_->state == PlayerState::kNone) {
+			chargeTimer_ = 0.0f;
+			chargeRatio_ = 0.0f;
+			// Rush方向初期化
+			Vector3 rushDirXZ = commonData_->currentDir;
+			if (rushDirXZ.x == 0.0f && rushDirXZ.z == 0.0f) { rushDirXZ = { commonData_->velocity.x, 0.0f, commonData_->velocity.z }; }
+			rushDirection_ = (rushDirXZ.x == 0.0f && rushDirXZ.z == 0.0f) ? commonData_->cameraForwardXZ : rushDirXZ.Normalize();
+			// 溜め開始時はレベルをリセット
+			rushChargeLevel_ = 0;
+			// 現在の状態
+			commonData_->state = PlayerState::kCharging;
+			Log("Player start charge");
+		}	
 	}
 
+	// 発射状態
+	if (inputCommand_->IsCommandActive("RushStart")) {
+		if (commonData_->state == PlayerState::kCharging) {
+			// 予備動作時間を溜め比率で決定
+			chargeRatio_ = std::clamp(chargeTimer_, 0.0f, 1.0f);
+			// 溜め比率に応じてレベル決定
+			if (chargeRatio_ < kRushChargeLevel2Ratio_) {
+				rushChargeLevel_ = 1;
+			} else if (chargeRatio_ < kRushChargeLevel3Ratio_) {
+				rushChargeLevel_ = 2;
+			} else {
+				rushChargeLevel_ = 3;
+			}
+			rushTimer_ = 0.0f;
 
+			float levelMultiplier = 1.0f;
+			switch (rushChargeLevel_) {
+			case 1: levelMultiplier = kRushStrengthLevel1_; break;
+			case 2: levelMultiplier = kRushStrengthLevel2_; break;
+			case 3: levelMultiplier = kRushStrengthLevel3_; break;
+			default: levelMultiplier = kRushStrengthLevel1_; break;
+			}
+			float rushSpeed = kRushMaxSpeed_ * levelMultiplier;
+			Vector3 initVel = rushDirection_ * rushSpeed;
+			commonData_->velocity.x = initVel.x;
+			commonData_->velocity.z = initVel.z;
+			// 現在の状態
+			commonData_->state = PlayerState::kAttackRush;
+			Log("Player start attackRush");
+		}
+	}
+}
+
+void PlayerAttackRushAction::Update() {
+
+	// ため時間計測
+	if (commonData_->state == PlayerState::kCharging) {
+		chargeTimer_ += FpsCounter::deltaTime / kRushChargeMaxTime_;
+	}
+
+	// 突進
+	if (commonData_->state == PlayerState::kAttackRush) {
+		rushTimer_ += FpsCounter::deltaTime / kRushMaxTime_;
+
+		if (rushTimer_ >= 1.0f) {
+			Log("Player end attackRush");
+			commonData_->state = PlayerState::kNone;
+		}
+	}
+
+	// 突進硬直のクールタイム
+	if (commonData_->state == PlayerState::kStiffness) {
+		coolTime_ += FpsCounter::deltaTime / kRushCooldownTime_;
+
+		if (coolTime_ >= 1.0f) {
+			commonData_->state = PlayerState::kNone;
+		}
+	}
+
+}
+
+void PlayerAttackRushAction::RegisterParameter(GameEngine::DebugParameter* param) {
+	std::string subGroup = "AttackRush";
+	int index = 0;
+	param->Register("PreRushMaxTime", kPreRushMaxTime_, index++, subGroup);
+	param->Register("RushMaxSpeed", kRushMaxSpeed_, index++, subGroup);
+	param->Register("RushLockMaxTime", kRushLockMaxTime_, index++, subGroup);
+	param->Register("RushChargeMaxTime", kRushChargeMaxTime_, index++, subGroup);
+
+	param->Register("RushChargeLevel1Ratio", kRushChargeLevel1Ratio_, index++, subGroup);
+	param->Register("RushChargeLevel2Ratio", kRushChargeLevel2Ratio_, index++, subGroup);
+	param->Register("RushChargeLevel3Ratio", kRushChargeLevel3Ratio_, index++, subGroup);
+
+	param->Register("RushCooldownTime", kRushCooldownTime_, index++, subGroup);
+
+	param->Register("RushStrengthLevel1", kRushStrengthLevel1_, index++, subGroup);
+	param->Register("RushStrengthLevel2", kRushStrengthLevel2_, index++, subGroup);
+	param->Register("RushStrengthLevel3", kRushStrengthLevel3_, index++, subGroup);
+
+	param->Register("RushMaxTime", kRushMaxTime_, index++, subGroup);
 }
 
 //=======================================================
@@ -187,6 +284,18 @@ void PlayerBounceAction::WallBounce(Vector3& pos,const Vector3& bounceDirection,
 		}
 	}
 
+	// ラッシュ状態からの突進であれば上に飛ぶ
+	if (commonData_->state == PlayerState::kAttackRush) {
+		float levelMultiplier = 1.0f;
+		switch (rushChargeLevel_) {
+		case 1: levelMultiplier = kWallBounceStrengthLevel1_; break;
+		case 2: levelMultiplier = kWallBounceStrengthLevel2_; break;
+		case 3: levelMultiplier = kWallBounceStrengthLevel3_; break;
+		default: levelMultiplier = kWallBounceStrengthLevel1_; break;
+		}
+		commonData_->velocity.y = kWallBounceUpSpeed_ * kWallBounceReflectFactor_ * levelMultiplier;
+		//currentBounceLockTime_ = kWallBounceLockTime_;
+	}
 }
 
 void PlayerBounceAction::RegisterParameter(GameEngine::DebugParameter* param) {
@@ -201,4 +310,16 @@ void PlayerBounceAction::RegisterParameter(GameEngine::DebugParameter* param) {
 
 void PlayerAttackDownAction::Initialize(PlayerCommonData* commonData) {
 	commonData_ = commonData;
+}
+
+void PlayerAttackDownAction::Update() {
+		
+
+
+}
+
+void PlayerAttackDownAction::RegisterParameter(GameEngine::DebugParameter* param) {
+
+
+
 }

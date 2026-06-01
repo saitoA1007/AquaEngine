@@ -32,7 +32,7 @@ namespace GameEngine {
 		/// インデックスを削除
 		/// </summary>
 		/// <param name="index"></param>
-		void ReleseIndex(const uint32_t& index);
+		void ReleaseIndex(uint32_t index);
 
 		/// <summary>
 		/// 指定インデックスのCPUディスクリプタハンドルを取得
@@ -45,7 +45,7 @@ namespace GameEngine {
 		D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle(uint32_t index) const;
 
 		// heapのsrvIndexのスタート位置を取得
-		const uint32_t& GetStartSrvIndex(const SrvHeapType& type);
+		uint32_t GetStartSrvIndex(SrvHeapType type);
 
 	private:
 

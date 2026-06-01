@@ -66,6 +66,9 @@ private:
 	// 跳ね返りアクション
 	PlayerBounceAction bounceAction_;
 
+	// プレイヤーが受ける物理
+	PlayerPhysics playerPhysics_;
+
 private:
 
 	// 当たり判定

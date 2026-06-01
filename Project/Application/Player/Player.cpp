@@ -42,6 +42,10 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model)
 	moveAction_.Initialize(&commonData_, inputCommand);
 	// 跳ね返りアクション
 	bounceAction_.Initialize(&commonData_);
+	// 突進アクション
+	attackRushAction_.Initialize(&commonData_, inputCommand);
+	// 重力
+	playerPhysics_.Initialize(&commonData_);
 }
 
 void Player::Initialize() {
@@ -61,6 +65,11 @@ void Player::Update() {
 	moveAction_.UpdateCameraBasis(camera_->GetWorldMatrix());
 	// 移動操作
 	moveAction_.ProcessMoveInput();
+	// 突進操作
+	attackRushAction_.ProcessInput();
+
+	// 受ける物理を更新
+	playerPhysics_.Update();
 
 	// 移動を適応
 	worldTransform_.transform_.translate += commonData_.velocity * FpsCounter::deltaTime;
@@ -113,6 +122,9 @@ void Player::Update() {
 	worldTransform_.UpdateTransformMatrix();
 	// 当たり判定の更新
 	collider_.SetWorldPosition(worldTransform_.GetWorldPosition());
+
+	// 更新
+	attackRushAction_.Update();
 }
 
 void Player::Draw() {
@@ -127,7 +139,7 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 	
 	// 壁の衝突処理
 	if (isWall) {
-		Log("Player is hit Wall");
+		//Log("Player is hit Wall");
 		bounceAction_.WallBounce(worldTransform_.transform_.translate, result.contactNormal, result.penetrationDepth);
 	}
 }

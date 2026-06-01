@@ -20,7 +20,7 @@ namespace GameEngine {
 				}
 				// srvの解放
 				if (srvManager_) {
-					srvManager_->ReleseIndex(srvIndex_);
+					srvManager_->ReleaseIndex(srvIndex_);
 				}
 			}
 		}

@@ -16,6 +16,7 @@ enum class PlayerState {
 	kCharging,
 	kAttackDown,
 	kBounce,
+	kStiffness,
 
 	kMaxCount
 };
@@ -32,6 +33,9 @@ struct PlayerCommonData {
 
 	// プレイヤーの状態
 	PlayerState state = PlayerState::kNone;
+
+	Vector3 cameraForwardXZ = { 0.0f,0.0f,1.0f };
+	Vector3 cameraRightXZ = { 1.0f,0.0f,0.0f };
 };
 
 // プレイヤーアクションの基底クラス
@@ -103,7 +107,8 @@ private:
 	Vector3 cameraRightXZ_ = { 1.0f,0.0f,0.0f };
 
 private:
-	void ApplyAxis(float& vel, float target, bool isAir);
+	
+	float MoveTowards(float current, float target, float maxDelta);
 };
 
 // 突進アクション
@@ -111,10 +116,12 @@ class PlayerAttackRushAction : public IPlayerAction {
 public:
 	void Initialize(PlayerCommonData* commonData, GameEngine::InputCommand* inputCommand);
 
-	// パラメータを登録する
-	//void RegisterParameter(GameEngine::DebugParameter* param) override;
+	void ProcessInput();
 
 	void Update();
+
+	// パラメータを登録する
+	void RegisterParameter(GameEngine::DebugParameter* param) override;
 
 private:
 	// 入力機能
@@ -142,6 +149,18 @@ private:
 	float kRushStrengthLevel1_ = 0.5f;
 	float kRushStrengthLevel2_ = 0.8f;
 	float kRushStrengthLevel3_ = 1.0f;
+
+	// 突進している時の時間
+	float kRushMaxTime_ = 2.0f;
+
+private:
+	float chargeTimer_ = 0.0f;
+	float chargeRatio_ = 0.0f;
+	Vector3 rushDirection_;
+	uint32_t rushChargeLevel_ = 0;
+
+	float rushTimer_ = 0.0f;
+	float coolTime_ = 0.0f;
 };
 
 // 跳ね返りアクション
@@ -167,8 +186,18 @@ private:
 	// 速さに応じた跳ね返りの倍率の最大値
 	float kWallBounceMaxSpeedFactor_ = 1.5f;
 
+	// 跳ね返る大きさ
+	float kWallBounceStrengthLevel1_ = 0.5f;
+	float kWallBounceStrengthLevel2_ = 0.75f;
+	float kWallBounceStrengthLevel3_ = 1.0f;
+
 	// 壁に衝突した際の跳ね返りの倍率
 	float kWallBounceReflectFactor_ = 1.0f;
+
+private:
+
+	uint32_t rushChargeLevel_ = 3;
+
 };
 
 // 急降下攻撃アクション
@@ -176,8 +205,14 @@ class PlayerAttackDownAction : public IPlayerAction {
 public:
 	void Initialize(PlayerCommonData* commonData);
 
+	void Update();
+
 	// パラメータを登録する
-	//void RegisterParameter(GameEngine::DebugParameter* param) override;
+	void RegisterParameter(GameEngine::DebugParameter* param) override;
+
+private:
+
+
 };
 
 

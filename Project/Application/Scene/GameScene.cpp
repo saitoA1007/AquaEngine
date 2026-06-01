@@ -64,7 +64,7 @@ void GameScene::InputRegisterCommand() {
 	// AttackDownコマンド
 	inputCommand_->RegisterCommand("AttackDown", { {InputState::MouseTrigger, 0}, {InputState::PadTrigger, XINPUT_GAMEPAD_X} });
 	// RushChargeコマンド
-	inputCommand_->RegisterCommand("RushCharge", { {InputState::MousePush, 0}, {InputState::PadPush, XINPUT_GAMEPAD_X} });
+	inputCommand_->RegisterCommand("RushCharge", { {InputState::MouseTrigger, 0}, {InputState::PadTrigger, XINPUT_GAMEPAD_X} });
 	// RushStartコマンド
 	inputCommand_->RegisterCommand("RushStart", { {InputState::MouseRelease, 0}, {InputState::PadRelease, XINPUT_GAMEPAD_X} });
 }

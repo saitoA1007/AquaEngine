@@ -33,7 +33,7 @@ uint32_t RtvManager::CreateView(ID3D12Resource* resource, DXGI_FORMAT format) {
     return index;
 }
 
-void RtvManager::ReleseIndex(const uint32_t& index) {
+void RtvManager::ReleaseIndex(const uint32_t& index) {
     assert(index < maxRtvCount_ && "RTV index out of range");
     // 解放されたインデックスを再利用リストに追加
     freeIndices_.push_back(index);
