@@ -69,8 +69,9 @@ void Player::Update() {
 
 	// カメベクトルを更新
 	moveAction_.UpdateCameraBasis(camera_->GetWorldMatrix());
+
 	// 移動操作
-	moveAction_.ProcessMoveInput();
+	moveAction_.ProcessInput();
 	// 突進操作
 	attackRushAction_.ProcessInput();
 	// 落下攻撃操作
@@ -80,20 +81,14 @@ void Player::Update() {
 	playerAttackDownAction_.Update();
 	// 受ける物理を更新
 	playerPhysics_.Update();
-
+	// 更新
+	attackRushAction_.Update();
 	
-	if (commonData_.state == PlayerState::kAttackDown) {
-		commonData_.velocity.y = std::max(commonData_.velocity.y, -playerAttackDownAction_.GetAttackDownMaxSpeed());
-	} else {
-		commonData_.velocity.y = std::max(commonData_.velocity.y, -playerPhysics_.GetMaxFallSpeed());
-	}
+	// 範囲制限
+	ApplyClamp();
 
 	// 移動を適応
 	worldTransform_.transform_.translate += commonData_.velocity * FpsCounter::deltaTime;
-
-	// プレイヤーを移動範囲に制限
-	worldTransform_.transform_.translate.x = std::clamp(worldTransform_.transform_.translate.x, -9.0f, 9.0f);
-	worldTransform_.transform_.translate.z = std::clamp(worldTransform_.transform_.translate.z, -9.0f, 9.0f);
 
 	// 地面
 	if (worldTransform_.transform_.translate.y <= 0.0f) {
@@ -106,18 +101,37 @@ void Player::Update() {
 		}
 	}
 
+	// 角度を更新
+	UpdateRotation();
+
+	// 行列の更新
+	worldTransform_.UpdateTransformMatrix();
+	// 当たり判定の更新
+	collider_.SetWorldPosition(worldTransform_.GetWorldPosition());
+
+	// 更新
+	commonData_.transform = worldTransform_.transform_;
+}
+
+void Player::Draw() {
+
+	// モデル描画
+	renderQueue_->SubmitRaytracingModel(model_, worldTransform_);
+}
+
+void Player::UpdateRotation() {
 	// 現在向いている角度を更新
 	commonData_.currentDir = Vector3(commonData_.velocity.x, 0.0f, commonData_.velocity.z);
 	commonData_.currentDir.Normalize();
 
-	// 目標方向を取得
+	// 方向を取得
 	Vector3 targetDir = { 0.0f, 0.0f, 0.0f };
 	if (commonData_.targetDir.x != 0.0f || commonData_.targetDir.z != 0.0f) {
 		targetDir = commonData_.targetDir;
 	} else {
 		targetDir = commonData_.currentDir;
 	}
-	
+
 	// 回転の更新
 	if (targetDir.x != 0.0f || targetDir.z != 0.0f) {
 		targetDir.y = 0.0f;
@@ -136,23 +150,14 @@ void Player::Update() {
 		// 現在の角度を更新
 		commonData_.currentDir = Math::YawToDirection(commonData_.currentYaw);
 	}
-
-	// 行列の更新
-	worldTransform_.UpdateTransformMatrix();
-	// 当たり判定の更新
-	collider_.SetWorldPosition(worldTransform_.GetWorldPosition());
-
-	// 更新
-	commonData_.transform = worldTransform_.transform_;
-
-	// 更新
-	attackRushAction_.Update();
 }
 
-void Player::Draw() {
-
-	// モデル描画
-	renderQueue_->SubmitRaytracingModel(model_, worldTransform_);
+void Player::ApplyClamp() {
+	if (commonData_.state == PlayerState::kAttackDown) {
+		commonData_.velocity.y = std::max(commonData_.velocity.y, -playerAttackDownAction_.GetAttackDownMaxSpeed());
+	} else {
+		commonData_.velocity.y = std::max(commonData_.velocity.y, -playerPhysics_.GetMaxFallSpeed());
+	}
 }
 
 void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {

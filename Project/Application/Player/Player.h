@@ -73,8 +73,12 @@ private:
 
 private:
 
+	// 制限
+	void ApplyClamp();
+
+	// 回転の更新
+	void UpdateRotation();
+
 	// 当たり判定
 	void OnCollisionStay(const GameEngine::CollisionResult& result);
-
-
 };
