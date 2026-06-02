@@ -11,13 +11,13 @@ namespace GameEngine {
 
 // プレイヤーの状態
 enum class PlayerState {
-	kNone,
-	kJump,
-	kAttackRush,
-	kCharging,
-	kAttackDown,
-	kBounce,
-	kStiffness,
+	kNone,        // 通常
+	kJump,        // 空中
+	kAttackRush,  // 突進
+	kCharging,    // 突進するためのチャージ
+	kAttackDown,  // 落下攻撃
+	kBounce,      // バウンド
+	kStiffness,   // 硬直
 
 	kMaxCount
 };

@@ -110,9 +110,6 @@ void Player::Update() {
 	commonData_.currentDir = Vector3(commonData_.velocity.x, 0.0f, commonData_.velocity.z);
 	commonData_.currentDir.Normalize();
 
-	// 回転を適応
-	worldTransform_.transform_.rotate = Math::DirectionToEuler(commonData_.currentDir);
-
 	// 目標方向を取得
 	Vector3 targetDir = { 0.0f, 0.0f, 0.0f };
 	if (commonData_.targetDir.x != 0.0f || commonData_.targetDir.z != 0.0f) {

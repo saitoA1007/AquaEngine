@@ -58,19 +58,10 @@ void PlayerMoveAction::ProcessMoveInput() {
 		
 		// 最大移動速度を受け取る
 		const float maxSpeed = isJump ? kAirMaxMoveSpeed_ : kGroundMaxMoveSpeed_;
-		// 加速度を受け取る
-		float acceleration = isJump ? kAirAcceleration_ : kGroundAcceleration_;
-
-		// 現在の水平速度が既にmaxSpeed以上なら入力で増やさない
-		Vector3 horiz = { commonData_->velocity.x, 0.0f, commonData_->velocity.z };
-		float proj = horiz.x * dir.x + horiz.z * dir.z;
-		float horizLen = Math::Length(horiz);
-		if (horizLen >= maxSpeed) {
-			desiredVelocityXZ = dir * proj;
-		} else {
-			desiredVelocityXZ += dir * acceleration;
-		}
+		// 目標速度を設定
+		desiredVelocityXZ = dir * maxSpeed;
 	}
+	
 	// 目標方向
 	commonData_->targetDir = dir;
 	
@@ -187,6 +178,7 @@ void PlayerAttackRushAction::ProcessInput() {
 				rushChargeLevel_ = 3;
 			}
 			rushTimer_ = 0.0f;
+			coolTime_ = 0.0f;
 
 			float levelMultiplier = 1.0f;
 			switch (rushChargeLevel_) {
@@ -219,7 +211,7 @@ void PlayerAttackRushAction::Update() {
 
 		if (rushTimer_ >= 1.0f) {
 			Log("Player end attackRush");
-			commonData_->state = PlayerState::kNone;
+			commonData_->state = PlayerState::kStiffness;
 		}
 	}
 
@@ -391,7 +383,7 @@ void PlayerAttackDownAction::RegisterParameter(GameEngine::DebugParameter* param
 	int index = 0;
 
 	param->Register("AttackPreDownTime", kAttackPreDownTime_, index++, subGroup);
-	param->Register("AttackDowMaxSpeed", kAttackDownMaxSpeed_, index++, subGroup);
+	param->Register("AttackDownMaxSpeed", kAttackDownMaxSpeed_, index++, subGroup);
 	param->Register("AttackDownMinPower", kAttackDownMinPower_, index++, subGroup);
 	param->Register("AttackDownMaxPower", kAttackDownMaxPower_, index++, subGroup);
 	param->Register("AttackDownDistanceToMax", kAttackDownDistanceToMax_, index++, subGroup);
