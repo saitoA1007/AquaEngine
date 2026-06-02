@@ -3,6 +3,7 @@ using namespace GameEngine;
 
 #include "Application/Player/Player.h"
 #include "Application/Stage/StageManager.h"
+#include "Application/Enemy/BossEnemy.h"
 
 GameScene::~GameScene() {
 }
@@ -21,6 +22,11 @@ GameScene::GameScene() {
 	auto* playerModel = modelManager_->GetNameByModel("Walk");
 	playerModel->SetDefaultIsEnableLight(true);
 	auto player = gameObjectManager_->AddObject<Player>(inputCommand_, playerModel);
+
+	// 敵
+	auto* enemyModel = modelManager_->GetNameByModel("Cube");
+	enemyModel->SetDefaultIsEnableLight(true);
+	gameObjectManager_->AddObject<BossEnemy>(enemyModel);
 
 	// カメラ操作
 	cameraController_ = gameObjectManager_->AddObject<CameraController>(inputCommand_, &player->GetWorldTransform());
