@@ -12,7 +12,7 @@ namespace GameEngine {
 		~RefBuffer() {
 			// bufferRefの解放
 			if (isCreated_) {
-				bufferRefManager_->ReleseIndex(refIndex_);
+				bufferRefManager_->ReleaseIndex(refIndex_);
 			}
 		}
 

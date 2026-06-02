@@ -21,6 +21,9 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model)
 	// 値を登録
 	moveAction_.RegisterParameter(debugParame_.get());
 	bounceAction_.RegisterParameter(debugParame_.get());
+	attackRushAction_.RegisterParameter(debugParame_.get());
+	playerAttackDownAction_.RegisterParameter(debugParame_.get());
+	playerPhysics_.RegisterParameter(debugParame_.get());
 
 	// 当たり判定の実装
 	collider_.SetRadius(1.0f);
@@ -42,6 +45,13 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model)
 	moveAction_.Initialize(&commonData_, inputCommand);
 	// 跳ね返りアクション
 	bounceAction_.Initialize(&commonData_);
+	// 突進アクション
+	attackRushAction_.Initialize(&commonData_, inputCommand);
+	// 落下攻撃アクション
+	playerAttackDownAction_.Initialize(&commonData_, inputCommand);
+
+	// 重力
+	playerPhysics_.Initialize(&commonData_);
 }
 
 void Player::Initialize() {
@@ -61,6 +71,22 @@ void Player::Update() {
 	moveAction_.UpdateCameraBasis(camera_->GetWorldMatrix());
 	// 移動操作
 	moveAction_.ProcessMoveInput();
+	// 突進操作
+	attackRushAction_.ProcessInput();
+	// 落下攻撃操作
+	playerAttackDownAction_.ProcessInput();
+
+	// 落下攻撃の更新処理
+	playerAttackDownAction_.Update();
+	// 受ける物理を更新
+	playerPhysics_.Update();
+
+	
+	if (commonData_.state == PlayerState::kAttackDown) {
+		commonData_.velocity.y = std::max(commonData_.velocity.y, -playerAttackDownAction_.GetAttackDownMaxSpeed());
+	} else {
+		commonData_.velocity.y = std::max(commonData_.velocity.y, -playerPhysics_.GetMaxFallSpeed());
+	}
 
 	// 移動を適応
 	worldTransform_.transform_.translate += commonData_.velocity * FpsCounter::deltaTime;
@@ -73,14 +99,16 @@ void Player::Update() {
 	if (worldTransform_.transform_.translate.y <= 0.0f) {
 		worldTransform_.transform_.translate.y = 0.0f;
 		commonData_.velocity.y = 0.0f;
+
+		if (commonData_.state == PlayerState::kAttackDown) {
+			commonData_.state = PlayerState::kStiffness;
+			Log("Player End attackDown");
+		}
 	}
 
 	// 現在向いている角度を更新
 	commonData_.currentDir = Vector3(commonData_.velocity.x, 0.0f, commonData_.velocity.z);
 	commonData_.currentDir.Normalize();
-
-	// 回転を適応
-	worldTransform_.transform_.rotate = Math::DirectionToEuler(commonData_.currentDir);
 
 	// 目標方向を取得
 	Vector3 targetDir = { 0.0f, 0.0f, 0.0f };
@@ -113,6 +141,12 @@ void Player::Update() {
 	worldTransform_.UpdateTransformMatrix();
 	// 当たり判定の更新
 	collider_.SetWorldPosition(worldTransform_.GetWorldPosition());
+
+	// 更新
+	commonData_.transform = worldTransform_.transform_;
+
+	// 更新
+	attackRushAction_.Update();
 }
 
 void Player::Draw() {
@@ -127,7 +161,7 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 	
 	// 壁の衝突処理
 	if (isWall) {
-		Log("Player is hit Wall");
-		bounceAction_.WallBounce(worldTransform_.transform_.translate, result.contactNormal, result.penetrationDepth);
+		//Log("Player is hit Wall");
+		bounceAction_.WallBounce(worldTransform_.transform_.translate, result.contactNormal, result.penetrationDepth, attackRushAction_.GetRushMaxSpeed());
 	}
 }

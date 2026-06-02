@@ -1,6 +1,7 @@
 #pragma once
 #include "Vector3.h"
 #include "Matrix4x4.h"
+#include "Transform.h"
 
 namespace GameEngine {
 	// 前方宣言
@@ -10,18 +11,21 @@ namespace GameEngine {
 
 // プレイヤーの状態
 enum class PlayerState {
-	kNone,
-	kJump,
-	kAttackRush,
-	kCharging,
-	kAttackDown,
-	kBounce,
+	kNone,        // 通常
+	kJump,        // 空中
+	kAttackRush,  // 突進
+	kCharging,    // 突進するためのチャージ
+	kAttackDown,  // 落下攻撃
+	kBounce,      // バウンド
+	kStiffness,   // 硬直
 
 	kMaxCount
 };
 
 // プレイヤーの共通データ
 struct PlayerCommonData {
+	Transform transform = { {1,1,1},{0,0,0},{0,0,0} };
+
 	Vector3 velocity = {0.0f,0.0f,0.0f};
 	// 現在向いている方向
 	Vector3 currentDir = {0.0f,0.0f,1.0f};
@@ -32,6 +36,9 @@ struct PlayerCommonData {
 
 	// プレイヤーの状態
 	PlayerState state = PlayerState::kNone;
+
+	Vector3 cameraForwardXZ = { 0.0f,0.0f,1.0f };
+	Vector3 cameraRightXZ = { 1.0f,0.0f,0.0f };
 };
 
 // プレイヤーアクションの基底クラス
@@ -55,7 +62,10 @@ public:
 	void Update();
 
 	// パラメータを登録する
-	//void RegisterParameter(GameEngine::DebugParameter* param) override;
+	void RegisterParameter(GameEngine::DebugParameter* param) override;
+
+	// 落下の最大速度を取得
+	float GetMaxFallSpeed() const { return kMaxFallSpeed_; }
 
 private:
 	// 落下速度の上限
@@ -103,7 +113,8 @@ private:
 	Vector3 cameraRightXZ_ = { 1.0f,0.0f,0.0f };
 
 private:
-	void ApplyAxis(float& vel, float target, bool isAir);
+	
+	float MoveTowards(float current, float target, float maxDelta);
 };
 
 // 突進アクション
@@ -111,10 +122,15 @@ class PlayerAttackRushAction : public IPlayerAction {
 public:
 	void Initialize(PlayerCommonData* commonData, GameEngine::InputCommand* inputCommand);
 
-	// パラメータを登録する
-	//void RegisterParameter(GameEngine::DebugParameter* param) override;
+	void ProcessInput();
 
 	void Update();
+
+	// パラメータを登録する
+	void RegisterParameter(GameEngine::DebugParameter* param) override;
+
+	// 突進の最大速度を取得
+	float GetRushMaxSpeed() const { return  kRushMaxSpeed_; }
 
 private:
 	// 入力機能
@@ -142,6 +158,18 @@ private:
 	float kRushStrengthLevel1_ = 0.5f;
 	float kRushStrengthLevel2_ = 0.8f;
 	float kRushStrengthLevel3_ = 1.0f;
+
+	// 突進している時の時間
+	float kRushMaxTime_ = 2.0f;
+
+private:
+	float chargeTimer_ = 0.0f;
+	float chargeRatio_ = 0.0f;
+	Vector3 rushDirection_;
+	uint32_t rushChargeLevel_ = 0;
+
+	float rushTimer_ = 0.0f;
+	float coolTime_ = 0.0f;
 };
 
 // 跳ね返りアクション
@@ -149,7 +177,7 @@ class PlayerBounceAction : public IPlayerAction {
 public:
 	void Initialize(PlayerCommonData* commonData);
 
-	void WallBounce(Vector3& pos,const Vector3& bounceDirection,const float& penetrationDepth);
+	void WallBounce(Vector3& pos,const Vector3& bounceDirection,const float& penetrationDepth, const float kRushMaxSpeed);
 
 	// パラメータを登録する
 	void RegisterParameter(GameEngine::DebugParameter* param) override;
@@ -167,17 +195,55 @@ private:
 	// 速さに応じた跳ね返りの倍率の最大値
 	float kWallBounceMaxSpeedFactor_ = 1.5f;
 
-	// 壁に衝突した際の跳ね返りの倍率
+	// 突進の時の壁に衝突した際の跳ね返り倍率
 	float kWallBounceReflectFactor_ = 1.0f;
+	// 通常の時の壁に衝突した際の跳ね返り倍率
+	float kWallHitReflectFactor_ = 0.2f;
 };
 
 // 急降下攻撃アクション
 class PlayerAttackDownAction : public IPlayerAction {
 public:
-	void Initialize(PlayerCommonData* commonData);
+	void Initialize(PlayerCommonData* commonData, GameEngine::InputCommand* inputCommand);
+
+	void ProcessInput();
+
+	void Update();
 
 	// パラメータを登録する
-	//void RegisterParameter(GameEngine::DebugParameter* param) override;
+	void RegisterParameter(GameEngine::DebugParameter* param) override;
+
+	// 落下の最大速度
+	float GetAttackDownMaxSpeed()const { return kAttackDownMaxSpeed_; }
+
+private:
+	// 入力機能
+	GameEngine::InputCommand* inputCommand_ = nullptr;
+
+private:
+	// 落下前の硬直時間
+	float kAttackPreDownTime_ = 0.3f;
+	// 落下攻撃の最大落下速度
+	float kAttackDownMaxSpeed_ = 30.0f;
+	// 落下攻撃の最低攻撃力
+	float kAttackDownMinPower_ = 1.0f;
+	// 落下攻撃の最大攻撃力
+	float kAttackDownMaxPower_ = 10.0f;
+	// 最大攻撃力に達するまでの落下距離
+	float kAttackDownDistanceToMax_ = 5.0f;
+	// 急降下準備中の上昇量
+	float kAttackDownPrepareRise_ = 20.0f;
+
+	// 落下攻撃の加速度
+	float kAttackDownAcceleration_ = -70.0f;
+
+private:
+	// 攻撃の強さ
+	float attackDownPower_ = 0.0f;
+
+	bool isAttackDownPrepping_ = true;
+	float attackDownPrepareTimer_ = 0.0f;
+
 };
 
 

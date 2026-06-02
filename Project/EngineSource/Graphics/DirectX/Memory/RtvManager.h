@@ -23,9 +23,9 @@ namespace GameEngine {
 		/// インデックスを削除
 		/// </summary>
 		/// <param name="index"></param>
-		void ReleseIndex(const uint32_t& index);
+		void ReleaseIndex(uint32_t index);
 
-		D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle(const uint32_t& index) const;
+		D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle(uint32_t index) const;
 
 		uint32_t GetDescriptorSize() const { return descriptorSizeRTV_; }
 			

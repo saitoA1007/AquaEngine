@@ -22,10 +22,10 @@ namespace GameEngine {
 				}
 				// SRV,UAVインデックス解放
 				if (srvManager_) {
-					srvManager_->ReleseIndex(srvIndex_);
+					srvManager_->ReleaseIndex(srvIndex_);
 
 					if (enableUAV_) {
-						srvManager_->ReleseIndex(uavIndex_);
+						srvManager_->ReleaseIndex(uavIndex_);
 					}
 				}
 				isCreated_ = false;

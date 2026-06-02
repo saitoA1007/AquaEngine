@@ -5,8 +5,6 @@
 
 using namespace GameEngine;
 
-ID3D12Device* SrvManager::device_ = nullptr;
-
 void SrvManager::Initialize(ID3D12Device* device) {
 	device_ = device;
 	// SRV用のヒープを作成する
@@ -55,7 +53,7 @@ uint32_t SrvManager::AllocateSrvIndex(SrvHeapType srvHeapType) {
 	return index;
 }
 
-void SrvManager::ReleseIndex(const uint32_t& index) {
+void SrvManager::ReleaseIndex(uint32_t index) {
 	// インデックスがどのタイプか検索
 	auto it = indexTypeMap_.find(index);
 	if (it != indexTypeMap_.end()) {
@@ -75,6 +73,6 @@ D3D12_GPU_DESCRIPTOR_HANDLE SrvManager::GetGPUHandle(uint32_t index) const {
 	return GetGPUDescriptorHandle(srvHeap_.Get(), descriptorSizeSRV_, index);
 }
 
-const uint32_t& SrvManager::GetStartSrvIndex(const SrvHeapType& type) {
+uint32_t SrvManager::GetStartSrvIndex(SrvHeapType type) {
 	return ranges_[type].start;
 }

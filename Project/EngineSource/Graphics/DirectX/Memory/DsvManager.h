@@ -22,7 +22,7 @@ namespace GameEngine {
         /// <summary>
         /// リソースの解放とインデックスの回収
         /// </summary>
-        void ReleseIndex(uint32_t index);
+        void ReleaseIndex(uint32_t index);
 
         D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle(uint32_t index) const;
 

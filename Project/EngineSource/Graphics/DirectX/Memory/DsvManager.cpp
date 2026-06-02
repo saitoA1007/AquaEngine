@@ -24,7 +24,7 @@ uint32_t DsvManager::CreateView(ID3D12Resource* resource, DXGI_FORMAT dsvFormat)
     return index;
 }
 
-void DsvManager::ReleseIndex(uint32_t index) {
+void DsvManager::ReleaseIndex(uint32_t index) {
     assert(index < maxDsvCount_);
     freeIndices_.push_back(index);
 }

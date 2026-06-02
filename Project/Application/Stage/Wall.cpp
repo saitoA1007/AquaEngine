@@ -32,13 +32,13 @@ void Wall::SetParameter(const Transform& transform) {
 
 	// 当たり判定の更新
 	collider_.SetWorldPosition(worldTransform_.transform_.translate);
-	collider_.SetSize(worldTransform_.transform_.scale);
+	collider_.SetSize(worldTransform_.transform_.scale + Vector3(0.0f, 100.0f, 0.0f));
 	collider_.UpdateOrientationsFromRotate(worldTransform_.transform_.rotate);
 }
 
 void Wall::Initialize() {
 	collider_.SetWorldPosition(worldTransform_.transform_.translate);
-	collider_.SetSize(worldTransform_.transform_.scale);
+	collider_.SetSize(worldTransform_.transform_.scale + Vector3(0.0f,100.0f,0.0f));
 	collider_.UpdateOrientationsFromRotate(worldTransform_.transform_.rotate);
 	worldTransform_.UpdateTransformMatrix();
 }

@@ -12,15 +12,15 @@ RenderTexture::~RenderTexture() {
 	if (mode_ != RenderTextureMode::DsvOnly) {
 		// RTVインデックス解放
 		if (rtvIndex_ != 0) {
-			rtvManager_->ReleseIndex(rtvIndex_);
+			rtvManager_->ReleaseIndex(rtvIndex_);
 		}
 		// SRVインデックス解放
 		if (srvIndex_ != 0) {
-			srvManager_->ReleseIndex(srvIndex_);
+			srvManager_->ReleaseIndex(srvIndex_);
 		}
 		// UAVインデックス解放
 		if (uavIndex_ != 0) {
-			srvManager_->ReleseIndex(uavIndex_);
+			srvManager_->ReleaseIndex(uavIndex_);
 		}
 	}
 
@@ -30,12 +30,12 @@ RenderTexture::~RenderTexture() {
 		mode_ != RenderTextureMode::RtvAndUav)
 	{
 		if (dsvIndex_ != 0) {
-			dsvManager_->ReleseIndex(dsvIndex_);
+			dsvManager_->ReleaseIndex(dsvIndex_);
 		}
 
 		// RtvAndDsvの場合、深度用SRVインデックスはsrvIndexとは別
 		if (mode_ == RenderTextureMode::RtvAndDsv && depthSrvIndex_ != 0) {
-			srvManager_->ReleseIndex(depthSrvIndex_);
+			srvManager_->ReleaseIndex(depthSrvIndex_);
 		}
 	}
 }
