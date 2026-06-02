@@ -9,11 +9,6 @@ void RtvManager::Initialize(ID3D12Device* device) {
 
     device_ = device;
 
-    // RTVの設定
-    D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_ = {};
-    rtvDesc_.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-    rtvDesc_.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-
     // RTV用のヒープ
     rtvHeap_ = CreateDescriptorHeap(device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, maxRtvCount_, false);
     // サイズを取得
@@ -33,13 +28,13 @@ uint32_t RtvManager::CreateView(ID3D12Resource* resource, DXGI_FORMAT format) {
     return index;
 }
 
-void RtvManager::ReleaseIndex(const uint32_t& index) {
+void RtvManager::ReleaseIndex(uint32_t index) {
     assert(index < maxRtvCount_ && "RTV index out of range");
     // 解放されたインデックスを再利用リストに追加
     freeIndices_.push_back(index);
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE RtvManager::GetCPUHandle(const uint32_t& index) const {
+D3D12_CPU_DESCRIPTOR_HANDLE RtvManager::GetCPUHandle(uint32_t index) const {
     assert(index < maxRtvCount_ && "RTV index out of range");
     return GetCPUDescriptorHandle(rtvHeap_.Get(), descriptorSizeRTV_, index);
 }

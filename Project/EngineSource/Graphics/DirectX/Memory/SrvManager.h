@@ -2,7 +2,6 @@
 #include <d3d12.h>
 #include <wrl.h>
 #include <queue>
-#include <unordered_set>
 #include <unordered_map>
 
 #include "DescriptorCounts.h"
@@ -61,7 +60,7 @@ namespace GameEngine {
 		SrvManager(const SrvManager&) = delete;
 		SrvManager& operator=(const SrvManager&) = delete;
 
-		static ID3D12Device* device_;
+		ID3D12Device* device_ = nullptr;
 
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap_;
 		uint32_t descriptorSizeSRV_ = 0;

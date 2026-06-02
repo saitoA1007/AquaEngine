@@ -17,7 +17,7 @@ uint32_t BufferRefManager::AllocateIndex() {
     return nextIndex_++;
 }
 
-void BufferRefManager::ReleseIndex(const uint32_t& index) {
+void BufferRefManager::ReleaseIndex(const uint32_t& index) {
     assert(index < maxCount_ && "MaterialRef index out of range");
     // 解放されたインデックスを再利用リストに追加
     freeIndices_.push_back(index);

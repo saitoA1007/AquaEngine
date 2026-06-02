@@ -5,8 +5,6 @@
 
 using namespace GameEngine;
 
-ID3D12Device* SrvManager::device_ = nullptr;
-
 void SrvManager::Initialize(ID3D12Device* device) {
 	device_ = device;
 	// SRV用のヒープを作成する
