@@ -65,6 +65,8 @@ private:
 	PlayerAttackRushAction attackRushAction_;
 	// 跳ね返りアクション
 	PlayerBounceAction bounceAction_;
+	// 落下攻撃アクション
+	PlayerAttackDownAction playerAttackDownAction_;
 
 	// プレイヤーが受ける物理
 	PlayerPhysics playerPhysics_;

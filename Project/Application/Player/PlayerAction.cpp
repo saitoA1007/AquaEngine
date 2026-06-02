@@ -5,6 +5,7 @@
 #include "MyMath.h"
 #include "FpsCounter.h"
 #include "DebugParameter.h"
+#include "EasingManager.h"
 #include "LogManager.h"
 using namespace GameEngine;
 
@@ -19,7 +20,13 @@ void PlayerPhysics::Initialize(PlayerCommonData* commonData) {
 void PlayerPhysics::Update() {
 	// 重力を適応
 	commonData_->velocity.y += kFallAcceleration_ * FpsCounter::deltaTime;
-	commonData_->velocity.y = std::max(commonData_->velocity.y, -kMaxFallSpeed_);
+}
+
+void PlayerPhysics::RegisterParameter(GameEngine::DebugParameter* param) {
+	std::string subGroup = "Physics";
+	int index = 0;
+
+	param->Register("FallAcceleration", kFallAcceleration_, index++, subGroup);
 }
 
 //======================================================
@@ -150,8 +157,8 @@ void PlayerAttackRushAction::Initialize(PlayerCommonData* commonData, GameEngine
 
 void PlayerAttackRushAction::ProcessInput() {
 	// ため状態
-	if (inputCommand_->IsCommandActive("RushCharge")) {
-		if (commonData_->state == PlayerState::kNone) {
+	if (commonData_->state == PlayerState::kNone) {
+		if (inputCommand_->IsCommandActive("RushCharge")) {
 			chargeTimer_ = 0.0f;
 			chargeRatio_ = 0.0f;
 			// Rush方向初期化
@@ -163,12 +170,12 @@ void PlayerAttackRushAction::ProcessInput() {
 			// 現在の状態
 			commonData_->state = PlayerState::kCharging;
 			Log("Player start charge");
-		}	
+		}
 	}
 
 	// 発射状態
-	if (inputCommand_->IsCommandActive("RushStart")) {
-		if (commonData_->state == PlayerState::kCharging) {
+	if (commonData_->state == PlayerState::kCharging) {
+		if (inputCommand_->IsCommandActive("RushStart")) {
 			// 予備動作時間を溜め比率で決定
 			chargeRatio_ = std::clamp(chargeTimer_, 0.0f, 1.0f);
 			// 溜め比率に応じてレベル決定
@@ -256,70 +263,119 @@ void PlayerBounceAction::Initialize(PlayerCommonData* commonData) {
 	commonData_ = commonData;
 }
 
-void PlayerBounceAction::WallBounce(Vector3& pos,const Vector3& bounceDirection, const float& penetrationDepth) {
-
-	// 壁に衝突していたら押し戻す
-	Vector3 dirXZ = { bounceDirection.x, 0.0f, bounceDirection.z };
-	if (dirXZ.x != 0.0f || dirXZ.z != 0.0f) { dirXZ.Normalize(); }
-	float depth = std::max(penetrationDepth, 0.0f);
-	Vector3 correction = { dirXZ.x * depth, 0.0f, dirXZ.z * depth };
-	pos.x += correction.x;
-	pos.z += correction.z;
-
-	// 速度と方向を変更する
-	Vector3 velocityXZ = { commonData_->velocity.x, 0.0f, commonData_->velocity.z };
-	float dot = velocityXZ.x * dirXZ.x + velocityXZ.z * dirXZ.z;
-	if (dot < 0.0f) {
-		Vector3 reflected = {
-			velocityXZ.x - 2.0f * dot * dirXZ.x,
-			0.0f,
-			velocityXZ.z - 2.0f * dot * dirXZ.z
-		};
-		commonData_->velocity.x = reflected.x * kWallBounceReflectFactor_;
-		commonData_->velocity.z = reflected.z * kWallBounceReflectFactor_;
-		Vector3 newDir = { reflected.x, 0.0f, reflected.z };
-		float len = Math::Length(newDir);
-		if (len > 0.00001f) {
-			commonData_->targetDir = Math::Normalize(newDir);
-		}
-	}
+void PlayerBounceAction::WallBounce(Vector3& pos,const Vector3& bounceDirection, const float& penetrationDepth, const float kRushMaxSpeed) {
 
 	// ラッシュ状態からの突進であれば上に飛ぶ
 	if (commonData_->state == PlayerState::kAttackRush) {
-		float levelMultiplier = 1.0f;
-		switch (rushChargeLevel_) {
-		case 1: levelMultiplier = kWallBounceStrengthLevel1_; break;
-		case 2: levelMultiplier = kWallBounceStrengthLevel2_; break;
-		case 3: levelMultiplier = kWallBounceStrengthLevel3_; break;
-		default: levelMultiplier = kWallBounceStrengthLevel1_; break;
-		}
-		commonData_->velocity.y = kWallBounceUpSpeed_ * kWallBounceReflectFactor_ * levelMultiplier;
 		//currentBounceLockTime_ = kWallBounceLockTime_;
+
+		Vector3 prevHoriz = { commonData_->velocity.x, 0.0f, commonData_->velocity.z };
+		float prevSpeed = prevHoriz.Length();
+		// 速度比を計算
+		float speedRatio = 0.0f;
+		if (kRushMaxSpeed > 0.00001f) {
+			speedRatio = std::clamp(prevSpeed / kRushMaxSpeed, 0.0f, 1.0f);
+		}
+		// 高さ倍率を決定
+		float heightMultiplier = Lerp(kWallBounceMinSpeedFactor_, kWallBounceMaxSpeedFactor_, speedRatio);
+
+		// 水平方向の反発速度は従来通り
+		commonData_->velocity = bounceDirection * (kWallBounceAwaySpeed_ * kWallBounceReflectFactor_);
+		// 上方向速度は強さと速度倍率に応じて変化
+		commonData_->velocity.y = kWallBounceUpSpeed_ * kWallBounceReflectFactor_ * heightMultiplier;
+
+		commonData_->state = PlayerState::kJump;
+	} else {
+
+		// 壁に衝突していたら押し戻す
+		Vector3 dirXZ = { bounceDirection.x, 0.0f, bounceDirection.z };
+		if (dirXZ.x != 0.0f || dirXZ.z != 0.0f) { dirXZ.Normalize(); }
+		float depth = std::max(penetrationDepth, 0.0f);
+		Vector3 correction = { dirXZ.x * depth, 0.0f, dirXZ.z * depth };
+		pos.x += correction.x;
+		pos.z += correction.z;
+
+		// 速度と方向を変更する
+		Vector3 velocityXZ = { commonData_->velocity.x, 0.0f, commonData_->velocity.z };
+		float dot = Math::Dot(velocityXZ, dirXZ);
+		if (dot < 0.0f) {
+			Vector3 reflected = {
+				velocityXZ.x - 2.0f * dot * dirXZ.x,
+				0.0f,
+				velocityXZ.z - 2.0f * dot * dirXZ.z
+			};
+			commonData_->velocity.x = reflected.x * kWallHitReflectFactor_;
+			commonData_->velocity.z = reflected.z * kWallHitReflectFactor_;
+			Vector3 newDir = { reflected.x, 0.0f, reflected.z };
+			float len = Math::Length(newDir);
+			if (len > 0.00001f) {
+				commonData_->targetDir = Math::Normalize(newDir);
+			}
+		}
 	}
 }
 
 void PlayerBounceAction::RegisterParameter(GameEngine::DebugParameter* param) {
 	std::string subGroup = "Bounce";
 	int index = 0;
+	param->Register("WallBounceUpSpeed", kWallBounceUpSpeed_, index++, subGroup);
+	param->Register("WallBounceAwaySpeed", kWallBounceAwaySpeed_, index++, subGroup);
+	param->Register("WallBounceLockTime", kWallBounceLockTime_, index++, subGroup);
+
+	param->Register("WallBounceMinSpeedFactor", kWallBounceMinSpeedFactor_, index++, subGroup);
+	param->Register("WallBounceMaxSpeedFactor", kWallBounceMaxSpeedFactor_, index++, subGroup);
+
 	param->Register("WallBounceReflectFactor", kWallBounceReflectFactor_, index++, subGroup);
+	param->Register("WallHitReflectFactor", kWallHitReflectFactor_, index++, subGroup);
 }
 
 //=======================================================
 // プレイヤーの急降下攻撃アクション
 //=======================================================
 
-void PlayerAttackDownAction::Initialize(PlayerCommonData* commonData) {
+void PlayerAttackDownAction::Initialize(PlayerCommonData* commonData, GameEngine::InputCommand* inputCommand) {
 	commonData_ = commonData;
+	inputCommand_ = inputCommand;
+}
+
+void PlayerAttackDownAction::ProcessInput() {
+
+	if (commonData_->state == PlayerState::kJump) {
+		if (inputCommand_->IsCommandActive("AttackDown")) {
+			commonData_->velocity.x = 0.0f;
+			commonData_->velocity.z = 0.0f;
+			attackDownPower_ = 0.0f;
+			// 準備状態に入る（実際の落下は後で開始）
+			//isAttackDownPrepping_ = true;
+			//attackDownPrepareTimer_ = 0.0f;
+			attackDownStartY_ = commonData_->transform.translate.y;
+
+			float fallDistance = attackDownStartY_;
+			if (fallDistance < 0.0f) fallDistance = 0.0f;
+			float ratio = 0.0f;
+			if (kAttackDownDistanceToMax_ > 0.00001f) {
+				ratio = std::clamp(fallDistance / kAttackDownDistanceToMax_, 0.0f, 1.0f);
+			}
+			attackDownPower_ = Lerp(kAttackDownMinPower_, kAttackDownMaxPower_, ratio);
+
+			commonData_->state = PlayerState::kAttackDown;
+
+			Log("Player start attackDown");
+		}
+	}
 }
 
 void PlayerAttackDownAction::Update() {
 		
-
-
+	if (commonData_->state == PlayerState::kAttackDown) {
+		// 下への加速度
+		commonData_->velocity.y += kAttackDownAcceleration_ * FpsCounter::deltaTime;
+	}
 }
 
 void PlayerAttackDownAction::RegisterParameter(GameEngine::DebugParameter* param) {
+	std::string subGroup = "AttackDown";
+	int index = 0;
 
-
-
+	param->Register("AttackDowMaxSpeed", kAttackDownMaxSpeed_, index++, subGroup);
 }
