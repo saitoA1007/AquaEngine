@@ -232,20 +232,17 @@ private:
 	// 最大攻撃力に達するまでの落下距離
 	float kAttackDownDistanceToMax_ = 5.0f;
 	// 急降下準備中の上昇量
-	float kAttackDownPrepareRise_ = 4.0f;
+	float kAttackDownPrepareRise_ = 20.0f;
 
 	// 落下攻撃の加速度
 	float kAttackDownAcceleration_ = -70.0f;
-
-	// 回転補間速度（ラジアン / 秒）
-	float kRotationLerpSpeed_ = 10.0f;
 
 private:
 	// 攻撃の強さ
 	float attackDownPower_ = 0.0f;
 
-	// 攻撃の開始位置
-	float attackDownStartY_ = 0.0f;
+	bool isAttackDownPrepping_ = true;
+	float attackDownPrepareTimer_ = 0.0f;
 
 };
 

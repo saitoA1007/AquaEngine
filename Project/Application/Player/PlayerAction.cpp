@@ -345,12 +345,12 @@ void PlayerAttackDownAction::ProcessInput() {
 			commonData_->velocity.x = 0.0f;
 			commonData_->velocity.z = 0.0f;
 			attackDownPower_ = 0.0f;
-			// 準備状態に入る（実際の落下は後で開始）
-			//isAttackDownPrepping_ = true;
-			//attackDownPrepareTimer_ = 0.0f;
-			attackDownStartY_ = commonData_->transform.translate.y;
-
-			float fallDistance = attackDownStartY_;
+			// 準備状態に入る
+			isAttackDownPrepping_ = true;
+			attackDownPrepareTimer_ = 0.0f;
+			
+			// 攻撃力計算
+			float fallDistance = commonData_->transform.translate.y;
 			if (fallDistance < 0.0f) fallDistance = 0.0f;
 			float ratio = 0.0f;
 			if (kAttackDownDistanceToMax_ > 0.00001f) {
@@ -368,8 +368,21 @@ void PlayerAttackDownAction::ProcessInput() {
 void PlayerAttackDownAction::Update() {
 		
 	if (commonData_->state == PlayerState::kAttackDown) {
-		// 下への加速度
-		commonData_->velocity.y += kAttackDownAcceleration_ * FpsCounter::deltaTime;
+
+		if (isAttackDownPrepping_) {
+
+			attackDownPrepareTimer_ += FpsCounter::deltaTime / kAttackPreDownTime_;
+
+			commonData_->velocity.y += kAttackDownPrepareRise_ * FpsCounter::deltaTime;
+
+			if (attackDownPrepareTimer_ >= 1.0f) {
+				isAttackDownPrepping_ = false;
+			}
+
+		} else {
+			// 下への加速度
+			commonData_->velocity.y += kAttackDownAcceleration_ * FpsCounter::deltaTime;
+		}
 	}
 }
 
@@ -377,5 +390,11 @@ void PlayerAttackDownAction::RegisterParameter(GameEngine::DebugParameter* param
 	std::string subGroup = "AttackDown";
 	int index = 0;
 
+	param->Register("AttackPreDownTime", kAttackPreDownTime_, index++, subGroup);
 	param->Register("AttackDowMaxSpeed", kAttackDownMaxSpeed_, index++, subGroup);
+	param->Register("AttackDownMinPower", kAttackDownMinPower_, index++, subGroup);
+	param->Register("AttackDownMaxPower", kAttackDownMaxPower_, index++, subGroup);
+	param->Register("AttackDownDistanceToMax", kAttackDownDistanceToMax_, index++, subGroup);
+	param->Register("AttackDownPrepareRise", kAttackDownPrepareRise_, index++, subGroup);
+	param->Register("AttackDownAcceleration", kAttackDownAcceleration_, index++, subGroup);
 }
