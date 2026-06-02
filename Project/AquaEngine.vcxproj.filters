@@ -527,6 +527,11 @@
     <ClCompile Include="Application\Stage\Wall.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\SceneRenderManager.cpp" />
     <ClCompile Include="EngineSource\3D\ParticleSystem\ModulesControl.cpp" />
+    <ClCompile Include="Application\Enemy\BossEnemy.cpp" />
+    <ClCompile Include="Application\Enemy\State\BossStateIn.cpp" />
+    <ClCompile Include="Application\Enemy\State\BossStateOut.cpp" />
+    <ClCompile Include="Application\Enemy\State\BossStateBattle.cpp" />
+    <ClCompile Include="Application\Enemy\BattleAction\BossBattleAction.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1027,6 +1032,14 @@
     <ClInclude Include="EngineSource\Graphics\Buffers\RefBuffer.h" />
     <ClInclude Include="EngineSource\3D\ParticleSystem\ParticleModules.h" />
     <ClInclude Include="EngineSource\3D\ParticleSystem\ModulesControl.h" />
+    <ClInclude Include="Application\Enemy\BossEnemy.h" />
+    <ClInclude Include="Application\Enemy\IBossState.h" />
+    <ClInclude Include="Application\Enemy\State\BossStateIn.h" />
+    <ClInclude Include="Application\Enemy\State\BossStateOut.h" />
+    <ClInclude Include="Application\Enemy\State\BossStateBattle.h" />
+    <ClInclude Include="Application\Player\IPlayerAction.h" />
+    <ClInclude Include="Application\Enemy\BattleAction\IBossBattleAction.h" />
+    <ClInclude Include="Application\Enemy\BattleAction\BossBattleAction.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />

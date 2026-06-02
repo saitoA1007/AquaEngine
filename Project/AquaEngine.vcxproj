@@ -162,6 +162,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClCompile Include="Application\Camera\CameraController.cpp" />
     <ClCompile Include="Application\ColorEditor.cpp" />
+    <ClCompile Include="Application\Enemy\BattleAction\BossBattleAction.cpp" />
+    <ClCompile Include="Application\Enemy\BossEnemy.cpp" />
+    <ClCompile Include="Application\Enemy\State\BossStateBattle.cpp" />
+    <ClCompile Include="Application\Enemy\State\BossStateIn.cpp" />
+    <ClCompile Include="Application\Enemy\State\BossStateOut.cpp" />
     <ClCompile Include="Application\Player\Player.cpp" />
     <ClCompile Include="Application\Player\PlayerAction.cpp" />
     <ClCompile Include="Application\Scene\GameScene.cpp" />
@@ -377,6 +382,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClInclude Include="Application\Camera\CameraController.h" />
     <ClInclude Include="Application\ColorEditor.h" />
+    <ClInclude Include="Application\Enemy\BattleAction\BossBattleAction.h" />
+    <ClInclude Include="Application\Enemy\BattleAction\IBossBattleAction.h" />
+    <ClInclude Include="Application\Enemy\BossEnemy.h" />
+    <ClInclude Include="Application\Enemy\IBossState.h" />
+    <ClInclude Include="Application\Enemy\State\BossStateBattle.h" />
+    <ClInclude Include="Application\Enemy\State\BossStateIn.h" />
+    <ClInclude Include="Application\Enemy\State\BossStateOut.h" />
+    <ClInclude Include="Application\Player\IPlayerAction.h" />
     <ClInclude Include="Application\Player\Player.h" />
     <ClInclude Include="Application\Player\PlayerAction.h" />
     <ClInclude Include="Application\Scene\GameScene.h" />

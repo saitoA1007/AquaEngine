@@ -1,58 +1,5 @@
 #pragma once
-#include "Vector3.h"
-#include "Matrix4x4.h"
-#include "Transform.h"
-
-namespace GameEngine {
-	// 前方宣言
-	class InputCommand;
-	class DebugParameter;
-}
-
-// プレイヤーの状態
-enum class PlayerState {
-	kNone,        // 通常
-	kJump,        // 空中
-	kAttackRush,  // 突進
-	kCharging,    // 突進するためのチャージ
-	kAttackDown,  // 落下攻撃
-	kBounce,      // バウンド
-	kStiffness,   // 硬直
-
-	kMaxCount
-};
-
-// プレイヤーの共通データ
-struct PlayerCommonData {
-	Transform transform = { {1,1,1},{0,0,0},{0,0,0} };
-
-	Vector3 velocity = {0.0f,0.0f,0.0f};
-	// 現在向いている方向
-	Vector3 currentDir = {0.0f,0.0f,1.0f};
-	// 最終的に向く方向
-	Vector3 targetDir = { 0.0f, 0.0f, 1.0f };
-	// 現在の方向
-	float currentYaw = 0.0f;
-
-	// プレイヤーの状態
-	PlayerState state = PlayerState::kNone;
-
-	Vector3 cameraForwardXZ = { 0.0f,0.0f,1.0f };
-	Vector3 cameraRightXZ = { 1.0f,0.0f,0.0f };
-};
-
-// プレイヤーアクションの基底クラス
-class IPlayerAction {
-public:
-	virtual ~IPlayerAction() = default;
-
-	// 値を登録する
-	virtual void RegisterParameter([[maybe_unused]]GameEngine::DebugParameter* param) {};
-
-protected:
-	// プレイヤーの共通状態
-	PlayerCommonData* commonData_ = nullptr;
-};
+#include "IPlayerAction.h"
 
 // プレイヤーが常に受ける物理
 class PlayerPhysics : public IPlayerAction {
@@ -81,7 +28,7 @@ public:
 	void Initialize(PlayerCommonData* commonData, GameEngine::InputCommand* inputCommand);
 
 	// 入力
-	void ProcessMoveInput();
+	void ProcessInput();
 
 	// カメラ基準のベクトルを更新する
 	void UpdateCameraBasis(const Matrix4x4& cameraWorldMatrix);
@@ -113,7 +60,7 @@ private:
 	Vector3 cameraRightXZ_ = { 1.0f,0.0f,0.0f };
 
 private:
-	
+
 	float MoveTowards(float current, float target, float maxDelta);
 };
 
@@ -164,7 +111,6 @@ private:
 
 private:
 	float chargeTimer_ = 0.0f;
-	float chargeRatio_ = 0.0f;
 	Vector3 rushDirection_;
 	uint32_t rushChargeLevel_ = 0;
 
@@ -177,7 +123,7 @@ class PlayerBounceAction : public IPlayerAction {
 public:
 	void Initialize(PlayerCommonData* commonData);
 
-	void WallBounce(Vector3& pos,const Vector3& bounceDirection,const float& penetrationDepth, const float kRushMaxSpeed);
+	void WallBounce(Vector3& pos, const Vector3& bounceDirection, const float& penetrationDepth, const float kRushMaxSpeed);
 
 	// パラメータを登録する
 	void RegisterParameter(GameEngine::DebugParameter* param) override;
@@ -216,6 +162,8 @@ public:
 	// 落下の最大速度
 	float GetAttackDownMaxSpeed()const { return kAttackDownMaxSpeed_; }
 
+	float GetAttackDownPower() const { return attackDownPower_; }
+
 private:
 	// 入力機能
 	GameEngine::InputCommand* inputCommand_ = nullptr;
@@ -245,5 +193,3 @@ private:
 	float attackDownPrepareTimer_ = 0.0f;
 
 };
-
-

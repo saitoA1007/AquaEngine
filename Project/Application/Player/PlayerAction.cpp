@@ -3,7 +3,7 @@
 #include <algorithm>
 #include "InputCommand.h"
 #include "MyMath.h"
-#include "FpsCounter.h"
+#include "FPSCounter.h"
 #include "DebugParameter.h"
 #include "EasingManager.h"
 #include "LogManager.h"
@@ -38,7 +38,7 @@ void PlayerMoveAction::Initialize(PlayerCommonData* commonData, GameEngine::Inpu
 	inputCommand_ = inputCommand;
 }
 
-void PlayerMoveAction::ProcessMoveInput() {
+void PlayerMoveAction::ProcessInput() {
 
 	bool isJump = commonData_->state == PlayerState::kJump;
 
@@ -52,22 +52,19 @@ void PlayerMoveAction::ProcessMoveInput() {
 	if (inputCommand_->IsCommandActive("MoveLeft")) { dir -= cameraRightXZ_; }
 	if (inputCommand_->IsCommandActive("MoveRight")) { dir += cameraRightXZ_; }
 
-	if (dir.x != 0.0f || dir.z != 0.0f) {
-		dir.y = 0.0f;
-		dir.Normalize();
-		
-		// 最大移動速度を受け取る
-		const float maxSpeed = isJump ? kAirMaxMoveSpeed_ : kGroundMaxMoveSpeed_;
-		// 目標速度を設定
-		desiredVelocityXZ = dir * maxSpeed;
-	}
-	
 	// 目標方向
 	commonData_->targetDir = dir;
-	
-	// ノーマルとジャンプ状態以外は移動を無効化
-	if (commonData_->state != PlayerState::kNone && commonData_->state != PlayerState::kJump) {
-		desiredVelocityXZ = Vector3(0.0f, 0.0f, 0.0f);
+
+	if (commonData_->state == PlayerState::kNone || commonData_->state == PlayerState::kJump) {
+		if (dir.x != 0.0f || dir.z != 0.0f) {
+			dir.y = 0.0f;
+			dir.Normalize();
+
+			// 最大移動速度を受け取る
+			const float maxSpeed = isJump ? kAirMaxMoveSpeed_ : kGroundMaxMoveSpeed_;
+			// 目標速度を設定
+			desiredVelocityXZ = dir * maxSpeed;
+		}
 	}
 
 	// 加速,減速
@@ -151,11 +148,10 @@ void PlayerAttackRushAction::ProcessInput() {
 	if (commonData_->state == PlayerState::kNone) {
 		if (inputCommand_->IsCommandActive("RushCharge")) {
 			chargeTimer_ = 0.0f;
-			chargeRatio_ = 0.0f;
 			// Rush方向初期化
 			Vector3 rushDirXZ = commonData_->currentDir;
 			if (rushDirXZ.x == 0.0f && rushDirXZ.z == 0.0f) { rushDirXZ = { commonData_->velocity.x, 0.0f, commonData_->velocity.z }; }
-			rushDirection_ = (rushDirXZ.x == 0.0f && rushDirXZ.z == 0.0f) ? commonData_->cameraForwardXZ : rushDirXZ.Normalize();
+			rushDirection_ = (rushDirXZ.x == 0.0f && rushDirXZ.z == 0.0f) ? Vector3(0, 0, 1) : rushDirXZ.Normalize();
 			// 溜め開始時はレベルをリセット
 			rushChargeLevel_ = 0;
 			// 現在の状態
@@ -168,7 +164,7 @@ void PlayerAttackRushAction::ProcessInput() {
 	if (commonData_->state == PlayerState::kCharging) {
 		if (inputCommand_->IsCommandActive("RushStart")) {
 			// 予備動作時間を溜め比率で決定
-			chargeRatio_ = std::clamp(chargeTimer_, 0.0f, 1.0f);
+			float chargeRatio_ = std::clamp(chargeTimer_, 0.0f, 1.0f);
 			// 溜め比率に応じてレベル決定
 			if (chargeRatio_ < kRushChargeLevel2Ratio_) {
 				rushChargeLevel_ = 1;
@@ -255,7 +251,7 @@ void PlayerBounceAction::Initialize(PlayerCommonData* commonData) {
 	commonData_ = commonData;
 }
 
-void PlayerBounceAction::WallBounce(Vector3& pos,const Vector3& bounceDirection, const float& penetrationDepth, const float kRushMaxSpeed) {
+void PlayerBounceAction::WallBounce(Vector3& pos, const Vector3& bounceDirection, const float& penetrationDepth, const float kRushMaxSpeed) {
 
 	// ラッシュ状態からの突進であれば上に飛ぶ
 	if (commonData_->state == PlayerState::kAttackRush) {
@@ -340,7 +336,7 @@ void PlayerAttackDownAction::ProcessInput() {
 			// 準備状態に入る
 			isAttackDownPrepping_ = true;
 			attackDownPrepareTimer_ = 0.0f;
-			
+
 			// 攻撃力計算
 			float fallDistance = commonData_->transform.translate.y;
 			if (fallDistance < 0.0f) fallDistance = 0.0f;
@@ -358,7 +354,7 @@ void PlayerAttackDownAction::ProcessInput() {
 }
 
 void PlayerAttackDownAction::Update() {
-		
+
 	if (commonData_->state == PlayerState::kAttackDown) {
 
 		if (isAttackDownPrepping_) {
