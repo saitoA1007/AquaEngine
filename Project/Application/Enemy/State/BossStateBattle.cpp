@@ -21,9 +21,9 @@ BossStateBattle::BossStateBattle(BossStateCommonData& commonData) : stateCommonD
 	};
 
 	// 値を登録
-	for (auto& state : battleStatesTable_) {
-		state->RegisterParameter(stateCommonData_.debugParame);
-	}
+	//for (auto& state : battleStatesTable_) {
+	//	state->RegisterParameter(stateCommonData_.debugParame);
+	//}
 }
 
 void BossStateBattle::Enter() {
