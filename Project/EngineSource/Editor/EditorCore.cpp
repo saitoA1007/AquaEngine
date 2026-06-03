@@ -38,7 +38,7 @@ void EditorCore::Initialize(TextureManager* textureManager, SceneChangeRequest* 
 
 	// ウィンドウの内容を登録する
 	windowManager_->RegisterWindow(std::make_unique<SceneWindow>(renderPassController));
-	windowManager_->RegisterWindow(std::make_unique<AssetWindow>());
+	windowManager_->RegisterWindow(std::make_unique<AssetWindow>(textureManager));
 	windowManager_->RegisterWindow(std::make_unique<HierarchyWindow>(gameParamEditor));
 	windowManager_->RegisterWindow(std::make_unique<InspectorWindow>(gameParamEditor));
 	windowManager_->RegisterWindow(std::make_unique<ConsoleWindow>());
