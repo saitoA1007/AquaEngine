@@ -27,9 +27,6 @@ void EditorToolBar::Run() {
 	// ショートカットキーでも更新処理を管理
 	UpdateShortcutsKey();
 
-	// 画像の表示スタイル設定 
-	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.1f, 0.1f, 1));
-
 	// メインメニュー
 	if (ImGui::BeginMainMenuBar()) {
 		ImVec2 imageSize = { 12.0f,12.0f };
@@ -64,8 +61,6 @@ void EditorToolBar::Run() {
 		ImGui::EndMainMenuBar();
 	}
 
-	// 元に戻す
-	ImGui::PopStyleColor(1);
 }
 
 bool EditorToolBar::GetIsActiveUpdate() const {

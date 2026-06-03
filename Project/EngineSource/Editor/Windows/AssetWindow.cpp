@@ -153,19 +153,9 @@ void AssetWindow::RenderContentArea() {
             ImGui::PushID(filename.c_str());
             ImGui::BeginGroup();
 
-            // 画像の表示スタイル設定
-            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));  // 内側の余白をゼロ
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));     // 通常時の背景を透明に
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.3f, 0.3f, 0.2f)); // ホバー時
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));              // クリック時も枠線を出さない
-
             // それぞれの画像ボタンを表示
             std::string buttonID = "##Btn_" + filename;
             ImGui::ImageButton(buttonID.c_str(), textureID, iconSize);
-
-            // 画像の表示スタイルを元に戻す
-            ImGui::PopStyleColor(3);
-            ImGui::PopStyleVar();
 
             // ドラッグ判定
             if (!entry.is_directory()) {

@@ -58,5 +58,9 @@ namespace GameEngine {
 		ID3D12GraphicsCommandList* commandList_ = nullptr;
 		WindowsApp* windowsApp_ = nullptr;
 		SrvManager* srvManager_ = nullptr;
+
+	private:
+
+		void ApplyStyle();
 	};
 }
