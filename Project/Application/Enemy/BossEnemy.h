@@ -33,10 +33,10 @@ private:
 	GameEngine::WorldTransform worldTransform_;
 
 	// 状態
-	std::array<std::unique_ptr<IBossState>, static_cast<size_t>(BossState::MaxCount)> statesTable_;
+	std::array<std::unique_ptr<IBossState>, static_cast<size_t>(BossState::kMaxCount)> statesTable_;
 	// 現在の状態
 	IBossState* currentState_ = nullptr;
-	BossState bossState_ = BossState::In;
+	BossState bossState_ = BossState::kIn;
 
 	// 各状態で共有するデータ
 	BossStateCommonData stateCommonData_;
@@ -49,5 +49,4 @@ private:
 	void OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result);
 
 	void OnCollisionStay([[maybe_unused]] const GameEngine::CollisionResult& result);
-
 };
