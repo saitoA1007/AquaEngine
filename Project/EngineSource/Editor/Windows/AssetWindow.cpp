@@ -36,10 +36,10 @@ void AssetWindow::Draw() {
         ImGui::TableNextColumn();
 
         ImGuiTreeNodeFlags rootFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_DefaultOpen;
-        if (selectedPath == resourcesPath) rootFlags |= ImGuiTreeNodeFlags_Selected;
+        if (selectedPath == resourcesPath) { rootFlags |= ImGuiTreeNodeFlags_Selected; }
 
         if (ImGui::TreeNodeEx("Resources", rootFlags)) {
-            if (ImGui::IsItemClicked()) selectedPath = resourcesPath;
+            if (ImGui::IsItemClicked()) { selectedPath = resourcesPath; }
             RenderDirectoryTree(resourcesPath);
             ImGui::TreePop();
         }
@@ -78,7 +78,7 @@ void AssetWindow::RenderDirectoryTree(const std::filesystem::path& path) {
         for (const auto& subEntry : std::filesystem::directory_iterator(entry.path())) {
             if (subEntry.is_directory()) { hasSubDir = true; break; }
         }
-        if (!hasSubDir) flags |= ImGuiTreeNodeFlags_Leaf;
+        if (!hasSubDir) { flags |= ImGuiTreeNodeFlags_Leaf; }
 
         // ツリーノードを作成
         bool open = ImGui::TreeNodeEx(folderName.c_str(), flags);
@@ -102,7 +102,7 @@ void AssetWindow::RenderContentArea() {
     // 1アイテムの横幅を 80px として列数を計算
     float panelWidth = ImGui::GetContentRegionAvail().x;
     int columnCount = (int)(panelWidth / 80.0f);
-    if (columnCount < 1) columnCount = 1;
+    if (columnCount < 1) { columnCount = 1; }
 
     if (ImGui::BeginTable("AssetGrid", columnCount)) {
         for (const auto& entry : std::filesystem::directory_iterator(selectedPath)) {
@@ -153,19 +153,9 @@ void AssetWindow::RenderContentArea() {
             ImGui::PushID(filename.c_str());
             ImGui::BeginGroup();
 
-            // 画像の表示スタイル設定
-            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));  // 内側の余白をゼロ
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));     // 通常時の背景を透明に
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.3f, 0.3f, 0.2f)); // ホバー時
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));              // クリック時も枠線を出さない
-
             // それぞれの画像ボタンを表示
             std::string buttonID = "##Btn_" + filename;
             ImGui::ImageButton(buttonID.c_str(), textureID, iconSize);
-
-            // 画像の表示スタイルを元に戻す
-            ImGui::PopStyleColor(3);
-            ImGui::PopStyleVar();
 
             // ドラッグ判定
             if (!entry.is_directory()) {

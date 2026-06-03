@@ -60,6 +60,7 @@ void EditorToolBar::Run() {
 
 		ImGui::EndMainMenuBar();
 	}
+
 }
 
 bool EditorToolBar::GetIsActiveUpdate() const {
