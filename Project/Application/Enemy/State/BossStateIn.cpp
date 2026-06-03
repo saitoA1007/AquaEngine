@@ -9,7 +9,7 @@ void BossStateIn::Enter() {
 }
 
 void BossStateIn::Update() {
-
+	stateCommonData_.bossStateRequest = BossState::kBattle;
 }
 
 void BossStateIn::Exit() {

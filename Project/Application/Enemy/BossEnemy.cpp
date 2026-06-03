@@ -14,7 +14,7 @@ BossEnemy::BossEnemy(GameEngine::Model* model) {
 	model_ = model;
 
 	// 初期化
-	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
+	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,5.0f,0.0f} });
 
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>("BossEnemy");
@@ -24,13 +24,13 @@ BossEnemy::BossEnemy(GameEngine::Model* model) {
 	stateCommonData_.debugParame = debugParame_.get();
 
 	// 状態の生成
-	statesTable_[static_cast<size_t>(BossState::In)] = std::make_unique<BossStateIn>(stateCommonData_);
-	statesTable_[static_cast<size_t>(BossState::Battle)] = std::make_unique<BossStateBattle>(stateCommonData_);
-	statesTable_[static_cast<size_t>(BossState::Out)] = std::make_unique<BossStateOut>(stateCommonData_);
+	statesTable_[static_cast<size_t>(BossState::kIn)] = std::make_unique<BossStateIn>(stateCommonData_);
+	statesTable_[static_cast<size_t>(BossState::kBattle)] = std::make_unique<BossStateBattle>(stateCommonData_);
+	statesTable_[static_cast<size_t>(BossState::kOut)] = std::make_unique<BossStateOut>(stateCommonData_);
 
 	// 最初の状態を設定する
-	bossState_ = BossState::In;
-	currentState_ = statesTable_[static_cast<size_t>(BossState::In)].get();
+	bossState_ = BossState::kIn;
+	currentState_ = statesTable_[static_cast<size_t>(BossState::kIn)].get();
 	currentState_->Enter();
 
 	// 当たり判定を設定
@@ -40,7 +40,7 @@ BossEnemy::BossEnemy(GameEngine::Model* model) {
 	collider_.SetCollisionMask(~kCollisionAttributeEnemy);
 	// データを登録
 	UserData userData;
-	userData.typeID = static_cast<uint32_t>(CollisionTypeID::Boss);
+	userData.typeID = static_cast<uint32_t>(CollisionTypeID::kBoss);
 	userData.object = this;
 	collider_.SetUserData(userData);
 	// コールバック登録

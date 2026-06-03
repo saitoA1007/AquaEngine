@@ -1,7 +1,16 @@
 #pragma once
+#include <array>
 #include "Application/Enemy/IBossState.h"
+#include "Application/Enemy/BattleAction/IBossBattleAction.h"
 
 class BossStateBattle : public IBossState {
+public:
+	// 行動に重みを付ける
+	struct BehaviorWeight {
+		BossBattleState behavior;
+		uint32_t weight;
+	};
+
 public:
 	BossStateBattle(BossStateCommonData& commonData);
 	~BossStateBattle() = default;
@@ -24,6 +33,20 @@ public:
 private:
 	BossStateCommonData& stateCommonData_;
 
+	// 戦いの状態テーブル
+	std::array<std::unique_ptr<IBossBattleAction>, static_cast<size_t>(BossBattleState::kMaxCount)> battleStatesTable_;
+	BossBattleState currentBattleState_;
 
+	BossBattleStateCommonData battleStateCommonData_;
 
+	// 遷移するために使用するリスト
+	std::vector<BehaviorWeight> lotteryList_;
+
+private:
+
+	/// <summary>
+	/// 次の攻撃行動を取得する
+	/// </summary>
+	/// <returns></returns>
+	BossBattleState SelectWeightedBattleState();
 };

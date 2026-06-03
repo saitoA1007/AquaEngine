@@ -16,7 +16,7 @@ Wall::Wall(GameEngine::Model* model, float& respawnTime, int32_t& maxHp) : respa
 	collider_.SetCollisionMask(~kCollisionAttributeTerrain);
 	// データを登録
 	UserData userData;
-	userData.typeID = static_cast<uint32_t>(CollisionTypeID::Wall);
+	userData.typeID = static_cast<uint32_t>(CollisionTypeID::kWall);
 	userData.object = this;
 	collider_.SetUserData(userData);
 	// コールバック関数に登録する

@@ -32,7 +32,7 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model)
 	collider_.SetCollisionMask(~kCollisionAttributePlayer);
 	// データを登録
 	UserData userData;
-	userData.typeID = static_cast<uint32_t>(CollisionTypeID::Player);
+	userData.typeID = static_cast<uint32_t>(CollisionTypeID::kPlayer);
 	userData.object = this;
 	collider_.SetUserData(userData);
 	// コールバック登録
@@ -162,7 +162,7 @@ void Player::ApplyClamp() {
 
 void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 
-	bool isWall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::Wall));
+	bool isWall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kWall));
 	
 	// 壁の衝突処理
 	if (isWall) {
