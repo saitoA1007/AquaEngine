@@ -13,6 +13,14 @@ void ImGuiManager::Initialize([[maybe_unused]]ID3D12Device* device, [[maybe_unus
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	
+	// 使用するフォントを読み込む
+	ImFont* baseFont = io.Fonts->AddFontFromFileTTF("EngineSource/Resources/Text/JetBrainsMono-Regular.ttf", 16.0f);
+	if (baseFont == nullptr) {
+		assert(false && "Imgui dont load font");
+	}
+
+	// フォントをビルド
 	io.Fonts->Build();
 
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_ = {};

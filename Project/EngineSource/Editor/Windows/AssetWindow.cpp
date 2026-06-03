@@ -36,10 +36,10 @@ void AssetWindow::Draw() {
         ImGui::TableNextColumn();
 
         ImGuiTreeNodeFlags rootFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_DefaultOpen;
-        if (selectedPath == resourcesPath) rootFlags |= ImGuiTreeNodeFlags_Selected;
+        if (selectedPath == resourcesPath) { rootFlags |= ImGuiTreeNodeFlags_Selected; }
 
         if (ImGui::TreeNodeEx("Resources", rootFlags)) {
-            if (ImGui::IsItemClicked()) selectedPath = resourcesPath;
+            if (ImGui::IsItemClicked()) { selectedPath = resourcesPath; }
             RenderDirectoryTree(resourcesPath);
             ImGui::TreePop();
         }
@@ -78,7 +78,7 @@ void AssetWindow::RenderDirectoryTree(const std::filesystem::path& path) {
         for (const auto& subEntry : std::filesystem::directory_iterator(entry.path())) {
             if (subEntry.is_directory()) { hasSubDir = true; break; }
         }
-        if (!hasSubDir) flags |= ImGuiTreeNodeFlags_Leaf;
+        if (!hasSubDir) { flags |= ImGuiTreeNodeFlags_Leaf; }
 
         // ツリーノードを作成
         bool open = ImGui::TreeNodeEx(folderName.c_str(), flags);
@@ -102,7 +102,7 @@ void AssetWindow::RenderContentArea() {
     // 1アイテムの横幅を 80px として列数を計算
     float panelWidth = ImGui::GetContentRegionAvail().x;
     int columnCount = (int)(panelWidth / 80.0f);
-    if (columnCount < 1) columnCount = 1;
+    if (columnCount < 1) { columnCount = 1; }
 
     if (ImGui::BeginTable("AssetGrid", columnCount)) {
         for (const auto& entry : std::filesystem::directory_iterator(selectedPath)) {
