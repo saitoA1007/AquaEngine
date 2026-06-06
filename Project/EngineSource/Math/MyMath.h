@@ -7,6 +7,8 @@
 #include"Quaternion.h"
 
 static const double M_PI = 3.14159265358979323846;
+constexpr float PI = 3.1415926535f;
+constexpr float TWO_PI = PI * 2.0f;
 
 namespace GameEngine {
 
@@ -68,6 +70,12 @@ namespace GameEngine {
 
 		// 最短経路で角度を補間する
 		float LerpShortAngle(float a, float b, float t);
+
+		// 補間した差分を求める
+		float GetAngleDiff(float a, float b);
+
+		// 0~360度の範囲に抑える
+		float WrapAngle(float angle);
 
 		// 最大値
 		Vector3 Max(Vector3 pos1, Vector3 pos2);

@@ -12,7 +12,7 @@ public:
 	};
 
 public:
-	BossStateBattle(BossStateCommonData& commonData);
+	BossStateBattle(BossStateCommonData& commonData,Vector3* playerPos);
 	~BossStateBattle() = default;
 
 	/// <summary>

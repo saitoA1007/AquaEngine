@@ -7,7 +7,7 @@
 
 class BossEnemy : public GameEngine::IGameObject {
 public:
-	BossEnemy(GameEngine::Model* model);
+	BossEnemy(GameEngine::Model* model, GameEngine::WorldTransform& playerWorld);
 	~BossEnemy() = default;
 
 	// 初期化処理
@@ -18,6 +18,14 @@ public:
 
 	// 描画処理
 	void Draw() override;
+
+public:
+
+	/// <summary>
+	/// ワールド行列を取得
+	/// </summary>
+	/// <returns></returns>
+	GameEngine::WorldTransform& GetWorldTransform() { return worldTransform_; }
 
 private:
 	// パラメータ機能

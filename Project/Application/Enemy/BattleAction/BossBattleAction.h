@@ -12,8 +12,22 @@ public:
     void Finalize() override;
 
 private:
-    BossBattleStateCommonData& commonData_;
+    // 回転移動時間
+    float rotateMoveMaxTime_ = 1.0f;
 
+private:
+
+    // 回転移動の角度
+    float startAngle_ = 0.0f;
+    float endAngle_ = 0.0f;
+
+    // 突進の位置
+    Vector3 startRushPos_;
+    Vector3 endRushPos_;
+
+    float defaultPosY_ = 5.0f;
+
+    float timer_ = 0.0f;
 };
 
 // 待機
@@ -26,7 +40,11 @@ public:
     void Update() override;
     void Finalize() override;
 
-private:
-    BossBattleStateCommonData& commonData_;
+    //void RegisterParameter([[maybe_unused]] GameEngine::DebugParameter* param) override;
 
+private:
+
+    float timer_ = 0.0f;
+    // 待機時間
+    float maxTIme_ = 1.0f;
 };

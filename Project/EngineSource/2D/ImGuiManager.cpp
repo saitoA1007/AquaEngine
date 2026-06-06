@@ -31,7 +31,6 @@ void ImGuiManager::Initialize([[maybe_unused]]ID3D12Device* device, [[maybe_unus
 	D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = srvManager_->GetCPUHandle(index);
 	D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = srvManager_->GetGPUHandle(index);
 
-	//ImGui::StyleColorsDark();
     ApplyStyle();
 
 	ImGui_ImplWin32_Init(windowsApp_->GetHwnd());
@@ -107,11 +106,11 @@ void ImGuiManager::ApplyStyle() {
     ImVec4* colors = style.Colors;
 
     // レイアウトの調整
-    style.WindowRounding = 3.0f;
-    style.FrameRounding = 2.0f;
-    style.GrabRounding = 2.0f;
-    style.PopupRounding = 2.0f;
-    style.ScrollbarRounding = 3.0f;
+    style.WindowRounding = 6.0f;
+    style.FrameRounding = 4.0f;
+    style.GrabRounding = 4.0f;
+    style.PopupRounding = 4.0f;
+    style.ScrollbarRounding = 4.0f;
     style.TabRounding = 4.0f;
     style.FramePadding = ImVec2(6, 4);
     style.ItemSpacing = ImVec2(6, 4);

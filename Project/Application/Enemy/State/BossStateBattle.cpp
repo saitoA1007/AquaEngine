@@ -1,10 +1,14 @@
 #include "BossStateBattle.h"
 #include "RandomGenerator.h"
+#include "LogManager.h"
 #include "Application/Enemy/BattleAction/BossBattleAction.h"
 
 using namespace GameEngine;
 
-BossStateBattle::BossStateBattle(BossStateCommonData& commonData) : stateCommonData_(commonData) {
+BossStateBattle::BossStateBattle(BossStateCommonData& commonData, Vector3* playerPos) : stateCommonData_(commonData) {
+
+	// プレイヤーの位置を取得
+	battleStateCommonData_.playerPos = playerPos;
 
 	// 各行動を登録する
 	battleStatesTable_[static_cast<size_t>(BossBattleState::kRushAttack)] = std::make_unique<BossRushAttackAction>(battleStateCommonData_);
@@ -38,10 +42,16 @@ void BossStateBattle::Update() {
 		battleStatesTable_[static_cast<size_t>(currentBattleState_)]->Finalize();
 		// 次の行動を取得する
 		currentBattleState_ = SelectWeightedBattleState();
+		Log("BossEnemy change battleState");
 		// 初期化する
 		battleStatesTable_[static_cast<size_t>(currentBattleState_)]->Initialize();
 	}
 
+	// 指定した状態による更新処理
+	battleStatesTable_[static_cast<size_t>(currentBattleState_)]->Update();
+
+	// 更新
+	stateCommonData_.worldTransform->transform_ = battleStateCommonData_.transform;
 }
 
 void BossStateBattle::Exit() {
