@@ -32,6 +32,8 @@ private:
 	float kMinLockOnDistance_ = 20.0f;
 	float lockOnPlayerOffsetY_ = 1.0f;
 	float lockOnTargetOffsetY_ = 6.0f;
+	// 旋回速度
+	float lockOnRotateRate_ = 0.06f;
 
 	// 位置の追従
 	float kPositionLerpRate_ = 0.08f;

@@ -19,6 +19,7 @@ CameraController::CameraController(GameEngine::InputCommand* inputCommand, const
 	debugParame_->Register("RotateSpeed", kRotateSpeed_, 0, "Follow");
 	debugParame_->Register("RotateDamping", kRotateDamping_, 0, "Follow");
 
+	debugParame_->Register("LockOnRotateRate", lockOnRotateRate_, 0, "LockOn");
 	debugParame_->Register("MinLockOnDistance", kMinLockOnDistance_, 0, "LockOn");
 	debugParame_->Register("LockOnPlayerOffsetY", lockOnPlayerOffsetY_, 0, "LockOn");
 	debugParame_->Register("LockOnTargetOffsetY", lockOnTargetOffsetY_, 0, "LockOn");
@@ -71,15 +72,22 @@ void CameraController::Update() {
 		// 距離に応じてカメラの引き具合を動的に設定
 		float currentDistance = kMinLockOnDistance_ + dist * 0.6f;
 
+		// 目標角度を求める
+		float targetAngleX = std::atan2f(-dir.x, -dir.z);
+		float angleDiff = Math::GetAngleDiff(rotateMove_.x, targetAngleX);
+
+		// カメラの旋回速度
+		float actualAngleLerp = 1.0f - std::powf(1.0f - lockOnRotateRate_, dt60);
+
+		// 角度を目標に向けて滑らかに近づける
+		rotateMove_.x += angleDiff * actualAngleLerp;
+		rotateVelocityX_ = 0.0f; // 慣性をリセット
+
 		// カメラの位置を決定
-		idealPosition.x = idealTarget.x + dir.x * currentDistance;
-		idealPosition.z = idealTarget.z + dir.z * currentDistance;
+		idealPosition.x = idealTarget.x - std::sinf(rotateMove_.x) * currentDistance;
+		idealPosition.z = idealTarget.z - std::cosf(rotateMove_.x) * currentDistance;
 		// カメラの高さを調整。距離が離れる程見下ろすような視点にする。
 		idealPosition.y = idealTarget.y + lockOnTargetOffsetY_ + dist * 0.1f;
-
-		// ロックオンを解除した時にカメラが急反転しないよう、現在の角度を球面座標系に同期しておく
-		rotateMove_.x = std::atan2f(-dir.x, -dir.z);
-		rotateVelocityX_ = 0.0f; // 慣性をリセット
 	} else {
 		idealTarget = targetWorld_->GetWorldPosition();
 		idealTarget.y = offsetY_;

@@ -42,7 +42,7 @@ struct BossBattleStateCommonData {
     const Vector3* playerPos;
 
     // ステージの半径
-    float stageRadius = 6.0f;
+    float stageRadius = 10.0f;
 
     // 状態
     BossBattleState state = BossBattleState::kNormal;

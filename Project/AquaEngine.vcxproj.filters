@@ -532,6 +532,8 @@
     <ClCompile Include="Application\Enemy\State\BossStateOut.cpp" />
     <ClCompile Include="Application\Enemy\State\BossStateBattle.cpp" />
     <ClCompile Include="Application\Enemy\BattleAction\BossBattleAction.cpp" />
+    <ClCompile Include="Application\GamePlay\GamePhaseManager.cpp" />
+    <ClCompile Include="Application\GamePlay\Phase\ScenePhase.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1040,6 +1042,9 @@
     <ClInclude Include="Application\Player\IPlayerAction.h" />
     <ClInclude Include="Application\Enemy\BattleAction\IBossBattleAction.h" />
     <ClInclude Include="Application\Enemy\BattleAction\BossBattleAction.h" />
+    <ClInclude Include="Application\GamePlay\GamePhaseManager.h" />
+    <ClInclude Include="Application\GamePlay\IScenePhase.h" />
+    <ClInclude Include="Application\GamePlay\Phase\ScenePhase.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />

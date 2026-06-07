@@ -167,6 +167,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Enemy\State\BossStateBattle.cpp" />
     <ClCompile Include="Application\Enemy\State\BossStateIn.cpp" />
     <ClCompile Include="Application\Enemy\State\BossStateOut.cpp" />
+    <ClCompile Include="Application\GamePlay\GamePhaseManager.cpp" />
+    <ClCompile Include="Application\GamePlay\Phase\ScenePhase.cpp" />
     <ClCompile Include="Application\Player\Player.cpp" />
     <ClCompile Include="Application\Player\PlayerAction.cpp" />
     <ClCompile Include="Application\Scene\GameScene.cpp" />
@@ -389,6 +391,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Enemy\State\BossStateBattle.h" />
     <ClInclude Include="Application\Enemy\State\BossStateIn.h" />
     <ClInclude Include="Application\Enemy\State\BossStateOut.h" />
+    <ClInclude Include="Application\GamePlay\GamePhaseManager.h" />
+    <ClInclude Include="Application\GamePlay\IScenePhase.h" />
+    <ClInclude Include="Application\GamePlay\Phase\ScenePhase.h" />
     <ClInclude Include="Application\Player\IPlayerAction.h" />
     <ClInclude Include="Application\Player\Player.h" />
     <ClInclude Include="Application\Player\PlayerAction.h" />

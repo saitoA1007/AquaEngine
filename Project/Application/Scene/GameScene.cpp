@@ -4,6 +4,7 @@ using namespace GameEngine;
 #include "Application/Player/Player.h"
 #include "Application/Stage/StageManager.h"
 #include "Application/Enemy/BossEnemy.h"
+#include "Application/GamePlay/GamePhaseManager.h"
 
 GameScene::~GameScene() {
 }
@@ -35,6 +36,9 @@ GameScene::GameScene() {
 	// ステージ
 	auto* wallModel = modelManager_->GetNameByModel("Cube");
 	gameObjectManager_->AddObject<StageManager>(gameObjectManager_, wallModel);
+
+	// シーンフェーズを管理
+	gameObjectManager_->AddObject<GamePhaseManager>();
 }
 
 void GameScene::Initialize() {
