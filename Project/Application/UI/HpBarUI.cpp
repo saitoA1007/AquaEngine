@@ -22,6 +22,9 @@ HpBarUI::HpBarUI(std::string name) {
 
 void HpBarUI::Initialize() {
 	debugParame_->Apply();
+
+	// hpを初期化
+	currentHp_ = maxHp_;
 }
 
 void HpBarUI::Update() {
@@ -39,6 +42,8 @@ void HpBarUI::Update() {
 	// 演出の更新処理
 	EffectUpdate();
 
+	// 更新処理
+	baseWorld_.UpdateTransformMatrix();
 	barSprite_.Update();
 	effectSprite_.Update();
 	frameSprite_.Update();

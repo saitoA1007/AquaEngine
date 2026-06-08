@@ -535,6 +535,7 @@
     <ClCompile Include="Application\GamePlay\GamePhaseManager.cpp" />
     <ClCompile Include="Application\GamePlay\Phase\ScenePhase.cpp" />
     <ClCompile Include="Application\UI\HpBarUI.cpp" />
+    <ClCompile Include="Application\UI\HpContainer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1047,6 +1048,7 @@
     <ClInclude Include="Application\GamePlay\IScenePhase.h" />
     <ClInclude Include="Application\GamePlay\Phase\ScenePhase.h" />
     <ClInclude Include="Application\UI\HpBarUI.h" />
+    <ClInclude Include="Application\UI\HpContainer.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />

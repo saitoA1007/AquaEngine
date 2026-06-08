@@ -29,8 +29,14 @@ public:
 
 public:
 
-	void SetCurrentHp(const int32_t& hp) { currentHp_ = hp; }
-	void SetMaxHp(const int32_t& hp) { maxHp_ = hp; }
+	void SetCurrentHp(int32_t hp) { currentHp_ = hp; }
+
+	void SetMaxHp(int32_t hp) { maxHp_ = hp; }
+
+	// 基準点に親を設定
+	void SetParent(GameEngine::WorldTransform* parent) {
+		baseWorld_.SetParent(parent);
+	}
 
 private:
 
