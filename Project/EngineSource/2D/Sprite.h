@@ -29,7 +29,7 @@ namespace GameEngine {
 		};
 
 	public:
-		Sprite(const Vector2& position = {0.0f,0.0f}, const Vector2& size = {64.0f,64.0f}, const Vector2& anchorPoint = {0.5f,0.5f}, const Vector4& color = {1, 1, 1, 1},
+		Sprite(const Vector2& position = {0.0f,0.0f}, const Vector2& size = {64.0f,64.0f}, const Vector2& anchorPoint = {0.0f,0.0f}, const Vector4& color = {1, 1, 1, 1},
 			const Vector2& leftTop = { 0.0f,0.0f }, const Vector2& textureSize = { 1.0f,1.0f }, const Vector2& textureMaxSize = { 1.0f,1.0f });
 		~Sprite();
 
