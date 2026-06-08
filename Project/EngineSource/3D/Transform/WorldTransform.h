@@ -12,7 +12,7 @@ namespace GameEngine {
 	/// </summary>
 	class WorldTransform {
 	public:
-		WorldTransform() = default;
+		WorldTransform(const Transform& transform = {{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}});
 		~WorldTransform();
 
 		/// <summary>

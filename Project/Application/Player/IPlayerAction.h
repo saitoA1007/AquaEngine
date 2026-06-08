@@ -2,6 +2,7 @@
 #include "Vector3.h"
 #include "Matrix4x4.h"
 #include "Transform.h"
+#include "PlayerAnimator.h"
 
 namespace GameEngine {
 	// 前方宣言
@@ -35,6 +36,9 @@ struct PlayerCommonData {
 
 	// プレイヤーの状態
 	PlayerState state = PlayerState::kNone;
+
+	// プレイヤーのアニメーション管理
+	PlayerAnimator* animator_ = nullptr;
 };
 
 // プレイヤーアクションの基底クラス

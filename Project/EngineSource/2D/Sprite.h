@@ -7,6 +7,7 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "ConstantBuffer.h"
+#include "WorldTransform.h"
 
 namespace GameEngine {
 
@@ -28,7 +29,8 @@ namespace GameEngine {
 		};
 
 	public:
-		Sprite() = default;
+		Sprite(const Vector2& position = {0.0f,0.0f}, const Vector2& size = {64.0f,64.0f}, const Vector2& anchorPoint = {0.0f,0.0f}, const Vector4& color = {1, 1, 1, 1},
+			const Vector2& leftTop = { 0.0f,0.0f }, const Vector2& textureSize = { 1.0f,1.0f }, const Vector2& textureMaxSize = { 1.0f,1.0f });
 		~Sprite();
 
 		/// <summary>
@@ -38,20 +40,6 @@ namespace GameEngine {
 		/// <param name="window_width">画面幅</param>
 		/// <param name="window_height">画面高さ</param>
 		static void StaticInitialize(int32_t width, int32_t height);
-
-		/// <summary>
-		/// スプライト生成
-		/// </summary>
-		/// <param name="position">座標</param>
-		/// <param name="size">サイズ</param>
-		/// <param name="anchorPoint">アンカーポイント</param>
-		/// <param name="color">色</param>
-		/// <param name="leftTop">画像の描画する左上の位置</param>
-		/// <param name="textureSize">画像の描画したい範囲</param>
-		/// <param name="textureMaxSize">画像のサイズ</param>
-		/// <returns></returns>
-		static std::unique_ptr<Sprite> Create(const Vector2& position,const Vector2& size,const Vector2& anchorPoint,const Vector4& color = { 1, 1, 1, 1 },
-			const Vector2& leftTop={0.0f,0.0f}, const Vector2& textureSize={1.0f,1.0f}, const Vector2& textureMaxSize={1.0f,1.0f});
 
 	public:
 
@@ -95,6 +83,11 @@ namespace GameEngine {
 
 		ID3D12Resource* GetResource() const { return constBuffer_.GetResource(); }
 
+		// 親を設定
+		void SetParent(WorldTransform* parent) {
+			parent_ = parent;
+		}
+
 	public: // 変数
 
 		// 座標
@@ -116,13 +109,17 @@ namespace GameEngine {
 		// テクスチャハンドル
 		uint32_t textureHandle_ = 0;
 
+		// アンカーポイント
+		Vector2 anchorPoint_{};
+
 	private:
 
 		// 射影行列
 		static Matrix4x4 orthoMatrix_;
-		
-		// アンカーポイント
-		Vector2 anchorPoint_{};
+
+		// 親
+		WorldTransform* parent_ = nullptr;
+	
 		// ワールド行列
 		Matrix4x4 worldMatrix_;
 

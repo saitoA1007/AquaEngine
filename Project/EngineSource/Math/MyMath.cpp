@@ -262,14 +262,43 @@ namespace GameEngine {
 		float LerpShortAngle(float a, float b, float t) {
 			float diff = b - a;
 			// -2pi-2piに補正する
-			diff = std::fmodf(diff, M_PI *2.0f);
+			diff = std::fmodf(diff, TWO_PI);
 			// -pi-piに補正する
-			if (diff < -M_PI) {
-				diff += M_PI *2.0f;
-			} else if (diff > M_PI) {
-				diff -= M_PI *2.0f;
+			if (diff < PI) {
+				diff += TWO_PI;
+			} else if (diff > PI) {
+				diff -= TWO_PI;
 			}
 			return a + diff * t;
+		}
+
+		float GetAngleDiff(float a, float b) {
+			float diff = b - a;
+
+			// -2pi-2piに補正する
+			diff = std::fmodf(diff, TWO_PI);
+
+			// -pi ~ piに補正
+			if (diff < -PI) {
+				diff += TWO_PI;
+			} else if (diff > PI) {
+				diff -= TWO_PI;
+			}
+
+			// 微小差分判定
+			if (std::fabsf(diff) < 1.0e-4f) {
+				return 0.0f;
+			}
+
+			return diff;
+		}
+
+		float WrapAngle(float angle) {
+			angle = std::fmod(angle, TWO_PI);
+			if (angle < 0.0f) {
+				angle += TWO_PI;
+			}
+			return angle;
 		}
 
 		Vector3 Max(Vector3 pos1, Vector3 pos2) {

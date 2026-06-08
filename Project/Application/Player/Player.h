@@ -10,7 +10,7 @@
 
 class Player : public GameEngine::IGameObject {
 public:
-	Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model);
+	Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model, GameEngine::AnimationManager* animationManager);
 	~Player() = default;
 
 	// 初期化処理
@@ -54,6 +54,9 @@ private:
 
 	// 球の当たり判定
 	GameEngine::SphereCollider collider_;
+
+	// アニメーション管理
+	std::unique_ptr<PlayerAnimator> animator_;
 
 private:
 	// プレイヤー

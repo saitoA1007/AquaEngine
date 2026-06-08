@@ -4,6 +4,7 @@ using namespace GameEngine;
 #include "Application/Player/Player.h"
 #include "Application/Stage/StageManager.h"
 #include "Application/Enemy/BossEnemy.h"
+#include "Application/GamePlay/GamePhaseManager.h"
 
 GameScene::~GameScene() {
 }
@@ -19,22 +20,25 @@ GameScene::GameScene() {
 	renderQueue_->SetCamera(mainCamera_.get());
 
 	// プレイヤー
-	auto* playerModel = modelManager_->GetNameByModel("Walk");
+	auto* playerModel = modelManager_->GetNameByModel("Player");
 	playerModel->SetDefaultIsEnableLight(true);
-	auto player = gameObjectManager_->AddObject<Player>(inputCommand_, playerModel);
+	auto player = gameObjectManager_->AddObject<Player>(inputCommand_, playerModel, animationManager_);
 
 	// 敵
 	auto* enemyModel = modelManager_->GetNameByModel("Cube");
 	enemyModel->SetDefaultIsEnableLight(true);
-	gameObjectManager_->AddObject<BossEnemy>(enemyModel);
+	auto bossEnemy = gameObjectManager_->AddObject<BossEnemy>(enemyModel, player->GetWorldTransform());
 
 	// カメラ操作
-	cameraController_ = gameObjectManager_->AddObject<CameraController>(inputCommand_, &player->GetWorldTransform());
+	cameraController_ = gameObjectManager_->AddObject<CameraController>(inputCommand_, &player->GetWorldTransform(), &bossEnemy->GetWorldTransform());
 	player->SetCamera(cameraController_);
 
 	// ステージ
 	auto* wallModel = modelManager_->GetNameByModel("Cube");
 	gameObjectManager_->AddObject<StageManager>(gameObjectManager_, wallModel);
+
+	// シーンフェーズを管理
+	gameObjectManager_->AddObject<GamePhaseManager>();
 }
 
 void GameScene::Initialize() {
@@ -66,6 +70,10 @@ void GameScene::InputRegisterCommand() {
 	// カメラ操作のコマンドを登録する
 	inputCommand_->RegisterCommand("CameraMoveLeft", { { InputState::KeyPush, DIK_LEFT },{InputState::PadRightStick,0,{-1.0f,0.0f},0.2f} });
 	inputCommand_->RegisterCommand("CameraMoveRight", { { InputState::KeyPush, DIK_RIGHT },{InputState::PadRightStick,0,{1.0f,0.0f},0.2f} });
+	// ロックオン
+	inputCommand_->RegisterCommand("CameraLockOn", { {InputState::KeyTrigger, DIK_L},{InputState::PadTriggerRightTrigger,0,{0.0f,0.0f},0.2f},{InputState::PadTriggerLeftTrigger,0,{0.0f,0.0f},0.2f} });
+
+	// 決定ボタン
 
 	// AttackDownコマンド
 	inputCommand_->RegisterCommand("AttackDown", { {InputState::MouseTrigger, 1}, {InputState::PadTrigger, XINPUT_GAMEPAD_X} });

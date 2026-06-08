@@ -7,16 +7,16 @@ AnimationManager::~AnimationManager() {
 	animations_.clear();
 }
 
-void AnimationManager::RegisterAnimation(const std::string& filename, const std::string& objFilename) {
+void AnimationManager::RegisterAnimation(const std::string& registerName, const std::string& objFilename, const std::string& directory) {
 	
 	// 同名のアニメーションデータが登録されている場合は早期リターン
-	auto getName = animations_.find(filename);
+	auto getName = animations_.find(registerName);
 	if (getName != animations_.end()) {
 		return;
 	}
 
 	// 指定したモデルに存在するアニメーションデータをを全て取得する
-	animations_[filename] = ModelLoader::LoadAnimationsFile(objFilename, filename);
+	animations_[registerName] = ModelLoader::LoadAnimationsFile(objFilename, directory);
 }
 
 void AnimationManager::UnregisterAnimation(const std::string& name) {

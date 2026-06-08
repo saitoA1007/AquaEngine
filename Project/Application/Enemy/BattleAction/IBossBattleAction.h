@@ -38,6 +38,12 @@ struct BossBattleStateCommonData {
     // 現在の方向
     float currentYaw = 0.0f;
 
+    // プレイヤーの位置
+    const Vector3* playerPos;
+
+    // ステージの半径
+    float stageRadius = 10.0f;
+
     // 状態
     BossBattleState state = BossBattleState::kNormal;
 };
@@ -47,6 +53,7 @@ struct BossBattleStateCommonData {
 /// </summary>
 class IBossBattleAction {
 public:
+    IBossBattleAction(BossBattleStateCommonData& commonData) : commonData_(commonData) {}
     virtual ~IBossBattleAction() = default;
 
     /// <summary>
@@ -75,5 +82,8 @@ public:
     bool IsFinished() const { return isFinished_; }
 
 protected:
+    // 共通データ
+    BossBattleStateCommonData& commonData_;
+
     bool isFinished_ = false;
 };

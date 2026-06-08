@@ -9,7 +9,7 @@
 #include "Application/CollisionConfig.h"
 using namespace GameEngine;
 
-Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model) {
+Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model, GameEngine::AnimationManager* animationManager) {
 	inputCommand_ = inputCommand;
 	model_ = model;
 	
@@ -40,6 +40,8 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model)
 		this->OnCollisionStay(result); 
 		});
 
+	// アニメーション管理
+	animator_ = std::make_unique<PlayerAnimator>(model, animationManager);
 
 	// 移動アクション
 	moveAction_.Initialize(&commonData_, inputCommand);
@@ -61,6 +63,9 @@ void Player::Initialize() {
 
 	// 位置を初期化
 	worldTransform_.transform_.translate = { 0.0f,0.0f,0.0f };
+
+	// 初期化
+	animator_->Initialize();
 }
 
 void Player::Update() {
@@ -111,6 +116,9 @@ void Player::Update() {
 
 	// 更新
 	commonData_.transform = worldTransform_.transform_;
+
+	// アニメーションの更新
+	animator_->Update();
 }
 
 void Player::Draw() {
