@@ -7,6 +7,7 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "ConstantBuffer.h"
+#include "WorldTransform.h"
 
 namespace GameEngine {
 
@@ -82,6 +83,11 @@ namespace GameEngine {
 
 		ID3D12Resource* GetResource() const { return constBuffer_.GetResource(); }
 
+		// 親を設定
+		void SetParent(WorldTransform* parent) {
+			parent_ = parent;
+		}
+
 	public: // 変数
 
 		// 座標
@@ -107,6 +113,9 @@ namespace GameEngine {
 
 		// 射影行列
 		static Matrix4x4 orthoMatrix_;
+
+		// 親
+		WorldTransform* parent_ = nullptr;
 		
 		// アンカーポイント
 		Vector2 anchorPoint_{};

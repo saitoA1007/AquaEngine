@@ -47,6 +47,9 @@ void Sprite::Update() {
 
 	// 座標を元にワールド行列の生成
 	worldMatrix_ = Math::MakeAffineMatrix(Vector3(scale_.x, scale_.y, 0.0f), Vector3(0.0f,0.0f,rotate_), Vector3(position_.x, position_.y, 0.0f));
+	if (parent_) {
+		worldMatrix_ *= parent_->GetWorldMatrix();
+	}
 	// 座標を適用 
 	constBufferData_->WVP = worldMatrix_ * orthoMatrix_;
 }
@@ -55,6 +58,9 @@ void Sprite::SetPosition(const Vector2& position) {
 	position_ = position;
 	// 座標を元にワールド行列の生成
 	worldMatrix_ = Math::MakeTranslateMatrix({ position.x,position.y,0.0f });
+	if (parent_) {
+		worldMatrix_ *= parent_->GetWorldMatrix();
+	}
 	// 座標を適用 
 	constBufferData_->WVP = worldMatrix_ * orthoMatrix_;
 }
