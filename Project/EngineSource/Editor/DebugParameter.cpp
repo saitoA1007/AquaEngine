@@ -1,11 +1,44 @@
 #include "DebugParameter.h"
-
+#include "WorldTransform.h"
+#include "Sprite.h"
 using namespace GameEngine;
 
 GameParamEditor* DebugParameter::gameParamEditor_ = nullptr;
 
 DebugParameter::DebugParameter(const std::string& rootGroupName) {
 	rootGroupName_ = rootGroupName;
+}
+
+void DebugParameter::Register(const std::string& worldName, WorldTransform& world, const std::string subGroupName) {
+    std::string name = worldName + "WorldTransform";
+    std::string path;
+    if (subGroupName.empty()) {
+        path = name;
+    } else {
+        path = subGroupName + "/" + name;
+    }
+
+    Register("Scale", world.transform_.scale, 0, path);
+    Register("Rotate", world.transform_.rotate, 1, path);
+    Register("Translate", world.transform_.translate, 2, path);
+}
+
+void DebugParameter::Register(const std::string& spriteName, Sprite& sprite, const std::string subGroupName) {
+    std::string name = spriteName + "Sprite";
+    std::string path;
+    if (subGroupName.empty()) {
+        path = spriteName + name;
+    } else {
+        path = subGroupName + "/" + name;
+    }
+
+    int index = 0;
+    Register("Scale", sprite.scale_, index++, path);
+    Register("Rotate", sprite.rotate_, index++, path);
+    Register("Position", sprite.position_, index++, path);
+    Register("MeshSize", sprite.size_, index++, path);
+    Register("AnchorPoint", sprite.anchorPoint_, index++, path);
+    Register("Color", sprite.color_, index++, path);
 }
 
 void DebugParameter::Apply() {

@@ -109,6 +109,9 @@ namespace GameEngine {
 		// テクスチャハンドル
 		uint32_t textureHandle_ = 0;
 
+		// アンカーポイント
+		Vector2 anchorPoint_{};
+
 	private:
 
 		// 射影行列
@@ -116,9 +119,7 @@ namespace GameEngine {
 
 		// 親
 		WorldTransform* parent_ = nullptr;
-		
-		// アンカーポイント
-		Vector2 anchorPoint_{};
+	
 		// ワールド行列
 		Matrix4x4 worldMatrix_;
 

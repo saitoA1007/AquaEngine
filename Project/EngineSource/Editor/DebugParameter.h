@@ -6,6 +6,10 @@
 
 namespace GameEngine {
 
+    // 前方宣言
+    class WorldTransform;
+    class Sprite;
+
 	class DebugParameter {
 	public:
 		DebugParameter(const std::string& rootGroupName);
@@ -43,6 +47,9 @@ namespace GameEngine {
             // 値を保持
             bindings_.push_back(std::make_unique<ParamBinding<T>>(path, subGroupName, key, valueRef, itemPtr));
         }
+
+        void Register(const std::string& worldName, WorldTransform& world, const std::string subGroupName = "");
+        void Register(const std::string& spriteName, Sprite& sprite,const std::string subGroupName = "");
 
         // 値を適応する
         void Apply();
