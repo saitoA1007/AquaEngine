@@ -28,7 +28,8 @@ namespace GameEngine {
 		};
 
 	public:
-		Sprite() = default;
+		Sprite(const Vector2& position = {0.0f,0.0f}, const Vector2& size = {64.0f,64.0f}, const Vector2& anchorPoint = {0.5f,0.5f}, const Vector4& color = {1, 1, 1, 1},
+			const Vector2& leftTop = { 0.0f,0.0f }, const Vector2& textureSize = { 1.0f,1.0f }, const Vector2& textureMaxSize = { 1.0f,1.0f });
 		~Sprite();
 
 		/// <summary>
@@ -38,20 +39,6 @@ namespace GameEngine {
 		/// <param name="window_width">画面幅</param>
 		/// <param name="window_height">画面高さ</param>
 		static void StaticInitialize(int32_t width, int32_t height);
-
-		/// <summary>
-		/// スプライト生成
-		/// </summary>
-		/// <param name="position">座標</param>
-		/// <param name="size">サイズ</param>
-		/// <param name="anchorPoint">アンカーポイント</param>
-		/// <param name="color">色</param>
-		/// <param name="leftTop">画像の描画する左上の位置</param>
-		/// <param name="textureSize">画像の描画したい範囲</param>
-		/// <param name="textureMaxSize">画像のサイズ</param>
-		/// <returns></returns>
-		static std::unique_ptr<Sprite> Create(const Vector2& position,const Vector2& size,const Vector2& anchorPoint,const Vector4& color = { 1, 1, 1, 1 },
-			const Vector2& leftTop={0.0f,0.0f}, const Vector2& textureSize={1.0f,1.0f}, const Vector2& textureMaxSize={1.0f,1.0f});
 
 	public:
 

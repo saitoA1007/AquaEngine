@@ -32,7 +32,7 @@ private:
 	// 辺の数
 	uint32_t maxSideNumber_ = 8;
 	// 半径
-	float radius_ = 8.0f;
+	float radius_ = 12.0f;
 
 	/// 壁のデータ
 	// 最大hp

@@ -1,9 +1,30 @@
 #include "Sprite.h"
-#include "CreateBufferResource.h"
 #include "MyMath.h"
 using namespace GameEngine;
 
 Matrix4x4 Sprite::orthoMatrix_;
+
+Sprite::Sprite(const Vector2& position, const Vector2& size, const Vector2& anchorPoint, const Vector4& color,
+	const Vector2& leftTop, const Vector2& textureSize, const Vector2& textureMaxSize) {
+	// 座標と大きさを取得
+	position_ = position;
+	size_ = size;
+	anchorPoint_ = anchorPoint;
+	// 座標を元にワールド行列の生成
+	worldMatrix_ = Math::MakeTranslateMatrix({ position.x,position.y,0.0f });
+
+	// テクスチャのサイズを取得
+	textureLeftTop_ = leftTop;
+	textureSize_ = textureSize;
+	textureMaxeSize_ = textureMaxSize;
+
+	// メッシュを作成
+	CreateMesh();
+
+	// マテリアルを作成
+	color_ = color;
+	CreateConstBufferData(color);
+}
 
 Sprite::~Sprite() {
 
@@ -11,34 +32,6 @@ Sprite::~Sprite() {
 
 void Sprite::StaticInitialize(int32_t width, int32_t height) {
 	orthoMatrix_ = Matrix4x4::MakeIdentity() * Math::MakeOrthographicMatrix(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, 100.0f);
-}
-
-std::unique_ptr<Sprite> Sprite::Create(const Vector2& position,const Vector2& size,const Vector2& anchorPoint,const Vector4& color,
-	const Vector2& leftTop, const Vector2& textureSize, const Vector2& textureMaxSize) {
-
-	// インスタンスを生成
-	std::unique_ptr<Sprite> sprite = std::make_unique<Sprite>();
-
-	// 座標と大きさを取得
-	sprite->position_ = position;
-	sprite->size_ = size;
-	sprite->anchorPoint_ = anchorPoint;
-	// 座標を元にワールド行列の生成
-	sprite->worldMatrix_ = Math::MakeTranslateMatrix({ position.x,position.y,0.0f });
-
-	// テクスチャのサイズを取得
-	sprite->textureLeftTop_ = leftTop;
-	sprite->textureSize_ = textureSize;
-	sprite->textureMaxeSize_ = textureMaxSize;
-
-	// メッシュを作成
-	sprite->CreateMesh();
-
-	// マテリアルを作成
-	sprite->color_ = color;
-	sprite->CreateConstBufferData(color);
-
-	return sprite;
 }
 
 void Sprite::Update() {

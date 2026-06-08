@@ -4,11 +4,7 @@
 #include"FPSCounter.h"
 using namespace GameEngine;
 
-WorldTransform::~WorldTransform() {
-
-}
-
-void WorldTransform::Initialize(const Transform& transform) {
+WorldTransform::WorldTransform(const Transform& transform) {
 	transform_ = transform;
 	worldMatrix_ = Math::MakeWorldMatrixFromEulerRotation(transform_.translate, transform_.rotate, transform_.scale);
 
@@ -19,6 +15,18 @@ void WorldTransform::Initialize(const Transform& transform) {
 	// 単位行列を書き込んでおく
 	transformationMatrixData_->World = Matrix4x4::MakeIdentity();
 	transformationMatrixData_->worldInverseTranspose = Matrix4x4::MakeIdentity();
+}
+
+WorldTransform::~WorldTransform() {
+
+}
+
+void WorldTransform::Initialize(const Transform& transform) {
+	transform_ = transform;
+	worldMatrix_ = Math::MakeWorldMatrixFromEulerRotation(transform_.translate, transform_.rotate, transform_.scale);
+
+	// 更新
+	UpdateTransformMatrix();
 }
 
 void WorldTransform::UpdateTransformMatrix() {

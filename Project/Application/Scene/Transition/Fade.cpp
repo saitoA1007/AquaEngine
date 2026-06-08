@@ -5,7 +5,7 @@ using namespace GameEngine;
 
 void Fade::Initialize() {
 	// 初期化
-	sprite_ = Sprite::Create({ 0.0f,0.0f }, { 1280.0f,720.0f }, { 0.0f,0.0f }, { 0.0f,0.0f,0.0f,0.0f });
+	//sprite_ = Sprite::Create({ 0.0f,0.0f }, { 1280.0f,720.0f }, { 0.0f,0.0f }, { 0.0f,0.0f,0.0f,0.0f });
 }
 
 void Fade::Update(float timer) {
