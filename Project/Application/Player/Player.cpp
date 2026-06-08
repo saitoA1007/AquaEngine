@@ -42,6 +42,7 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model,
 
 	// アニメーション管理
 	animator_ = std::make_unique<PlayerAnimator>(model, animationManager);
+	commonData_.animator_ = animator_.get();
 
 	// 移動アクション
 	moveAction_.Initialize(&commonData_, inputCommand);
@@ -59,6 +60,7 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model,
 void Player::Initialize() {
 	// ステータスを初期化
 	commonData_ = PlayerCommonData{};
+	commonData_.animator_ = animator_.get();
 	commonData_.currentYaw = std::atan2f(commonData_.currentDir.x, commonData_.currentDir.z);
 
 	// 位置を初期化
@@ -100,8 +102,14 @@ void Player::Update() {
 		worldTransform_.transform_.translate.y = 0.0f;
 		commonData_.velocity.y = 0.0f;
 
+		// 空中浮遊状態なら歩き状態へ
+		if (commonData_.animator_->GetCurrentType() == PlayerAnimationType::kAirMove) {
+			commonData_.animator_->StartAnimation(PlayerAnimationType::kWalk, "歩き");
+		}
+
 		if (commonData_.state == PlayerState::kAttackDown) {
 			commonData_.state = PlayerState::kStiffness;
+			commonData_.animator_->StartAnimation(PlayerAnimationType::kWalk, "歩き");
 			Log("Player End attackDown");
 		}
 	}

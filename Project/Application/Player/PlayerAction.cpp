@@ -20,6 +20,15 @@ void PlayerPhysics::Initialize(PlayerCommonData* commonData) {
 void PlayerPhysics::Update() {
 	// 重力を適応
 	commonData_->velocity.y += kFallAcceleration_ * FpsCounter::deltaTime;
+
+	if (commonData_->state == PlayerState::kJump) {
+		if (commonData_->velocity.y <= 1.0f) {
+			if (commonData_->animator_->GetCurrentType() != PlayerAnimationType::kAirMove) {
+				// 空中アニメーション
+				commonData_->animator_->StartAnimation(PlayerAnimationType::kAirMove, "AirMove", 0.1f);
+			}
+		}
+	}
 }
 
 void PlayerPhysics::RegisterParameter(GameEngine::DebugParameter* param) {
@@ -156,6 +165,8 @@ void PlayerAttackRushAction::ProcessInput() {
 			rushChargeLevel_ = 0;
 			// 現在の状態
 			commonData_->state = PlayerState::kCharging;
+			// 溜めアニメーション
+			commonData_->animator_->StartAnimation(PlayerAnimationType::kRushAttack, "突進_Prepare", kRushChargeMaxTime_, false);
 			Log("Player start charge");
 		}
 	}
@@ -189,6 +200,8 @@ void PlayerAttackRushAction::ProcessInput() {
 			commonData_->velocity.z = initVel.z;
 			// 現在の状態
 			commonData_->state = PlayerState::kAttackRush;
+			// 突進アニメーション
+			commonData_->animator_->StartAnimation(PlayerAnimationType::kRushAttack, "突進_Main", 0.2f, false);
 			Log("Player start attackRush");
 		}
 	}
@@ -255,6 +268,10 @@ void PlayerBounceAction::WallBounce(Vector3& pos, const Vector3& bounceDirection
 
 	// ラッシュ状態からの突進であれば上に飛ぶ
 	if (commonData_->state == PlayerState::kAttackRush) {
+
+		// 跳ね返りアニメーション
+		commonData_->animator_->StartAnimation(PlayerAnimationType::kRushAttack, "突進_End", 1.0f, false);
+
 		//currentBounceLockTime_ = kWallBounceLockTime_;
 
 		Vector3 prevHoriz = { commonData_->velocity.x, 0.0f, commonData_->velocity.z };
@@ -347,6 +364,9 @@ void PlayerAttackDownAction::ProcessInput() {
 			attackDownPower_ = Lerp(kAttackDownMinPower_, kAttackDownMaxPower_, ratio);
 
 			commonData_->state = PlayerState::kAttackDown;
+
+			// 落下攻撃アニメーション
+			commonData_->animator_->StartAnimation(PlayerAnimationType::kDownAttack, "DownAttack_Prepare", 1.0f, false);
 
 			Log("Player start attackDown");
 		}
