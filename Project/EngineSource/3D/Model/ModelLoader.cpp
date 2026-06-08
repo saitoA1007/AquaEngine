@@ -235,7 +235,7 @@ std::map<std::string, AnimationData> ModelLoader::LoadAnimationsFile(const std::
 	std::map<std::string, AnimationData> loadedAnimations;
 
 	Assimp::Importer importer;
-	std::string filePath = kDirectoryPath_ + "/" + filename + "/" + objFilename;
+	std::string filePath = filename + "/" + objFilename;
 	const aiScene* scene = importer.ReadFile(filePath.c_str(), 0);
 	assert(scene->mNumAnimations != 0); // アニメーションがない
 

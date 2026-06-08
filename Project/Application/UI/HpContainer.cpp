@@ -58,12 +58,12 @@ void HpContainer::Draw() {
 void HpContainer::SetMaxHp(int32_t hp) {
 	if (hpSprites_.size() == hp) { return; }
 
-	int32_t currentNum = hpSprites_.size();
+	int32_t currentNum = static_cast<int32_t>(hpSprites_.size());
 	maxHp_ = hp;
 
 	hpSprites_.resize(maxHp_);
 
-	for (size_t i = currentNum; i < maxHp_; ++i) {
+	for (int32_t i = currentNum; i < maxHp_; ++i) {
 		hpSprites_[i] = std::make_unique<Sprite>();
 		hpSprites_[i]->SetParent(&baseWorld_);
 		hpSprites_[i]->position_.x = i * (spacing_ + iconSize_.x);

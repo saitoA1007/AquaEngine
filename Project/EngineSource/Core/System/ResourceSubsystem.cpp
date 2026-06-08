@@ -43,9 +43,11 @@ void ResourceSubsystem::LoadAllResources() {
 	modelManager_->LoadAllModel();
 
 	// アニメーションデータをロード
-	animationManager_->RegisterAnimation("Walk", "walk.gltf");
+	animationManager_->RegisterAnimation("Walk", "walk.gltf", "Resources/Models/Walk");
+	animationManager_->RegisterAnimation("AnimatedCube", "AnimatedCube.gltf", "Resources/Models/AnimatedCube");
 
-	animationManager_->RegisterAnimation("AnimatedCube", "AnimatedCube.gltf");
+	// プレイヤーのアニメーションデータを読み込む
+	animationManager_->RegisterAnimation("PlayerWalk", "PlayerWalk.gltf", "Resources/Animations/Player/PlayerWalk");
 
 	// 音声データを全てロードする
 	AudioManager::GetInstance().LoadAllAudio();

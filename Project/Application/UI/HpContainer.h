@@ -26,6 +26,11 @@ public:
 
 	// 最大Hpを設定
 	void SetMaxHp(int32_t hp);
+
+	// 基準点に親を設定
+	void SetParent(GameEngine::WorldTransform* parent) {
+		baseWorld_.SetParent(parent);
+	}
 	
 private:
 	// パラメータ機能

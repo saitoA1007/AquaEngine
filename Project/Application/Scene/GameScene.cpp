@@ -20,9 +20,9 @@ GameScene::GameScene() {
 	renderQueue_->SetCamera(mainCamera_.get());
 
 	// プレイヤー
-	auto* playerModel = modelManager_->GetNameByModel("Walk");
+	auto* playerModel = modelManager_->GetNameByModel("Player");
 	playerModel->SetDefaultIsEnableLight(true);
-	auto player = gameObjectManager_->AddObject<Player>(inputCommand_, playerModel);
+	auto player = gameObjectManager_->AddObject<Player>(inputCommand_, playerModel, animationManager_);
 
 	// 敵
 	auto* enemyModel = modelManager_->GetNameByModel("Cube");
