@@ -40,7 +40,7 @@ void GameObjectManager::UpdateAll() {
 
 void GameObjectManager::DrawAll() {
     for (auto& obj : objects_) {
-        if (!obj->IsDead()) {
+        if (obj->IsActive() && !obj->IsDead()) {
             obj->Draw();
         }
     }

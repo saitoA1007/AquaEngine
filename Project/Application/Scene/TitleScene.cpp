@@ -109,7 +109,7 @@ void TitleScene::DebugUpdate() {
 	light->SetDirectionalIntensity(intensity_);
 
 	model_->SetDefaultColor(color_);
-	model2_->SetDefaultColor(color1_);
+	model1_->SetDefaultColor(color1_);
 	model_->SetDefaultMetallic(metalic_);
 	model1_->SetDefaultMetallic(metalic1_);
 	model2_->SetDefaultMetallic(metalic2_);

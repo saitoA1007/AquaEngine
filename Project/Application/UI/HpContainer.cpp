@@ -16,12 +16,11 @@ HpContainer::HpContainer(std::string name) {
 		hpSprites_[i] = std::make_unique<Sprite>();
 		hpSprites_[i]->SetParent(&baseWorld_);
 		hpSprites_[i]->position_.x = i * (spacing_ + iconSize_.x);
-		hpSprites_[i]->position_.y = iconSize_.y;
 	}
 }
 
 void HpContainer::Initialize() {
-
+	debugParame_->Apply();
 }
 
 void HpContainer::Update() {
@@ -38,7 +37,7 @@ void HpContainer::Update() {
 		}
 
 		sprite->position_.x = i * (spacing_ + iconSize_.x);
-		sprite->scale_ = iconSize_;
+		sprite->size_ = iconSize_;
 
 		// スプライトの更新処理
 		sprite->Update();
@@ -67,6 +66,5 @@ void HpContainer::SetMaxHp(int32_t hp) {
 		hpSprites_[i] = std::make_unique<Sprite>();
 		hpSprites_[i]->SetParent(&baseWorld_);
 		hpSprites_[i]->position_.x = i * (spacing_ + iconSize_.x);
-		hpSprites_[i]->position_.y = iconSize_.y;
 	}
 }

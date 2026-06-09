@@ -264,7 +264,7 @@ namespace GameEngine {
 			// -2pi-2piに補正する
 			diff = std::fmodf(diff, TWO_PI);
 			// -pi-piに補正する
-			if (diff < PI) {
+			if (diff < -PI) {
 				diff += TWO_PI;
 			} else if (diff > PI) {
 				diff -= TWO_PI;

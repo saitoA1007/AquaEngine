@@ -20,7 +20,7 @@ BossStateBattle::BossStateBattle(BossStateCommonData& commonData, Vector3* playe
 
 	// 行動に重み付け
 	lotteryList_ = {
-		{ BossBattleState::kRushAttack,10 }, // 突進攻撃
+		{ BossBattleState::kRushAttack,50 }, // 突進攻撃
 		{ BossBattleState::kWait,10 }, // 待機
 	};
 

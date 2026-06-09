@@ -22,7 +22,7 @@ public:
 
 	void Update();
 
-private:
+public:
 
 	// アニメーションを設定
 	void StartAnimation(PlayerAnimationType type, const std::string& animeName, bool isLoop = true);
@@ -34,12 +34,18 @@ private:
 	// 再生
 	void Start();
 
+	// 現在のアニメーションタイプ
+	PlayerAnimationType GetCurrentType() const { return currentType_; }
+
 private:
 	// アニメーション再生クラス
 	GameEngine::Animator animator_;
 
 	// アニメーションのデータ
 	std::unordered_map<PlayerAnimationType, std::map<std::string, AnimationData>> animationData_;
+
+	// 現在のタイプ
+	PlayerAnimationType currentType_;
 
 	bool isStop_ = false;
 	bool isLoop_ = false;

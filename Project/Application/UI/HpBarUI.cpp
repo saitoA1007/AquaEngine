@@ -13,6 +13,7 @@ HpBarUI::HpBarUI(std::string name) {
 	debugParame_->Register("Bar", barSprite_);
 	debugParame_->Register("Effect", effectSprite_);
 	debugParame_->Register("Frame", frameSprite_);
+	debugParame_->Apply();
 
 	// ペアレント
 	barSprite_.SetParent(&baseWorld_);

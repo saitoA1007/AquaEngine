@@ -48,6 +48,9 @@ void ResourceSubsystem::LoadAllResources() {
 
 	// プレイヤーのアニメーションデータを読み込む
 	animationManager_->RegisterAnimation("PlayerWalk", "PlayerWalk.gltf", "Resources/Animations/Player/PlayerWalk");
+	animationManager_->RegisterAnimation("PlayerAirMove", "PlayerAirMove.gltf", "Resources/Animations/Player/PlayerAirMove");
+	animationManager_->RegisterAnimation("PlayerRush", "PlayerRush.gltf", "Resources/Animations/Player/PlayerRush");
+	animationManager_->RegisterAnimation("PlayerDownAttack", "DownAttack.gltf", "Resources/Animations/Player/PlayerDownAttack");
 
 	// 音声データを全てロードする
 	AudioManager::GetInstance().LoadAllAudio();

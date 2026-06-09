@@ -207,6 +207,7 @@ void RenderQueue::SubmitGrid(const Model* model, WorldTransform& worldTransform,
 }
 
 void RenderQueue::SubmitDebugLine(const DebugRenderer* debugRenderer, const std::string& passName) {
+    if (!debugRenderer->IsEnabled()) { return; }
     Draw3dRequest request;
     request.type = Draw3dType::DebugLine;
     request.layer = RenderLayer::Debug;
