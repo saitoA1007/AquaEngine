@@ -4,9 +4,14 @@
 #include "IGameObject.h"
 #include "IScenePhase.h"
 
+// 前方宣言
+class Player;
+class PlayUIManager;
+class BossEnemy;
+
 class GamePhaseManager : public GameEngine::IGameObject {
 public:
-	GamePhaseManager();
+	GamePhaseManager(Player* player, BossEnemy* bossEnemy, PlayUIManager* playUIManager);
 	~GamePhaseManager() = default;
 
 	void Initialize() override;
@@ -15,6 +20,7 @@ public:
 	void Update() override;
 
 private:
+
 	// 各フェーズ
 	std::unordered_map<ScenePhase, std::unique_ptr<IScenePhase>> phases_;
 

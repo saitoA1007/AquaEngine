@@ -537,6 +537,7 @@
     <ClCompile Include="Application\UI\HpBarUI.cpp" />
     <ClCompile Include="Application\UI\HpContainer.cpp" />
     <ClCompile Include="Application\Player\PlayerAnimator.cpp" />
+    <ClCompile Include="Application\UI\PlayUIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1051,6 +1052,7 @@
     <ClInclude Include="Application\UI\HpBarUI.h" />
     <ClInclude Include="Application\UI\HpContainer.h" />
     <ClInclude Include="Application\Player\PlayerAnimator.h" />
+    <ClInclude Include="Application\UI\PlayUIManager.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />
@@ -1066,6 +1068,7 @@
     <FxCompile Include="Resources\Shaders\PostEffect\Smoothing\BoxFilter3x3.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\Smoothing\BoxFilter5x5.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\Smoothing\GaussianFilter.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\Raytracing\ChsIceObject.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Externals\imgui\ProggyClean.ttf" />

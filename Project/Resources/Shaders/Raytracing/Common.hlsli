@@ -215,4 +215,53 @@ bool ShootShadowRay(float3 origin, float3 direction)
         payload);
     return payload.isHit;
 }
+
+float3 GlassBSDF(float3 worldPos, float3 worldNormal, int recursive, float ior, float roughness, float3 glassColor)
+{
+    float3 worldRayDir = normalize(WorldRayDirection());
+    
+    bool entering = dot(worldRayDir, worldNormal) < 0.0f;
+    // 常に入射側を向く
+    float3 N = entering ? worldNormal : -worldNormal;
+    // Snell の法則
+    float eta = entering ? (1.0f / ior) : ior;
+    
+    // フレネル反射率
+    float cosTheta = saturate(dot(-worldRayDir, N));
+    float r0 = (1.0f - ior) / (1.0f + ior);
+    r0 = r0 * r0;
+    float F = r0 + (1.0f - r0) * pow(1.0f - cosTheta, 5.0f);
+    F = saturate(F);
+    
+    // 屈折方向の計算
+    float3 refracted = refract(worldRayDir, N, eta);
+ 
+    // 屈折レイが存在しなければ反射のみを返す
+    if (length(refracted) < 0.001f)
+    {
+        return Reflection(worldPos, N, recursive);
+    }
+    
+    // 屈折レイを発射
+    RayDesc refractRay;
+    refractRay.Origin = worldPos;
+    refractRay.Direction = refracted;
+    refractRay.TMin = 0.001f;
+    refractRay.TMax = 100000.0f;
+    
+    Payload refractPayload;
+    refractPayload.color = float3(0.0f, 0.0f, 0.0f);
+    refractPayload.recursive = recursive;
+    refractPayload.depth = 0.0f;
+    TraceRay(gRtScene, RAY_FLAG_NONE, 0xFF, 0, 1, 0, refractRay, refractPayload);
+    
+    // ガラス色で透過光をティント
+    float3 refractColor = refractPayload.color * glassColor;
+    
+    // 反射レイを発射
+    float3 reflectColor = Reflection(worldPos, N, recursive);
+    
+    return lerp(refractColor, reflectColor, F);
+}
+
 #endif

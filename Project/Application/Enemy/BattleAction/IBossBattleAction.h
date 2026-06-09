@@ -27,7 +27,7 @@ enum class BossBattleState {
 
 // 戦いで使用する共通データ
 struct BossBattleStateCommonData {
-    Transform transform = { {1,1,1},{0,0,0},{0,0,0} };
+    Transform transform = { {2,2,2},{0,0,0},{0,0,0} };
 
     // 速度
     Vector3 velocity = { 0.0f,0.0f,0.0f };

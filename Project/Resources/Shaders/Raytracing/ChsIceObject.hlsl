@@ -1,14 +1,16 @@
 #include "Common.hlsli"
 #include "../LightElement.hlsli"
 
-struct VertexData {
+struct VertexData
+{
     float4 position;
     float2 texcoord;
     float3 normal;
     float4 tangent;
 };
 
-struct MaterialData {
+struct MaterialData
+{
     float4 color;
     
     int enableLighting;
@@ -40,10 +42,11 @@ VertexData GetHitVertex(MyAttribute attrib, uint vertexHandle, uint indexHandle)
     float3 normals[3];
     float4 tangents[3];
 
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 3; ++i)
+    {
         uint index = gBufferData[indexHandle].Load<uint>((start + i) * 4);
         
-        VertexData v = gBufferData[vertexHandle].Load<VertexData>(index * VERTEX_STRIDE);
+        VertexData v = gBufferData[vertexHandle].Load < VertexData > (index * VERTEX_STRIDE);
         
         positions[i] = v.position.xyz;
         normals[i] = v.normal;
@@ -62,7 +65,8 @@ VertexData GetHitVertex(MyAttribute attrib, uint vertexHandle, uint indexHandle)
 }
 
 [shader("closesthit")]
-void MainObjectCHS(inout Payload payload, MyAttribute attrib) {    
+void MainObjectCHS(inout Payload payload, MyAttribute attrib)
+{
     if (checkRecursiveLimit(payload))
     {
         return;
@@ -72,7 +76,7 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     uint refHandle = InstanceID();
     BufferRef ref = gBufferRefs[refHandle];
     // マテリアルデータを取得
-    MaterialData material = gBufferData[ref.MaterialIndex].Load<MaterialData>(0);
+    MaterialData material = gBufferData[ref.MaterialIndex].Load < MaterialData > (0);
     
     // 頂点データを取得する
     VertexData vtx = GetHitVertex(attrib, ref.vertexHandle, ref.indexHandle);
@@ -100,7 +104,10 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     float3 viewDir = normalize(gCamera.worldPosition.xyz - worldPosition);
     
      // 裏面の法線を視線側に向け直す
-    if (dot(worldNormal, viewDir) < 0.0f) { worldNormal = -worldNormal;}
+    if (dot(worldNormal, viewDir) < 0.0f)
+    {
+        worldNormal = -worldNormal;
+    }
     
     // テクスチャカラーを取得
     float4 textureColor = gTexture[material.textureHandle].SampleLevel(gSampler, transformedUV.xy, 0);
@@ -113,9 +120,9 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
         payload.color = albedoColor;
         return;
     }
-     
-     // ガラスの反射
-    if (ref.type == 1)
+    
+    // ガラスの反射
+    if (ref.type == 2)
     {
         float3 glassColor = material.color.rgb * textureColor.rgb;
         payload.color = GlassBSDF(
@@ -128,7 +135,7 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
         );
         return;
     }
-    
+     
     // ライト
     float3 lightDir = normalize(-gDirectionalLight.direction);
     float3 lightColor = gDirectionalLight.color.xyz * gDirectionalLight.intensity;
@@ -144,7 +151,7 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     
      // 透明度の表示
     if (ref.type == 1)
-    {   
+    {
         /// 屈折
         // 屈折レイを飛ばす
         float3 refractColor = TranslucentRefraction(worldPosition, worldNormal, payload.recursive, material.ior);

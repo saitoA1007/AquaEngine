@@ -34,6 +34,7 @@ private:
     // 回転移動の角度
     float startAngle_ = 0.0f;
     float endAngle_ = 0.0f;
+    float angle_ = 0.0f;
 
     // 突進の位置
     Vector3 startRushPos_;

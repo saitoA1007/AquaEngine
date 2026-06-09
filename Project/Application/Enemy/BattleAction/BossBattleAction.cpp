@@ -63,7 +63,8 @@ void BossRushAttackAction::RotateMove() {
 	timer_ += FpsCounter::deltaTime / rotateMoveMaxTime_;
 
 	// 角度補間
-	float angle = Lerp(startAngle_, endAngle_, timer_);
+	float preAngle = angle_;
+	angle_ = Lerp(startAngle_, endAngle_, timer_);
 
 	float r = 0.0f;
 	if (timer_ >= 0.4f && timer_ < 0.8f) {
@@ -78,7 +79,14 @@ void BossRushAttackAction::RotateMove() {
 	float radius = commonData_.stageRadius + r;
 
 	// 回転移動
-	commonData_.transform.translate = Vector3(std::cosf(angle) * radius, defaultPosY_, std::sinf(angle) * radius);
+	commonData_.transform.translate = Vector3(std::cosf(angle_) * radius, defaultPosY_, std::sinf(angle_) * radius);
+
+	// 回転
+	commonData_.transform.rotate.z = 0.2f;
+	Vector3 prePos = Vector3(std::cosf(preAngle) * radius, defaultPosY_, std::sinf(preAngle) * radius);
+	Vector3 dir = commonData_.transform.translate - prePos;
+	dir.Normalize();
+	commonData_.transform.rotate.y = std::atan2f(dir.x, dir.z);
 
 	if (timer_ >= 1.0f) {
 		state_ = State::kRush;
@@ -122,9 +130,14 @@ void BossRushAttackAction::RushAttack() {
 
 	// 移動
 	commonData_.transform.translate = Lerp(startRushPos_, endRushPos_,timer_);
-
 	// 高さ
 	commonData_.transform.translate.y = Lerp(startRushPos_.y, 2.0f, timer_);
+
+	// 回転
+	Vector3 dir = endRushPos_ - startRushPos_;
+	dir.Normalize();
+	commonData_.transform.rotate.y = std::atan2f(dir.x, dir.z);
+	commonData_.transform.rotate.z = 0.0f;
 
 	if (timer_ >= 1.0f) {
 		isFinished_ = true;

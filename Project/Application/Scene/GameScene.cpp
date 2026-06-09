@@ -5,6 +5,7 @@ using namespace GameEngine;
 #include "Application/Stage/StageManager.h"
 #include "Application/Enemy/BossEnemy.h"
 #include "Application/GamePlay/GamePhaseManager.h"
+#include "Application/UI/PlayUIManager.h"
 
 GameScene::~GameScene() {
 }
@@ -25,7 +26,7 @@ GameScene::GameScene() {
 	auto player = gameObjectManager_->AddObject<Player>(inputCommand_, playerModel, animationManager_);
 
 	// 敵
-	auto* enemyModel = modelManager_->GetNameByModel("Cube");
+	auto* enemyModel = modelManager_->GetNameByModel("BossEnemy");
 	enemyModel->SetDefaultIsEnableLight(true);
 	auto bossEnemy = gameObjectManager_->AddObject<BossEnemy>(enemyModel, player->GetWorldTransform());
 
@@ -34,11 +35,21 @@ GameScene::GameScene() {
 	player->SetCamera(cameraController_);
 
 	// ステージ
-	auto* wallModel = modelManager_->GetNameByModel("Cube");
+	auto* wallModel = modelManager_->GetNameByModel("Rock");
+	wallModel->SetDefaultIsEnableLight(true);
+	wallModel->SetDefaultColor({1,1,1,0.9f});
+	wallModel->SetDefaultIOR(1.31f);
+	uint32_t grassGH = textureManager_->GetHandleByName("white2x2.png");
+	wallModel->SetDefaultTextureHandle(grassGH);
+	uint32_t normalGH = textureManager_->GetHandleByName("namaqualand_boulder_03_nor_gl.png");
+	wallModel->SetDefaultNormalTexture(normalGH);
 	gameObjectManager_->AddObject<StageManager>(gameObjectManager_, wallModel);
 
+	// プレイ中のUI
+	auto* playUIManager = gameObjectManager_->AddObject<PlayUIManager>();
+
 	// シーンフェーズを管理
-	gameObjectManager_->AddObject<GamePhaseManager>();
+	gameObjectManager_->AddObject<GamePhaseManager>(player, bossEnemy, playUIManager);
 }
 
 void GameScene::Initialize() {
