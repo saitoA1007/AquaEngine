@@ -9,6 +9,8 @@ BossStateBattle::BossStateBattle(BossStateCommonData& commonData, Vector3* playe
 
 	// プレイヤーの位置を取得
 	battleStateCommonData_.playerPos = playerPos;
+	// アニメーション管理機能を取得
+	battleStateCommonData_.animator = commonData.animator;
 
 	// 各行動を登録する
 	battleStatesTable_[static_cast<size_t>(BossBattleState::kRushAttack)] = std::make_unique<BossRushAttackAction>(battleStateCommonData_);

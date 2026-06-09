@@ -9,18 +9,22 @@
 
 using namespace GameEngine;
 
-BossEnemy::BossEnemy(GameEngine::Model* model, GameEngine::WorldTransform& playerWorld) {
+BossEnemy::BossEnemy(GameEngine::Model* model, GameEngine::WorldTransform& playerWorld, GameEngine::AnimationManager* animationManager) {
 
 	model_ = model;
 
 	// 初期化
 	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,5.0f,0.0f} });
 
+	// アニメーション
+	animator_ = std::make_unique<BossAnimator>(model_, animationManager);
+
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>("BossEnemy");
 
 	// 共通データ設定
 	stateCommonData_.worldTransform = &worldTransform_;
+	stateCommonData_.animator = animator_.get();
 	stateCommonData_.debugParame = debugParame_.get();
 
 	// 状態の生成
@@ -55,6 +59,8 @@ BossEnemy::BossEnemy(GameEngine::Model* model, GameEngine::WorldTransform& playe
 
 void BossEnemy::Initialize() {
 	worldTransform_.transform_.translate = { 0.0f,5.0f,0.0f };
+	// アニメーション初期化
+	animator_->Initialize();
 }
 
 void BossEnemy::Update() {
@@ -76,6 +82,9 @@ void BossEnemy::Update() {
 
 	// 当たり判定の位置を更新
 	collider_.SetWorldPosition(worldTransform_.GetWorldPosition());
+
+	// アニメーションの更新
+	animator_->Update();
 }
 
 void BossEnemy::Draw() {

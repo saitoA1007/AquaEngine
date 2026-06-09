@@ -27,6 +27,14 @@ public:
 		bossHpBarUI_->SetMaxHp(hp);
 	}
 
+	void SetCurrentPlayerHp(int32_t hp) {
+		playerHpUI_->SetCurrentHp(hp);
+	}
+
+	void SetMaxPlayerHp(int32_t hp) {
+		playerHpUI_->SetMaxHp(hp);
+	}
+
 private:
 	// ボスのHpUI
 	std::unique_ptr<HpBarUI> bossHpBarUI_;

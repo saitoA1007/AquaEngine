@@ -163,6 +163,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Camera\CameraController.cpp" />
     <ClCompile Include="Application\ColorEditor.cpp" />
     <ClCompile Include="Application\Enemy\BattleAction\BossBattleAction.cpp" />
+    <ClCompile Include="Application\Enemy\BossAnimator.cpp" />
     <ClCompile Include="Application\Enemy\BossEnemy.cpp" />
     <ClCompile Include="Application\Enemy\State\BossStateBattle.cpp" />
     <ClCompile Include="Application\Enemy\State\BossStateIn.cpp" />
@@ -390,6 +391,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\ColorEditor.h" />
     <ClInclude Include="Application\Enemy\BattleAction\BossBattleAction.h" />
     <ClInclude Include="Application\Enemy\BattleAction\IBossBattleAction.h" />
+    <ClInclude Include="Application\Enemy\BossAnimator.h" />
     <ClInclude Include="Application\Enemy\BossEnemy.h" />
     <ClInclude Include="Application\Enemy\IBossState.h" />
     <ClInclude Include="Application\Enemy\State\BossStateBattle.h" />

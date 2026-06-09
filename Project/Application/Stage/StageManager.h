@@ -42,7 +42,7 @@ private:
 	// 壁の縦幅
 	float wallHeight_ = 2.0f;
 	// 壁の横幅の余剰分
-	float offsetWallWidth_ = 0.2f;
+	float offsetWallWidth_ = -3.0f;
 	// 復活するまでの時間
 	float respawnTime_ = 3.0f;
 
