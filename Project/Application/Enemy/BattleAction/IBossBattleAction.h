@@ -8,6 +8,8 @@ namespace GameEngine {
     class DebugParameter;
 }
 
+class BossAnimator;
+
 // ボスの戦い中の状態
 enum class BossBattleState {
     kNormal, // 状態の切り替えを管理
@@ -46,6 +48,9 @@ struct BossBattleStateCommonData {
 
     // 状態
     BossBattleState state = BossBattleState::kNormal;
+
+    // アニメーション
+    BossAnimator* animator = nullptr;
 };
 
 /// <summary>

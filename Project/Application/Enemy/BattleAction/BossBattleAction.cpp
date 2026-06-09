@@ -3,6 +3,7 @@
 #include "FPSCounter.h"
 #include "MyMath.h"
 #include "EasingManager.h"
+#include "Application/Enemy/BossAnimator.h"
 using namespace GameEngine;
 
 //=============================================================

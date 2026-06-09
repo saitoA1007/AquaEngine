@@ -538,6 +538,7 @@
     <ClCompile Include="Application\UI\HpContainer.cpp" />
     <ClCompile Include="Application\Player\PlayerAnimator.cpp" />
     <ClCompile Include="Application\UI\PlayUIManager.cpp" />
+    <ClCompile Include="Application\Enemy\BossAnimator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1053,6 +1054,7 @@
     <ClInclude Include="Application\UI\HpContainer.h" />
     <ClInclude Include="Application\Player\PlayerAnimator.h" />
     <ClInclude Include="Application\UI\PlayUIManager.h" />
+    <ClInclude Include="Application\Enemy\BossAnimator.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />

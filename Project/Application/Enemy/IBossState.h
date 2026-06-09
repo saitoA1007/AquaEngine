@@ -2,6 +2,7 @@
 #include <optional>
 #include "WorldTransform.h"
 #include "DebugParameter.h"
+#include "BossAnimator.h"
 
 // ボスの基本的な状態
 enum class BossState {
@@ -20,8 +21,11 @@ struct BossStateCommonData {
 	// 状態の切り替えを管理
 	std::optional<BossState> bossStateRequest = std::nullopt;
 
+	// アニメーションの管理
+	BossAnimator* animator = nullptr;
+
 	// パラメータの保存用
-	GameEngine::DebugParameter* debugParame;
+	GameEngine::DebugParameter* debugParame = nullptr;
 };
 
 class IBossState {

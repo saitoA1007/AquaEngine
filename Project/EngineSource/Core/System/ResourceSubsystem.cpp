@@ -52,6 +52,9 @@ void ResourceSubsystem::LoadAllResources() {
 	animationManager_->RegisterAnimation("PlayerRush", "PlayerRush.gltf", "Resources/Animations/Player/PlayerRush");
 	animationManager_->RegisterAnimation("PlayerDownAttack", "DownAttack.gltf", "Resources/Animations/Player/PlayerDownAttack");
 
+	// ボスのアニメーションデータを読み込む
+	animationManager_->RegisterAnimation("BossBirdBaseMove", "BossBirdBaseMove.gltf", "Resources/Animations/Boss/BossBirdBaseMove");
+
 	// 音声データを全てロードする
 	AudioManager::GetInstance().LoadAllAudio();
 }

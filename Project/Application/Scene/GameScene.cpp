@@ -28,21 +28,17 @@ GameScene::GameScene() {
 	// 敵
 	auto* enemyModel = modelManager_->GetNameByModel("BossEnemy");
 	enemyModel->SetDefaultIsEnableLight(true);
-	auto bossEnemy = gameObjectManager_->AddObject<BossEnemy>(enemyModel, player->GetWorldTransform());
+	auto bossEnemy = gameObjectManager_->AddObject<BossEnemy>(enemyModel, player->GetWorldTransform(), animationManager_);
 
 	// カメラ操作
 	cameraController_ = gameObjectManager_->AddObject<CameraController>(inputCommand_, &player->GetWorldTransform(), &bossEnemy->GetWorldTransform());
 	player->SetCamera(cameraController_);
 
 	// ステージ
-	auto* wallModel = modelManager_->GetNameByModel("Rock");
+	auto* wallModel = modelManager_->GetNameByModel("Cube");
 	wallModel->SetDefaultIsEnableLight(true);
 	wallModel->SetDefaultColor({1,1,1,0.9f});
 	wallModel->SetDefaultIOR(1.31f);
-	uint32_t grassGH = textureManager_->GetHandleByName("white2x2.png");
-	wallModel->SetDefaultTextureHandle(grassGH);
-	uint32_t normalGH = textureManager_->GetHandleByName("namaqualand_boulder_03_nor_gl.png");
-	wallModel->SetDefaultNormalTexture(normalGH);
 	gameObjectManager_->AddObject<StageManager>(gameObjectManager_, wallModel);
 
 	// プレイ中のUI

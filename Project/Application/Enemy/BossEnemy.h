@@ -7,7 +7,7 @@
 
 class BossEnemy : public GameEngine::IGameObject {
 public:
-	BossEnemy(GameEngine::Model* model, GameEngine::WorldTransform& playerWorld);
+	BossEnemy(GameEngine::Model* model, GameEngine::WorldTransform& playerWorld, GameEngine::AnimationManager* animationManager);
 	~BossEnemy() = default;
 
 	// 初期化処理
@@ -48,6 +48,9 @@ private:
 
 	// 各状態で共有するデータ
 	BossStateCommonData stateCommonData_;
+
+	// ボスのアニメーション
+	std::unique_ptr<BossAnimator> animator_;
 
 private:
 
