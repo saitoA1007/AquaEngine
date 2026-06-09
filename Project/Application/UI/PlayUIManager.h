@@ -1,7 +1,7 @@
 #pragma once
 #include "IGameObject.h"
-#include "GameObjectManager.h"
 #include "HpBarUI.h"
+#include "HpContainer.h"
 
 class PlayUIManager : public GameEngine::IGameObject {
 public:
@@ -29,5 +29,8 @@ public:
 
 private:
 	// ボスのHpUI
-	std::unique_ptr<HpBarUI> bossHpBarUI_ = nullptr;
+	std::unique_ptr<HpBarUI> bossHpBarUI_;
+
+	// プレイヤーHpUI
+	std::unique_ptr<HpContainer> playerHpUI_;
 };
