@@ -97,4 +97,18 @@ private: // シーン機能
 
 	float intensity_ = 1.0f;
 	Vector3 dir_ = { 0.0f,-1.0f,0.0f };
+
+
+	// 高ポリゴン氷
+	GameEngine::Model* iceHighModel_;
+	GameEngine::WorldTransform iceHighWorld_;
+	// 中ポリゴン氷
+	GameEngine::Model* iceMiddleModel_;
+	GameEngine::WorldTransform iceMiddleWorld_;
+	// 小ポリゴン氷
+	GameEngine::Model* iceLowModel_;
+	GameEngine::WorldTransform iceLowWorld_;
+	// キューブ
+	GameEngine::Model* iceCubeModel_;
+	GameEngine::WorldTransform iceCubeWorld_;
 };
