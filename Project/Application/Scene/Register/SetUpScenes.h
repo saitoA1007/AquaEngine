@@ -2,7 +2,7 @@
 #include "SceneRegistry.h"
 
 // 各シーン
-#include "Application/Scene/TitleScene.h"
+#include "Application/Scene/TestScene.h"
 #include "Application/Scene/GameScene.h"
 
 using namespace GameEngine;
@@ -14,9 +14,9 @@ using namespace GameEngine;
 void SetupScenes(SceneRegistry& factory) {
 
     // 各シーンの登録
-    factory.RegisterScene<TitleScene>("Title");
+    factory.RegisterScene<TestScene>("Test");
     factory.RegisterScene<GameScene>("Game");
 
     // 立ち上げ時に起動するシーン
-    factory.SetDefaultScene("Title");
+    factory.SetDefaultScene("Test");
 }

@@ -174,9 +174,6 @@
     <ClCompile Include="Application\Scene\GameScene.cpp">
       <Filter>Application\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Application\Scene\TitleScene.cpp">
-      <Filter>Application\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Application\Scene\Transition\Fade.cpp">
       <Filter>Application\Scene\Transition</Filter>
     </ClCompile>
@@ -539,6 +536,7 @@
     <ClCompile Include="Application\Player\PlayerAnimator.cpp" />
     <ClCompile Include="Application\UI\PlayUIManager.cpp" />
     <ClCompile Include="Application\Enemy\BossAnimator.cpp" />
+    <ClCompile Include="Application\Scene\TestScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -551,9 +549,6 @@
       <Filter>Application\Player</Filter>
     </ClInclude>
     <ClInclude Include="Application\Scene\GameScene.h">
-      <Filter>Application\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Application\Scene\TitleScene.h">
       <Filter>Application\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Application\Scene\Register\SetUpScenes.h">
@@ -1055,6 +1050,7 @@
     <ClInclude Include="Application\Player\PlayerAnimator.h" />
     <ClInclude Include="Application\UI\PlayUIManager.h" />
     <ClInclude Include="Application\Enemy\BossAnimator.h" />
+    <ClInclude Include="Application\Scene\TestScene.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />
