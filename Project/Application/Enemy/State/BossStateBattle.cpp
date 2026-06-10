@@ -15,6 +15,10 @@ BossStateBattle::BossStateBattle(BossStateCommonData& commonData, Vector3* playe
 	// 各行動を登録する
 	battleStatesTable_[static_cast<size_t>(BossBattleState::kRushAttack)] = std::make_unique<BossRushAttackAction>(battleStateCommonData_);
 	battleStatesTable_[static_cast<size_t>(BossBattleState::kWait)] = std::make_unique<BossWaitAction>(battleStateCommonData_);
+	battleStatesTable_[static_cast<size_t>(BossBattleState::kRotateMove)] = std::make_unique<RotateMoveAction>(battleStateCommonData_);
+	battleStatesTable_[static_cast<size_t>(BossBattleState::kCrossMove)] = std::make_unique<BossCrossMoveAction>(battleStateCommonData_);
+	battleStatesTable_[static_cast<size_t>(BossBattleState::kIceFallAttack)] = std::make_unique<IceFallAttackAction>(battleStateCommonData_);
+	battleStatesTable_[static_cast<size_t>(BossBattleState::kWindAttack)] = std::make_unique<WindAttackAction>(battleStateCommonData_);
 
 	// 初期化
 	currentBattleState_ = BossBattleState::kWait;
@@ -22,8 +26,12 @@ BossStateBattle::BossStateBattle(BossStateCommonData& commonData, Vector3* playe
 
 	// 行動に重み付け
 	lotteryList_ = {
-		{ BossBattleState::kRushAttack,50 }, // 突進攻撃
-		{ BossBattleState::kWait,10 }, // 待機
+		{ BossBattleState::kRushAttack,50 },    // 突進攻撃
+		{ BossBattleState::kWait,10 },          // 待機
+		{ BossBattleState::kRotateMove,10 },    // ステージに沿った移動
+		{ BossBattleState::kCrossMove,10 },     // 横断移動
+		{ BossBattleState::kIceFallAttack,10 }, // 氷柱攻撃
+		{ BossBattleState::kWindAttack,10 },    // 風攻撃
 	};
 
 	// 値を登録
