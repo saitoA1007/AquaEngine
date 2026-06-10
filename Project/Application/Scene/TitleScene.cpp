@@ -29,7 +29,7 @@ TitleScene::TitleScene() {
 	model1_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
 	uint32_t grassGH = textureManager_->GetHandleByName("grass.png");
 	model1_->SetDefaultTextureHandle(grassGH);
-	world1_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,-1.0f,0.0f} });
+	world1_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,-2.0f,0.0f} });
 
 	uint32_t normalGH = textureManager_->GetHandleByName("testNormal.png");
 	model1_->SetDefaultNormalTexture(normalGH);
@@ -56,6 +56,31 @@ TitleScene::TitleScene() {
 	ringModel_->SetDefaultTextureHandle(lineGH);
 	ringWorld_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,3.2f,0.0f},{0.0f,2.0f,0.0f} });
 	ringUvTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+
+	// 高ポリゴン氷
+	iceHighModel_ = modelManager_->GetNameByModel("Ice_highPolygon");
+	iceHighModel_->SetDefaultIsEnableLight(true);
+	iceHighModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,0.9f });
+	iceHighModel_->SetDefaultIOR(1.309f);
+	iceHighWorld_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-4.0f,2.0f,0.0f} });
+	// 中ポリゴン氷
+	iceMiddleModel_ = modelManager_->GetNameByModel("Ice_middlePolygon");
+	iceMiddleModel_->SetDefaultIsEnableLight(true);
+	iceMiddleModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,0.9f });
+	iceMiddleModel_->SetDefaultIOR(1.309f);
+	iceMiddleWorld_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,2.0f,0.0f} });
+	// 小ポリゴン氷
+	iceLowModel_ = modelManager_->GetNameByModel("Ice_lowPolygon");
+	iceLowModel_->SetDefaultIsEnableLight(true);
+	iceLowModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,0.9f });
+	iceLowModel_->SetDefaultIOR(1.309f);
+	iceLowWorld_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{4.0f,2.0f,0.0f} });
+	// キューブ氷
+	iceCubeModel_ = modelManager_->GetNameByModel("Cube");
+	iceCubeModel_->SetDefaultIsEnableLight(true);
+	iceCubeModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,0.9f });
+	iceCubeModel_->SetDefaultIOR(1.309f);
+	iceCubeWorld_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{8.0f,2.0f,0.0f} });
 }
 
 void TitleScene::Initialize() {
@@ -138,6 +163,12 @@ void TitleScene::Draw() {
 
 	// リングを描画
 	//renderQueue_->SubmitModel(ringModel_, ringWorld_);
+
+	// それぞれの氷を描画
+	renderQueue_->SubmitRaytracingModel(iceHighModel_, iceHighWorld_);
+	renderQueue_->SubmitRaytracingModel(iceMiddleModel_, iceMiddleWorld_);
+	renderQueue_->SubmitRaytracingModel(iceLowModel_, iceLowWorld_);
+	renderQueue_->SubmitRaytracingModel(iceCubeModel_, iceCubeWorld_);
 
 	// エフェクトを描画
 	renderQueue_->SubmitInstancing(effectModel_, primitiveEffect_->GetCurrentNumInstance(), *primitiveEffect_->GetWorldTransforms(),0.0f, BlendMode::kBlendModeAdd);
