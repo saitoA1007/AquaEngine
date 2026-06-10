@@ -1,8 +1,10 @@
+#define NOMINMAX
 #include "BossBattleAction.h"
 #include <numbers>
 #include "FPSCounter.h"
 #include "MyMath.h"
 #include "EasingManager.h"
+#include "RandomGenerator.h"
 #include "Application/Enemy/BossAnimator.h"
 using namespace GameEngine;
 
@@ -80,11 +82,11 @@ void BossRushAttackAction::RotateMove() {
 	float radius = commonData_.stageRadius + r;
 
 	// 回転移動
-	commonData_.transform.translate = Vector3(std::cosf(angle_) * radius, defaultPosY_, std::sinf(angle_) * radius);
-
+	commonData_.transform.translate = GetXZFromAngle(angle_, radius, defaultPosY_);
+	
 	// 回転
 	commonData_.transform.rotate.z = 0.2f;
-	Vector3 prePos = Vector3(std::cosf(preAngle) * radius, defaultPosY_, std::sinf(preAngle) * radius);
+	Vector3 prePos = GetXZFromAngle(preAngle, radius, defaultPosY_);
 	Vector3 dir = commonData_.transform.translate - prePos;
 	dir.Normalize();
 	commonData_.transform.rotate.y = std::atan2f(dir.x, dir.z);
@@ -179,14 +181,316 @@ BossCrossMoveAction::BossCrossMoveAction(BossBattleStateCommonData& commonData) 
 }
 
 void BossCrossMoveAction::Initialize() {
+	isFinished_ = false;
+	timer_ = 0.0f;
+	// 開始位置
+	startPos_ = commonData_.transform.translate;
+	Vector3 startDir = startPos_;
+	startDir.y = 0.0f;
+	startDir.Normalize();
 
+	float angle = RandomGenerator::Get(-std::numbers::pi_v<float> / 4.0f, std::numbers::pi_v<float> / 4.0f);
+	Vector3 dir = RotateVectorXZ(startDir, angle);
+	// 反転
+	dir *= -1.0f;
+
+	// 終盤の位置を取得
+	endPos_ = dir * (commonData_.stageRadius * crossEndRatio_);
+
+	// 最初の回転するための角度を求める
+	startCurrentRotDir_ = commonData_.transform.translate;
+	startCurrentRotDir_.y = 0.0f;
+	startCurrentRotDir_.Normalize();
+	// 最初の内の最後に向く方向
+	endRotDir_ = Math::Normalize(endPos_);
+
+	// 最終的に向く方向
+	finalRotDir_ = endRotDir_ * -1.0f;
 }
 
 void BossCrossMoveAction::Update() {
+
+	timer_ += FpsCounter::deltaTime;
+	timer_ = std::min(timer_, 1.0f);
+
+	// 縦移動
+	float posY = 0.0f;
+	float totalCycle = timer_ * upDownCount_;
+	float localTimer = std::fmodf(totalCycle, 1.0f);
+	if (localTimer <= 0.5f) {
+		float t = localTimer / 0.5f;
+		posY = Lerp(0.0f, maxMoveHeight_, EaseInOut(t));
+	} else {
+		float t = (localTimer - 0.5f) / 0.5f;
+		posY = Lerp(maxMoveHeight_, 0.0f, EaseInOut(t));
+	}
+
+	// 移動
+	Vector3 pos = Lerp(startPos_, endPos_, EaseInOut(timer_));
+	commonData_.transform.translate = pos;
+	commonData_.transform.translate.y = defaultPosY_;
+	commonData_.transform.translate.y += posY;
+
+	/// 回転
+	Vector3 dir = { 0,0,1 };
+
+	// 回転の処理
+	if (timer_ <= 0.2f) {
+		float localT = timer_ / 0.2f;
+		// 回転
+		dir = Slerp(startCurrentRotDir_, endRotDir_, EaseIn(localT));
+		// Y軸周りの角度
+		commonData_.transform.rotate.y = std::atan2f(dir.x, dir.z);
+	} else if (timer_ >= 0.8f) {
+
+		float localT = (timer_ - 0.8f) / 0.2f;
+		// 回転
+		dir = Slerp(endRotDir_, finalRotDir_, EaseOut(localT));
+		// Y軸周りの角度
+		commonData_.transform.rotate.y = std::atan2f(dir.x, dir.z);
+	}
 	
+	if (timer_ >= 1.0f) {
+		isFinished_ = true;
+	}
 }
 
 void BossCrossMoveAction::Finalize() {
 
 }
+
+//===============================================================
+// 回転移動
+//===============================================================
+
+RotateMoveAction::RotateMoveAction(BossBattleStateCommonData& commonData) : IBossBattleAction(commonData) {
+
+}
+
+void RotateMoveAction::Initialize() {
+	isFinished_ = false;
+	timer_ = 0.0f;
+	
+	Vector3 myDir = commonData_.transform.translate;
+	myDir.y = 0.0f;
+	myDir.Normalize();
+	// 最初の角度
+	startAngle_ = std::atan2f(myDir.z, myDir.x);
+
+	// 回転する方向を求める
+	float rotOffset = 0.0f;
+	if (RandomGenerator::Get(0, 1) == 0) {
+		rotOffset = std::numbers::pi_v<float> *0.5f;
+	} else {
+		rotOffset = -std::numbers::pi_v<float> *0.5f;
+	}
+
+	// 反対側の角度を求める
+	endAngle_ = startAngle_ + rotOffset;
+
+	// 上下移動する回数を求める
+	float radius = commonData_.stageRadius + offsetStageRadius_;
+	Vector3 endPos = GetXZFromAngle(endAngle_, radius, defaultPosY_);
+	float angleDiff = std::fabs(endPos.Length());
+	cycleCount_ = angleDiff / (commonData_.stageRadius * 0.5f);
+
+	// 最初の回転するための角度を求める
+	startCurrentRotDir_ = commonData_.transform.translate;
+	startCurrentRotDir_.y = 0.0f;
+	startCurrentRotDir_.Normalize();
+	// 最初の内の最後に向く方向
+	float angle = Lerp(startAngle_, endAngle_, 0.2f);
+	Vector3 prePos = GetXZFromAngle(angle, radius, defaultPosY_);
+	endRotDir_ = Math::Normalize(prePos - commonData_.transform.translate);
+	// 最終的に向く方向
+	angle = Lerp(startAngle_, endAngle_, 1.0f);
+	prePos = GetXZFromAngle(angle, radius, defaultPosY_);
+	finalRotDir_ = Math::Normalize(prePos * -1.0f);
+}
+
+void RotateMoveAction::Update() {
+	timer_ += FpsCounter::deltaTime / maxTime_;
+	timer_ = std::min(timer_, 1.0f);
+
+	// 角度補間
+	float preAngle = angle_;
+	angle_ = Lerp(startAngle_, endAngle_, timer_);
+
+	// 半径を取得
+	float radius = commonData_.stageRadius + offsetStageRadius_;
+
+	// 縦移動
+	float posY = 0.0f;
+	float totalCycle = timer_ * cycleCount_;
+	float localTimer = std::fmodf(totalCycle, 1.0f);
+
+	if (localTimer <= 0.5f) {
+		float t = localTimer / 0.5f;
+		posY = Lerp(0.0f, maxMoveHeight_, EaseInOut(t));
+	} else {
+		float t = (localTimer - 0.5f) / 0.5f;
+		posY = Lerp(maxMoveHeight_, 0.0f, EaseInOut(t));
+	}
+
+	// 回転移動
+	commonData_.transform.translate = GetXZFromAngle(angle_, radius, defaultPosY_);
+	commonData_.transform.translate.y += posY;
+
+	/// 回転
+	Vector3 dir = { 0,0,1 };
+
+	// 回転の処理
+	if (timer_ <= 0.2f) {
+		float localT = timer_ / 0.2f;
+
+		// 回転
+		dir = Slerp(startCurrentRotDir_, endRotDir_, EaseIn(localT));
+		// Y軸周りの角度
+		commonData_.transform.rotate.y = std::atan2f(dir.x, dir.z);
+
+	} else if (timer_ <= 0.8f) {
+		// 回転
+		Vector3 prePos = GetXZFromAngle(preAngle, radius, defaultPosY_);
+		Vector3 dir = commonData_.transform.translate - prePos;
+		dir.Normalize();
+		commonData_.transform.rotate.y = std::atan2f(dir.x, dir.z);
+		// 保存
+		startCurrentRotDir_ = dir;
+	} else {
+		float localT = (timer_ - 0.8f) / 0.2f;
+		// 回転
+		dir = Slerp(startCurrentRotDir_, finalRotDir_, EaseOut(localT));
+		// Y軸周りの角度
+		commonData_.transform.rotate.y = std::atan2f(dir.x, dir.z);
+	}
+
+	if (timer_ >= 1.0f) {
+		isFinished_ = true;
+	}
+}
+
+void RotateMoveAction::Finalize() {
+
+}
+
+//==========================================================================
+// 氷柱攻撃
+//==========================================================================
+
+IceFallAttackAction::IceFallAttackAction(BossBattleStateCommonData& commonData) : IBossBattleAction(commonData) {
+
+}
+
+void IceFallAttackAction::Initialize() {
+	isFinished_ = false;
+	timer_ = 0.0f;
+}
+
+void IceFallAttackAction::Update() {
+	timer_ += FpsCounter::deltaTime / maxTime_;
+
+
+	if (timer_ >= 1.0f) {
+		isFinished_ = true;
+	}
+}
+
+void IceFallAttackAction::Finalize() {
+
+}
+
+//==========================================================================
+// 風攻撃
+//==========================================================================
+
+WindAttackAction::WindAttackAction(BossBattleStateCommonData& commonData) : IBossBattleAction(commonData) {
+
+}
+
+void WindAttackAction::Initialize() {
+	isFinished_ = false;
+	timer_ = 0.0f;
+	state_ = State::kIn;
+
+	// 現在の方向を求める
+	startCurrentRotDir_ = commonData_.transform.translate;
+	startCurrentRotDir_.y = 0.0f;
+	startCurrentRotDir_.Normalize();
+	startCurrentRotDir_ *= -1.0f;
+
+	float angle = std::numbers::pi_v<float> / 4.0f;
+	startRotDir_ = RotateVectorXZ(startCurrentRotDir_, angle);
+	endRotDir_ = RotateVectorXZ(startCurrentRotDir_, -angle);
+}
+
+void WindAttackAction::Update() {
+
+	switch (state_)
+	{
+	case WindAttackAction::State::kIn: {
+		timer_ += FpsCounter::deltaTime / inMaxTime_;
+
+		// 回転
+		Vector3 dir = Slerp(startCurrentRotDir_, startRotDir_, timer_);
+		// Y軸周りの角度
+		commonData_.transform.rotate.y = std::atan2f(dir.x, dir.z);
+
+		if (timer_ >= 1.0f) {
+			state_ = State::kMain;
+			timer_ = 0.0f;
+		}
+		break;
+	}
+
+	case WindAttackAction::State::kMain: {
+		timer_ += FpsCounter::deltaTime / mainMaxTime_;
+
+		// 回転
+		Vector3 dir = Slerp(startRotDir_, endRotDir_, timer_);
+		// Y軸周りの角度
+		commonData_.transform.rotate.y = std::atan2f(dir.x, dir.z);
+
+		if (timer_ >= 1.0f) {
+			state_ = State::kOut;
+			timer_ = 0.0f;
+		}
+		break;
+	}
+
+
+	case WindAttackAction::State::kOut: {
+		timer_ += FpsCounter::deltaTime / outMaxTime_;
+
+		// 回転
+		Vector3 dir = Slerp(endRotDir_, startCurrentRotDir_, timer_);
+		// Y軸周りの角度
+		commonData_.transform.rotate.y = std::atan2f(dir.x, dir.z);
+
+		if (timer_ >= 1.0f) {
+			isFinished_ = true;
+		}
+		break;
+	}
+	}
+}
+
+void WindAttackAction::Finalize() {
+
+}
+
+// ヘルパー関数
+namespace {
+
+	Vector3 GetXZFromAngle(float angle, float radius, float posY) {
+		return  Vector3(std::cosf(angle) * radius, posY, std::sinf(angle) * radius);
+	}
+
+	Vector3 RotateVectorXZ(Vector3 dir, float angle) {
+		float cos = std::cosf(angle);
+		float sin = std::sinf(angle);
+		return Vector3(dir.x * cos - dir.z * sin, 0.0f, dir.x * sin + dir.z * cos );
+	}
+}
+
+
 

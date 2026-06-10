@@ -16,15 +16,16 @@ namespace GameEngine {
 	Quaternion Lerp(const Quaternion& start, const Quaternion& end, const float& t);
 
 	// イージングイン
-	float EaseIn(const float& t);
+	float EaseIn(float t);
 
 	// イージングアウト
-	float EaseOut(const float& t);
+	float EaseOut(float t);
 
 	// イージングインアウト
-	float EaseInOut(const float& t);
+	float EaseInOut(float t);
 
 	// 球面線形補間
 	Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t);
+	Vector3 Slerp(const Vector3& start, const Vector3& end, float t);
 }
 

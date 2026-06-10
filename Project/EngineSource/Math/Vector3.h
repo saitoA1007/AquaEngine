@@ -16,7 +16,11 @@ struct Vector3 {
 	Vector3 operator-(const float& other) const { return { x - other, y - other, z - other }; }
 	Vector3 operator*(const float& other) const { return { x * other, y * other, z * other }; }
 	Vector3 operator/(const float& other) const { return { x / other, y / other, z / other }; }
-	
+	Vector3 operator+=(const float& other) { return { x += other, y += other, z += other }; }
+	Vector3 operator-=(const float& other) { return { x -= other, y -= other, z -= other }; }
+	Vector3 operator*=(const float& other) { return { x *= other, y *= other, z *= other }; }
+	Vector3 operator/=(const float& other) { return { x /= other, y /= other, z /= other }; }
+
 	// ベクトルの長さ
 	float Length() const {
 		return std::sqrt(x * x + y * y + z * z);
