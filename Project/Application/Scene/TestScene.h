@@ -77,6 +77,7 @@ private: // シーン機能
 
 	float intensity_ = 1.0f;
 	Vector3 dir_ = { 0.0f,-1.0f,0.0f };
+	Vector4 lightColor_ = { 1.0f,1.0f,1.0f,1.0f };
 
 	Vector4 playerColor_ = { 1.0f,1.0f,1.0f,1.0f };
 

@@ -121,38 +121,13 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
         return;
     }
     
-    // 反射
-    float3 glassColor = material.color.rgb * textureColor.rgb;
-    payload.color = GlassBSDF(
-            worldPosition,
-            worldNormal,
-            payload.recursive,
-            material.ior,
-            material.roughness,
-            glassColor
-        );
-     
-    // ライト
-    //float3 lightDir = normalize(-gDirectionalLight.direction);
-    //float3 lightColor = gDirectionalLight.color.xyz * gDirectionalLight.intensity;
-    
-    //// 平行光源
-    //float3 directLight = CalculateBRDF(albedoColor, worldNormal, viewDir, lightDir, lightColor, material.roughness, material.metallic);
-    //
-    //// 反射レイを飛ばして反射色を取得
-    //float3 reflectColor = Reflection(worldPosition, worldNormal, payload.recursive);
-    //
-    //// 環境光
-    //float3 indirectLight = CalculateIBL(albedoColor, reflectColor, worldNormal, viewDir, material.metallic, material.roughness);
-    
-    // 最終的な色を設定
-    //payload.color = directLight + indirectLight;
-    //
-    //// 影判定を取得
-    //bool isInShadow = ShootShadowRay(worldPosition, lightDir);
-    //// 影の中であれば、影色を設定
-    //if (isInShadow)
-    //{
-    //    payload.color.xyz *= 0.5;
-    //}
+    float3 iceColor = material.color.rgb * textureColor.rgb;
+    payload.color = IceBSDF(
+        worldPosition,
+        worldNormal,
+        payload.recursive,
+        material.ior,
+        material.roughness,
+        iceColor
+    );
 }

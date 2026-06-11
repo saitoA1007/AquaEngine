@@ -167,4 +167,23 @@ float3 GetNormalFromMap(float4 normalMapColor, float3 normal, float4 tangent)
     
     return normalize(mul(textureNormal, tbn));
 }
+
+// Beer-Lambert法則による体積透過率
+float3 BeerLambert(float3 absorptionCoeff, float distance)
+{
+    return exp(-absorptionCoeff * distance);
+}
+
+// 表面下散乱の近似
+float3 IceFakeSSS(float3 normal, float3 lightDir, float3 incomingRayDir, float3 lightColor, float scatterStrength)
+{
+    // 内部散乱光
+    static const float3 ICE_SCATTER_COLOR = float3(0.72f, 0.92f, 1.00f);
+    
+    float wrapDiffuse = saturate(dot(normal, lightDir) * 0.5f + 0.5f);
+    float backlit = pow(saturate(dot(-incomingRayDir, lightDir)), 3.0f);
+
+    float scatter = wrapDiffuse * 0.35f + backlit * 0.65f;
+    return ICE_SCATTER_COLOR * lightColor * scatter * scatterStrength;
+}
 #endif

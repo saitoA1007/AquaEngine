@@ -101,10 +101,13 @@ void TestScene::DebugUpdate() {
 	ImGui::DragFloat3("PlayerPos", &world_.transform_.translate.x, 0.1f);
 	ImGui::DragFloat3("PlayerScale", &world_.transform_.scale.x, 0.1f);
 	ImGui::ColorEdit4("PlayerColor", &playerColor_.x);
+
 	ImGui::DragFloat3("lightDir", &dir_.x, 0.1f);
 	ImGui::DragFloat("lightIntensity", &intensity_, 0.1f);
+	ImGui::ColorEdit4("lightColor", &lightColor_.x);
+
 	ImGui::ColorEdit4("IceColor", &color_.x);
-	ImGui::DragFloat("IceRoughness", &roughness_, 0.01f);
+	ImGui::DragFloat("IceRoughness", &roughness_, 0.01f,0.0f,1.0f);
 	ImGui::DragFloat("IceIor", &ior_, 0.01f);
 	iceMaterial_.SetColor(color_);
 	iceMaterial_.SetRoughness(roughness_);
@@ -114,6 +117,7 @@ void TestScene::DebugUpdate() {
 
 	light->SetDirectionalDirction(dir_);
 	light->SetDirectionalIntensity(intensity_);
+	light->SetDirectionalColor(lightColor_);
 	world_.UpdateTransformMatrix();
 	model_->SetDefaultColor(playerColor_);
 	ImGui::End();
