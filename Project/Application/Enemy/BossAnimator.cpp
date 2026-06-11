@@ -6,6 +6,11 @@ BossAnimator::BossAnimator(GameEngine::Model* model, GameEngine::AnimationManage
 
 	// アニメーションデータを取得
 	animationData_[BossAnimationType::kMove] = animationManager->GetNameByAnimations("BossBirdBaseMove");
+	animationData_[BossAnimationType::kBreath] = animationManager->GetNameByAnimations("BossBirdIceBreath");
+	animationData_[BossAnimationType::kRush] = animationManager->GetNameByAnimations("BossBirdRush");
+	animationData_[BossAnimationType::kScream] = animationManager->GetNameByAnimations("BossBirdScream");
+	animationData_[BossAnimationType::kAppearance] = animationManager->GetNameByAnimations("BossBirdAppearance");
+	animationData_[BossAnimationType::kDeath] = animationManager->GetNameByAnimations("BossBirdShootDown");
 
 	// アニメーターを初期化
 	animator_.Initialize(model, &animationData_[BossAnimationType::kMove]["基本移動"]);

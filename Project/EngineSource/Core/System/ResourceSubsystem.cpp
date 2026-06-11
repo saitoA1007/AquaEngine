@@ -57,8 +57,8 @@ void ResourceSubsystem::LoadAllResources() {
 	animationManager_->RegisterAnimation("BossBirdScream", "BossBird_Screamgltf.gltf", "Resources/Animations/Boss/BossBirdScream");
 	animationManager_->RegisterAnimation("BossBirdRush", "BossBirdRush.gltf", "Resources/Animations/Boss/BossBirdRush");
 	animationManager_->RegisterAnimation("BossBirdIceBreath", "BossBird_IceBreath.gltf", "Resources/Animations/Boss/BossBirdIceBreath");
-
-	//animationManager_->RegisterAnimation("BossBirdAppearance", "BossBird_Screamgltf.gltf", "Resources/Animations/Boss/BossBirdAppearance");
+	animationManager_->RegisterAnimation("BossBirdAppearance", "BossBird_Screamgltf.gltf", "Resources/Animations/Boss/BossBirdAppearance");
+	animationManager_->RegisterAnimation("BossBirdShootDown", "ShootDown_Animation.gltf", "Resources/Animations/Boss/BossBirdShootDown");
 
 	// 音声データを全てロードする
 	AudioManager::GetInstance().LoadAllAudio();
