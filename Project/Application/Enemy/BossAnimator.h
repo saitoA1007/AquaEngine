@@ -6,10 +6,13 @@
 
 // プレイヤーのアニメーションタイプ
 enum class BossAnimationType {
-	kMove,
-	kRush,
-	kBreath,
-	kScream,
+	kMove,   // 移動
+	kRush,   // 突進
+	kBreath, // ブレス
+	kScream, // 叫ぶ
+
+	kAppearance, // 登場
+	kDeath,      // 撃破
 
 	kMaxCount
 };
