@@ -237,9 +237,6 @@ void RenderQueue::SubmitRaytracingModel(Model* model, WorldTransform& worldTrans
         // blasを登録
         data.blas = mesh->GetBLAS();
 
-        // 屈折するかや透明かなどの情報から使用するシェーダーを判断するようにする
-        data.hitGroupIndexOffset = 0;
-
         if (customRefBuffer == nullptr) {
             // デフォルトのマテリアルを設定
             Material* drawMaterial = model->GetMaterial(mesh->GetMaterialName());
@@ -252,6 +249,9 @@ void RenderQueue::SubmitRaytracingModel(Model* model, WorldTransform& worldTrans
             }
             refBuffer.SetBufferMaterial(type, materialBuffer.GetSrvIndex());
             refIndex = refBuffer.GetRefIndex();
+
+            // 使用するヒットグループを設定
+            data.hitGroupIndexOffset = refBuffer.GetUseHitGroupIndex();
         } else {
             // スケルトンがあれば参照するデータを変える
             uint32_t vertexHandle = 0;
@@ -265,6 +265,9 @@ void RenderQueue::SubmitRaytracingModel(Model* model, WorldTransform& worldTrans
             // モデルデータを設定
             customRefBuffer->SetModelData(vertexHandle, mesh->GetIndexBufferSrvIndex());
             refIndex = customRefBuffer->GetRefIndex();
+
+            // 使用するヒットグループを設定
+            data.hitGroupIndexOffset = customRefBuffer->GetUseHitGroupIndex();
         }
 
         // 使用するデータを設定

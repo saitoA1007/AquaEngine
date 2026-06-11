@@ -7,6 +7,8 @@
 #include "WorldTransform.h"
 #include "Animator.h"
 #include "ParticleBehavior.h"
+#include "Material.h"
+#include "RefBuffer.h"
 
 #include "Application/Scene/Transition/Fade.h"
 
@@ -77,6 +79,16 @@ private: // シーン機能
 	Vector3 dir_ = { 0.0f,-1.0f,0.0f };
 
 	Vector4 playerColor_ = { 1.0f,1.0f,1.0f,1.0f };
+
+	// 氷で共通のマテリアル
+	GameEngine::Material iceMaterial_;
+	// レイトレーシングで氷マテリアルを参照する用
+	GameEngine::RefBuffer iceRefBuffers_[4];
+
+	Vector4 color_ = {1.0f,1.0f,1.0f,1.0f};
+	float roughness_ = 0.5f;
+	// 屈折
+	float ior_ = 1.31f;
 
 	// 地面
 	GameEngine::Model* terrainModel_;

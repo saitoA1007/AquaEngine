@@ -65,7 +65,7 @@ VertexData GetHitVertex(MyAttribute attrib, uint vertexHandle, uint indexHandle)
 }
 
 [shader("closesthit")]
-void MainObjectCHS(inout Payload payload, MyAttribute attrib)
+void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
 {
     if (checkRecursiveLimit(payload))
     {
