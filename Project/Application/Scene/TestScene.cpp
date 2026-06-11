@@ -1,15 +1,18 @@
-#include "TitleScene.h"
+#include "TestScene.h"
 #include "ImguiManager.h"
 using namespace GameEngine;
 
-TitleScene::~TitleScene() {
-}
+TestScene::~TestScene() {}
 
-TitleScene::TitleScene() {
+TestScene::TestScene() {
 	// メインカメラの初期化
 	mainCamera_ = std::make_unique<Camera>();
 	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720);
 	mainCamera_->Update();
+
+	// 背景画像を設定rostock_laage_airport_4k
+	uint32_t skyboxGH = textureManager_->GetHandleByName("grasslands_sunset_1k.dds");
+	renderQueue_->SetSkyboxTexture(skyboxGH);
 
 	// プレイヤーモデルを生成
 	model_ = modelManager_->GetNameByModel("Walk");
@@ -24,38 +27,20 @@ TitleScene::TitleScene() {
 	walkAnimator_->Initialize(model_, &walkAnimationData_["Armature|mixamo.com|Layer0"]);
 
 	// 地面
-	model1_ = modelManager_->GetNameByModel("Terrain");
-	model1_->SetDefaultIsEnableLight(true);
-	model1_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
+	terrainModel_ = modelManager_->GetNameByModel("Terrain");
+	terrainModel_->SetDefaultIsEnableLight(true);
+	terrainModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
 	uint32_t grassGH = textureManager_->GetHandleByName("grass.png");
-	model1_->SetDefaultTextureHandle(grassGH);
-	world1_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,-2.0f,0.0f} });
+	terrainModel_->SetDefaultTextureHandle(grassGH);
+	terrainWorld_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,-2.0f,0.0f} });
 
 	uint32_t normalGH = textureManager_->GetHandleByName("testNormal.png");
-	model1_->SetDefaultNormalTexture(normalGH);
-
-	// cube
-	model2_ = modelManager_->GetNameByModel("Cube");
-	model2_->SetDefaultIsEnableLight(true);
-	model2_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
-	world2_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-4.0f,1.0f,0.0f} });
-	world3_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{5.0f,-4.0f,0.0f} });
-
-	// 背景画像を設定rostock_laage_airport_4k
-	uint32_t skyboxGH = textureManager_->GetHandleByName("grasslands_sunset_1k.dds");
-	renderQueue_->SetSkyboxTexture(skyboxGH);
+	terrainModel_->SetDefaultNormalTexture(normalGH);
 
 	uint32_t effectGH = textureManager_->GetHandleByName("circle.png");
 	primitiveEffect_ = std::make_unique<ParticleBehavior>("PrimitiveEffect", 16, effectGH);
 	// エフェクト用モデル
 	effectModel_ = modelManager_->GetNameByModel("Plane");
-
-	// リング
-	ringModel_ = modelManager_->GetNameByModel("Ring");
-	uint32_t lineGH = textureManager_->GetHandleByName("gradationLine.png");
-	ringModel_->SetDefaultTextureHandle(lineGH);
-	ringWorld_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,3.2f,0.0f},{0.0f,2.0f,0.0f} });
-	ringUvTransform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 
 	// 高ポリゴン氷
 	iceHighModel_ = modelManager_->GetNameByModel("Ice_highPolygon");
@@ -83,11 +68,11 @@ TitleScene::TitleScene() {
 	iceCubeWorld_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{8.0f,2.0f,0.0f} });
 }
 
-void TitleScene::Initialize() {
-	
+void TestScene::Initialize() {
+
 }
 
-void TitleScene::Update() {
+void TestScene::Update() {
 
 	// カメラの更新処理
 	mainCamera_->Update();
@@ -99,70 +84,37 @@ void TitleScene::Update() {
 	walkAnimator_->Update();
 }
 
-void TitleScene::DebugUpdate() {
+void TestScene::DebugUpdate() {
 #ifdef USE_IMGUI
 	auto* light = renderQueue_->GetLightManager();
 
-	ImGui::Begin("Ring");
-	ImGui::DragFloat3("pos", &ringWorld_.transform_.translate.x);
-	ImGui::DragFloat3("rotate", &ringWorld_.transform_.rotate.x);
-	ImGui::DragFloat3("scale", &ringWorld_.transform_.scale.x);
-	ImGui::DragFloat3("UVrotate", &ringUvTransform_.rotate.x);
-	ImGui::DragFloat3("UVscale", &ringUvTransform_.scale.x);
-	ImGui::End();
-	ringWorld_.UpdateTransformMatrix();
-	ringModel_->SetDefaultUVMatrix(ringUvTransform_);
-
 	ImGui::Begin("test");
 
-	ImGui::ColorEdit4("P_color", &color_.x);
-	ImGui::ColorEdit4("Cubecolor", &color1_.x);
-	ImGui::DragFloat("P_metalic", &metalic_, 0.01f, 0.0f, 1.0f);
-	ImGui::DragFloat("grassMetalic", &metalic1_, 0.01f, 0.0f, 1.0f);
-	ImGui::DragFloat("CubeMetalic", &metalic2_, 0.01f, 0.0f, 1.0f);
-	ImGui::DragFloat("P_shininess", &roughness_, 0.1f, 0.0f, 1.0f);
-	ImGui::DragFloat("CubeShininess", &roughness1_, 0.1f, 0.0f, 1.0f);
-	ImGui::DragFloat("GrassShininess", &roughness2_, 0.1f, 0.0f, 1.0f);
-	ImGui::DragFloat("P_IOR", &ior_, 0.1f);
-	ImGui::DragFloat("CubeIOR", &ior1_, 0.1f);
-
+	ImGui::DragFloat3("PlayerPos", &world_.transform_.translate.x, 0.1f);
+	ImGui::DragFloat3("PlayerScale", &world_.transform_.scale.x, 0.1f);
+	ImGui::ColorEdit4("PlayerColor", &playerColor_.x);
 	ImGui::DragFloat3("lightDir", &dir_.x, 0.1f);
 	ImGui::DragFloat("lightIntensity", &intensity_, 0.1f);
 	dir_.Normalize();
 
 	light->SetDirectionalDirction(dir_);
 	light->SetDirectionalIntensity(intensity_);
-
-	model_->SetDefaultColor(color_);
-	model1_->SetDefaultColor(color1_);
-	model_->SetDefaultMetallic(metalic_);
-	model1_->SetDefaultMetallic(metalic1_);
-	model2_->SetDefaultMetallic(metalic2_);
-	model_->SetRoughness(roughness_);
-	model2_->SetRoughness(roughness1_);
-	model1_->SetRoughness(roughness2_);
-	model_->SetDefaultIOR(ior_);
-	model2_->SetDefaultIOR(ior1_);
+	world_.UpdateTransformMatrix();
+	model_->SetDefaultColor(playerColor_);
 	ImGui::End();
 #endif
 }
 
-void TitleScene::Draw() {
+void TestScene::Draw() {
 
 	// 描画に使用するカメラを設定
 	renderQueue_->SetCamera(mainCamera_.get());
 
-	// ボーンのデバック描画
-	//walkAnimator_->DebugDraw(debugRenderer_);
+	// 地面を描画
+	renderQueue_->SubmitRaytracingModel(terrainModel_, terrainWorld_);
 
-	// テストモデルを描画
-	//renderQueue_->SubmitAnimation(model_, world_);
-	renderQueue_->SubmitRaytracingModel(model1_, world1_);
-	//renderQueue_->SubmitRaytracingModel(model2_, world2_);
-	renderQueue_->SubmitModel(model2_, world3_);
-
-	// リングを描画
-	//renderQueue_->SubmitModel(ringModel_, ringWorld_);
+	// アニメーションモデル
+	renderQueue_->SubmitRaytracingModel(model_, world_);
 
 	// それぞれの氷を描画
 	renderQueue_->SubmitRaytracingModel(iceHighModel_, iceHighWorld_);
@@ -171,5 +123,5 @@ void TitleScene::Draw() {
 	renderQueue_->SubmitRaytracingModel(iceCubeModel_, iceCubeWorld_);
 
 	// エフェクトを描画
-	renderQueue_->SubmitInstancing(effectModel_, primitiveEffect_->GetCurrentNumInstance(), *primitiveEffect_->GetWorldTransforms(),0.0f, BlendMode::kBlendModeAdd);
+	renderQueue_->SubmitInstancing(effectModel_, primitiveEffect_->GetCurrentNumInstance(), *primitiveEffect_->GetWorldTransforms(), 0.0f, BlendMode::kBlendModeAdd);
 }

@@ -9,7 +9,7 @@ DebugParameter::DebugParameter(const std::string& rootGroupName) {
 	rootGroupName_ = rootGroupName;
 }
 
-void DebugParameter::Register(const std::string& worldName, WorldTransform& world, const std::string subGroupName) {
+void DebugParameter::RegisterWorld(const std::string& worldName, WorldTransform& world, const std::string subGroupName) {
     std::string name = worldName + "WorldTransform";
     std::string path;
     if (subGroupName.empty()) {
@@ -23,7 +23,7 @@ void DebugParameter::Register(const std::string& worldName, WorldTransform& worl
     Register("Translate", world.transform_.translate, 2, path);
 }
 
-void DebugParameter::Register(const std::string& spriteName, Sprite& sprite, const std::string subGroupName) {
+void DebugParameter::RegisterSprite(const std::string& spriteName, Sprite& sprite, const std::string subGroupName) {
     std::string name = spriteName + "Sprite";
     std::string path;
     if (subGroupName.empty()) {

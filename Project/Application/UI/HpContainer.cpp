@@ -6,7 +6,7 @@ HpContainer::HpContainer(std::string name) {
 
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>(name);
-	debugParame_->Register("Base", baseWorld_);
+	debugParame_->RegisterWorld("Base", baseWorld_);
 	debugParame_->Register("Spacing", spacing_);
 	debugParame_->Register("IconSize", iconSize_);
 

@@ -18,6 +18,9 @@ struct BossStateCommonData {
 	// ワールド行列
 	GameEngine::WorldTransform* worldTransform = nullptr;
 
+	// hp
+	int32_t hp_ = 1;
+
 	// 状態の切り替えを管理
 	std::optional<BossState> bossStateRequest = std::nullopt;
 

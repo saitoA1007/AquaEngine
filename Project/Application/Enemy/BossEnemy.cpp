@@ -61,6 +61,8 @@ void BossEnemy::Initialize() {
 	worldTransform_.transform_.translate = { 0.0f,5.0f,0.0f };
 	// アニメーション初期化
 	animator_->Initialize();
+
+	stateCommonData_.hp_ = maxHp_;
 }
 
 void BossEnemy::Update() {
@@ -94,6 +96,14 @@ void BossEnemy::Draw() {
 }
 
 void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
+
+	bool isPlayer = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kPlayer));
+
+	if (isPlayer) {
+
+		stateCommonData_.hp_ -= 1;
+
+	}
 
 }
 

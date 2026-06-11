@@ -52,6 +52,9 @@ private:
 	// ボスのアニメーション
 	std::unique_ptr<BossAnimator> animator_;
 
+	// 最大hp
+	int32_t maxHp_ = 10;
+
 private:
 
 	/// <summary>

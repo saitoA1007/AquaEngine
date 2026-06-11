@@ -10,10 +10,10 @@
 
 #include "Application/Scene/Transition/Fade.h"
 
-class TitleScene : public GameEngine::IScene {
+class TestScene : public GameEngine::IScene {
 public:
-	TitleScene();
-	~TitleScene();
+	TestScene();
+	~TestScene();
 
 	/// <summary>
 	/// 初期化
@@ -73,31 +73,14 @@ private: // シーン機能
 	// アニメーションを再生するクラス
 	std::unique_ptr<GameEngine::Animator> walkAnimator_;
 
-	GameEngine::Model* ringModel_;
-	GameEngine::WorldTransform ringWorld_;
-	Transform ringUvTransform_;
-
-	GameEngine::Model* model1_;
-	GameEngine::WorldTransform world1_;
-
-	GameEngine::Model* model2_;
-	GameEngine::WorldTransform world2_;
-	GameEngine::WorldTransform world3_;
-	
-	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
-	Vector4 color1_ = { 1.0f,1.0f,1.0f,1.0f };
-	float metalic_ = 0.01f;
-	float metalic1_ = 0.01f;
-	float metalic2_ = 0.01f;
-	float roughness_ = 1.0f;
-	float roughness1_ = 1.0f;
-	float roughness2_ = 1.0f;
-	float ior_ = 1.0f;
-	float ior1_ = 1.0f;
-
 	float intensity_ = 1.0f;
 	Vector3 dir_ = { 0.0f,-1.0f,0.0f };
 
+	Vector4 playerColor_ = { 1.0f,1.0f,1.0f,1.0f };
+
+	// 地面
+	GameEngine::Model* terrainModel_;
+	GameEngine::WorldTransform terrainWorld_;
 
 	// 高ポリゴン氷
 	GameEngine::Model* iceHighModel_;
