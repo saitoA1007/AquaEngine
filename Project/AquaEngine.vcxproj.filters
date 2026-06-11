@@ -537,6 +537,8 @@
     <ClCompile Include="Application\UI\PlayUIManager.cpp" />
     <ClCompile Include="Application\Enemy\BossAnimator.cpp" />
     <ClCompile Include="Application\Scene\TestScene.cpp" />
+    <ClCompile Include="Application\Utils\Timer.cpp" />
+    <ClCompile Include="Application\UI\TimeUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1051,6 +1053,8 @@
     <ClInclude Include="Application\UI\PlayUIManager.h" />
     <ClInclude Include="Application\Enemy\BossAnimator.h" />
     <ClInclude Include="Application\Scene\TestScene.h" />
+    <ClInclude Include="Application\Utils\Timer.h" />
+    <ClInclude Include="Application\UI\TimeUI.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />

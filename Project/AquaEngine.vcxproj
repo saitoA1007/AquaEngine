@@ -181,6 +181,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\UI\HpBarUI.cpp" />
     <ClCompile Include="Application\UI\HpContainer.cpp" />
     <ClCompile Include="Application\UI\PlayUIManager.cpp" />
+    <ClCompile Include="Application\UI\TimeUI.cpp" />
+    <ClCompile Include="Application\Utils\Timer.cpp" />
     <ClCompile Include="EngineSource\2D\ImGuiManager.cpp" />
     <ClCompile Include="EngineSource\2D\Sprite.cpp" />
     <ClCompile Include="EngineSource\2D\SpriteRenderer.cpp" />
@@ -413,6 +415,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\UI\HpBarUI.h" />
     <ClInclude Include="Application\UI\HpContainer.h" />
     <ClInclude Include="Application\UI\PlayUIManager.h" />
+    <ClInclude Include="Application\UI\TimeUI.h" />
+    <ClInclude Include="Application\Utils\Timer.h" />
     <ClInclude Include="EngineSource\2D\ImGuiManager.h" />
     <ClInclude Include="EngineSource\2D\Sprite.h" />
     <ClInclude Include="EngineSource\2D\SpriteRenderer.h" />

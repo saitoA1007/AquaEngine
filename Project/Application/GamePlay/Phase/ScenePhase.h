@@ -1,5 +1,6 @@
 #pragma once
 #include "Application/GamePlay/IScenePhase.h"
+#include "Application/Utils/Timer.h"
 
 // 前方宣言
 class Player;
@@ -44,6 +45,9 @@ private:
 
     // UI
     PlayUIManager* playUIManager_ = nullptr;
+
+    // プレイ時間を計測
+    Timer playTimer_;
 };
 
 // クリア
@@ -59,4 +63,7 @@ public:
     void Exit() override;
 
 private:
+
+
+
 };

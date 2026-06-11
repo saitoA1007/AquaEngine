@@ -21,6 +21,9 @@ struct PhaseCommonData {
 
     // リクエスト
     std::optional<ScenePhase> requestPhase = std::nullopt;
+
+    // プレイ時間
+    float playTime_ = 0.0f;
 };
 
 class IScenePhase {

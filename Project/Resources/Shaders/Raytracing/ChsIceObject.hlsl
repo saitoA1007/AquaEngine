@@ -121,11 +121,9 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib)
         return;
     }
     
-    // ガラスの反射
-    if (ref.type == 2)
-    {
-        float3 glassColor = material.color.rgb * textureColor.rgb;
-        payload.color = GlassBSDF(
+    // 反射
+    float3 glassColor = material.color.rgb * textureColor.rgb;
+    payload.color = GlassBSDF(
             worldPosition,
             worldNormal,
             payload.recursive,
@@ -133,43 +131,28 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib)
             material.roughness,
             glassColor
         );
-        return;
-    }
      
     // ライト
-    float3 lightDir = normalize(-gDirectionalLight.direction);
-    float3 lightColor = gDirectionalLight.color.xyz * gDirectionalLight.intensity;
+    //float3 lightDir = normalize(-gDirectionalLight.direction);
+    //float3 lightColor = gDirectionalLight.color.xyz * gDirectionalLight.intensity;
     
-    // 平行光源
-    float3 directLight = CalculateBRDF(albedoColor, worldNormal, viewDir, lightDir, lightColor, material.roughness, material.metallic);
-    
-    // 反射レイを飛ばして反射色を取得
-    float3 reflectColor = Reflection(worldPosition, worldNormal, payload.recursive);
-    
-    // 環境光
-    float3 indirectLight = CalculateIBL(albedoColor, reflectColor, worldNormal, viewDir, material.metallic, material.roughness);
-    
-     // 透明度の表示
-    if (ref.type == 1)
-    {
-        /// 屈折
-        // 屈折レイを飛ばす
-        float3 refractColor = TranslucentRefraction(worldPosition, worldNormal, payload.recursive, material.ior);
-        // オブジェクトの色を取得
-        float3 objectColor = directLight + indirectLight;
-        
-        payload.color = lerp(refractColor, objectColor, material.color.a);
-        return;
-    }
+    //// 平行光源
+    //float3 directLight = CalculateBRDF(albedoColor, worldNormal, viewDir, lightDir, lightColor, material.roughness, material.metallic);
+    //
+    //// 反射レイを飛ばして反射色を取得
+    //float3 reflectColor = Reflection(worldPosition, worldNormal, payload.recursive);
+    //
+    //// 環境光
+    //float3 indirectLight = CalculateIBL(albedoColor, reflectColor, worldNormal, viewDir, material.metallic, material.roughness);
     
     // 最終的な色を設定
-    payload.color = directLight + indirectLight;
-    
-    // 影判定を取得
-    bool isInShadow = ShootShadowRay(worldPosition, lightDir);
-    // 影の中であれば、影色を設定
-    if (isInShadow)
-    {
-        payload.color.xyz *= 0.5;
-    }
+    //payload.color = directLight + indirectLight;
+    //
+    //// 影判定を取得
+    //bool isInShadow = ShootShadowRay(worldPosition, lightDir);
+    //// 影の中であれば、影色を設定
+    //if (isInShadow)
+    //{
+    //    payload.color.xyz *= 0.5;
+    //}
 }

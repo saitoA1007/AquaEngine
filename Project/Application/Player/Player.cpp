@@ -179,10 +179,16 @@ void Player::ApplyClamp() {
 void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 
 	bool isWall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kWall));
+	bool isBoss = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kBoss));
 	
 	// 壁の衝突処理
 	if (isWall) {
 		//Log("Player is hit Wall");
 		bounceAction_.WallBounce(worldTransform_.transform_.translate, result.contactNormal, result.penetrationDepth, attackRushAction_.GetRushMaxSpeed());
+	}
+
+	// ボスの衝突判定
+	if (isBoss) {
+
 	}
 }

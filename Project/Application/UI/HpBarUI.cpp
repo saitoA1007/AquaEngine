@@ -7,12 +7,12 @@ HpBarUI::HpBarUI(std::string name) {
 
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>(name);
-	debugParame_->Register("Base", baseWorld_);
+	debugParame_->RegisterWorld("Base", baseWorld_);
 	debugParame_->Register("BarSizeX", barSizeX_);
 	debugParame_->Register("EffectmaxTime", effectmaxTime_);
-	debugParame_->Register("Bar", barSprite_);
-	debugParame_->Register("Effect", effectSprite_);
-	debugParame_->Register("Frame", frameSprite_);
+	debugParame_->RegisterSprite("Bar", barSprite_);
+	debugParame_->RegisterSprite("Effect", effectSprite_);
+	debugParame_->RegisterSprite("Frame", frameSprite_);
 	debugParame_->Apply();
 
 	// ペアレント

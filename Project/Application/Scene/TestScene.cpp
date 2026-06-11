@@ -90,12 +90,17 @@ void TestScene::DebugUpdate() {
 
 	ImGui::Begin("test");
 
+	ImGui::DragFloat3("PlayerPos", &world_.transform_.translate.x, 0.1f);
+	ImGui::DragFloat3("PlayerScale", &world_.transform_.scale.x, 0.1f);
+	ImGui::ColorEdit4("PlayerColor", &playerColor_.x);
 	ImGui::DragFloat3("lightDir", &dir_.x, 0.1f);
 	ImGui::DragFloat("lightIntensity", &intensity_, 0.1f);
 	dir_.Normalize();
 
 	light->SetDirectionalDirction(dir_);
 	light->SetDirectionalIntensity(intensity_);
+	world_.UpdateTransformMatrix();
+	model_->SetDefaultColor(playerColor_);
 	ImGui::End();
 #endif
 }
@@ -107,6 +112,9 @@ void TestScene::Draw() {
 
 	// 地面を描画
 	renderQueue_->SubmitRaytracingModel(terrainModel_, terrainWorld_);
+
+	// アニメーションモデル
+	renderQueue_->SubmitRaytracingModel(model_, world_);
 
 	// それぞれの氷を描画
 	renderQueue_->SubmitRaytracingModel(iceHighModel_, iceHighWorld_);

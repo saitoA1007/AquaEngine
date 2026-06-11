@@ -48,8 +48,8 @@ namespace GameEngine {
             bindings_.push_back(std::make_unique<ParamBinding<T>>(path, subGroupName, key, valueRef, itemPtr));
         }
 
-        void Register(const std::string& worldName, WorldTransform& world, const std::string subGroupName = "");
-        void Register(const std::string& spriteName, Sprite& sprite,const std::string subGroupName = "");
+        void RegisterWorld(const std::string& worldName, WorldTransform& world, const std::string subGroupName = "");
+        void RegisterSprite(const std::string& spriteName, Sprite& sprite,const std::string subGroupName = "");
 
         // 値を適応する
         void Apply();
