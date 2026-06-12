@@ -1,10 +1,14 @@
 #include "StageManager.h"
 #include <numbers>
+#include "Floor.h"
 using namespace GameEngine;
 
 StageManager::StageManager(GameEngine::GameObjectManager* objectManager, GameEngine::Model* model) {
 	objectManager_ = objectManager;
 	model_ = model;
+
+	// 床モデルを生成
+	objectManager_->AddObject<Floor>(model);
 
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>("StageManager");

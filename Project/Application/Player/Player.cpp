@@ -103,23 +103,6 @@ void Player::Update() {
 	// 移動を適応
 	worldTransform_.transform_.translate += commonData_.velocity * FpsCounter::deltaTime;
 
-	// 地面
-	if (worldTransform_.transform_.translate.y <= 0.0f) {
-		worldTransform_.transform_.translate.y = 0.0f;
-		commonData_.velocity.y = 0.0f;
-
-		// 空中浮遊状態なら歩き状態へ
-		if (commonData_.animator_->GetCurrentType() == PlayerAnimationType::kAirMove) {
-			commonData_.animator_->StartAnimation(PlayerAnimationType::kWalk, "歩き");
-		}
-
-		if (commonData_.state == PlayerState::kAttackDown) {
-			commonData_.state = PlayerState::kStiffness;
-			commonData_.animator_->StartAnimation(PlayerAnimationType::kWalk, "歩き");
-			Log("Player End attackDown");
-		}
-	}
-
 	// 角度を更新
 	UpdateRotation();
 
@@ -186,6 +169,26 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 
 	bool isWall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kWall));
 	bool isBoss = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kBoss));
+	bool isFloor = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kGround));
+
+	// 床の衝突
+	if (isFloor) {
+		worldTransform_.transform_.translate.y -= result.contactNormal.y * result.penetrationDepth;
+		if (commonData_.velocity.y < 0.0f) {
+			commonData_.velocity.y = 0.0f;
+		}
+
+		// 空中浮遊状態なら歩き状態へ
+		if (commonData_.animator_->GetCurrentType() == PlayerAnimationType::kAirMove) {
+			commonData_.animator_->StartAnimation(PlayerAnimationType::kWalk, "歩き");
+		}
+
+		if (commonData_.state == PlayerState::kAttackDown) {
+			commonData_.state = PlayerState::kStiffness;
+			commonData_.animator_->StartAnimation(PlayerAnimationType::kWalk, "歩き");
+			Log("Player End attackDown");
+		}
+	}
 	
 	// 壁の衝突処理
 	if (isWall) {
