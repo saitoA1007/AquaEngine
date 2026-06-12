@@ -22,6 +22,8 @@ public:
 	// 描画処理
 	void Draw() override;
 
+public:
+
 	/// <summary>
 	/// ワールド行列を取得
 	/// </summary>
@@ -38,6 +40,12 @@ public:
 	void SetCamera(CameraController* camera) {
 		camera_ = camera;
 	}
+
+	// 現在のHpを取得
+	int32_t GetCurrentHp() const { return playerStatus_.GetCurrentHp(); }
+
+	// 最大のHpを取得
+	int32_t GetMaxHp() const { return playerStatus_.GetMaxHp(); }
 
 private:
 	// パラメータ機能
