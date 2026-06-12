@@ -74,6 +74,9 @@ private:
 	// プレイヤーが受ける物理
 	PlayerPhysics playerPhysics_;
 
+	// プレイヤーの状態
+	PlayerStatus playerStatus_;
+
 private:
 
 	// 制限

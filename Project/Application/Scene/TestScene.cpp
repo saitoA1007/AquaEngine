@@ -10,7 +10,7 @@ TestScene::TestScene() {
 	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720);
 	mainCamera_->Update();
 
-	// 背景画像を設定rostock_laage_airport_4k
+	// 背景画像を設定
 	uint32_t skyboxGH = textureManager_->GetHandleByName("grasslands_sunset_1k.dds");
 	renderQueue_->SetSkyboxTexture(skyboxGH);
 
@@ -112,6 +112,10 @@ void TestScene::DebugUpdate() {
 	iceMaterial_.SetColor(color_);
 	iceMaterial_.SetRoughness(roughness_);
 	iceMaterial_.SetIOR(ior_);
+
+	ImGui::DragFloat3("IceHighPos", &iceHighWorld_.transform_.translate.x, 0.1f);
+	ImGui::DragFloat3("IceHighScale", &iceHighWorld_.transform_.scale.x, 0.1f);
+	iceHighWorld_.UpdateTransformMatrix();
 
 	dir_.Normalize();
 

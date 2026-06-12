@@ -1,0 +1,55 @@
+{
+    "PlayUI": {
+        "BossNameSprite": {
+            "AnchorPoint": [
+                0.5,
+                0.5
+            ],
+            "Color": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "MeshSize": [
+                1.0,
+                1.0
+            ],
+            "Position": [
+                640.0,
+                64.0
+            ],
+            "Rotate": 0.0,
+            "Scale": [
+                256.0,
+                64.0
+            ]
+        },
+        "PlayGuideSprite": {
+            "AnchorPoint": [
+                0.0,
+                0.0
+            ],
+            "Color": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "MeshSize": [
+                1.0,
+                1.0
+            ],
+            "Position": [
+                917.8099975585938,
+                564.739990234375
+            ],
+            "Rotate": 0.0,
+            "Scale": [
+                340.0,
+                150.0
+            ]
+        },
+        "SceneName": "Game"
+    }
+}

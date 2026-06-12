@@ -27,7 +27,7 @@ void DebugParameter::RegisterSprite(const std::string& spriteName, Sprite& sprit
     std::string name = spriteName + "Sprite";
     std::string path;
     if (subGroupName.empty()) {
-        path = spriteName + name;
+        path = name;
     } else {
         path = subGroupName + "/" + name;
     }

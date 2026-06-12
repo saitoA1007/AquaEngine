@@ -14,6 +14,10 @@ GameScene::GameScene() {
 	// 入力コマンド設定
 	InputRegisterCommand();
 
+	// 背景を設定
+	uint32_t skyboxGH = textureManager_->GetHandleByName("rogland_clear_night_1k.dds");
+	renderQueue_->SetSkyboxTexture(skyboxGH);
+
 	// メインカメラの初期化
 	mainCamera_ = std::make_unique<Camera>();
 	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720);
@@ -42,7 +46,10 @@ GameScene::GameScene() {
 	gameObjectManager_->AddObject<StageManager>(gameObjectManager_, wallModel);
 
 	// プレイ中のUI
-	auto* playUIManager = gameObjectManager_->AddObject<PlayUIManager>();
+	uint32_t playerHpGH = textureManager_->GetHandleByName("PlayerHP.png");
+	uint32_t bossNameGH = textureManager_->GetHandleByName("BossName.png");
+	uint32_t playGuideGH = textureManager_->GetHandleByName("playerGuide.png");
+	auto* playUIManager = gameObjectManager_->AddObject<PlayUIManager>(playerHpGH, bossNameGH, playGuideGH);
 
 	// シーンフェーズを管理
 	gameObjectManager_->AddObject<GamePhaseManager>(player, bossEnemy, playUIManager);

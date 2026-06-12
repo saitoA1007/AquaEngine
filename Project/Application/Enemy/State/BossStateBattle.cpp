@@ -13,20 +13,20 @@ BossStateBattle::BossStateBattle(BossStateCommonData& commonData, Vector3* playe
 	battleStateCommonData_.animator = commonData.animator;
 
 	// 各行動を登録する
-	battleStatesTable_[static_cast<size_t>(BossBattleState::kRushAttack)] = std::make_unique<BossRushAttackAction>(battleStateCommonData_);
-	battleStatesTable_[static_cast<size_t>(BossBattleState::kWait)] = std::make_unique<BossWaitAction>(battleStateCommonData_);
-	battleStatesTable_[static_cast<size_t>(BossBattleState::kRotateMove)] = std::make_unique<RotateMoveAction>(battleStateCommonData_);
-	battleStatesTable_[static_cast<size_t>(BossBattleState::kCrossMove)] = std::make_unique<BossCrossMoveAction>(battleStateCommonData_);
-	battleStatesTable_[static_cast<size_t>(BossBattleState::kIceFallAttack)] = std::make_unique<IceFallAttackAction>(battleStateCommonData_);
-	battleStatesTable_[static_cast<size_t>(BossBattleState::kWindAttack)] = std::make_unique<WindAttackAction>(battleStateCommonData_);
+	battleStatesTable_[BossBattleState::kRushAttack] = std::make_unique<BossRushAttackAction>(battleStateCommonData_);
+	battleStatesTable_[BossBattleState::kWait] = std::make_unique<BossWaitAction>(battleStateCommonData_);
+	battleStatesTable_[BossBattleState::kRotateMove] = std::make_unique<RotateMoveAction>(battleStateCommonData_);
+	battleStatesTable_[BossBattleState::kCrossMove] = std::make_unique<BossCrossMoveAction>(battleStateCommonData_);
+	battleStatesTable_[BossBattleState::kIceFallAttack] = std::make_unique<IceFallAttackAction>(battleStateCommonData_);
+	battleStatesTable_[BossBattleState::kWindAttack] = std::make_unique<WindAttackAction>(battleStateCommonData_);
 
 	// 初期化
 	currentBattleState_ = BossBattleState::kWait;
-	battleStatesTable_[static_cast<size_t>(currentBattleState_)]->Initialize();
+	battleStatesTable_[currentBattleState_]->Initialize();
 
 	// 行動に重み付け
 	lotteryList_ = {
-		{ BossBattleState::kRushAttack,50 },    // 突進攻撃
+		{ BossBattleState::kRushAttack,10 },    // 突進攻撃
 		{ BossBattleState::kWait,10 },          // 待機
 		{ BossBattleState::kRotateMove,10 },    // ステージに沿った移動
 		{ BossBattleState::kCrossMove,10 },     // 横断移動
@@ -34,31 +34,40 @@ BossStateBattle::BossStateBattle(BossStateCommonData& commonData, Vector3* playe
 		{ BossBattleState::kWindAttack,10 },    // 風攻撃
 	};
 
+	std::string subGroup = "StatusWeight";
+	int index = 0;
+	stateCommonData_.debugParame->Register("RushAttack", lotteryList_[0].weight, index++, subGroup);
+	stateCommonData_.debugParame->Register("Wait", lotteryList_[1].weight, index++, subGroup);
+	stateCommonData_.debugParame->Register("RotateMove", lotteryList_[2].weight, index++, subGroup);
+	stateCommonData_.debugParame->Register("CrossMove", lotteryList_[3].weight, index++, subGroup);
+	stateCommonData_.debugParame->Register("IceFallAttack", lotteryList_[4].weight, index++, subGroup);
+	stateCommonData_.debugParame->Register("WindAttack", lotteryList_[5].weight, index++, subGroup);
+
 	// 値を登録
-	//for (auto& state : battleStatesTable_) {
-	//	state->RegisterParameter(stateCommonData_.debugParame);
-	//}
+	for (auto& [key,state] : battleStatesTable_) {
+		state->RegisterParameter(stateCommonData_.debugParame);
+	}
 }
 
 void BossStateBattle::Enter() {
 	currentBattleState_ = BossBattleState::kWait;
-	battleStatesTable_[static_cast<size_t>(currentBattleState_)]->Initialize();
+	battleStatesTable_[currentBattleState_]->Initialize();
 }
 
 void BossStateBattle::Update() {
 	// 切り替え処理
-	if (battleStatesTable_[static_cast<size_t>(currentBattleState_)]->IsFinished()) {
+	if (battleStatesTable_[currentBattleState_]->IsFinished()) {
 		// 終了処理をおこなう
-		battleStatesTable_[static_cast<size_t>(currentBattleState_)]->Finalize();
+		battleStatesTable_[currentBattleState_]->Finalize();
 		// 次の行動を取得する
 		currentBattleState_ = SelectWeightedBattleState();
 		Log("BossEnemy change battleState");
 		// 初期化する
-		battleStatesTable_[static_cast<size_t>(currentBattleState_)]->Initialize();
+		battleStatesTable_[currentBattleState_]->Initialize();
 	}
 
 	// 指定した状態による更新処理
-	battleStatesTable_[static_cast<size_t>(currentBattleState_)]->Update();
+	battleStatesTable_[currentBattleState_]->Update();
 
 	// 更新
 	stateCommonData_.worldTransform->transform_ = battleStateCommonData_.transform;

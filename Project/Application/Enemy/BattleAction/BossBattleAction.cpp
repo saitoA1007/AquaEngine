@@ -41,6 +41,8 @@ void BossRushAttackAction::Initialize() {
 	startRushPos_.y = defaultPosY_;
 	endRushPos_ = myDir * commonData_.stageRadius;
 	endRushPos_.y = defaultPosY_;
+
+	commonData_.animator->StartAnimation(BossAnimationType::kRush, "Rush_Prepare", rotateMoveMaxTime_,false);
 }
 
 void BossRushAttackAction::Update() {
@@ -125,6 +127,8 @@ void BossRushAttackAction::RotateMove() {
 		// 突進する位置を求める
 		float rushDistance = commonData_.stageRadius * 2.0f * std::cosf(diffAngle);
 		endRushPos_ = commonData_.transform.translate + targetDir * rushDistance;
+
+		commonData_.animator->StartAnimation(BossAnimationType::kRush, "Rush_Main", rushMaxTime_, false);
 	}
 }
 
@@ -158,6 +162,8 @@ BossWaitAction::BossWaitAction(BossBattleStateCommonData& commonData) : IBossBat
 void BossWaitAction::Initialize() {
 	timer_ = 0.0f;
 	isFinished_ = false;
+
+	commonData_.animator->StartAnimation(BossAnimationType::kMove, "基本移動");
 }
 
 void BossWaitAction::Update() {
@@ -206,6 +212,8 @@ void BossCrossMoveAction::Initialize() {
 
 	// 最終的に向く方向
 	finalRotDir_ = endRotDir_ * -1.0f;
+
+	commonData_.animator->StartAnimation(BossAnimationType::kMove, "基本移動");
 }
 
 void BossCrossMoveAction::Update() {
@@ -306,6 +314,8 @@ void RotateMoveAction::Initialize() {
 	angle = Lerp(startAngle_, endAngle_, 1.0f);
 	prePos = GetXZFromAngle(angle, radius, defaultPosY_);
 	finalRotDir_ = Math::Normalize(prePos * -1.0f);
+
+	commonData_.animator->StartAnimation(BossAnimationType::kMove, "基本移動");
 }
 
 void RotateMoveAction::Update() {
@@ -384,6 +394,9 @@ IceFallAttackAction::IceFallAttackAction(BossBattleStateCommonData& commonData) 
 void IceFallAttackAction::Initialize() {
 	isFinished_ = false;
 	timer_ = 0.0f;
+
+	// 叫びモージョンに以降
+	commonData_.animator->StartAnimation(BossAnimationType::kScream, "Scream", maxTime_, false);
 }
 
 void IceFallAttackAction::Update() {
@@ -421,6 +434,8 @@ void WindAttackAction::Initialize() {
 	float angle = std::numbers::pi_v<float> / 4.0f;
 	startRotDir_ = RotateVectorXZ(startCurrentRotDir_, angle);
 	endRotDir_ = RotateVectorXZ(startCurrentRotDir_, -angle);
+
+	commonData_.animator->StartAnimation(BossAnimationType::kBreath, "IceBreath_Prepare", inMaxTime_,false);
 }
 
 void WindAttackAction::Update() {
@@ -438,6 +453,8 @@ void WindAttackAction::Update() {
 		if (timer_ >= 1.0f) {
 			state_ = State::kMain;
 			timer_ = 0.0f;
+
+			commonData_.animator->StartAnimation(BossAnimationType::kBreath, "IceBreath_Main", mainMaxTime_, false);
 		}
 		break;
 	}
@@ -453,6 +470,7 @@ void WindAttackAction::Update() {
 		if (timer_ >= 1.0f) {
 			state_ = State::kOut;
 			timer_ = 0.0f;
+			commonData_.animator->StartAnimation(BossAnimationType::kMove, "基本移動");
 		}
 		break;
 	}
