@@ -2,7 +2,10 @@
 
 using namespace GameEngine;
 
-HpContainer::HpContainer(std::string name) {
+HpContainer::HpContainer(std::string name, uint32_t texture) {
+
+	// テクスチャを取得
+	texture_ = texture;
 
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>(name);
@@ -16,6 +19,7 @@ HpContainer::HpContainer(std::string name) {
 		hpSprites_[i] = std::make_unique<Sprite>();
 		hpSprites_[i]->SetParent(&baseWorld_);
 		hpSprites_[i]->position_.x = i * (spacing_ + iconSize_.x);
+		hpSprites_[i]->textureHandle_ = texture_;
 	}
 }
 
@@ -66,5 +70,6 @@ void HpContainer::SetMaxHp(int32_t hp) {
 		hpSprites_[i] = std::make_unique<Sprite>();
 		hpSprites_[i]->SetParent(&baseWorld_);
 		hpSprites_[i]->position_.x = i * (spacing_ + iconSize_.x);
+		hpSprites_[i]->textureHandle_ = texture_;
 	}
 }

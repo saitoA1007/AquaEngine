@@ -48,9 +48,20 @@ namespace GameEngine {
 			refData_->vertexHandle = vertexHandle - bufferStartIndex_;
 		}
 
+		// 使用するヒットグループを設定
+		void SetHitGroupIndex(uint32_t index) {
+			useHitGroupIndex_ = index;
+		}
+
+		// 使用するヒットグループを取得
+		uint32_t GetUseHitGroupIndex() const { return useHitGroupIndex_; }
+
 	private:
 		uint32_t refIndex_ = 0;
 		BufferRef* refData_ = nullptr;
+
+		// 使用するヒットグループ
+		uint32_t useHitGroupIndex_ = 0;
 
 		bool isCreated_ = false;
 	};

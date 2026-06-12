@@ -66,6 +66,9 @@ void BossEnemy::Initialize() {
 }
 
 void BossEnemy::Update() {
+	// 値の適応
+	debugParame_->ApplyIfDirty();
+
 	// 状態変更が有効であれば、切り替える
 	if (stateCommonData_.bossStateRequest) {
 		currentState_->Exit();

@@ -5,7 +5,7 @@
 
 class PlayUIManager : public GameEngine::IGameObject {
 public:
-	PlayUIManager();
+	PlayUIManager(uint32_t playerHpGH, uint32_t bossNameGH, uint32_t playGuideGH);
 	~PlayUIManager() = default;
 
 	// 初期化処理
@@ -36,9 +36,18 @@ public:
 	}
 
 private:
+	// パラメータ機能
+	std::unique_ptr<GameEngine::DebugParameter> debugParame_;
+
 	// ボスのHpUI
 	std::unique_ptr<HpBarUI> bossHpBarUI_;
 
+	// ボスの名前
+	GameEngine::Sprite bossNameSprite_;
+
 	// プレイヤーHpUI
 	std::unique_ptr<HpContainer> playerHpUI_;
+
+	// 操作説明UI
+	GameEngine::Sprite playGuideSprite_;
 };

@@ -7,7 +7,7 @@
 
 class HpContainer : public GameEngine::IGameObject {
 public:
-	HpContainer(std::string name);
+	HpContainer(std::string name, uint32_t texture);
 	~HpContainer() = default;
 
 	// 初期化処理
@@ -47,6 +47,9 @@ private:
 
 	// 間隔
 	float spacing_ = 4.0f;
+
+	// 画像
+	uint32_t texture_ = 0;
 
 	// 大きさ
 	Vector2 iconSize_ = { 64.0f,64.0f };

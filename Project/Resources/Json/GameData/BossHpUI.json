@@ -1,6 +1,6 @@
 {
     "BossHpUI": {
-        "BarBarSprite": {
+        "BarSprite": {
             "AnchorPoint": [
                 0.0,
                 0.0
@@ -39,11 +39,11 @@
             ],
             "Translate": [
                 400.0,
-                64.0,
+                110.0,
                 0.0
             ]
         },
-        "EffectEffectSprite": {
+        "EffectSprite": {
             "AnchorPoint": [
                 0.0,
                 0.0
@@ -69,7 +69,7 @@
             ]
         },
         "EffectmaxTime": 0.5,
-        "FrameFrameSprite": {
+        "FrameSprite": {
             "AnchorPoint": [
                 0.0,
                 0.0

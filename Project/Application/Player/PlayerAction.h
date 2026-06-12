@@ -1,6 +1,47 @@
 #pragma once
 #include "IPlayerAction.h"
 
+// プレイヤーの状態
+class PlayerStatus : public IPlayerAction {
+public:
+	void Initialize(PlayerCommonData* commonData);
+
+	void Update();
+
+	// パラメータを登録する
+	void RegisterParameter(GameEngine::DebugParameter* param) override;
+
+public:
+
+	// ダメージを受ける
+	void TakeDamage(int32_t damage) {
+		if (!isCoolActive_) { return; }
+		currentHp_ -= damage;
+		isCoolActive_ = true;
+	}
+
+	// 現在Hp
+	int32_t GetCurrentHp()const { return currentHp_; }
+
+	// 最大Hp
+	int32_t GetMaxHp()const { return maxHp_; }
+
+private:
+
+	int32_t maxHp_ = 3;
+
+	float coolTime_ = 1.0f;
+
+private:
+	// クール状態
+	bool isCoolActive_ = false;
+
+	int32_t currentHp_ = 3;
+
+	float timer_ = 0.0f;
+
+};
+
 // プレイヤーが常に受ける物理
 class PlayerPhysics : public IPlayerAction {
 public:

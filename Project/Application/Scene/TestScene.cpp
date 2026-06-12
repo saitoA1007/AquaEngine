@@ -10,7 +10,7 @@ TestScene::TestScene() {
 	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720);
 	mainCamera_->Update();
 
-	// 背景画像を設定rostock_laage_airport_4k
+	// 背景画像を設定
 	uint32_t skyboxGH = textureManager_->GetHandleByName("grasslands_sunset_1k.dds");
 	renderQueue_->SetSkyboxTexture(skyboxGH);
 
@@ -66,6 +66,14 @@ TestScene::TestScene() {
 	iceCubeModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,0.9f });
 	iceCubeModel_->SetDefaultIOR(1.309f);
 	iceCubeWorld_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{8.0f,2.0f,0.0f} });
+
+	// 氷用マテリアルを作成
+	iceMaterial_.Initialize({ 1.0f,1.0f,1.0f,1.0f }, { 1.0f,1.0f,1.0f }, 500.0f, true);
+	for (size_t i = 0; i < 4; ++i) {
+		iceRefBuffers_[i].Create();
+		iceRefBuffers_[i].SetBufferMaterial(0, iceMaterial_.GetMaterialSrvIndex());
+		iceRefBuffers_[i].SetHitGroupIndex(1);
+	}
 }
 
 void TestScene::Initialize() {
@@ -93,12 +101,27 @@ void TestScene::DebugUpdate() {
 	ImGui::DragFloat3("PlayerPos", &world_.transform_.translate.x, 0.1f);
 	ImGui::DragFloat3("PlayerScale", &world_.transform_.scale.x, 0.1f);
 	ImGui::ColorEdit4("PlayerColor", &playerColor_.x);
+
 	ImGui::DragFloat3("lightDir", &dir_.x, 0.1f);
 	ImGui::DragFloat("lightIntensity", &intensity_, 0.1f);
+	ImGui::ColorEdit4("lightColor", &lightColor_.x);
+
+	ImGui::ColorEdit4("IceColor", &color_.x);
+	ImGui::DragFloat("IceRoughness", &roughness_, 0.01f,0.0f,1.0f);
+	ImGui::DragFloat("IceIor", &ior_, 0.01f);
+	iceMaterial_.SetColor(color_);
+	iceMaterial_.SetRoughness(roughness_);
+	iceMaterial_.SetIOR(ior_);
+
+	ImGui::DragFloat3("IceHighPos", &iceHighWorld_.transform_.translate.x, 0.1f);
+	ImGui::DragFloat3("IceHighScale", &iceHighWorld_.transform_.scale.x, 0.1f);
+	iceHighWorld_.UpdateTransformMatrix();
+
 	dir_.Normalize();
 
 	light->SetDirectionalDirction(dir_);
 	light->SetDirectionalIntensity(intensity_);
+	light->SetDirectionalColor(lightColor_);
 	world_.UpdateTransformMatrix();
 	model_->SetDefaultColor(playerColor_);
 	ImGui::End();
@@ -117,10 +140,10 @@ void TestScene::Draw() {
 	renderQueue_->SubmitRaytracingModel(model_, world_);
 
 	// それぞれの氷を描画
-	renderQueue_->SubmitRaytracingModel(iceHighModel_, iceHighWorld_);
-	renderQueue_->SubmitRaytracingModel(iceMiddleModel_, iceMiddleWorld_);
-	renderQueue_->SubmitRaytracingModel(iceLowModel_, iceLowWorld_);
-	renderQueue_->SubmitRaytracingModel(iceCubeModel_, iceCubeWorld_);
+	renderQueue_->SubmitRaytracingModel(iceHighModel_, iceHighWorld_, &iceRefBuffers_[0]);
+	renderQueue_->SubmitRaytracingModel(iceMiddleModel_, iceMiddleWorld_, &iceRefBuffers_[1]);
+	renderQueue_->SubmitRaytracingModel(iceLowModel_, iceLowWorld_, &iceRefBuffers_[2]);
+	renderQueue_->SubmitRaytracingModel(iceCubeModel_, iceCubeWorld_, &iceRefBuffers_[3]);
 
 	// エフェクトを描画
 	renderQueue_->SubmitInstancing(effectModel_, primitiveEffect_->GetCurrentNumInstance(), *primitiveEffect_->GetWorldTransforms(), 0.0f, BlendMode::kBlendModeAdd);

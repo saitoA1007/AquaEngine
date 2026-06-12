@@ -264,4 +264,75 @@ float3 GlassBSDF(float3 worldPos, float3 worldNormal, int recursive, float ior, 
     return lerp(refractColor, reflectColor, F);
 }
 
+// 氷のBeer-Lambert則の吸収係数
+static const float3 ICE_ABSORPTION_COEFF = float3(0.80f, 0.25f, 0.04f);
+
+// 氷のレンダリング
+float3 IceBSDF(float3 worldPos, float3 worldNormal, int recursive, float ior, float roughness, float3 iceColor)
+{
+    float3 worldRayDir = normalize(WorldRayDirection());
+
+    // 裏面確認
+    bool entering = dot(worldRayDir, worldNormal) < 0.0f;
+    float3 N = entering ? worldNormal : -worldNormal;
+    float eta = entering ? (1.0f / ior) : ior;
+
+    // Fresnel反射率
+    float cosTheta = saturate(dot(-worldRayDir, N));
+    float r0 = (1.0f - ior) / (1.0f + ior);
+    r0 = r0 * r0;
+    float F = r0 + (1.0f - r0) * pow(1.0f - cosTheta, 5.0f);
+    F = saturate(F);
+
+    // Beer-Lambert
+    float3 transmittance = float3(1.0f, 1.0f, 1.0f);
+    if (!entering)
+    {
+        float dist = RayTCurrent();
+        float absorpScale = 1.0f - roughness * 0.6f;
+        float3 absorption = ICE_ABSORPTION_COEFF * absorpScale;
+        transmittance = BeerLambert(absorption, dist);
+    }
+
+    // 屈折方向の計算
+    float3 refracted = refract(worldRayDir, N, eta);
+    if (length(refracted) < 0.001f)
+    {
+        // 全反射
+        return Reflection(worldPos, N, recursive) * transmittance;
+    }
+
+    // 屈折レイ発射 
+    RayDesc refractRay;
+    refractRay.Origin = worldPos;
+    refractRay.Direction = refracted;
+    refractRay.TMin = 0.001f;
+    refractRay.TMax = 100000.0f;
+
+    Payload refractPayload;
+    refractPayload.color = float3(0.0f, 0.0f, 0.0f);
+    refractPayload.recursive = recursive;
+    refractPayload.depth = 0.0f;
+    TraceRay(gRtScene, RAY_FLAG_NONE, 0xFF, 0, 1, 0, refractRay, refractPayload);
+
+    // 透過光にBeer-Lambert吸収とiceColorティントを適用
+    float3 refractColor = refractPayload.color * transmittance * iceColor;
+
+    // 反射レイ発射
+    float3 reflectColor = Reflection(worldPos, N, recursive);
+
+    // 近似SSS
+    float3 sssContrib = float3(0.0f, 0.0f, 0.0f);
+    if (entering && roughness > 0.01f)
+    {
+        float3 lightDir = normalize(-gDirectionalLight.direction);
+        float3 lightColor = gDirectionalLight.color.rgb * gDirectionalLight.intensity;
+        float scatterStr = roughness * 0.4f;
+        sssContrib = IceFakeSSS(N, lightDir, worldRayDir, lightColor, scatterStr);
+        sssContrib *= (1.0f - F);
+    }
+
+    return lerp(refractColor, reflectColor, F) + sssContrib;
+}
+
 #endif

@@ -52,6 +52,8 @@ namespace GameEngine {
 
         void SetDirectionalIntensity(const float& intensity);
 
+        void SetDirectionalColor(Vector4 color);
+
         /// <summary>
         /// 平行光源の有効化
         /// </summary>

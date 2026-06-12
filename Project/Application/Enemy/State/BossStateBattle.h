@@ -1,5 +1,5 @@
 #pragma once
-#include <array>
+#include <unordered_map>
 #include "Application/Enemy/IBossState.h"
 #include "Application/Enemy/BattleAction/IBossBattleAction.h"
 
@@ -34,7 +34,7 @@ private:
 	BossStateCommonData& stateCommonData_;
 
 	// 戦いの状態テーブル
-	std::array<std::unique_ptr<IBossBattleAction>, static_cast<size_t>(BossBattleState::kMaxCount)> battleStatesTable_;
+	std::unordered_map<BossBattleState, std::unique_ptr<IBossBattleAction>> battleStatesTable_;
 	BossBattleState currentBattleState_;
 
 	BossBattleStateCommonData battleStateCommonData_;

@@ -24,6 +24,7 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model,
 	attackRushAction_.RegisterParameter(debugParame_.get());
 	playerAttackDownAction_.RegisterParameter(debugParame_.get());
 	playerPhysics_.RegisterParameter(debugParame_.get());
+	playerStatus_.RegisterParameter(debugParame_.get());
 
 	// 当たり判定の設定
 	collider_.SetRadius(1.0f);
@@ -55,6 +56,9 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model,
 
 	// 重力
 	playerPhysics_.Initialize(&commonData_);
+
+	// プレイヤーの状態
+	playerStatus_.Initialize(&commonData_);
 }
 
 void Player::Initialize() {
@@ -90,6 +94,8 @@ void Player::Update() {
 	playerPhysics_.Update();
 	// 更新
 	attackRushAction_.Update();
+	// 状態
+	playerStatus_.Update();
 	
 	// 範囲制限
 	ApplyClamp();
@@ -189,6 +195,7 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 
 	// ボスの衝突判定
 	if (isBoss) {
-
+		// ダメージを受ける
+		playerStatus_.TakeDamage(1);
 	}
 }

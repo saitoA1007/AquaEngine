@@ -45,6 +45,7 @@ void RaytracingPipeline::CreateStateObject() {
 	LibraryResult raygenResult = rayLibShaderCompiler_.CompileShader(L"Resources/Shaders/Raytracing/RayGen.hlsl");
 	LibraryResult missResult = rayLibShaderCompiler_.CompileShader(L"Resources/Shaders/Raytracing/Miss.hlsl");
 	LibraryResult objectResult = rayLibShaderCompiler_.CompileShader(L"Resources/Shaders/Raytracing/chsObject.hlsl");
+	LibraryResult iceObjectResult = rayLibShaderCompiler_.CompileShader(L"Resources/Shaders/Raytracing/ChsIceObject.hlsl");
 
 	// 初期化処理
 	stateObjectBuilder_.Initialize();
@@ -53,9 +54,11 @@ void RaytracingPipeline::CreateStateObject() {
 	stateObjectBuilder_.AddDXILLibrary(raygenResult.blob.Get(), raygenResult.exportNames);
 	stateObjectBuilder_.AddDXILLibrary(missResult.blob.Get(), missResult.exportNames);
 	stateObjectBuilder_.AddDXILLibrary(objectResult.blob.Get(), objectResult.exportNames);
+	stateObjectBuilder_.AddDXILLibrary(iceObjectResult.blob.Get(), iceObjectResult.exportNames);
 
 	// ヒットグループを設定
 	stateObjectBuilder_.AddHitGroup(AppHitGroups::DefaultModel, L"MainObjectCHS");
+	stateObjectBuilder_.AddHitGroup(AppHitGroups::IceModel, L"MainIceObjectCHS");
 
 	// シェーダー設定
 	const uint32_t MaxPayloadSize = sizeof(float) * 3 + sizeof(uint32_t) + sizeof(float);
@@ -109,14 +112,23 @@ void RaytracingPipeline::CreateShaderTable() {
 	
 	// hitGroup
 	{
+		// デフォルト
 		auto id = rtsoProps->GetShaderIdentifier(AppHitGroups::DefaultModel.c_str());
 		if (id == nullptr) {
 			assert(false && "Not found ShaderIdentifier");
 		}
-
 		ShaderRecord record;
 		auto& table = record.SetIdentifier(id);
 		shaderTableBuilder_.HitGroup().AddRecord(std::move(record));
+
+		// 氷
+		auto iceId = rtsoProps->GetShaderIdentifier(AppHitGroups::IceModel.c_str());
+		if (iceId == nullptr) {
+			assert(false && "Not found ShaderIdentifier");
+		}
+		ShaderRecord iceRecord;
+		auto& iceTable = iceRecord.SetIdentifier(iceId);
+		shaderTableBuilder_.HitGroup().AddRecord(std::move(iceRecord));
 	}
 
 	// テーブルを設定する

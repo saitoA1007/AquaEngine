@@ -13,6 +13,35 @@ using namespace GameEngine;
 // プレイヤーが受ける物理
 //=====================================================
 
+void PlayerStatus::Initialize(PlayerCommonData* commonData) {
+	commonData_ = commonData;
+
+	currentHp_ = maxHp_;
+}
+
+void PlayerStatus::Update() {
+	if (!isCoolActive_) { return; }
+
+	timer_ += FpsCounter::deltaTime / coolTime_;
+
+	if (timer_ >= 1.0f) {
+		timer_ = 0.0f;
+		isCoolActive_ = false;
+	}
+}
+
+void PlayerStatus::RegisterParameter(GameEngine::DebugParameter* param) {
+	std::string subGroup = "Status";
+	int index = 0;
+
+	param->Register("MaxHp", maxHp_, index++, subGroup);
+	param->Register("CoolTime", coolTime_, index++, subGroup);
+}
+
+//=====================================================
+// プレイヤーが受ける物理
+//=====================================================
+
 void PlayerPhysics::Initialize(PlayerCommonData* commonData) {
 	commonData_ = commonData;
 }
