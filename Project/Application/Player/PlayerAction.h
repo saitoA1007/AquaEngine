@@ -15,7 +15,7 @@ public:
 
 	// ダメージを受ける
 	void TakeDamage(int32_t damage) {
-		if (!isCoolActive_) { return; }
+		if (isCoolActive_) { return; }
 		currentHp_ -= damage;
 		isCoolActive_ = true;
 	}
@@ -36,7 +36,7 @@ private:
 	// クール状態
 	bool isCoolActive_ = false;
 
-	int32_t currentHp_ = 3;
+	int32_t currentHp_ = 1;
 
 	float timer_ = 0.0f;
 

@@ -38,13 +38,22 @@ void PlayPhase::Enter() {
 	// 計測開始
 	playTimer_.Reset();
 	playTimer_.Start();
+
+	// Hpを設定
+	playUIManager_->SetCurrentBossHp(bossEnemy_->GetCurrentHp());
+	playUIManager_->SetMaxBossHp(bossEnemy_->GetMaxHp());
+	playUIManager_->SetCurrentPlayerHp(player_->GetCurrentHp());
+	playUIManager_->SetMaxPlayerHp(player_->GetMaxHp());
 }
 
 void PlayPhase::Update() {
 
+	// 現在のHpを設定
+	playUIManager_->SetCurrentBossHp(bossEnemy_->GetCurrentHp());
+	playUIManager_->SetCurrentPlayerHp(player_->GetCurrentHp());
+
 	// 計測
 	playTimer_.Update();
-
 }
 
 void PlayPhase::Exit() {

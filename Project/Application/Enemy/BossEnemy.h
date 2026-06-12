@@ -27,6 +27,12 @@ public:
 	/// <returns></returns>
 	GameEngine::WorldTransform& GetWorldTransform() { return worldTransform_; }
 
+	// 現在のHpを取得
+	int32_t GetCurrentHp() const { return stateCommonData_.hp_; }
+
+	// 最大Hpを取得
+	int32_t GetMaxHp() const { return maxHp_; }
+
 private:
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;
