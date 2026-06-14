@@ -3,6 +3,7 @@
 #include "DrawRequest.h"
 #include "WorldTransform.h"
 #include "Material.h"
+#include "RefBuffer.h"
 
 namespace GameEngine {
 
@@ -23,22 +24,16 @@ namespace GameEngine {
 		// 描画処理
 		void Draw(RenderQueue* renderQueue, const Draw3dType& drawType = Draw3dType::Default,const std::string& passName = "DefaultPass");
 
+		// レイトレによる描画
+		void DrawRaytracing(RenderQueue* renderQueue);
+
 	public:
 
 		// モデルが持つワールド行列
 		WorldTransform worldTransform_;
 
-		// 色
-		Vector4 color_ = {1.0f,1.0f,1.0f,1.0f};
-
-		// 使用する画像
-		uint32_t texture_ = 0;
-
-		// 輝度
-		float shininess_ = 500.0f;
-
-		// ライトの適応
-		bool isEnableLighting_ = false;
+		// マテリアルデータ
+		Material::MaterialData* materialData_ = nullptr;
 
 	private:
 		// モデルデータ
@@ -46,6 +41,9 @@ namespace GameEngine {
 
 		// 標準のマテリアル
 		Material defaultMaterial_;
+
+		// 参照用
+		RefBuffer refBuffer_;
 	};
 }
 

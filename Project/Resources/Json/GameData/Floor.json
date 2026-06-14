@@ -1,0 +1,27 @@
+{
+    "Floor": {
+        "ColliderSize": [
+            30.0,
+            1.0,
+            30.0
+        ],
+        "SceneName": "Game",
+        "worldWorldTransform": {
+            "Rotate": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Scale": [
+                15.0,
+                0.5,
+                15.0
+            ],
+            "Translate": [
+                0.0,
+                -0.5,
+                0.0
+            ]
+        }
+    }
+}

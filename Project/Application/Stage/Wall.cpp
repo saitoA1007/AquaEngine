@@ -3,15 +3,12 @@
 #include "FPSCounter.h"
 using namespace GameEngine;
 
-Wall::Wall(GameEngine::Model* model, float& respawnTime, int32_t& maxHp) : respawnTime_(respawnTime), maxHp_(maxHp) {
-	model_ = model;
-	// ワールド行列を初期化
-	worldTransform_.Initialize({{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}});
-
+Wall::Wall(GameEngine::Model* model, float& respawnTime, int32_t& maxHp) : respawnTime_(respawnTime), maxHp_(maxHp), modelComponent_(model) {
+	
 	// 当たり判定
-	collider_.SetWorldPosition(worldTransform_.transform_.translate);
-	collider_.SetSize(worldTransform_.transform_.scale);
-	collider_.UpdateOrientationsFromRotate(worldTransform_.transform_.rotate);
+	collider_.SetWorldPosition(modelComponent_.worldTransform_.transform_.translate);
+	collider_.SetSize(modelComponent_.worldTransform_.transform_.scale);
+	collider_.UpdateOrientationsFromRotate(modelComponent_.worldTransform_.transform_.rotate);
 	collider_.SetCollisionAttribute(kCollisionAttributeTerrain);
 	collider_.SetCollisionMask(~kCollisionAttributeTerrain);
 	// データを登録
@@ -27,20 +24,20 @@ Wall::Wall(GameEngine::Model* model, float& respawnTime, int32_t& maxHp) : respa
 
 void Wall::SetParameter(const Transform& transform) {
 	// 位置を取得
-	worldTransform_.transform_ = transform;
-	worldTransform_.UpdateTransformMatrix();
+	modelComponent_.worldTransform_.transform_ = transform;
+	modelComponent_.Update();
 
 	// 当たり判定の更新
-	collider_.SetWorldPosition(worldTransform_.transform_.translate);
-	collider_.SetSize(worldTransform_.transform_.scale + Vector3(0.0f, 100.0f, 0.0f));
-	collider_.UpdateOrientationsFromRotate(worldTransform_.transform_.rotate);
+	collider_.SetWorldPosition(modelComponent_.worldTransform_.transform_.translate);
+	collider_.SetSize(modelComponent_.worldTransform_.transform_.scale + Vector3(0.0f, 100.0f, 0.0f));
+	collider_.UpdateOrientationsFromRotate(modelComponent_.worldTransform_.transform_.rotate);
 }
 
 void Wall::Initialize() {
-	collider_.SetWorldPosition(worldTransform_.transform_.translate);
-	collider_.SetSize(worldTransform_.transform_.scale + Vector3(0.0f,100.0f,0.0f));
-	collider_.UpdateOrientationsFromRotate(worldTransform_.transform_.rotate);
-	worldTransform_.UpdateTransformMatrix();
+	collider_.SetWorldPosition(modelComponent_.worldTransform_.transform_.translate);
+	collider_.SetSize(modelComponent_.worldTransform_.transform_.scale + Vector3(0.0f,100.0f,0.0f));
+	collider_.UpdateOrientationsFromRotate(modelComponent_.worldTransform_.transform_.rotate);
+	modelComponent_.Update();
 }
 
 void Wall::Update() {
@@ -58,11 +55,13 @@ void Wall::Update() {
 		respawnTimer_ = 0.0f;
 		currentHp_ = maxHp_;
 	}
+
+	modelComponent_.Update();
 }
 
 void Wall::Draw() {
 	// 壁を描画
-	renderQueue_->SubmitRaytracingModel(model_, worldTransform_);
+	modelComponent_.Draw(renderQueue_);
 }
 
 void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {

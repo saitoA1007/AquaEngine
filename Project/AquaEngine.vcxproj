@@ -165,6 +165,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Enemy\BattleAction\BossBattleAction.cpp" />
     <ClCompile Include="Application\Enemy\BossAnimator.cpp" />
     <ClCompile Include="Application\Enemy\BossEnemy.cpp" />
+    <ClCompile Include="Application\Enemy\BossRangedAttackManager.cpp" />
     <ClCompile Include="Application\Enemy\State\BossStateBattle.cpp" />
     <ClCompile Include="Application\Enemy\State\BossStateIn.cpp" />
     <ClCompile Include="Application\Enemy\State\BossStateOut.cpp" />
@@ -176,6 +177,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Scene\GameScene.cpp" />
     <ClCompile Include="Application\Scene\TestScene.cpp" />
     <ClCompile Include="Application\Scene\Transition\Fade.cpp" />
+    <ClCompile Include="Application\Stage\Floor.cpp" />
     <ClCompile Include="Application\Stage\StageManager.cpp" />
     <ClCompile Include="Application\Stage\Wall.cpp" />
     <ClCompile Include="Application\UI\HpBarUI.cpp" />
@@ -395,6 +397,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Enemy\BattleAction\IBossBattleAction.h" />
     <ClInclude Include="Application\Enemy\BossAnimator.h" />
     <ClInclude Include="Application\Enemy\BossEnemy.h" />
+    <ClInclude Include="Application\Enemy\BossRangedAttackManager.h" />
     <ClInclude Include="Application\Enemy\IBossState.h" />
     <ClInclude Include="Application\Enemy\State\BossStateBattle.h" />
     <ClInclude Include="Application\Enemy\State\BossStateIn.h" />
@@ -410,6 +413,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Scene\Register\SetUpScenes.h" />
     <ClInclude Include="Application\Scene\TestScene.h" />
     <ClInclude Include="Application\Scene\Transition\Fade.h" />
+    <ClInclude Include="Application\Stage\Floor.h" />
     <ClInclude Include="Application\Stage\StageManager.h" />
     <ClInclude Include="Application\Stage\Wall.h" />
     <ClInclude Include="Application\UI\HpBarUI.h" />

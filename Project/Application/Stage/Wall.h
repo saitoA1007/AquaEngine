@@ -1,6 +1,6 @@
 #pragma once
 #include "IGameObject.h"
-#include "WorldTransform.h"
+#include "ModelComponent.h"
 #include "Collider.h"
 
 class Wall : public GameEngine::IGameObject {
@@ -19,15 +19,10 @@ public:
 	// 描画処理
 	void Draw() override;
 
-public:
-	// ワールド行列を取得
-	GameEngine::WorldTransform& GetWorldTransform() { return worldTransform_; }
-
 private:
-	// ワールド行列
-	GameEngine::WorldTransform worldTransform_;
+
 	// モデル
-	GameEngine::Model* model_;
+	GameEngine::ModelComponent modelComponent_;
 
 	// リスポーン時間
 	float& respawnTime_;

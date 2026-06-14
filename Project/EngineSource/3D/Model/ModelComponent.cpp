@@ -8,27 +8,27 @@ ModelComponent::ModelComponent(Model* model) {
 	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 
 	// モデルからマテリアル情報を取得
-	Material* material = model_->GetMaterial("default");
+	auto& meshes = model_->GetMeshes();
+	Material* material = model_->GetMaterial(meshes[0]->GetMaterialName());
 	auto data = material->GetMaterialData();
 
-	color_ = data->color;
-	shininess_ = data->shininess;
-	isEnableLighting_ = data->enableLighting;
-	texture_ = data->textureHandle;
 	// マテリアルを作成
-	defaultMaterial_.Initialize(color_, { 1.0f,1.0f,1.0f }, shininess_, isEnableLighting_);
+	defaultMaterial_.Initialize(data->color, { 1.0f,1.0f,1.0f }, data->shininess, data->enableLighting);
+	materialData_ = defaultMaterial_.GetMaterialData();
+
+	materialData_->textureHandle = data->textureHandle;
+	materialData_->roughness = data->roughness;
+	materialData_->metallic = data->metallic;
+
+	// 参照用
+	refBuffer_.Create();
+	refBuffer_.SetBufferMaterial(0, defaultMaterial_.GetMaterialSrvIndex());
 }
 
 void ModelComponent::Update() {
 	
 	// 行列を更新
 	worldTransform_.UpdateTransformMatrix();
-
-	// マテリアルを更新
-	defaultMaterial_.SetColor(color_);
-	defaultMaterial_.SetShininess(shininess_);
-	defaultMaterial_.SetEnableLighting(isEnableLighting_);
-	defaultMaterial_.SetTextureHandle(texture_);
 }
 
 void ModelComponent::Draw(RenderQueue* renderQueue, const Draw3dType& drawType, const std::string& passName) {
@@ -36,15 +36,15 @@ void ModelComponent::Draw(RenderQueue* renderQueue, const Draw3dType& drawType, 
 	switch (drawType)
 	{
 	case GameEngine::Draw3dType::Default:
-		renderQueue->SubmitModel(model_, worldTransform_,color_.w, &defaultMaterial_.GetMaterialBuffer(), passName);
+		renderQueue->SubmitModel(model_, worldTransform_, materialData_->color.w, &defaultMaterial_.GetMaterialBuffer(), passName);
 		break;
 
 	case GameEngine::Draw3dType::DefaultAdd:
-		renderQueue->SubmitModel(model_, worldTransform_, color_.w, &defaultMaterial_.GetMaterialBuffer(), passName);
+		renderQueue->SubmitModel(model_, worldTransform_, materialData_->color.w, &defaultMaterial_.GetMaterialBuffer(), passName);
 		break;
 
 	case GameEngine::Draw3dType::Animation:
-		renderQueue->SubmitAnimation(model_, worldTransform_, color_.w, &defaultMaterial_.GetMaterialBuffer(), passName);
+		renderQueue->SubmitAnimation(model_, worldTransform_, materialData_->color.w, &defaultMaterial_.GetMaterialBuffer(), passName);
 		break;
 
 	case GameEngine::Draw3dType::ShadowMap:
@@ -58,4 +58,9 @@ void ModelComponent::Draw(RenderQueue* renderQueue, const Draw3dType& drawType, 
 	default:
 		break;
 	}
+}
+
+void ModelComponent::DrawRaytracing(RenderQueue* renderQueue) {
+	// レイトレによる描画
+	renderQueue->SubmitRaytracingModel(model_, worldTransform_, &refBuffer_);
 }
