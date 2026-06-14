@@ -6,6 +6,7 @@
 #include "State/BossStateOut.h"
 
 #include "Application/CollisionConfig.h"
+#include "Application/Player/Player.h"
 
 using namespace GameEngine;
 
@@ -103,9 +104,15 @@ void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRes
 	bool isPlayer = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kPlayer));
 
 	if (isPlayer) {
+		// プレイヤーを取得
+		Player* player = result.userData.As<Player>();
+		if (player == nullptr) { return; }
 
-		stateCommonData_.hp_ -= 1;
-
+		// プレイヤーが攻撃状態の時にダメージを受ける
+		if (player->GetCurrentState() == PlayerState::kAttackDown) {
+			float damage = player->GetDamage();
+			stateCommonData_.hp_ -= static_cast<int32_t>(damage);
+		}
 	}
 
 }

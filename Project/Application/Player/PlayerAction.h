@@ -30,7 +30,7 @@ private:
 
 	int32_t maxHp_ = 3;
 
-	float coolTime_ = 1.0f;
+	float coolTime_ = 2.0f;
 
 private:
 	// クール状態
@@ -39,7 +39,6 @@ private:
 	int32_t currentHp_ = 1;
 
 	float timer_ = 0.0f;
-
 };
 
 // プレイヤーが常に受ける物理

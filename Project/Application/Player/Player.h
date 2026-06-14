@@ -47,6 +47,12 @@ public:
 	// 最大のHpを取得
 	int32_t GetMaxHp() const { return playerStatus_.GetMaxHp(); }
 
+	// 現在の状態を取得
+	PlayerState GetCurrentState() const { return commonData_.state; }
+
+	// 攻撃力
+	float GetDamage() const { return playerAttackDownAction_.GetAttackDownPower(); }
+
 private:
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;

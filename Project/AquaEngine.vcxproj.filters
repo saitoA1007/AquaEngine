@@ -540,6 +540,7 @@
     <ClCompile Include="Application\Utils\Timer.cpp" />
     <ClCompile Include="Application\UI\TimeUI.cpp" />
     <ClCompile Include="Application\Stage\Floor.cpp" />
+    <ClCompile Include="Application\Enemy\BossRangedAttackManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1057,6 +1058,7 @@
     <ClInclude Include="Application\Utils\Timer.h" />
     <ClInclude Include="Application\UI\TimeUI.h" />
     <ClInclude Include="Application\Stage\Floor.h" />
+    <ClInclude Include="Application\Enemy\BossRangedAttackManager.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />
