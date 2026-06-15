@@ -1079,6 +1079,7 @@
     <FxCompile Include="Resources\Shaders\PostEffect\Smoothing\BoxFilter5x5.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\Smoothing\GaussianFilter.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\Raytracing\ChsIceObject.hlsl" />
+    <FxCompile Include="Resources\Shaders\PostEffect\OutLine\DepthOutLine.PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Externals\imgui\ProggyClean.ttf" />

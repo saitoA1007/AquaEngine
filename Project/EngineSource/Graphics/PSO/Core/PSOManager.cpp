@@ -602,9 +602,9 @@ void PSOManager::DefaultLoadPostEffectPSO() {
     defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/RadialBlur/RadialBlur.PS.hlsl";
     RegisterPSO("RadialBlur", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 
-    // ぼかしを作成
-    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/Smoothing/GaussianFilter.PS.hlsl";
-    RegisterPSO("GaussianBlur", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
+    // アウトライン
+    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/OutLine/OutLine.PS.hlsl";
+    RegisterPSO("OutLine", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 
     // ラスタライズとレイトレの描画を合成する
     defaultPostEffect.rootSigName = "LightingComposite";

@@ -5,8 +5,9 @@ SamplerState gSampler : register(s0);
 
 struct Material
 {
+    float intensity;
+    float time;
     uint textureHandle;
-    float diff;
 };
 ConstantBuffer<Material> gMaterial : register(b0);
 
@@ -41,8 +42,10 @@ PixelShaderOutput main(VertexShaderOutput input)
     float2 uvStepSize = float2(rcp(width), rcp(height));
     
     float2 difference = float2(0.0f, 0.0f);
-    for (int x = 0; x < 3; ++x) {
-        for (int y = 0; y < 3; ++y) {
+    for (int x = 0; x < 3; ++x)
+    {
+        for (int y = 0; y < 3; ++y)
+        {
             float2 texcoord = input.texcoord + kIndex3x3[x][y] * uvStepSize;
             float3 fetchColor = gTexture[gMaterial.textureHandle].Sample(gSampler, texcoord).rgb;
             float luminance = Luminance(fetchColor);
@@ -50,6 +53,7 @@ PixelShaderOutput main(VertexShaderOutput input)
             difference.y += luminance * kPrewittVerticalKernel[x][y];
         }
     }
+    
     
     float weight = length(difference);
     weight = saturate(weight);
