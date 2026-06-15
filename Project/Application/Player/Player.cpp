@@ -7,6 +7,7 @@
 #include "FPSCounter.h"
 #include "Model.h"
 #include "Application/CollisionConfig.h"
+#include "Application/Enemy/RangedAttack/IceFall.h"
 using namespace GameEngine;
 
 Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model, GameEngine::AnimationManager* animationManager) {
@@ -170,6 +171,7 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 	bool isWall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kWall));
 	bool isBoss = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kBoss));
 	bool isFloor = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kGround));
+	bool isIceFall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kIceFall));
 
 	// 床の衝突
 	if (isFloor) {
@@ -192,8 +194,20 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 	
 	// 壁の衝突処理
 	if (isWall) {
-		//Log("Player is hit Wall");
 		bounceAction_.WallBounce(worldTransform_.transform_.translate, result.contactNormal, result.penetrationDepth, attackRushAction_.GetRushMaxSpeed());
+	}
+
+	// 氷柱との衝突
+	if (isIceFall) {
+		IceFall* iceFall = result.userData.As<IceFall>();
+		if (iceFall == nullptr) { return; }
+
+		// 氷柱を削除
+		if (commonData_.state == PlayerState::kAttackRush) {
+			iceFall->Destroy();
+		}
+
+		bounceAction_.WallBounce(worldTransform_.transform_.translate, result.contactNormal * -1.0f, result.penetrationDepth, attackRushAction_.GetRushMaxSpeed());
 	}
 
 	// ボスの衝突判定

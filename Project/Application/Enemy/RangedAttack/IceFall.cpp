@@ -2,7 +2,6 @@
 #include "Application/CollisionConfig.h"
 #include "FPSCounter.h"
 #include "EasingManager.h"
-#include "Application/Player/Player.h"
 using namespace GameEngine;
 
 IceFall::IceFall(GameEngine::Model* model, Vector3 pos, int32_t& iceFallCurrentNum) :
@@ -66,17 +65,6 @@ void IceFall::Draw() {
 }
 
 void IceFall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
-
-	bool isPlayer = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kPlayer));
-
-	if (isPlayer) {
-		Player* player = result.userData.As<Player>();
-		if (player == nullptr) { return; }
-		if (player->GetCurrentState() != PlayerState::kAttackRush) { return; }
-
-		// 氷柱を破壊
-		isDead_ = true;
-	}
 
 }
 
