@@ -10,7 +10,7 @@
 
 using namespace GameEngine;
 
-BossEnemy::BossEnemy(GameEngine::Model* model, GameEngine::WorldTransform& playerWorld, GameEngine::AnimationManager* animationManager) {
+BossEnemy::BossEnemy(GameEngine::Model* model, GameEngine::WorldTransform& playerWorld, GameEngine::AnimationManager* animationManager, BossRangedAttackManager* rangedAttackManager) {
 
 	model_ = model;
 
@@ -30,7 +30,7 @@ BossEnemy::BossEnemy(GameEngine::Model* model, GameEngine::WorldTransform& playe
 
 	// 状態の生成
 	statesTable_[static_cast<size_t>(BossState::kIn)] = std::make_unique<BossStateIn>(stateCommonData_);
-	statesTable_[static_cast<size_t>(BossState::kBattle)] = std::make_unique<BossStateBattle>(stateCommonData_, &playerWorld.transform_.translate);
+	statesTable_[static_cast<size_t>(BossState::kBattle)] = std::make_unique<BossStateBattle>(stateCommonData_, &playerWorld.transform_.translate, rangedAttackManager);
 	statesTable_[static_cast<size_t>(BossState::kOut)] = std::make_unique<BossStateOut>(stateCommonData_);
 
 	// 最初の状態を設定する

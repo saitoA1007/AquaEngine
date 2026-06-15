@@ -4,6 +4,7 @@ using namespace GameEngine;
 #include "Application/Player/Player.h"
 #include "Application/Stage/StageManager.h"
 #include "Application/Enemy/BossEnemy.h"
+#include "Application/Enemy/BossRangedAttackManager.h"
 #include "Application/GamePlay/GamePhaseManager.h"
 #include "Application/UI/PlayUIManager.h"
 
@@ -29,10 +30,14 @@ GameScene::GameScene() {
 	playerModel->SetDefaultIsEnableLight(true);
 	auto player = gameObjectManager_->AddObject<Player>(inputCommand_, playerModel, animationManager_);
 
+	// 敵の遠距離攻撃管理
+	auto* iceFallModel = modelManager_->GetNameByModel("Cube");
+	auto* bossRangedAttackManager = gameObjectManager_->AddObject<BossRangedAttackManager>(gameObjectManager_, iceFallModel);
+
 	// 敵
 	auto* enemyModel = modelManager_->GetNameByModel("BossEnemy");
 	enemyModel->SetDefaultIsEnableLight(true);
-	auto bossEnemy = gameObjectManager_->AddObject<BossEnemy>(enemyModel, player->GetWorldTransform(), animationManager_);
+	auto bossEnemy = gameObjectManager_->AddObject<BossEnemy>(enemyModel, player->GetWorldTransform(), animationManager_, bossRangedAttackManager);
 
 	// カメラ操作
 	cameraController_ = gameObjectManager_->AddObject<CameraController>(inputCommand_, &player->GetWorldTransform(), &bossEnemy->GetWorldTransform());

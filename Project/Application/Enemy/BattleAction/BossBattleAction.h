@@ -92,6 +92,8 @@ public:
     void Update() override;
     void Finalize() override;
 
+    void RegisterParameter(GameEngine::DebugParameter* param) override;
+
 private:
 
     // はみ出る割合
@@ -195,6 +197,8 @@ public:
     void Update() override;
     void Finalize() override;
 
+    void RegisterParameter(GameEngine::DebugParameter* param) override;
+
 private:
 
     float inMaxTime_ = 1.0f;
@@ -211,6 +215,38 @@ private:
     Vector3 endRotDir_;
 
     State state_ = State::kIn;
+};
+
+// リセットアクション
+class ResetAction : public IBossBattleAction {
+public:
+    ResetAction(BossBattleStateCommonData& commonData);
+    ~ResetAction() = default;
+
+    void Initialize() override;
+    void Update() override;
+    void Finalize() override;
+
+private:
+
+    // 移動速度。移動時間を求めるのに使用
+    float moveSpeed_ = 1.0f;
+
+    // 回転時間
+    float rotateMaxTime_ = 1.0f;
+
+private:
+    Vector3 startRotDir_;
+    Vector3 endRotDir_;
+
+    Vector3 startPos_;
+    Vector3 endPos_;
+
+    float timer_ = 0.0f;
+
+    float moveMaxTime_ = 0.0f;
+
+    bool isRotate_ = false;
 };
 
 /// ヘルパー関数

@@ -36,4 +36,9 @@ struct Vector2 {
 			y /= len;
 		}
 	}
+
+	// ベクトルの距離を求める
+	static float GetDistance(Vector2 v1, Vector2 v2) {
+		return std::powf(v1.x - v2.x, 2) + std::powf(v1.y - v2.y, 2);
+	}
 };

@@ -171,7 +171,22 @@ namespace GameEngine {
 		CollisionData GetCollisionData() const override {
 			CollisionData collisionData;
 			OBB tmpOBB;
-			tmpOBB.center = worldPosition_;
+
+			// ローカルオフセットを計算
+			Vector3 localOffset = {
+				(0.5f - anchor_.x) * (size_.x * 2.0f),
+				(0.5f - anchor_.y) * (size_.y * 2.0f),
+				(0.5f - anchor_.z) * (size_.z * 2.0f)
+			};
+
+			// 各座標軸を考慮してワールド空間のオフセットに変換
+			Vector3 worldOffset =
+				orientations_[0] * localOffset.x +
+				orientations_[1] * localOffset.y +
+				orientations_[2] * localOffset.z;
+
+
+			tmpOBB.center = worldPosition_ + worldOffset;
 			tmpOBB.size = size_;
 			std::memcpy(tmpOBB.orientations, orientations_, sizeof(Vector3) * 3);
 			collisionData.data = tmpOBB;
@@ -199,10 +214,16 @@ namespace GameEngine {
 		void SetSize(const Vector3& size) { size_ = size; }
 		const Vector3& GetSize() const { return size_; }
 
+		// アンカーポイント
+		void SetAnchor(const Vector3& anchor) { anchor_ = anchor; }
+		const Vector3& GetAnchor() const { return anchor_; }
+
 	private:
 		// 座標軸
 		Vector3 orientations_[3];
 		// 座標軸方向の長さの半分。中心から面までの距離
 		Vector3 size_;
+		// アンカーポイント
+		Vector3 anchor_ = { 0.5f, 0.5f, 0.5f };
 	};
 }

@@ -6,6 +6,8 @@
 #include "EasingManager.h"
 #include "RandomGenerator.h"
 #include "Application/Enemy/BossAnimator.h"
+#include "DebugParameter.h"
+#include "Application/Enemy/BossRangedAttackManager.h"
 using namespace GameEngine;
 
 //=============================================================
@@ -148,6 +150,7 @@ void BossRushAttackAction::RushAttack() {
 
 	if (timer_ >= 1.0f) {
 		isFinished_ = true;
+		commonData_.requestState = BossBattleState::kResetMove;
 	}
 }
 
@@ -267,6 +270,17 @@ void BossCrossMoveAction::Finalize() {
 
 }
 
+void BossCrossMoveAction::RegisterParameter(GameEngine::DebugParameter* param) {
+	std::string subGroup = "CrossMove";
+	int index = 0;
+
+	param->Register("CrossEndRatio", crossEndRatio_, index++, subGroup);
+	param->Register("DefaultPosY", defaultPosY_, index++, subGroup);
+	param->Register("MaxMoveHeight", maxMoveHeight_, index++, subGroup);
+	param->Register("UpDownCount", upDownCount_, index++, subGroup);
+	param->Register("MaxTime", maxTime_, index++, subGroup);
+}
+
 //===============================================================
 // 回転移動
 //===============================================================
@@ -361,7 +375,7 @@ void RotateMoveAction::Update() {
 	} else if (timer_ <= 0.8f) {
 		// 回転
 		Vector3 prePos = GetXZFromAngle(preAngle, radius, defaultPosY_);
-		Vector3 dir = commonData_.transform.translate - prePos;
+		dir = commonData_.transform.translate - prePos;
 		dir.Normalize();
 		commonData_.transform.rotate.y = std::atan2f(dir.x, dir.z);
 		// 保存
@@ -493,6 +507,88 @@ void WindAttackAction::Update() {
 }
 
 void WindAttackAction::Finalize() {
+
+}
+
+void WindAttackAction::RegisterParameter(GameEngine::DebugParameter* param) {
+	std::string subGroup = "WindAttack";
+	int index = 0;
+	
+	param->Register("InMaxTime", inMaxTime_, index++, subGroup);
+	param->Register("MainMaxTime", mainMaxTime_, index++, subGroup);
+	param->Register("OutMaxTime", outMaxTime_, index++, subGroup);
+}
+
+//================================================================================
+// 位置と方向をリセット
+//================================================================================
+
+ResetAction::ResetAction(BossBattleStateCommonData& commonData) : IBossBattleAction(commonData) {
+
+}
+
+void ResetAction::Initialize() {
+	isFinished_ = false;
+	isRotate_ = true;
+	timer_ = 0.0f;
+
+	// 最初の位置を求める
+	startPos_ = commonData_.transform.translate;
+
+	// ステージの中心からのベクトルを求める
+	Vector3 dir = commonData_.transform.translate;
+
+	// 移動時間を求める
+	moveMaxTime_ = dir.Length() / moveSpeed_;
+
+	// ベクトルを正規化
+	dir.y = 0.0f;
+	dir.Normalize();
+
+	// 最後の位置を求める
+	endPos_ = dir * commonData_.stageRadius;
+
+	// 現在の向いている方向を求める
+	startRotDir_ = Math::YawToDirection(commonData_.transform.rotate.y);
+
+	// 向く方向を求める
+	endRotDir_ = commonData_.transform.translate * -1.0f;
+	endRotDir_.y = 0.0;
+	endRotDir_.Normalize();
+
+	commonData_.animator->StartAnimation(BossAnimationType::kMove, "基本移動");
+
+}
+
+void ResetAction::Update() {
+
+	if (isRotate_) {
+		timer_ += FpsCounter::deltaTime / rotateMaxTime_;
+
+		// 回転
+		Vector3 dir = Slerp(startRotDir_, endRotDir_, timer_);
+		// Y軸周りの角度
+		commonData_.transform.rotate.y = std::atan2f(dir.x, dir.z);
+
+		if (timer_ >= 1.0f) {
+			commonData_.transform.rotate.y = std::atan2f(endRotDir_.x, endRotDir_.z);
+			timer_ = 0.0f;
+			isRotate_ = false;
+		}
+	} else {
+		timer_ += FpsCounter::deltaTime / moveMaxTime_;
+
+		// 移動
+		commonData_.transform.translate = Lerp(startPos_, endPos_, EaseInOut(timer_));
+
+		if (timer_ >= 1.0f) {
+			commonData_.transform.translate = endPos_;
+			isFinished_ = true;
+		}
+	}
+}
+
+void ResetAction::Finalize() {
 
 }
 

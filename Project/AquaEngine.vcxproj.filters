@@ -541,6 +541,8 @@
     <ClCompile Include="Application\UI\TimeUI.cpp" />
     <ClCompile Include="Application\Stage\Floor.cpp" />
     <ClCompile Include="Application\Enemy\BossRangedAttackManager.cpp" />
+    <ClCompile Include="Application\Enemy\RangedAttack\IceFall.cpp" />
+    <ClCompile Include="Application\Enemy\RangedAttack\WindAttack.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1059,6 +1061,8 @@
     <ClInclude Include="Application\UI\TimeUI.h" />
     <ClInclude Include="Application\Stage\Floor.h" />
     <ClInclude Include="Application\Enemy\BossRangedAttackManager.h" />
+    <ClInclude Include="Application\Enemy\RangedAttack\IceFall.h" />
+    <ClInclude Include="Application\Enemy\RangedAttack\WindAttack.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />
