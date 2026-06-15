@@ -192,6 +192,18 @@ namespace GameEngine {
 			return { pitch, yaw, roll };
 		}
 
+		float AngleBetweenRadians(Vector3 v1, Vector3 v2) {
+			v1.Normalize();
+			v2.Normalize();
+
+			// 内積を求める
+			float dot = Math::Dot(v1, v2);
+			dot = std::clamp(dot, -1.0f, 1.0f);
+
+			// 内積から角度を求める
+			return std::acos(dot);
+		}
+
 		float Length(const Vector3& v) {
 			return std::sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
 		}

@@ -567,14 +567,17 @@ ResetAction::ResetAction(BossBattleStateCommonData& commonData) : IBossBattleAct
 
 void ResetAction::Initialize() {
 	isFinished_ = false;
-	isRotate_ = true;
 	timer_ = 0.0f;
+	state_ = State::kIn;
 
 	// 最初の位置を求める
 	startPos_ = commonData_.transform.translate;
 
 	// ステージの中心からのベクトルを求める
 	Vector3 dir = commonData_.transform.translate;
+	if (commonData_.transform.translate.x == 0.0f && commonData_.transform.translate.z == 0.0f) {
+		dir = { 0.0f,0.0f,1.0f };
+	}
 
 	// 移動時間を求める
 	moveMaxTime_ = dir.Length() / moveSpeed_;
@@ -587,43 +590,87 @@ void ResetAction::Initialize() {
 	endPos_ = dir * commonData_.stageRadius;
 
 	// 現在の向いている方向を求める
-	startRotDir_ = Math::YawToDirection(commonData_.transform.rotate.y);
+	inStartRotDir_ = Math::YawToDirection(commonData_.transform.rotate.y);
 
-	// 向く方向を求める
-	endRotDir_ = commonData_.transform.translate * -1.0f;
-	endRotDir_.y = 0.0;
-	endRotDir_.Normalize();
+	// 進む方向を求める
+	inEndRotDir_ = endPos_ - startPos_;
+	inEndRotDir_.y = 0.0;
+	inEndRotDir_.Normalize();
+
+	// 回転する時価を求める
+	float angle = Math::AngleBetweenRadians(inStartRotDir_, inEndRotDir_);
+	if (angle > 0.0001f) {
+		inRotateMaxTime_ = angle / rotateSpeed_;
+	} else {
+		inRotateMaxTime_ = 0.0001f;
+	}
+
+	// 最後
+	outStartRotDir_ = inEndRotDir_;
+	outEndRotDir_ = endPos_ * -1.0f;
+	outEndRotDir_.y = 0.0f;
+	outEndRotDir_.Normalize();
+
+	// 回転する時価を求める
+	angle = Math::AngleBetweenRadians(outStartRotDir_, outEndRotDir_);
+	if (angle > 0.0001f) {
+		outRotateMaxTime_ = angle / rotateSpeed_;
+	} else {
+		outRotateMaxTime_ = 0.0001f;
+	}
 
 	commonData_.animator->StartAnimation(BossAnimationType::kMove, "基本移動");
-
 }
 
 void ResetAction::Update() {
 
-	if (isRotate_) {
-		timer_ += FpsCounter::deltaTime / rotateMaxTime_;
+	switch (state_)
+	{
+	case ResetAction::State::kIn: {
+		timer_ += FpsCounter::deltaTime / inRotateMaxTime_;
 
 		// 回転
-		Vector3 dir = Slerp(startRotDir_, endRotDir_, timer_);
+		Vector3 dir = Slerp(inStartRotDir_, inEndRotDir_, timer_);
 		// Y軸周りの角度
 		commonData_.transform.rotate.y = std::atan2f(dir.x, dir.z);
 
 		if (timer_ >= 1.0f) {
-			commonData_.transform.rotate.y = std::atan2f(endRotDir_.x, endRotDir_.z);
+			commonData_.transform.rotate.y = std::atan2f(inEndRotDir_.x, inEndRotDir_.z);
 			timer_ = 0.0f;
-			isRotate_ = false;
+			state_ = State::kMain;
 		}
-	} else {
+		break;
+	}
+
+	case ResetAction::State::kMain: {
 		timer_ += FpsCounter::deltaTime / moveMaxTime_;
 
 		// 移動
 		commonData_.transform.translate = Lerp(startPos_, endPos_, EaseInOut(timer_));
 
 		if (timer_ >= 1.0f) {
+			state_ = State::kOut;
+			commonData_.transform.translate = endPos_;
+		}
+		break;
+	}
+
+	case ResetAction::State::kOut: {
+		timer_ += FpsCounter::deltaTime / outRotateMaxTime_;
+
+		// 回転
+		Vector3 dir = Slerp(outStartRotDir_, outEndRotDir_, timer_);
+		// Y軸周りの角度
+		commonData_.transform.rotate.y = std::atan2f(dir.x, dir.z);
+
+		if (timer_ >= 1.0f) {
 			commonData_.transform.translate = endPos_;
 			isFinished_ = true;
 		}
+		break;
 	}
+	}
+
 }
 
 void ResetAction::Finalize() {
@@ -635,7 +682,7 @@ void ResetAction::RegisterParameter(GameEngine::DebugParameter* param) {
 	int index = 0;
 
 	param->Register("MoveSpeed", moveSpeed_, index++, subGroup);
-	param->Register("RotateMaxTime", rotateMaxTime_, index++, subGroup);
+	param->Register("RotateSpeed", rotateSpeed_, index++, subGroup);
 }
 
 // ヘルパー関数

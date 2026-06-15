@@ -241,6 +241,16 @@ private:
 // リセットアクション
 class ResetAction : public IBossBattleAction {
 public:
+
+    enum class State {
+        kIn,
+        kMain,
+        kOut,
+
+        kMaxCount
+    };
+
+public:
     ResetAction(BossBattleStateCommonData& commonData);
     ~ResetAction() = default;
 
@@ -255,12 +265,15 @@ private:
     // 移動速度。移動時間を求めるのに使用
     float moveSpeed_ = 1.0f;
 
-    // 回転時間
-    float rotateMaxTime_ = 1.0f;
+    // 回転速度。回転する時間を求めるのに使用
+    float rotateSpeed_ = 6.0f;
 
 private:
-    Vector3 startRotDir_;
-    Vector3 endRotDir_;
+    Vector3 inStartRotDir_;
+    Vector3 inEndRotDir_;
+
+    Vector3 outStartRotDir_;
+    Vector3 outEndRotDir_;
 
     Vector3 startPos_;
     Vector3 endPos_;
@@ -268,8 +281,10 @@ private:
     float timer_ = 0.0f;
 
     float moveMaxTime_ = 0.0f;
+    float inRotateMaxTime_ = 1.0f;
+    float outRotateMaxTime_ = 1.0f;
 
-    bool isRotate_ = false;
+    State state_ = State::kIn;
 };
 
 /// ヘルパー関数

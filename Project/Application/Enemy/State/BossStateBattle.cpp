@@ -24,7 +24,7 @@ BossStateBattle::BossStateBattle(BossStateCommonData& commonData, Vector3* playe
 	battleStatesTable_[BossBattleState::kResetMove] = std::make_unique<ResetAction>(battleStateCommonData_);
 
 	// 初期化
-	currentBattleState_ = BossBattleState::kWait;
+	currentBattleState_ = BossBattleState::kResetMove;
 	battleStatesTable_[currentBattleState_]->Initialize();
 
 	// 行動に重み付け
@@ -53,7 +53,7 @@ BossStateBattle::BossStateBattle(BossStateCommonData& commonData, Vector3* playe
 }
 
 void BossStateBattle::Enter() {
-	currentBattleState_ = BossBattleState::kWait;
+	currentBattleState_ = BossBattleState::kResetMove;
 	battleStatesTable_[currentBattleState_]->Initialize();
 }
 
