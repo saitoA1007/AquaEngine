@@ -2,6 +2,7 @@
 #include "Application/CollisionConfig.h"
 #include "FPSCounter.h"
 #include "EasingManager.h"
+#include "Application/Player/Player.h"
 using namespace GameEngine;
 
 IceFall::IceFall(GameEngine::Model* model, Vector3 pos, int32_t& iceFallCurrentNum) :
@@ -19,6 +20,7 @@ IceFall::IceFall(GameEngine::Model* model, Vector3 pos, int32_t& iceFallCurrentN
 	debugParame_->Register("InMaxTime", inMaxTime_);
 	debugParame_->Register("StartPosY", startPosY_);
 	debugParame_->Register("EndPosY", endPosY_);
+	debugParame_->Register("Scale", modelComponent_.worldTransform_.transform_.scale);
 	debugParame_->Apply();
 
 	// 当たり判定
@@ -64,6 +66,17 @@ void IceFall::Draw() {
 }
 
 void IceFall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
+
+	bool isPlayer = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kPlayer));
+
+	if (isPlayer) {
+		Player* player = result.userData.As<Player>();
+		if (player == nullptr) { return; }
+		if (player->GetCurrentState() != PlayerState::kAttackRush) { return; }
+
+		// 氷柱を破壊
+		isDead_ = true;
+	}
 
 }
 

@@ -1,0 +1,21 @@
+{
+    "StageManager": {
+        "Generater": {
+            "CenterPos": [
+                0.0,
+                1.0,
+                0.0
+            ],
+            "MaxSideNumber": 8,
+            "Radius": 20.0
+        },
+        "SceneName": "Game",
+        "Wall": {
+            "MaxHp": 3,
+            "OffsetWallWidth": -5.0,
+            "RespawnTime": 3.0,
+            "WallHeight": 5.0,
+            "wallDepth": 0.5
+        }
+    }
+}

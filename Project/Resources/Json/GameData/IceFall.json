@@ -1,0 +1,14 @@
+{
+    "IceFall": {
+        "ColliderRadius": 2.0,
+        "EndPosY": 0.0,
+        "InMaxTime": 2.0,
+        "Scale": [
+            1.5,
+            4.0,
+            1.5
+        ],
+        "SceneName": "Game",
+        "StartPosY": -5.0
+    }
+}

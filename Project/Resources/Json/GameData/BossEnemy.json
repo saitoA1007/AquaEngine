@@ -1,0 +1,62 @@
+{
+    "BossEnemy": {
+        "Collider": {
+            "ColliderOffsetPosY": 2.369999885559082,
+            "ColliderRadius": 4.0
+        },
+        "CrossMove": {
+            "CrossEndRatio": 1.2000000476837158,
+            "DefaultPosY": 5.0,
+            "MaxMoveHeight": 4.0,
+            "MaxTime": 4.0,
+            "UpDownCount": 3.0
+        },
+        "IceFallAttack": {
+            "IceFallMaxNum": 5,
+            "IceFallNum": 3,
+            "MaxIter": 100,
+            "MaxTime": 2.0,
+            "MinDistance": 5.0,
+            "RangeRadiusRatio": 0.800000011920929
+        },
+        "MaxHp": 100,
+        "ResetAction": {
+            "MoveSpeed": 20.0,
+            "RotateSpeed": 6.0
+        },
+        "RotateMove": {
+            "DefaultPosY": 5.0,
+            "MaxMoveHeight": 2.0,
+            "MaxTime": 2.0,
+            "OffsetStageRadius": 0.0
+        },
+        "RushAttack": {
+            "RotateMoveMaxTime": 2.0,
+            "RushDistanceRatio": 1.5,
+            "RushMaxTime": 2.0
+        },
+        "Scale": [
+            3.0,
+            3.0,
+            3.0
+        ],
+        "SceneName": "Game",
+        "StatusWeight": {
+            "CrossMove": 0,
+            "IceFallAttack": 0,
+            "RotateMove": 64,
+            "RushAttack": 0,
+            "Wait": 0,
+            "WindAttack": 0
+        },
+        "Wait": {
+            "MaxTime": 1.0
+        },
+        "WindAttack": {
+            "InMaxTime": 1.0,
+            "MainMaxTime": 3.0,
+            "OutMaxTime": 1.0,
+            "WindDirY": -0.10000000149011612
+        }
+    }
+}

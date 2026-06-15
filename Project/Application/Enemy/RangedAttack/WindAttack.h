@@ -38,7 +38,7 @@ private:
 private:
 
 	// 当たり判定
-	Vector3 colliderSize_ = {1.0f,1.0f,5.0f};
+	Vector3 colliderSize_ = {1.0f,1.0f,16.0f};
 	Vector3 colliderAnchor_ = { 0.5f,0.5f,0.0f };
 
 private:

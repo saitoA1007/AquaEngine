@@ -36,6 +36,8 @@ private:
 
 	// 当たり判定のサイズ
 	Vector3 colliderSize_ = { 1.0f,1.0f,1.0f };
+	// アンカーポイント
+	Vector3 colliderAnchor_ = { 0.5f,0.5f,0.5f };
 
 private:
 

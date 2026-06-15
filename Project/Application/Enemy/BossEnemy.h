@@ -66,6 +66,10 @@ private:
 
 	// 最大hp
 	int32_t maxHp_ = 10;
+	// 当たり判定
+	float colliderRadius_ = 3.0f;
+	// 当たり判定のオフセット
+	float colliderOffsetPosY_ = 0.0f;
 
 private:
 

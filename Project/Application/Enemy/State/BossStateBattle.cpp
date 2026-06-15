@@ -13,6 +13,7 @@ BossStateBattle::BossStateBattle(BossStateCommonData& commonData, Vector3* playe
 	// アニメーション管理機能を取得
 	battleStateCommonData_.animator = commonData.animator;
 	battleStateCommonData_.rangedAttackManager = rangedAttackManager;
+	battleStateCommonData_.transform = commonData.worldTransform->transform_;
 
 	// 各行動を登録する
 	battleStatesTable_[BossBattleState::kRushAttack] = std::make_unique<BossRushAttackAction>(battleStateCommonData_);

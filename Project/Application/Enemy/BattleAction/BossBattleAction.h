@@ -20,12 +20,17 @@ public:
     void Update() override;
     void Finalize() override;
 
+    void RegisterParameter(GameEngine::DebugParameter* param) override;
+
 private:
     // 回転移動時間
     float rotateMoveMaxTime_ = 2.0f;
 
     // 突進する時間
     float rushMaxTime_ = 2.0f;
+
+    // 突進の移動範囲の割合
+    float rushDistanceRatio_ = 1.5f;
 
 private:
 
@@ -100,7 +105,7 @@ private:
     float crossEndRatio_ = 1.0f;
 
     // 最大時間
-    float maxTime_ = 1.0f;
+    float maxTime_ = 4.0f;
 
     // 移動する時のY軸の基本位置
     float defaultPosY_ = 5.0f;
@@ -223,8 +228,10 @@ public:
 private:
 
     float inMaxTime_ = 1.0f;
-    float mainMaxTime_ = 1.0f;
+    float mainMaxTime_ = 3.0f;
     float outMaxTime_ = 1.0f;
+
+    float windDirY_ = -0.1f;
 
 private:
 
@@ -263,10 +270,13 @@ public:
 private:
 
     // 移動速度。移動時間を求めるのに使用
-    float moveSpeed_ = 1.0f;
+    float moveSpeed_ = 20.0f;
 
     // 回転速度。回転する時間を求めるのに使用
     float rotateSpeed_ = 6.0f;
+
+    // 高さ
+    float defaultPosY_ = 5.0f;
 
 private:
     Vector3 inStartRotDir_;
