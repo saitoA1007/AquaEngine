@@ -13,14 +13,16 @@ BossRangedAttackManager::BossRangedAttackManager(GameEngine::GameObjectManager* 
 
 }
 
-void BossRangedAttackManager::StartIceFall(float rangeRadius, float minDistance, int targetCount, int maxIter) {
+void BossRangedAttackManager::StartIceFall(float rangeRadius, float minDistance, int iceFallNum, int iceFallMaxNum, int maxIter) {
+    if (currentIceFallNum_ > iceFallMaxNum) { return; }
+
     std::vector<Vector2> points;
     int attempts = 0;
 
     // 生成してた数
     int count = 0;
 
-    while (count < targetCount && attempts < maxIter) {
+    while (count < iceFallNum && attempts < maxIter) {
         attempts++;
 
         // 大きな円の中にランダムな点を生成
@@ -52,11 +54,11 @@ void BossRangedAttackManager::StartIceFall(float rangeRadius, float minDistance,
 
     // 求めた位置から氷を生成する
     for (size_t i = 0; i < points.size(); ++i) {
-        objectManager_->AddObject<IceFall>(iceFallModel_, Vector3(points[i].x, 0.0f, points[i].y));
+        objectManager_->AddObject<IceFall>(iceFallModel_, Vector3(points[i].x, 0.0f, points[i].y), currentIceFallNum_);
     }
 }
 
-void BossRangedAttackManager::StartWind(Vector3 pos, Vector3 startDir, Vector3 endDir) {
+void BossRangedAttackManager::StartWind(Vector3 pos, Vector3 startDir, Vector3 endDir, float maxTime) {
     // 風を生成
-    objectManager_->AddObject<WindAttack>(iceFallModel_, pos, startDir, endDir);
+    objectManager_->AddObject<WindAttack>(iceFallModel_, pos, startDir, endDir, maxTime);
 }

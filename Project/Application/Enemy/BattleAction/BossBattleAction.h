@@ -62,13 +62,13 @@ public:
     void Update() override;
     void Finalize() override;
 
-    //void RegisterParameter([[maybe_unused]] GameEngine::DebugParameter* param) override;
+    void RegisterParameter(GameEngine::DebugParameter* param) override;
 
 private:
 
     float timer_ = 0.0f;
     // 待機時間
-    float maxTIme_ = 1.0f;
+    float maxTime_ = 1.0f;
 };
 
 // 横断する動き
@@ -134,6 +134,8 @@ public:
     void Update() override;
     void Finalize() override;
 
+    void RegisterParameter(GameEngine::DebugParameter* param) override;
+
 private:
     // 移動する時のY軸の基本位置
     float defaultPosY_ = 5.0f;
@@ -173,10 +175,29 @@ public:
     void Update() override;
     void Finalize() override;
 
+    void RegisterParameter(GameEngine::DebugParameter* param) override;
+
+private:
+    // ステージの使用する範囲割合
+    float rangeRadiusRatio_ = 0.8f;
+
+    // 氷柱同士の最小距離
+    float minDistance_ = 5.0f;
+
+    // 発生させる数
+    int32_t iceFallNum_ = 3;
+
+    // ステージに存在させる最大の氷柱の数
+    int32_t iceFallMaxNum_ = 5;
+
+    // 試行回数
+    int32_t maxIter_ = 100;
+
+    float maxTime_ = 1.0f;
+
 private:
     float timer_ = 0.0f;
 
-    float maxTime_ = 1.0f;
 };
 
 // 風攻撃
@@ -226,6 +247,8 @@ public:
     void Initialize() override;
     void Update() override;
     void Finalize() override;
+
+    void RegisterParameter(GameEngine::DebugParameter* param) override;
 
 private:
 

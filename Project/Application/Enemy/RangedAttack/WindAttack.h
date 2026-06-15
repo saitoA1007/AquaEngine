@@ -6,7 +6,7 @@
 
 class WindAttack : public GameEngine::IGameObject {
 public:
-	WindAttack(GameEngine::Model* model, Vector3 pos, Vector3 startDir, Vector3 endDir);
+	WindAttack(GameEngine::Model* model, Vector3 pos, Vector3 startDir, Vector3 endDir, float maxTime);
 	~WindAttack() = default;
 
 	// 初期化
@@ -30,6 +30,8 @@ private:
 
 	float timer_ = 0.0f;
 
+	float maxTime_ = 2.0f;
+
 	Vector3 startDir_ = { 0.0f,0.0f,-1.0f };
 	Vector3 endDir_ = { 0.0f,0.0f,-1.0f };
 
@@ -38,8 +40,6 @@ private:
 	// 当たり判定
 	Vector3 colliderSize_ = {1.0f,1.0f,5.0f};
 	Vector3 colliderAnchor_ = { 0.5f,0.5f,0.0f };
-
-	float maxTime_ = 2.0f;
 
 private:
 

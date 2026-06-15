@@ -4,7 +4,11 @@
 #include "EasingManager.h"
 using namespace GameEngine;
 
-IceFall::IceFall(GameEngine::Model* model, Vector3 pos) : modelComponent_(model) {
+IceFall::IceFall(GameEngine::Model* model, Vector3 pos, int32_t& iceFallCurrentNum) :
+	modelComponent_(model), iceFallCurrentNum_(iceFallCurrentNum) {
+
+	// 現在数を増やす
+	iceFallCurrentNum_ += 1;
 
 	// 位置を設定
 	modelComponent_.worldTransform_.transform_.translate = pos;
@@ -31,7 +35,11 @@ IceFall::IceFall(GameEngine::Model* model, Vector3 pos) : modelComponent_(model)
 	collider_.SetOnCollisionCallback([this](const CollisionResult& result) {
 		this->OnCollisionEnter(result);
 	});
+}
 
+IceFall::~IceFall() {
+	// 現在の数を減らす
+	iceFallCurrentNum_ -= 1;
 }
 
 void IceFall::Initialize() {

@@ -5,16 +5,16 @@
 #include "MyMath.h"
 using namespace GameEngine;
 
-WindAttack::WindAttack(GameEngine::Model* model, Vector3 pos, Vector3 startDir, Vector3 endDir) : modelComponent_(model) {
+WindAttack::WindAttack(GameEngine::Model* model, Vector3 pos, Vector3 startDir, Vector3 endDir, float maxTime) : modelComponent_(model) {
 
 	modelComponent_.worldTransform_.transform_.translate = pos;
 	startDir_ = startDir;
 	endDir_ = endDir;
+	maxTime_ = maxTime;
 
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>("WindAttack");
 	debugParame_->Register("ColliderRadius", colliderSize_);
-	debugParame_->Register("MaxTime", maxTime_);
 	debugParame_->Apply();
 
 	// 当たり判定

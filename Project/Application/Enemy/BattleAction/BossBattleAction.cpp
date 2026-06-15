@@ -170,7 +170,7 @@ void BossWaitAction::Initialize() {
 }
 
 void BossWaitAction::Update() {
-	timer_ += FpsCounter::deltaTime / maxTIme_;
+	timer_ += FpsCounter::deltaTime / maxTime_;
 
 	if (timer_ >= 1.0f) {
 		isFinished_ = true;
@@ -179,6 +179,13 @@ void BossWaitAction::Update() {
 
 void BossWaitAction::Finalize() {
 
+}
+
+void BossWaitAction::RegisterParameter(GameEngine::DebugParameter* param) {
+	std::string subGroup = "Wait";
+	int index = 0;
+
+	param->Register("MaxTime", maxTime_, index++, subGroup);
 }
 
 //===============================================================
@@ -397,6 +404,16 @@ void RotateMoveAction::Finalize() {
 
 }
 
+void RotateMoveAction::RegisterParameter(GameEngine::DebugParameter* param) {
+	std::string subGroup = "RotateMove";
+	int index = 0;
+
+	param->Register("DefaultPosY", defaultPosY_, index++, subGroup);
+	param->Register("OffsetStageRadius", offsetStageRadius_, index++, subGroup);
+	param->Register("MaxTime", maxTime_, index++, subGroup);
+	param->Register("MaxMoveHeight", maxMoveHeight_, index++, subGroup);
+}
+
 //==========================================================================
 // 氷柱攻撃
 //==========================================================================
@@ -411,6 +428,12 @@ void IceFallAttackAction::Initialize() {
 
 	// 叫びモージョンに以降
 	commonData_.animator->StartAnimation(BossAnimationType::kScream, "Scream", maxTime_, false);
+
+	// 半径を求める
+	float radius = commonData_.stageRadius * rangeRadiusRatio_;
+
+	// 氷柱攻撃
+	commonData_.rangedAttackManager->StartIceFall(radius, minDistance_, iceFallNum_, iceFallMaxNum_, maxIter_);
 }
 
 void IceFallAttackAction::Update() {
@@ -424,6 +447,18 @@ void IceFallAttackAction::Update() {
 
 void IceFallAttackAction::Finalize() {
 
+}
+
+void IceFallAttackAction::RegisterParameter(GameEngine::DebugParameter* param) {
+	std::string subGroup = "IceFallAttack";
+	int index = 0;
+
+	param->Register("MaxTime", maxTime_, index++, subGroup);
+	param->Register("RangeRadiusRatio", rangeRadiusRatio_, index++, subGroup);
+	param->Register("MinDistance", minDistance_, index++, subGroup);
+	param->Register("IceFallNum", iceFallNum_, index++, subGroup);
+	param->Register("IceFallMaxNum", iceFallMaxNum_, index++, subGroup);
+	param->Register("MaxIter", maxIter_, index++, subGroup);
 }
 
 //==========================================================================
@@ -469,6 +504,9 @@ void WindAttackAction::Update() {
 			timer_ = 0.0f;
 
 			commonData_.animator->StartAnimation(BossAnimationType::kBreath, "IceBreath_Main", mainMaxTime_, false);
+
+			// 風攻撃を開始
+			commonData_.rangedAttackManager->StartWind(commonData_.transform.translate, startRotDir_, endRotDir_, mainMaxTime_);
 		}
 		break;
 	}
@@ -590,6 +628,14 @@ void ResetAction::Update() {
 
 void ResetAction::Finalize() {
 
+}
+
+void ResetAction::RegisterParameter(GameEngine::DebugParameter* param) {
+	std::string subGroup = "ResetAction";
+	int index = 0;
+
+	param->Register("MoveSpeed", moveSpeed_, index++, subGroup);
+	param->Register("RotateMaxTime", rotateMaxTime_, index++, subGroup);
 }
 
 // ヘルパー関数

@@ -6,8 +6,8 @@
 
 class IceFall : public GameEngine::IGameObject {
 public:
-	IceFall(GameEngine::Model* model, Vector3 pos);
-	~IceFall() = default;
+	IceFall(GameEngine::Model* model, Vector3 pos, int32_t& iceFallCurrentNum);
+	~IceFall();
 
 	// 初期化
 	void Initialize() override;
@@ -24,6 +24,9 @@ private:
 
 	// モデル
 	GameEngine::ModelComponent modelComponent_;
+
+	// 現在の氷柱の数
+	int32_t& iceFallCurrentNum_;
 
 	// 現在のhp
 	int32_t currentHp_ = 1;

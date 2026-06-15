@@ -22,12 +22,12 @@ public:
 	/// <summary>
 	/// 氷柱攻撃
 	/// </summary>
-	/// <param name="basePos">基準点</param>
 	/// <param name="rangeRadius">生成範囲</param>
-	/// <param name="minDistance">離れる範囲</param>
-	/// <param name="targetCount">出す数</param>
-	/// <param name="maxIter">最大試行回数</param>
-	void StartIceFall(float rangeRadius, float minDistance, int targetCount, int maxIter);
+	/// <param name="minDistance">最小の離れる距離</param>
+	/// <param name="iceFallNum">生成する数</param>
+	/// <param name="iceFallMaxNum">最大の数</param>
+	/// <param name="maxIter">試行回数</param>
+	void StartIceFall(float rangeRadius, float minDistance, int iceFallNum, int iceFallMaxNum, int maxIter);
 
 	/// <summary>
 	/// 風攻撃
@@ -35,10 +35,13 @@ public:
 	/// <param name="pos">位置</param>
 	/// <param name="startDir">最初の方向</param>
 	/// <param name="endDir">最後の方向</param>
-	void StartWind(Vector3 pos, Vector3 startDir, Vector3 endDir);
+	void StartWind(Vector3 pos, Vector3 startDir, Vector3 endDir, float maxTime);
 
 private:
 	GameEngine::GameObjectManager* objectManager_ = nullptr;
 
 	GameEngine::Model* iceFallModel_ = nullptr;
+
+	// 氷柱の現在の数
+	int32_t currentIceFallNum_ = 0;
 };
