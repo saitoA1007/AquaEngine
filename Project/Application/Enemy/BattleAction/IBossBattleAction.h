@@ -1,4 +1,5 @@
 #pragma once
+#include <optional>
 #include "Vector3.h"
 #include "Matrix4x4.h"
 #include "Transform.h"
@@ -7,13 +8,11 @@ namespace GameEngine {
     // 前方宣言
     class DebugParameter;
 }
-
+class BossRangedAttackManager;
 class BossAnimator;
 
 // ボスの戦い中の状態
 enum class BossBattleState {
-    kNormal, // 状態の切り替えを管理
-
     kRushAttack,    // 突進攻撃
     kWindAttack,    // 風の発射
     kIceFallAttack, // 氷柱を落とす攻撃
@@ -21,6 +20,8 @@ enum class BossBattleState {
     kWait,          // その場で留まる。攻撃と攻撃の小休憩
     kRotateMove,    // 回転して回る動き
     kCrossMove,     // 横断する動き
+
+    kResetMove,     // 位置をリセットする時に使用
 
     kInMove,        // 最初の時に取る行動
 
@@ -31,26 +32,22 @@ enum class BossBattleState {
 struct BossBattleStateCommonData {
     Transform transform = { {2,2,2},{0,0,0},{0,0,0} };
 
-    // 速度
-    Vector3 velocity = { 0.0f,0.0f,0.0f };
-    // 現在向いている方向
-    Vector3 currentDir = { 0.0f,0.0f,1.0f };
-    // 最終的に向く方向
-    Vector3 targetDir = { 0.0f, 0.0f, 1.0f };
-    // 現在の方向
-    float currentYaw = 0.0f;
-
     // プレイヤーの位置
     const Vector3* playerPos;
 
     // ステージの半径
-    float stageRadius = 10.0f;
+    float stageRadius = 20.0f;
 
     // 状態
-    BossBattleState state = BossBattleState::kNormal;
+    BossBattleState state = BossBattleState::kWait;
+    // 状態遷移のリクエスト
+    std::optional<BossBattleState> requestState = std::nullopt;
 
     // アニメーション
     BossAnimator* animator = nullptr;
+
+    // 遠距離攻撃管理
+    BossRangedAttackManager* rangedAttackManager = nullptr;
 };
 
 /// <summary>

@@ -5,9 +5,15 @@
 
 #include "IBossState.h"
 
+// 前方宣言
+namespace GameEngine {
+	class GameObjectManager;
+}
+class BossRangedAttackManager;
+
 class BossEnemy : public GameEngine::IGameObject {
 public:
-	BossEnemy(GameEngine::Model* model, GameEngine::WorldTransform& playerWorld, GameEngine::AnimationManager* animationManager);
+	BossEnemy(GameEngine::Model* model, GameEngine::WorldTransform& playerWorld, GameEngine::AnimationManager* animationManager, BossRangedAttackManager* rangedAttackManager);
 	~BossEnemy() = default;
 
 	// 初期化処理

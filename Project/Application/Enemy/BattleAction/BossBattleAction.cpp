@@ -6,6 +6,8 @@
 #include "EasingManager.h"
 #include "RandomGenerator.h"
 #include "Application/Enemy/BossAnimator.h"
+#include "DebugParameter.h"
+#include "Application/Enemy/BossRangedAttackManager.h"
 using namespace GameEngine;
 
 //=============================================================
@@ -148,6 +150,7 @@ void BossRushAttackAction::RushAttack() {
 
 	if (timer_ >= 1.0f) {
 		isFinished_ = true;
+		commonData_.requestState = BossBattleState::kResetMove;
 	}
 }
 
@@ -167,7 +170,7 @@ void BossWaitAction::Initialize() {
 }
 
 void BossWaitAction::Update() {
-	timer_ += FpsCounter::deltaTime / maxTIme_;
+	timer_ += FpsCounter::deltaTime / maxTime_;
 
 	if (timer_ >= 1.0f) {
 		isFinished_ = true;
@@ -176,6 +179,13 @@ void BossWaitAction::Update() {
 
 void BossWaitAction::Finalize() {
 
+}
+
+void BossWaitAction::RegisterParameter(GameEngine::DebugParameter* param) {
+	std::string subGroup = "Wait";
+	int index = 0;
+
+	param->Register("MaxTime", maxTime_, index++, subGroup);
 }
 
 //===============================================================
@@ -265,6 +275,17 @@ void BossCrossMoveAction::Update() {
 
 void BossCrossMoveAction::Finalize() {
 
+}
+
+void BossCrossMoveAction::RegisterParameter(GameEngine::DebugParameter* param) {
+	std::string subGroup = "CrossMove";
+	int index = 0;
+
+	param->Register("CrossEndRatio", crossEndRatio_, index++, subGroup);
+	param->Register("DefaultPosY", defaultPosY_, index++, subGroup);
+	param->Register("MaxMoveHeight", maxMoveHeight_, index++, subGroup);
+	param->Register("UpDownCount", upDownCount_, index++, subGroup);
+	param->Register("MaxTime", maxTime_, index++, subGroup);
 }
 
 //===============================================================
@@ -361,7 +382,7 @@ void RotateMoveAction::Update() {
 	} else if (timer_ <= 0.8f) {
 		// 回転
 		Vector3 prePos = GetXZFromAngle(preAngle, radius, defaultPosY_);
-		Vector3 dir = commonData_.transform.translate - prePos;
+		dir = commonData_.transform.translate - prePos;
 		dir.Normalize();
 		commonData_.transform.rotate.y = std::atan2f(dir.x, dir.z);
 		// 保存
@@ -383,6 +404,16 @@ void RotateMoveAction::Finalize() {
 
 }
 
+void RotateMoveAction::RegisterParameter(GameEngine::DebugParameter* param) {
+	std::string subGroup = "RotateMove";
+	int index = 0;
+
+	param->Register("DefaultPosY", defaultPosY_, index++, subGroup);
+	param->Register("OffsetStageRadius", offsetStageRadius_, index++, subGroup);
+	param->Register("MaxTime", maxTime_, index++, subGroup);
+	param->Register("MaxMoveHeight", maxMoveHeight_, index++, subGroup);
+}
+
 //==========================================================================
 // 氷柱攻撃
 //==========================================================================
@@ -397,6 +428,12 @@ void IceFallAttackAction::Initialize() {
 
 	// 叫びモージョンに以降
 	commonData_.animator->StartAnimation(BossAnimationType::kScream, "Scream", maxTime_, false);
+
+	// 半径を求める
+	float radius = commonData_.stageRadius * rangeRadiusRatio_;
+
+	// 氷柱攻撃
+	commonData_.rangedAttackManager->StartIceFall(radius, minDistance_, iceFallNum_, iceFallMaxNum_, maxIter_);
 }
 
 void IceFallAttackAction::Update() {
@@ -410,6 +447,18 @@ void IceFallAttackAction::Update() {
 
 void IceFallAttackAction::Finalize() {
 
+}
+
+void IceFallAttackAction::RegisterParameter(GameEngine::DebugParameter* param) {
+	std::string subGroup = "IceFallAttack";
+	int index = 0;
+
+	param->Register("MaxTime", maxTime_, index++, subGroup);
+	param->Register("RangeRadiusRatio", rangeRadiusRatio_, index++, subGroup);
+	param->Register("MinDistance", minDistance_, index++, subGroup);
+	param->Register("IceFallNum", iceFallNum_, index++, subGroup);
+	param->Register("IceFallMaxNum", iceFallMaxNum_, index++, subGroup);
+	param->Register("MaxIter", maxIter_, index++, subGroup);
 }
 
 //==========================================================================
@@ -455,6 +504,9 @@ void WindAttackAction::Update() {
 			timer_ = 0.0f;
 
 			commonData_.animator->StartAnimation(BossAnimationType::kBreath, "IceBreath_Main", mainMaxTime_, false);
+
+			// 風攻撃を開始
+			commonData_.rangedAttackManager->StartWind(commonData_.transform.translate, startRotDir_, endRotDir_, mainMaxTime_);
 		}
 		break;
 	}
@@ -494,6 +546,143 @@ void WindAttackAction::Update() {
 
 void WindAttackAction::Finalize() {
 
+}
+
+void WindAttackAction::RegisterParameter(GameEngine::DebugParameter* param) {
+	std::string subGroup = "WindAttack";
+	int index = 0;
+	
+	param->Register("InMaxTime", inMaxTime_, index++, subGroup);
+	param->Register("MainMaxTime", mainMaxTime_, index++, subGroup);
+	param->Register("OutMaxTime", outMaxTime_, index++, subGroup);
+}
+
+//================================================================================
+// 位置と方向をリセット
+//================================================================================
+
+ResetAction::ResetAction(BossBattleStateCommonData& commonData) : IBossBattleAction(commonData) {
+
+}
+
+void ResetAction::Initialize() {
+	isFinished_ = false;
+	timer_ = 0.0f;
+	state_ = State::kIn;
+
+	// 最初の位置を求める
+	startPos_ = commonData_.transform.translate;
+
+	// ステージの中心からのベクトルを求める
+	Vector3 dir = commonData_.transform.translate;
+	if (commonData_.transform.translate.x == 0.0f && commonData_.transform.translate.z == 0.0f) {
+		dir = { 0.0f,0.0f,1.0f };
+	}
+
+	// 移動時間を求める
+	moveMaxTime_ = dir.Length() / moveSpeed_;
+
+	// ベクトルを正規化
+	dir.y = 0.0f;
+	dir.Normalize();
+
+	// 最後の位置を求める
+	endPos_ = dir * commonData_.stageRadius;
+
+	// 現在の向いている方向を求める
+	inStartRotDir_ = Math::YawToDirection(commonData_.transform.rotate.y);
+
+	// 進む方向を求める
+	inEndRotDir_ = endPos_ - startPos_;
+	inEndRotDir_.y = 0.0;
+	inEndRotDir_.Normalize();
+
+	// 回転する時価を求める
+	float angle = Math::AngleBetweenRadians(inStartRotDir_, inEndRotDir_);
+	if (angle > 0.0001f) {
+		inRotateMaxTime_ = angle / rotateSpeed_;
+	} else {
+		inRotateMaxTime_ = 0.0001f;
+	}
+
+	// 最後
+	outStartRotDir_ = inEndRotDir_;
+	outEndRotDir_ = endPos_ * -1.0f;
+	outEndRotDir_.y = 0.0f;
+	outEndRotDir_.Normalize();
+
+	// 回転する時価を求める
+	angle = Math::AngleBetweenRadians(outStartRotDir_, outEndRotDir_);
+	if (angle > 0.0001f) {
+		outRotateMaxTime_ = angle / rotateSpeed_;
+	} else {
+		outRotateMaxTime_ = 0.0001f;
+	}
+
+	commonData_.animator->StartAnimation(BossAnimationType::kMove, "基本移動");
+}
+
+void ResetAction::Update() {
+
+	switch (state_)
+	{
+	case ResetAction::State::kIn: {
+		timer_ += FpsCounter::deltaTime / inRotateMaxTime_;
+
+		// 回転
+		Vector3 dir = Slerp(inStartRotDir_, inEndRotDir_, timer_);
+		// Y軸周りの角度
+		commonData_.transform.rotate.y = std::atan2f(dir.x, dir.z);
+
+		if (timer_ >= 1.0f) {
+			commonData_.transform.rotate.y = std::atan2f(inEndRotDir_.x, inEndRotDir_.z);
+			timer_ = 0.0f;
+			state_ = State::kMain;
+		}
+		break;
+	}
+
+	case ResetAction::State::kMain: {
+		timer_ += FpsCounter::deltaTime / moveMaxTime_;
+
+		// 移動
+		commonData_.transform.translate = Lerp(startPos_, endPos_, EaseInOut(timer_));
+
+		if (timer_ >= 1.0f) {
+			state_ = State::kOut;
+			commonData_.transform.translate = endPos_;
+		}
+		break;
+	}
+
+	case ResetAction::State::kOut: {
+		timer_ += FpsCounter::deltaTime / outRotateMaxTime_;
+
+		// 回転
+		Vector3 dir = Slerp(outStartRotDir_, outEndRotDir_, timer_);
+		// Y軸周りの角度
+		commonData_.transform.rotate.y = std::atan2f(dir.x, dir.z);
+
+		if (timer_ >= 1.0f) {
+			commonData_.transform.translate = endPos_;
+			isFinished_ = true;
+		}
+		break;
+	}
+	}
+
+}
+
+void ResetAction::Finalize() {
+
+}
+
+void ResetAction::RegisterParameter(GameEngine::DebugParameter* param) {
+	std::string subGroup = "ResetAction";
+	int index = 0;
+
+	param->Register("MoveSpeed", moveSpeed_, index++, subGroup);
+	param->Register("RotateSpeed", rotateSpeed_, index++, subGroup);
 }
 
 // ヘルパー関数

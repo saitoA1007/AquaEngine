@@ -46,6 +46,9 @@ namespace GameEngine {
 		// 方向からオイラー回転を求める
 		Vector3 DirectionToEuler(const Vector3& direction);
 
+		// 2つのベクトルからなす角を求める
+		float AngleBetweenRadians(Vector3 v1, Vector3 v2);
+
 		// ベクトルの長さを求める
 		float Length(const Vector3& v);
 		float Length(const Vector2& v);

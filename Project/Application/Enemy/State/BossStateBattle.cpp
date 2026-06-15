@@ -5,12 +5,14 @@
 
 using namespace GameEngine;
 
-BossStateBattle::BossStateBattle(BossStateCommonData& commonData, Vector3* playerPos) : stateCommonData_(commonData) {
+BossStateBattle::BossStateBattle(BossStateCommonData& commonData, Vector3* playerPos, BossRangedAttackManager* rangedAttackManager) :
+	stateCommonData_(commonData) {
 
 	// プレイヤーの位置を取得
 	battleStateCommonData_.playerPos = playerPos;
 	// アニメーション管理機能を取得
 	battleStateCommonData_.animator = commonData.animator;
+	battleStateCommonData_.rangedAttackManager = rangedAttackManager;
 
 	// 各行動を登録する
 	battleStatesTable_[BossBattleState::kRushAttack] = std::make_unique<BossRushAttackAction>(battleStateCommonData_);
@@ -19,9 +21,10 @@ BossStateBattle::BossStateBattle(BossStateCommonData& commonData, Vector3* playe
 	battleStatesTable_[BossBattleState::kCrossMove] = std::make_unique<BossCrossMoveAction>(battleStateCommonData_);
 	battleStatesTable_[BossBattleState::kIceFallAttack] = std::make_unique<IceFallAttackAction>(battleStateCommonData_);
 	battleStatesTable_[BossBattleState::kWindAttack] = std::make_unique<WindAttackAction>(battleStateCommonData_);
+	battleStatesTable_[BossBattleState::kResetMove] = std::make_unique<ResetAction>(battleStateCommonData_);
 
 	// 初期化
-	currentBattleState_ = BossBattleState::kWait;
+	currentBattleState_ = BossBattleState::kResetMove;
 	battleStatesTable_[currentBattleState_]->Initialize();
 
 	// 行動に重み付け
@@ -50,7 +53,7 @@ BossStateBattle::BossStateBattle(BossStateCommonData& commonData, Vector3* playe
 }
 
 void BossStateBattle::Enter() {
-	currentBattleState_ = BossBattleState::kWait;
+	currentBattleState_ = BossBattleState::kResetMove;
 	battleStatesTable_[currentBattleState_]->Initialize();
 }
 
@@ -59,8 +62,16 @@ void BossStateBattle::Update() {
 	if (battleStatesTable_[currentBattleState_]->IsFinished()) {
 		// 終了処理をおこなう
 		battleStatesTable_[currentBattleState_]->Finalize();
-		// 次の行動を取得する
-		currentBattleState_ = SelectWeightedBattleState();
+		// 状態を遷移
+		if (battleStateCommonData_.requestState.has_value()) {
+			// リクエストがあればその状態に遷移
+			currentBattleState_ = battleStateCommonData_.requestState.value();
+			battleStateCommonData_.requestState = std::nullopt;
+		} else {
+			// 次の行動を取得する
+			currentBattleState_ = SelectWeightedBattleState();
+		}
+		
 		Log("BossEnemy change battleState");
 		// 初期化する
 		battleStatesTable_[currentBattleState_]->Initialize();

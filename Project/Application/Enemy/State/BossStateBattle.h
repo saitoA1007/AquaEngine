@@ -3,6 +3,11 @@
 #include "Application/Enemy/IBossState.h"
 #include "Application/Enemy/BattleAction/IBossBattleAction.h"
 
+// 前方宣言
+namespace GameEngine {
+	class GameObjectManager;
+}
+
 class BossStateBattle : public IBossState {
 public:
 	// 行動に重みを付ける
@@ -12,7 +17,7 @@ public:
 	};
 
 public:
-	BossStateBattle(BossStateCommonData& commonData,Vector3* playerPos);
+	BossStateBattle(BossStateCommonData& commonData, Vector3* playerPos, BossRangedAttackManager* rangedAttackManager);
 	~BossStateBattle() = default;
 
 	/// <summary>

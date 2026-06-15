@@ -2,6 +2,7 @@
 #include "Application/Enemy/IBossState.h"
 
 class BossStateIn : public IBossState {
+
 public:
 	BossStateIn(BossStateCommonData& commonData);
 	~BossStateIn() = default;
@@ -24,6 +25,6 @@ public:
 private:
 	BossStateCommonData& stateCommonData_;
 
-
+	
 
 };
