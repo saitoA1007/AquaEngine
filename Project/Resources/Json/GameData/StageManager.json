@@ -14,7 +14,7 @@
             "MaxHp": 3,
             "OffsetWallWidth": -5.0,
             "RespawnTime": 3.0,
-            "WallHeight": 5.0,
+            "WallHeight": 3.0,
             "wallDepth": 0.5
         }
     }

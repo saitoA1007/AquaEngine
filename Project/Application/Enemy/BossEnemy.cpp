@@ -60,6 +60,8 @@ BossEnemy::BossEnemy(GameEngine::Model* model, GameEngine::WorldTransform& playe
 	collider_.SetOnCollisionCallback([this](const CollisionResult& result) {
 		this->OnCollisionStay(result);
 	});
+
+	debugParame_->Apply();
 }
 
 void BossEnemy::Initialize() {

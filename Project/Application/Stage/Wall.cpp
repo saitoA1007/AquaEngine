@@ -5,6 +5,8 @@ using namespace GameEngine;
 
 Wall::Wall(GameEngine::Model* model, float& respawnTime, int32_t& maxHp) : respawnTime_(respawnTime), maxHp_(maxHp), modelComponent_(model) {
 	
+	modelComponent_.materialData_->color.w = 0.8f;
+
 	// 当たり判定
 	collider_.SetWorldPosition(modelComponent_.worldTransform_.transform_.translate);
 	collider_.SetSize(modelComponent_.worldTransform_.transform_.scale);

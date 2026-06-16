@@ -60,6 +60,8 @@ void CameraController::Update() {
 
 		// プレイヤーから敵への水平方向のベクトルを計算
 		Vector3 dir = enemyPos - playerPos;
+		float heightDiff = dir.y;
+		dir.y = 0.0f;
 
 		// 水平距離を計測
 		float dist = dir.Length();
@@ -89,7 +91,7 @@ void CameraController::Update() {
 		idealPosition.x = idealTarget.x - std::sinf(rotateMove_.x) * currentDistance;
 		idealPosition.z = idealTarget.z - std::cosf(rotateMove_.x) * currentDistance;
 		// カメラの高さを調整。距離が離れる程見下ろすような視点にする。
-		idealPosition.y = idealTarget.y + lockOnTargetOffsetY_ + dist * 0.1f;
+		idealPosition.y = playerPos.y + lockOnTargetOffsetY_ + (dist * 0.1f) + (heightDiff * 1.0f);
 	} else {
 		idealTarget = targetWorld_->GetWorldPosition();
 		idealTarget.y = offsetY_;

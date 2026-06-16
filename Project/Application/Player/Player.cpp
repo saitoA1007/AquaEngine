@@ -26,6 +26,7 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model,
 	playerAttackDownAction_.RegisterParameter(debugParame_.get());
 	playerPhysics_.RegisterParameter(debugParame_.get());
 	playerStatus_.RegisterParameter(debugParame_.get());
+	debugParame_->Apply();
 
 	// 当たり判定の設定
 	collider_.SetRadius(1.0f);

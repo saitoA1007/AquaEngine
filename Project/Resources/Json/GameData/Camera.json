@@ -2,6 +2,7 @@
     "Camera": {
         "Follow": {
             "Distance": 38.0,
+            "Fov": 0.44999998807907104,
             "OffsetY": 1.0,
             "RotateDamping": 0.8799999952316284,
             "RotateSpeed": 2.0,
@@ -10,8 +11,8 @@
         "LockOn": {
             "LockOnPlayerOffsetY": 1.0,
             "LockOnRotateRate": 0.05999999865889549,
-            "LockOnTargetOffsetY": 6.0,
-            "MinLockOnDistance": 20.0
+            "LockOnTargetOffsetY": 13.399999618530273,
+            "MinLockOnDistance": 29.940000534057617
         },
         "PositionLerpRate": 0.07999999821186066,
         "SceneName": "Game",
