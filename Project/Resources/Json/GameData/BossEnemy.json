@@ -42,12 +42,12 @@
         ],
         "SceneName": "Game",
         "StatusWeight": {
-            "CrossMove": 0,
-            "IceFallAttack": 0,
-            "RotateMove": 64,
-            "RushAttack": 0,
-            "Wait": 0,
-            "WindAttack": 0
+            "CrossMove": 10,
+            "IceFallAttack": 10,
+            "RotateMove": 10,
+            "RushAttack": 20,
+            "Wait": 5,
+            "WindAttack": 20
         },
         "Wait": {
             "MaxTime": 1.0

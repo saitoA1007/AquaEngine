@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include "CameraController.h"
 #include "MyMath.h"
 #include "FPSCounter.h"
@@ -21,10 +22,16 @@ CameraController::CameraController(GameEngine::InputCommand* inputCommand, const
 	debugParame_->Register("RotateY", kFollowRotateY_, 0, "Follow");
 	debugParame_->Register("Fov", kFollowFov_, 0, "Follow");
 
-	debugParame_->Register("LockOnRotateRate", lockOnRotateRate_, 0, "LockOn");
-	debugParame_->Register("MinLockOnDistance", kMinLockOnDistance_, 0, "LockOn");
-	debugParame_->Register("LockOnPlayerOffsetY", lockOnPlayerOffsetY_, 0, "LockOn");
-	debugParame_->Register("LockOnTargetOffsetY", lockOnTargetOffsetY_, 0, "LockOn");
+	int i = 0;
+	debugParame_->Register("LockOnRotateRate", lockOnRotateRate_, i++, "LockOn");
+	debugParame_->Register("MinLockOnDistance", kMinLockOnDistance_, i++, "LockOn");
+	debugParame_->Register("LockOnPlayerOffsetY", lockOnPlayerOffsetY_, i++, "LockOn");
+	debugParame_->Register("LockOnTargetOffsetY", lockOnTargetOffsetY_, i++, "LockOn");
+	debugParame_->Register("LockOnNearFov", kLockOnNearFov_, i++, "LockOn");
+	debugParame_->Register("LockOnFarFov", kLockOnFarFov_, i++, "LockOn");
+	debugParame_->Register("LockOnFovMinDist", kLockOnFovMinDist_, i++, "LockOn");
+	debugParame_->Register("LockOnFovMaxDist", kLockOnFovMaxDist_, i++, "LockOn");
+	debugParame_->Register("FovLerpRate", kFovLerpRate_, i++, "LockOn");
 	debugParame_->Apply();
 }
 
@@ -72,6 +79,12 @@ void CameraController::Update() {
 			// 完全に重なっている場合
 			dir = { 0.0f, 0.0f, 1.0f };
 		}
+
+		float t = (dist - kLockOnFovMinDist_) / (kLockOnFovMaxDist_ - kLockOnFovMinDist_);
+		// 0.0f 未満や 1.0f を超えないようにクランプ (std::clamp が無ければ std::max/min 等で)
+		t = std::max(0.0f, std::min(1.0f, t));
+		// t=0(近い)のとき kLockOnNearFov_、t=1(遠い)のとき kLockOnFarFov_ になるように補間
+		targetFov_ = kLockOnNearFov_ + (kLockOnFarFov_ - kLockOnNearFov_) * t;
 
 		// 距離に応じてカメラの引き具合を動的に設定
 		float currentDistance = kMinLockOnDistance_ + dist * 0.6f;
@@ -129,6 +142,12 @@ void CameraController::Update() {
 	float actualPositionLerp = 1.0f - std::pow(1.0f - kPositionLerpRate_, dt60);
 	currentTarget_ = Lerp(currentTarget_, idealTarget, actualTargetLerp);
 	position_ = Lerp(position_, idealPosition, actualPositionLerp);
+
+	// Fovを補間
+	float actualFovLerp = 1.0f - std::powf(1.0f - kFovLerpRate_, dt60);
+	currentFov_ = currentFov_ + (targetFov_ - currentFov_) * actualFovLerp;
+	// 計算された currentFov_ をカメラのプロジェクション行列に適用
+	camera_->SetProjectionMatrix(currentFov_, 1280.0f, 720.0f, 0.1f, 200.0f);
 
 	// 回転行列に変換
 	Matrix4x4 rotateMatrix_ = LookAt(position_, currentTarget_, { 0.0f,1.0f,0.0f });

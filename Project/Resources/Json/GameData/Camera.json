@@ -9,6 +9,11 @@
             "RotateY": -1.2000000476837158
         },
         "LockOn": {
+            "FovLerpRate": 0.05000000074505806,
+            "LockOnFarFov": 0.44999998807907104,
+            "LockOnFovMaxDist": 30.0,
+            "LockOnFovMinDist": 4.0,
+            "LockOnNearFov": 0.699999988079071,
             "LockOnPlayerOffsetY": 1.0,
             "LockOnRotateRate": 0.05999999865889549,
             "LockOnTargetOffsetY": 13.399999618530273,

@@ -48,6 +48,15 @@ private:
 	float kFollowRotateY_ = -1.2f;
 	float kFollowFov_ = 0.45f;
 
+
+	float kLockOnNearFov_ = 0.75f;    // 敵が至近距離にいるときの広いFOV（広角）
+	float kLockOnFarFov_ = 0.45f;    // 敵が離れているときの通常のFOV
+
+	float kLockOnFovMinDist_ = 5.0f;  // これ以上近づいたらFOVを最大（NearFov）にする距離
+	float kLockOnFovMaxDist_ = 35.0f; // これ以上離れたらFOVを最小（FarFov）にする距離
+
+	float kFovLerpRate_ = 0.1f;
+
 private:
 	GameEngine::InputCommand* inputCommand_ = nullptr;
 	const GameEngine::WorldTransform* targetWorld_ = nullptr;
@@ -70,6 +79,8 @@ private:
 	Vector2 rotateMove_ = { 3.1f,1.0f };
 
 	float currentFov_ = 0.45f;
+
+	float targetFov_ = 0.45f;
 
 private:
 
