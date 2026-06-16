@@ -9,6 +9,10 @@ namespace GameEngine {
 		return start + t * (end - start);
 	}
 
+	Vector2 Lerp(Vector2 start, Vector2 end, float t) {
+		return Vector2(start.x + t * (end.x - start.x), start.y + t * (end.y - start.y));
+	}
+
 	Vector3 Lerp(const Vector3& start, const Vector3& end, const float& t) {
 		return Vector3(start.x + t * (end.x - start.x), start.y + t * (end.y - start.y), start.z + t * (end.z - start.z));
 	}

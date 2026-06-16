@@ -127,7 +127,7 @@ void CameraController::Update() {
 		// 視野を変更
 		if (currentFov_ != kFollowFov_) {
 			currentFov_ = kFollowFov_;
-			camera_->SetProjectionMatrix(currentFov_,1280.0f,720.0f,0.1f,200.0f);
+			camera_->SetProjectionMatrix(currentFov_,1280,720,0.1f,200.0f);
 		}
 
 		// 球面座標系で移動
@@ -145,7 +145,7 @@ void CameraController::Update() {
 	// Fovを補間
 	float actualFovLerp = 1.0f - std::powf(1.0f - kFovLerpRate_, dt60);
 	currentFov_ = currentFov_ + (targetFov_ - currentFov_) * actualFovLerp;
-	camera_->SetProjectionMatrix(currentFov_, 1280.0f, 720.0f, 0.1f, 200.0f);
+	camera_->SetProjectionMatrix(currentFov_, 1280, 720, 0.1f, 200.0f);
 
 	// 回転行列に変換
 	Matrix4x4 rotateMatrix_ = LookAt(position_, currentTarget_, { 0.0f,1.0f,0.0f });
