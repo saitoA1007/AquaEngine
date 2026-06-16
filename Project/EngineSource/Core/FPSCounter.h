@@ -35,6 +35,9 @@ namespace GameEngine {
 		// デルタ時間
 		static float deltaTime;
 
+		// ゲーム用のデルタ時間。ヒットストップなどの加工などをおこなう
+		static float gameDeltaTime;
+
 		// fpsの累積
 		static int frameCount_;
 

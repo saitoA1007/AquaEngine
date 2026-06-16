@@ -80,11 +80,10 @@ void CameraController::Update() {
 			dir = { 0.0f, 0.0f, 1.0f };
 		}
 
+		// Fovの補間
 		float t = (dist - kLockOnFovMinDist_) / (kLockOnFovMaxDist_ - kLockOnFovMinDist_);
-		// 0.0f 未満や 1.0f を超えないようにクランプ (std::clamp が無ければ std::max/min 等で)
-		t = std::max(0.0f, std::min(1.0f, t));
-		// t=0(近い)のとき kLockOnNearFov_、t=1(遠い)のとき kLockOnFarFov_ になるように補間
-		targetFov_ = kLockOnNearFov_ + (kLockOnFarFov_ - kLockOnNearFov_) * t;
+		t = std::clamp(t, 0.0f, 1.0f);
+		targetFov_ = Lerp(kLockOnNearFov_, kLockOnFarFov_, t);
 
 		// 距離に応じてカメラの引き具合を動的に設定
 		float currentDistance = kMinLockOnDistance_ + dist * 0.6f;
@@ -122,7 +121,7 @@ void CameraController::Update() {
 		// 目標の速度へ
 		float currentDamping = std::powf(kRotateDamping_, dt60);
 		rotateVelocityX_ = rotateVelocityX_ * currentDamping + targetRotateSpeed * (1.0f - currentDamping);
-		rotateMove_.x += rotateVelocityX_ * FpsCounter::deltaTime;
+		rotateMove_.x += rotateVelocityX_ * FpsCounter::gameDeltaTime;
 		rotateMove_.y = kFollowRotateY_;
 
 		// 視野を変更
@@ -138,15 +137,14 @@ void CameraController::Update() {
 	}
 
 	// 補間
-	float actualTargetLerp = 1.0f - std::pow(1.0f - kTargetLerpRate_, dt60);
-	float actualPositionLerp = 1.0f - std::pow(1.0f - kPositionLerpRate_, dt60);
+	float actualTargetLerp = 1.0f - std::powf(1.0f - kTargetLerpRate_, dt60);
+	float actualPositionLerp = 1.0f - std::powf(1.0f - kPositionLerpRate_, dt60);
 	currentTarget_ = Lerp(currentTarget_, idealTarget, actualTargetLerp);
 	position_ = Lerp(position_, idealPosition, actualPositionLerp);
 
 	// Fovを補間
 	float actualFovLerp = 1.0f - std::powf(1.0f - kFovLerpRate_, dt60);
 	currentFov_ = currentFov_ + (targetFov_ - currentFov_) * actualFovLerp;
-	// 計算された currentFov_ をカメラのプロジェクション行列に適用
 	camera_->SetProjectionMatrix(currentFov_, 1280.0f, 720.0f, 0.1f, 200.0f);
 
 	// 回転行列に変換

@@ -543,6 +543,7 @@
     <ClCompile Include="Application\Enemy\BossRangedAttackManager.cpp" />
     <ClCompile Include="Application\Enemy\RangedAttack\IceFall.cpp" />
     <ClCompile Include="Application\Enemy\RangedAttack\WindAttack.cpp" />
+    <ClCompile Include="Application\Utils\TimeController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1063,6 +1064,7 @@
     <ClInclude Include="Application\Enemy\BossRangedAttackManager.h" />
     <ClInclude Include="Application\Enemy\RangedAttack\IceFall.h" />
     <ClInclude Include="Application\Enemy\RangedAttack\WindAttack.h" />
+    <ClInclude Include="Application\Utils\TimeController.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />

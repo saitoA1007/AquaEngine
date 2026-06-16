@@ -48,13 +48,17 @@ private:
 	float kFollowRotateY_ = -1.2f;
 	float kFollowFov_ = 0.45f;
 
+	// 敵が近くにいる時のFov
+	float kLockOnNearFov_ = 0.75f;
+	// 敵から離れている時の通常Fov
+	float kLockOnFarFov_ = 0.45f;
 
-	float kLockOnNearFov_ = 0.75f;    // 敵が至近距離にいるときの広いFOV（広角）
-	float kLockOnFarFov_ = 0.45f;    // 敵が離れているときの通常のFOV
+	// Fovが最大になる距離
+	float kLockOnFovMinDist_ = 5.0f;
+	// Fovが最小になる距離
+	float kLockOnFovMaxDist_ = 35.0f;
 
-	float kLockOnFovMinDist_ = 5.0f;  // これ以上近づいたらFOVを最大（NearFov）にする距離
-	float kLockOnFovMaxDist_ = 35.0f; // これ以上離れたらFOVを最小（FarFov）にする距離
-
+	// Fovの補間
 	float kFovLerpRate_ = 0.1f;
 
 private:

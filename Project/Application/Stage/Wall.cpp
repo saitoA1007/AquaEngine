@@ -49,7 +49,7 @@ void Wall::Update() {
 	}
 
 	if (isAlive_) { return; }
-	respawnTimer_ += FpsCounter::deltaTime / respawnTime_;
+	respawnTimer_ += FpsCounter::gameDeltaTime / respawnTime_;
 
 	// リスポーン時間を超えたら、復活する
 	if (respawnTimer_ >= 1.0f) {

@@ -71,7 +71,7 @@ void IceFall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResul
 void IceFall::EnterMove() {
 	if (!isEnterMoveActive_) { return; }
 
-	timer_ += FpsCounter::deltaTime / inMaxTime_;
+	timer_ += FpsCounter::gameDeltaTime / inMaxTime_;
 
 	modelComponent_.worldTransform_.transform_.translate.y = Lerp(startPosY_, endPosY_, EaseInOut(timer_));
 

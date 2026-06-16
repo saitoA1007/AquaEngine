@@ -22,7 +22,7 @@ void PlayerStatus::Initialize(PlayerCommonData* commonData) {
 void PlayerStatus::Update() {
 	if (!isCoolActive_) { return; }
 
-	timer_ += FpsCounter::deltaTime / coolTime_;
+	timer_ += FpsCounter::gameDeltaTime / coolTime_;
 
 	if (timer_ >= 1.0f) {
 		timer_ = 0.0f;
@@ -48,7 +48,7 @@ void PlayerPhysics::Initialize(PlayerCommonData* commonData) {
 
 void PlayerPhysics::Update() {
 	// 重力を適応
-	commonData_->velocity.y += kFallAcceleration_ * FpsCounter::deltaTime;
+	commonData_->velocity.y += kFallAcceleration_ * FpsCounter::gameDeltaTime;
 
 	if (commonData_->state == PlayerState::kJump) {
 		if (commonData_->velocity.y <= 1.0f) {
@@ -113,11 +113,11 @@ void PlayerMoveAction::ProcessInput() {
 	if (desiredVelocityXZ.x == 0.0f && desiredVelocityXZ.z == 0.0f) {
 		// 減速
 		const float deceleration = isJump ? kAirDeceleration_ : kGroundDeceleration_;
-		deltaSpeed = deceleration * FpsCounter::deltaTime;
+		deltaSpeed = deceleration * FpsCounter::gameDeltaTime;
 	} else {
 		// 加速
 		const float acceleration = isJump ? kAirAcceleration_ : kGroundAcceleration_;
-		deltaSpeed = acceleration * FpsCounter::deltaTime;
+		deltaSpeed = acceleration * FpsCounter::gameDeltaTime;
 		target = desiredVelocityXZ;
 	}
 
@@ -242,12 +242,12 @@ void PlayerAttackRushAction::Update() {
 
 	// ため時間計測
 	if (commonData_->state == PlayerState::kCharging) {
-		chargeTimer_ += FpsCounter::deltaTime / kRushChargeMaxTime_;
+		chargeTimer_ += FpsCounter::gameDeltaTime / kRushChargeMaxTime_;
 	}
 
 	// 突進
 	if (commonData_->state == PlayerState::kAttackRush) {
-		rushTimer_ += FpsCounter::deltaTime / kRushMaxTime_;
+		rushTimer_ += FpsCounter::gameDeltaTime / kRushMaxTime_;
 
 		if (rushTimer_ >= 1.0f) {
 			Log("Player end attackRush");
@@ -258,7 +258,7 @@ void PlayerAttackRushAction::Update() {
 
 	// 突進硬直のクールタイム
 	if (commonData_->state == PlayerState::kStiffness) {
-		coolTime_ += FpsCounter::deltaTime / kRushCooldownTime_;
+		coolTime_ += FpsCounter::gameDeltaTime / kRushCooldownTime_;
 
 		if (coolTime_ >= 1.0f) {
 			commonData_->state = PlayerState::kNone;
@@ -411,9 +411,9 @@ void PlayerAttackDownAction::Update() {
 
 		if (isAttackDownPrepping_) {
 
-			attackDownPrepareTimer_ += FpsCounter::deltaTime / kAttackPreDownTime_;
+			attackDownPrepareTimer_ += FpsCounter::gameDeltaTime / kAttackPreDownTime_;
 
-			commonData_->velocity.y += kAttackDownPrepareRise_ * FpsCounter::deltaTime;
+			commonData_->velocity.y += kAttackDownPrepareRise_ * FpsCounter::gameDeltaTime;
 
 			if (attackDownPrepareTimer_ >= 1.0f) {
 				isAttackDownPrepping_ = false;
@@ -421,7 +421,7 @@ void PlayerAttackDownAction::Update() {
 
 		} else {
 			// 下への加速度
-			commonData_->velocity.y += kAttackDownAcceleration_ * FpsCounter::deltaTime;
+			commonData_->velocity.y += kAttackDownAcceleration_ * FpsCounter::gameDeltaTime;
 		}
 	}
 }

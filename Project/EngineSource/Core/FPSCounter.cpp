@@ -4,6 +4,7 @@ using namespace GameEngine;
 
 float FpsCounter::maxFrameCount = 1;
 float FpsCounter::deltaTime = 1.0f / 60.0f;
+float FpsCounter::gameDeltaTime = 1.0f / 60.0f;
 int FpsCounter::frameCount_ = 0;
 
 void FpsCounter::Initialize() {
@@ -32,5 +33,6 @@ void FpsCounter::Update() {
 		maxFrameCount = static_cast<float>(maxFrameCount_);
 		// Δ時間を求める
 		deltaTime = 1.0f / static_cast<float>(maxFrameCount_);
+		gameDeltaTime = deltaTime;
 	}
 }
