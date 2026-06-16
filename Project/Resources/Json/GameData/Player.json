@@ -1,10 +1,10 @@
 {
     "Player": {
         "AttackDown": {
-            "AttackDownAcceleration": -70.0,
+            "AttackDownAcceleration": -120.0,
             "AttackDownDistanceToMax": 5.0,
             "AttackDownMaxPower": 10.0,
-            "AttackDownMaxSpeed": 30.0,
+            "AttackDownMaxSpeed": 70.0,
             "AttackDownMinPower": 1.0,
             "AttackDownPrepareRise": 20.0,
             "AttackPreDownTime": 0.30000001192092896

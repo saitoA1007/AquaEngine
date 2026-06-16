@@ -1,7 +1,7 @@
 {
     "BossEnemy": {
         "Collider": {
-            "ColliderOffsetPosY": 2.369999885559082,
+            "ColliderOffsetPosY": 3.950000047683716,
             "ColliderRadius": 4.0
         },
         "CrossMove": {

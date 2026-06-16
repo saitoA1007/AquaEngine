@@ -66,7 +66,7 @@ void CameraController::Update() {
 		idealTarget.y += lockOnPlayerOffsetY_;
 
 		// プレイヤーから敵への水平方向のベクトルを計算
-		Vector3 dir = enemyPos - playerPos;
+		Vector3 dir = playerPos - enemyPos;
 		float heightDiff = dir.y;
 		dir.y = 0.0f;
 
@@ -105,8 +105,8 @@ void CameraController::Update() {
 		// カメラの高さを調整。距離が離れる程見下ろすような視点にする。
 		idealPosition.y = playerPos.y + lockOnTargetOffsetY_ + (dist * 0.1f) + (heightDiff * 1.0f);
 	} else {
-		idealTarget = targetWorld_->GetWorldPosition();
-		idealTarget.y = offsetY_;
+		idealTarget = playerWorld_->GetWorldPosition();
+		idealTarget.y += offsetY_;
 
 		// カメラ操作
 		float targetRotateSpeed = 0.0f;
