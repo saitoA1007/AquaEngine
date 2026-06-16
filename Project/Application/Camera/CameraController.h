@@ -45,6 +45,22 @@ private:
 	// 回転の減衰率
 	float kRotateDamping_ = 0.88f;
 
+	float kFollowRotateY_ = -1.2f;
+	float kFollowFov_ = 0.45f;
+
+	// 敵が近くにいる時のFov
+	float kLockOnNearFov_ = 0.75f;
+	// 敵から離れている時の通常Fov
+	float kLockOnFarFov_ = 0.45f;
+
+	// Fovが最大になる距離
+	float kLockOnFovMinDist_ = 5.0f;
+	// Fovが最小になる距離
+	float kLockOnFovMaxDist_ = 35.0f;
+
+	// Fovの補間
+	float kFovLerpRate_ = 0.1f;
+
 private:
 	GameEngine::InputCommand* inputCommand_ = nullptr;
 	const GameEngine::WorldTransform* targetWorld_ = nullptr;
@@ -65,6 +81,10 @@ private:
 
 	// 回転の移動量
 	Vector2 rotateMove_ = { 3.1f,1.0f };
+
+	float currentFov_ = 0.45f;
+
+	float targetFov_ = 0.45f;
 
 private:
 

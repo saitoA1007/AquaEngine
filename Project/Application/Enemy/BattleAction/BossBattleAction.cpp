@@ -44,7 +44,7 @@ void BossRushAttackAction::Initialize() {
 	endRushPos_ = myDir * commonData_.stageRadius;
 	endRushPos_.y = defaultPosY_;
 
-	commonData_.animator->StartAnimation(BossAnimationType::kRush, "Rush_Prepare", rotateMoveMaxTime_,false);
+	commonData_.animator->StartAnimation(BossAnimationType::kRush, "Rush_End", rushMaxTime_, false);
 }
 
 void BossRushAttackAction::Update() {
@@ -66,8 +66,17 @@ void BossRushAttackAction::Finalize() {
 
 }
 
+void BossRushAttackAction::RegisterParameter(GameEngine::DebugParameter* param) {
+	std::string subGroup = "RushAttack";
+	int index = 0;
+
+	param->Register("RotateMoveMaxTime", rotateMoveMaxTime_, index++, subGroup);
+	param->Register("RushMaxTime", rushMaxTime_, index++, subGroup);
+	param->Register("RushDistanceRatio", rushDistanceRatio_, index++, subGroup);
+}
+
 void BossRushAttackAction::RotateMove() {
-	timer_ += FpsCounter::deltaTime / rotateMoveMaxTime_;
+	timer_ += FpsCounter::gameDeltaTime / rotateMoveMaxTime_;
 
 	// 角度補間
 	float preAngle = angle_;
@@ -128,14 +137,16 @@ void BossRushAttackAction::RotateMove() {
 
 		// 突進する位置を求める
 		float rushDistance = commonData_.stageRadius * 2.0f * std::cosf(diffAngle);
+		rushDistance *= rushDistanceRatio_;
 		endRushPos_ = commonData_.transform.translate + targetDir * rushDistance;
+		endRushPos_.y = 2.0f;
 
-		commonData_.animator->StartAnimation(BossAnimationType::kRush, "Rush_Main", rushMaxTime_, false);
+		commonData_.animator->StartAnimation(BossAnimationType::kRush, "Rush_End", rushMaxTime_, false);
 	}
 }
 
 void BossRushAttackAction::RushAttack() {
-	timer_ += FpsCounter::deltaTime / rushMaxTime_;
+	timer_ += FpsCounter::gameDeltaTime / rushMaxTime_;
 
 	// 移動
 	commonData_.transform.translate = Lerp(startRushPos_, endRushPos_,timer_);
@@ -170,7 +181,7 @@ void BossWaitAction::Initialize() {
 }
 
 void BossWaitAction::Update() {
-	timer_ += FpsCounter::deltaTime / maxTime_;
+	timer_ += FpsCounter::gameDeltaTime / maxTime_;
 
 	if (timer_ >= 1.0f) {
 		isFinished_ = true;
@@ -213,9 +224,8 @@ void BossCrossMoveAction::Initialize() {
 	// 終盤の位置を取得
 	endPos_ = dir * (commonData_.stageRadius * crossEndRatio_);
 
-	// 最初の回転するための角度を求める
-	startCurrentRotDir_ = commonData_.transform.translate;
-	startCurrentRotDir_.y = 0.0f;
+	// 現在の向いている方向を求める
+	startCurrentRotDir_ = Math::YawToDirection(commonData_.transform.rotate.y);
 	startCurrentRotDir_.Normalize();
 	// 最初の内の最後に向く方向
 	endRotDir_ = Math::Normalize(endPos_);
@@ -228,7 +238,7 @@ void BossCrossMoveAction::Initialize() {
 
 void BossCrossMoveAction::Update() {
 
-	timer_ += FpsCounter::deltaTime;
+	timer_ += FpsCounter::gameDeltaTime / maxTime_;
 	timer_ = std::min(timer_, 1.0f);
 
 	// 縦移動
@@ -340,7 +350,7 @@ void RotateMoveAction::Initialize() {
 }
 
 void RotateMoveAction::Update() {
-	timer_ += FpsCounter::deltaTime / maxTime_;
+	timer_ += FpsCounter::gameDeltaTime / maxTime_;
 	timer_ = std::min(timer_, 1.0f);
 
 	// 角度補間
@@ -437,7 +447,7 @@ void IceFallAttackAction::Initialize() {
 }
 
 void IceFallAttackAction::Update() {
-	timer_ += FpsCounter::deltaTime / maxTime_;
+	timer_ += FpsCounter::gameDeltaTime / maxTime_;
 
 
 	if (timer_ >= 1.0f) {
@@ -492,7 +502,7 @@ void WindAttackAction::Update() {
 	switch (state_)
 	{
 	case WindAttackAction::State::kIn: {
-		timer_ += FpsCounter::deltaTime / inMaxTime_;
+		timer_ += FpsCounter::gameDeltaTime / inMaxTime_;
 
 		// 回転
 		Vector3 dir = Slerp(startCurrentRotDir_, startRotDir_, timer_);
@@ -506,13 +516,19 @@ void WindAttackAction::Update() {
 			commonData_.animator->StartAnimation(BossAnimationType::kBreath, "IceBreath_Main", mainMaxTime_, false);
 
 			// 風攻撃を開始
-			commonData_.rangedAttackManager->StartWind(commonData_.transform.translate, startRotDir_, endRotDir_, mainMaxTime_);
+			Vector3 startDir = startRotDir_;
+			startDir.y = windDirY_;
+			startDir.Normalize();
+			Vector3 endDir = endRotDir_;
+			endDir.y = windDirY_;
+			endDir.Normalize();
+			commonData_.rangedAttackManager->StartWind(commonData_.transform.translate, startDir, endDir, mainMaxTime_);
 		}
 		break;
 	}
 
 	case WindAttackAction::State::kMain: {
-		timer_ += FpsCounter::deltaTime / mainMaxTime_;
+		timer_ += FpsCounter::gameDeltaTime / mainMaxTime_;
 
 		// 回転
 		Vector3 dir = Slerp(startRotDir_, endRotDir_, timer_);
@@ -529,7 +545,7 @@ void WindAttackAction::Update() {
 
 
 	case WindAttackAction::State::kOut: {
-		timer_ += FpsCounter::deltaTime / outMaxTime_;
+		timer_ += FpsCounter::gameDeltaTime / outMaxTime_;
 
 		// 回転
 		Vector3 dir = Slerp(endRotDir_, startCurrentRotDir_, timer_);
@@ -555,6 +571,7 @@ void WindAttackAction::RegisterParameter(GameEngine::DebugParameter* param) {
 	param->Register("InMaxTime", inMaxTime_, index++, subGroup);
 	param->Register("MainMaxTime", mainMaxTime_, index++, subGroup);
 	param->Register("OutMaxTime", outMaxTime_, index++, subGroup);
+	param->Register("WindDirY", windDirY_, index++, subGroup);
 }
 
 //================================================================================
@@ -588,6 +605,7 @@ void ResetAction::Initialize() {
 
 	// 最後の位置を求める
 	endPos_ = dir * commonData_.stageRadius;
+	endPos_.y = defaultPosY_;
 
 	// 現在の向いている方向を求める
 	inStartRotDir_ = Math::YawToDirection(commonData_.transform.rotate.y);
@@ -627,7 +645,7 @@ void ResetAction::Update() {
 	switch (state_)
 	{
 	case ResetAction::State::kIn: {
-		timer_ += FpsCounter::deltaTime / inRotateMaxTime_;
+		timer_ += FpsCounter::gameDeltaTime / inRotateMaxTime_;
 
 		// 回転
 		Vector3 dir = Slerp(inStartRotDir_, inEndRotDir_, timer_);
@@ -643,12 +661,13 @@ void ResetAction::Update() {
 	}
 
 	case ResetAction::State::kMain: {
-		timer_ += FpsCounter::deltaTime / moveMaxTime_;
+		timer_ += FpsCounter::gameDeltaTime / moveMaxTime_;
 
 		// 移動
 		commonData_.transform.translate = Lerp(startPos_, endPos_, EaseInOut(timer_));
 
 		if (timer_ >= 1.0f) {
+			timer_ = 0.0f;
 			state_ = State::kOut;
 			commonData_.transform.translate = endPos_;
 		}
@@ -656,7 +675,7 @@ void ResetAction::Update() {
 	}
 
 	case ResetAction::State::kOut: {
-		timer_ += FpsCounter::deltaTime / outRotateMaxTime_;
+		timer_ += FpsCounter::gameDeltaTime / outRotateMaxTime_;
 
 		// 回転
 		Vector3 dir = Slerp(outStartRotDir_, outEndRotDir_, timer_);

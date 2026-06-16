@@ -13,6 +13,7 @@ BossStateBattle::BossStateBattle(BossStateCommonData& commonData, Vector3* playe
 	// アニメーション管理機能を取得
 	battleStateCommonData_.animator = commonData.animator;
 	battleStateCommonData_.rangedAttackManager = rangedAttackManager;
+	battleStateCommonData_.transform = commonData.worldTransform->transform_;
 
 	// 各行動を登録する
 	battleStatesTable_[BossBattleState::kRushAttack] = std::make_unique<BossRushAttackAction>(battleStateCommonData_);
@@ -97,6 +98,7 @@ BossBattleState BossStateBattle::SelectWeightedBattleState() {
 		totalWeight += item.weight;
 	}
 
+	if (totalWeight <= 0) { return result; }
 	uint32_t randomValue = RandomGenerator::Get(int32_t(0), int32_t(totalWeight - 1));
 
 	for (const auto& item : lotteryList_) {

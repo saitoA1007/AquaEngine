@@ -97,8 +97,20 @@ namespace GameEngine {
 			Group& group = ResolveOrCreateGroup(path);
 
 			// すでに登録されていれば優先順位だけ更新
-			if (group.items.find(key) != group.items.end()) {
-				group.items[key].priority = priority;
+			auto it = group.items.find(key);
+			if (it != group.items.end()) {
+				it->second.priority = priority;
+
+				// 正しい型を値を保ちながら変換する
+				if (!std::holds_alternative<T>(it->second.value)) {
+					std::visit([&](const auto& stored) {
+						using S = std::decay_t<decltype(stored)>;
+						if constexpr (std::is_arithmetic_v<S> && std::is_arithmetic_v<T>) {
+							it->second.value = static_cast<T>(stored);
+						}
+						}, it->second.value);
+				}
+
 				return false;
 			}
 

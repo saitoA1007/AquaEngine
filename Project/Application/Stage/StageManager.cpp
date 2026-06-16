@@ -13,6 +13,7 @@ StageManager::StageManager(GameEngine::GameObjectManager* objectManager, GameEng
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>("StageManager");
 	RegisterParameter();
+	debugParame_->Apply();
 	
 	// 壁の生成
 	GenerateWalls();

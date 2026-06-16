@@ -82,6 +82,7 @@ namespace GameEngine {
         ConstantBuffer<ScanLineData> buffer_;
     };
 
+    // グレースケール
     class Grayscale : public IPostEffect {
         struct GrayscaleData {
             uint32_t textureHandle;
@@ -101,6 +102,7 @@ namespace GameEngine {
         ConstantBuffer<GrayscaleData> buffer_;
     };
 
+    // ぼかし
     class GaussianBlur : public IPostEffect {
         struct GaussianBlurData {
             uint32_t textureHandle;
@@ -119,6 +121,27 @@ namespace GameEngine {
 
     private:
         ConstantBuffer<GaussianBlurData> buffer_;
+    };
+
+
+    class OutLine : public IPostEffect {
+        struct OutLineData {
+            uint32_t textureHandle;
+            float diff;
+            float padding[2];
+        };
+
+    public:
+        OutLine();
+
+        void Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) override;
+
+        void SetPassIndex(const uint32_t& index) override {
+            buffer_.GetData()->textureHandle = index;
+        }
+
+    private:
+        ConstantBuffer<OutLineData> buffer_;
     };
 }
 

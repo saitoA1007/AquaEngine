@@ -1,0 +1,26 @@
+{
+    "Camera": {
+        "Follow": {
+            "Distance": 38.0,
+            "Fov": 0.44999998807907104,
+            "OffsetY": 1.0,
+            "RotateDamping": 0.8799999952316284,
+            "RotateSpeed": 2.0,
+            "RotateY": -1.2000000476837158
+        },
+        "LockOn": {
+            "FovLerpRate": 0.05000000074505806,
+            "LockOnFarFov": 0.44999998807907104,
+            "LockOnFovMaxDist": 30.0,
+            "LockOnFovMinDist": 4.0,
+            "LockOnNearFov": 0.699999988079071,
+            "LockOnPlayerOffsetY": 1.0,
+            "LockOnRotateRate": 0.05999999865889549,
+            "LockOnTargetOffsetY": 13.399999618530273,
+            "MinLockOnDistance": 29.940000534057617
+        },
+        "PositionLerpRate": 0.07999999821186066,
+        "SceneName": "Game",
+        "TargetLerpRate": 0.11999999731779099
+    }
+}

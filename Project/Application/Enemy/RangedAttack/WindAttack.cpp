@@ -47,7 +47,7 @@ void WindAttack::Initialize() {
 void WindAttack::Update() {
 	debugParame_->ApplyIfDirty();
 
-	timer_ += FpsCounter::deltaTime / maxTime_;
+	timer_ += FpsCounter::gameDeltaTime / maxTime_;
 
 	// 回転
 	Vector3 dir = Slerp(startDir_, endDir_, timer_);
@@ -67,7 +67,7 @@ void WindAttack::Update() {
 
 void WindAttack::Draw() {
 	// 壁を描画
-	modelComponent_.Draw(renderQueue_);
+	modelComponent_.DrawRaytracing(renderQueue_);
 }
 
 void WindAttack::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {

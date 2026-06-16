@@ -19,6 +19,7 @@ IceFall::IceFall(GameEngine::Model* model, Vector3 pos, int32_t& iceFallCurrentN
 	debugParame_->Register("InMaxTime", inMaxTime_);
 	debugParame_->Register("StartPosY", startPosY_);
 	debugParame_->Register("EndPosY", endPosY_);
+	debugParame_->Register("Scale", modelComponent_.worldTransform_.transform_.scale);
 	debugParame_->Apply();
 
 	// 当たり判定
@@ -60,7 +61,7 @@ void IceFall::Update() {
 
 void IceFall::Draw() {
 	// 壁を描画
-	modelComponent_.Draw(renderQueue_);
+	modelComponent_.DrawRaytracing(renderQueue_);
 }
 
 void IceFall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
@@ -70,7 +71,7 @@ void IceFall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResul
 void IceFall::EnterMove() {
 	if (!isEnterMoveActive_) { return; }
 
-	timer_ += FpsCounter::deltaTime / inMaxTime_;
+	timer_ += FpsCounter::gameDeltaTime / inMaxTime_;
 
 	modelComponent_.worldTransform_.transform_.translate.y = Lerp(startPosY_, endPosY_, EaseInOut(timer_));
 

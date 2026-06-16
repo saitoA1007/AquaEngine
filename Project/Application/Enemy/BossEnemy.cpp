@@ -15,13 +15,17 @@ BossEnemy::BossEnemy(GameEngine::Model* model, GameEngine::WorldTransform& playe
 	model_ = model;
 
 	// 初期化
-	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,5.0f,0.0f} });
+	worldTransform_.Initialize({ {3.0f,3.0f,3.0f},{0.0f,0.0f,0.0f},{0.0f,5.0f,0.0f} });
 
 	// アニメーション
 	animator_ = std::make_unique<BossAnimator>(model_, animationManager);
 
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>("BossEnemy");
+	debugParame_->Register("MaxHp", maxHp_);
+	debugParame_->Register("Scale", worldTransform_.transform_.scale);
+	debugParame_->Register("ColliderRadius", colliderRadius_,0,"Collider");
+	debugParame_->Register("ColliderOffsetPosY", colliderOffsetPosY_, 1,"Collider");
 
 	// 共通データ設定
 	stateCommonData_.worldTransform = &worldTransform_;
@@ -39,8 +43,8 @@ BossEnemy::BossEnemy(GameEngine::Model* model, GameEngine::WorldTransform& playe
 	currentState_->Enter();
 
 	// 当たり判定を設定
-	collider_.SetRadius(1.0f);
-	collider_.SetWorldPosition(worldTransform_.transform_.translate);
+	collider_.SetRadius(colliderRadius_);
+	collider_.SetWorldPosition(worldTransform_.transform_.translate + Vector3(0.0f, colliderOffsetPosY_, 0.0f));
 	collider_.SetCollisionAttribute(kCollisionAttributeEnemy);
 	collider_.SetCollisionMask(~kCollisionAttributeEnemy);
 	// データを登録
@@ -56,6 +60,8 @@ BossEnemy::BossEnemy(GameEngine::Model* model, GameEngine::WorldTransform& playe
 	collider_.SetOnCollisionCallback([this](const CollisionResult& result) {
 		this->OnCollisionStay(result);
 	});
+
+	debugParame_->Apply();
 }
 
 void BossEnemy::Initialize() {
@@ -87,7 +93,8 @@ void BossEnemy::Update() {
 	worldTransform_.UpdateTransformMatrix();
 
 	// 当たり判定の位置を更新
-	collider_.SetWorldPosition(worldTransform_.GetWorldPosition());
+	collider_.SetWorldPosition(worldTransform_.GetWorldPosition() + Vector3(0.0f, colliderOffsetPosY_, 0.0f));
+	collider_.SetRadius(colliderRadius_);
 
 	// アニメーションの更新
 	animator_->Update();

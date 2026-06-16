@@ -27,6 +27,11 @@ namespace GameEngine {
 		// レイトレによる描画
 		void DrawRaytracing(RenderQueue* renderQueue);
 
+		// 参照値を設定
+		void SetRefType(uint32_t type) {
+			refBuffer_.SetType(type);
+		}
+
 	public:
 
 		// モデルが持つワールド行列

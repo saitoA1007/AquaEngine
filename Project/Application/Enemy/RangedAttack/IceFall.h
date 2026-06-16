@@ -44,7 +44,7 @@ private:
 private:
 
 	// 半径
-	float colliderRadius_ = 1.0f;
+	float colliderRadius_ = 2.0f;
 
 	float inMaxTime_ = 1.0f;
 

@@ -12,11 +12,13 @@ Floor::Floor(GameEngine::Model* model) {
 	debugParame_ = std::make_unique<DebugParameter>("Floor");
 	debugParame_->RegisterWorld("world", worldTransform_);
 	debugParame_->Register("ColliderSize", colliderSize_);
+	debugParame_->Register("ColliderAnchor", colliderAnchor_);
 	debugParame_->Apply();
 
 	// 当たり判定
 	collider_.SetWorldPosition(worldTransform_.transform_.translate);
 	collider_.SetSize(colliderSize_);
+	collider_.SetAnchorPoint(colliderAnchor_);
 	collider_.SetCollisionAttribute(kCollisionAttributeTerrain);
 	collider_.SetCollisionMask(~kCollisionAttributeTerrain);
 	// データを登録
@@ -33,6 +35,7 @@ Floor::Floor(GameEngine::Model* model) {
 void Floor::Initialize() {
 	collider_.SetWorldPosition(worldTransform_.transform_.translate);
 	collider_.SetSize(colliderSize_);
+	collider_.SetAnchorPoint(colliderAnchor_);
 	worldTransform_.UpdateTransformMatrix();
 }
 
@@ -43,6 +46,7 @@ void Floor::Update() {
 
 	collider_.SetWorldPosition(worldTransform_.transform_.translate);
 	collider_.SetSize(colliderSize_);
+	collider_.SetAnchorPoint(colliderAnchor_);
 }
 
 void Floor::Draw() {

@@ -123,9 +123,9 @@ namespace GameEngine {
 		// AABBの当たり判定を登録する
 		CollisionData GetCollisionData() const override {
 			CollisionData collisionData;
-			Vector3 pos = worldPosition_;
-			Vector3 halfSize = size_ * 0.5f;
-			collisionData.data = AABB{ pos - halfSize,pos + halfSize };
+			Vector3 min = worldPosition_ - (size_ * anchorPoint_);
+			Vector3 max = min + size_;
+			collisionData.data = AABB{ min, max };
 			collisionData.shapeType = ShapeType::kAABB;
 			return collisionData;
 		}
@@ -134,11 +134,16 @@ namespace GameEngine {
 		const Vector3 GetSize() const { return size_; }
 		void SetSize(const Vector3& size) { size_ = size; }
 
+		// アンカーポイント
+		const Vector3& GetAnchorPoint() const { return anchorPoint_; }
+		void SetAnchorPoint(const Vector3& anchorPoint) { anchorPoint_ = anchorPoint; }
+
 	private:
 		// サイズ
 		Vector3 size_;
+		// アンカーポイント
+		Vector3 anchorPoint_ = {0.5f,0.5f,0.5f};
 	};
-
 
 	/// <summary>
 	/// 線分の当たり判定

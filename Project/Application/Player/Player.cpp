@@ -7,6 +7,7 @@
 #include "FPSCounter.h"
 #include "Model.h"
 #include "Application/CollisionConfig.h"
+#include "Application/Enemy/RangedAttack/IceFall.h"
 using namespace GameEngine;
 
 Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model, GameEngine::AnimationManager* animationManager) {
@@ -25,6 +26,7 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model,
 	playerAttackDownAction_.RegisterParameter(debugParame_.get());
 	playerPhysics_.RegisterParameter(debugParame_.get());
 	playerStatus_.RegisterParameter(debugParame_.get());
+	debugParame_->Apply();
 
 	// 当たり判定の設定
 	collider_.SetRadius(1.0f);
@@ -101,7 +103,7 @@ void Player::Update() {
 	ApplyClamp();
 
 	// 移動を適応
-	worldTransform_.transform_.translate += commonData_.velocity * FpsCounter::deltaTime;
+	worldTransform_.transform_.translate += commonData_.velocity * FpsCounter::gameDeltaTime;
 
 	// 角度を更新
 	UpdateRotation();
@@ -147,7 +149,7 @@ void Player::UpdateRotation() {
 
 		// 最短経路で角度補間をして現在の角度を求める
 		float kRotationLerpSpeed_ = 10.0f;
-		float maxStep = kRotationLerpSpeed_ * FpsCounter::deltaTime;
+		float maxStep = kRotationLerpSpeed_ * FpsCounter::gameDeltaTime;
 		commonData_.currentYaw = Math::LerpShortAngle(commonData_.currentYaw, targetYaw, maxStep);
 
 		// ヨー角をワールドトランスフォームに反映
@@ -170,6 +172,8 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 	bool isWall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kWall));
 	bool isBoss = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kBoss));
 	bool isFloor = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kGround));
+	bool isIceFall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kIceFall));
+	bool isWind = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kWind));
 
 	// 床の衝突
 	if (isFloor) {
@@ -188,17 +192,36 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 			commonData_.animator_->StartAnimation(PlayerAnimationType::kWalk, "歩き");
 			Log("Player End attackDown");
 		}
+
+		if (commonData_.state == PlayerState::kJump) {
+			commonData_.state = PlayerState::kNone;
+			commonData_.animator_->StartAnimation(PlayerAnimationType::kWalk, "歩き");
+		}
 	}
 	
 	// 壁の衝突処理
 	if (isWall) {
-		//Log("Player is hit Wall");
 		bounceAction_.WallBounce(worldTransform_.transform_.translate, result.contactNormal, result.penetrationDepth, attackRushAction_.GetRushMaxSpeed());
 	}
 
+	// 氷柱との衝突
+	if (isIceFall) {
+		IceFall* iceFall = result.userData.As<IceFall>();
+		if (iceFall == nullptr) { return; }
+
+		// 氷柱を削除
+		if (commonData_.state == PlayerState::kAttackRush) {
+			iceFall->Destroy();
+		}
+
+		bounceAction_.WallBounce(worldTransform_.transform_.translate, result.contactNormal * -1.0f, result.penetrationDepth, attackRushAction_.GetRushMaxSpeed());
+	}
+
 	// ボスの衝突判定
-	if (isBoss) {
-		// ダメージを受ける
-		playerStatus_.TakeDamage(1);
+	if (isBoss || isWind) {
+		if (commonData_.state != PlayerState::kAttackDown) {
+			// ダメージを受ける
+			playerStatus_.TakeDamage(1);
+		}
 	}
 }

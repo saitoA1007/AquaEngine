@@ -5,6 +5,8 @@ using namespace GameEngine;
 
 Wall::Wall(GameEngine::Model* model, float& respawnTime, int32_t& maxHp) : respawnTime_(respawnTime), maxHp_(maxHp), modelComponent_(model) {
 	
+	modelComponent_.materialData_->color.w = 0.8f;
+
 	// 当たり判定
 	collider_.SetWorldPosition(modelComponent_.worldTransform_.transform_.translate);
 	collider_.SetSize(modelComponent_.worldTransform_.transform_.scale);
@@ -47,7 +49,7 @@ void Wall::Update() {
 	}
 
 	if (isAlive_) { return; }
-	respawnTimer_ += FpsCounter::deltaTime / respawnTime_;
+	respawnTimer_ += FpsCounter::gameDeltaTime / respawnTime_;
 
 	// リスポーン時間を超えたら、復活する
 	if (respawnTimer_ >= 1.0f) {
@@ -61,7 +63,7 @@ void Wall::Update() {
 
 void Wall::Draw() {
 	// 壁を描画
-	modelComponent_.Draw(renderQueue_);
+	modelComponent_.DrawRaytracing(renderQueue_);
 }
 
 void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {

@@ -40,7 +40,7 @@ GameScene::GameScene() {
 	auto bossEnemy = gameObjectManager_->AddObject<BossEnemy>(enemyModel, player->GetWorldTransform(), animationManager_, bossRangedAttackManager);
 
 	// カメラ操作
-	cameraController_ = gameObjectManager_->AddObject<CameraController>(inputCommand_, &player->GetWorldTransform(), &bossEnemy->GetWorldTransform());
+	cameraController_ = gameObjectManager_->AddObject<CameraController>(inputCommand_, &bossEnemy->GetWorldTransform(), &player->GetWorldTransform());
 	player->SetCamera(cameraController_);
 
 	// ステージ
