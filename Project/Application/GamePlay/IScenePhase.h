@@ -1,6 +1,10 @@
 #pragma once
 #include <optional>
 
+namespace GameEngine {
+    class InputCommand;
+}
+
 // 状態
 enum class ScenePhase {
     kTitle,    // タイトル
@@ -24,6 +28,9 @@ struct PhaseCommonData {
 
     // プレイ時間
     float playTime_ = 0.0f;
+
+    // 入力処理
+    GameEngine::InputCommand* inputCommand = nullptr;
 };
 
 class IScenePhase {

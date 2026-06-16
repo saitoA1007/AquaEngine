@@ -184,6 +184,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Stage\Wall.cpp" />
     <ClCompile Include="Application\UI\HpBarUI.cpp" />
     <ClCompile Include="Application\UI\HpContainer.cpp" />
+    <ClCompile Include="Application\UI\LetterboxUI.cpp" />
     <ClCompile Include="Application\UI\PlayUIManager.cpp" />
     <ClCompile Include="Application\UI\TimeUI.cpp" />
     <ClCompile Include="Application\Utils\TimeController.cpp" />
@@ -423,6 +424,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Stage\Wall.h" />
     <ClInclude Include="Application\UI\HpBarUI.h" />
     <ClInclude Include="Application\UI\HpContainer.h" />
+    <ClInclude Include="Application\UI\LetterboxUI.h" />
     <ClInclude Include="Application\UI\PlayUIManager.h" />
     <ClInclude Include="Application\UI\TimeUI.h" />
     <ClInclude Include="Application\Utils\TimeController.h" />

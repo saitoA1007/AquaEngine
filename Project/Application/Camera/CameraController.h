@@ -24,6 +24,9 @@ public:
 
 	Matrix4x4 GetWorldMatrix() const { return camera_->GetWorldMatrix(); }
 
+	// ロックオン
+	bool IsLockOn() const { return isLockOn_; }
+
 private:
 	// 距離
 	float kDistance_ = 40.0f;

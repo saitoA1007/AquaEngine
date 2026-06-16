@@ -1,7 +1,9 @@
 #include "ScenePhase.h"
+#include"InputCommand.h"
 #include "Application/UI/PlayUIManager.h"
 #include "Application/Player/Player.h"
 #include "Application/Enemy/BossEnemy.h"
+#include "Application/Camera/CameraController.h"
 
 TitlePhase::TitlePhase(PhaseCommonData& commonData) : IScenePhase(commonData) {
 
@@ -23,7 +25,7 @@ void TitlePhase::Exit() {
 // プレイ
 //===========================================
 
-PlayPhase::PlayPhase(PhaseCommonData& commonData, Player* player, BossEnemy* bossEnemy, PlayUIManager* playUIManager) : IScenePhase(commonData) {
+PlayPhase::PlayPhase(PhaseCommonData& commonData, Player* player, BossEnemy* bossEnemy, PlayUIManager* playUIManager, CameraController* cameraController) : IScenePhase(commonData) {
 	// プレイヤー
 	player_ = player;
 	// ボス
@@ -31,6 +33,8 @@ PlayPhase::PlayPhase(PhaseCommonData& commonData, Player* player, BossEnemy* bos
 	// プレイUIを取得
 	playUIManager_ = playUIManager;
 	playUIManager_->SetActive(false);
+	// カメラ管理を取得
+	cameraController_ = cameraController;
 }
 
 void PlayPhase::Enter() {
@@ -38,6 +42,8 @@ void PlayPhase::Enter() {
 	// 計測開始
 	playTimer_.Reset();
 	playTimer_.Start();
+
+	isBarActive_ = false;
 
 	// Hpを設定
 	playUIManager_->SetCurrentBossHp(bossEnemy_->GetCurrentHp());
@@ -51,6 +57,12 @@ void PlayPhase::Update() {
 	// 現在のHpを設定
 	playUIManager_->SetCurrentBossHp(bossEnemy_->GetCurrentHp());
 	playUIManager_->SetCurrentPlayerHp(player_->GetCurrentHp());
+
+	// 黒帯UIを表示
+	if (commonData_.inputCommand->IsCommandActive("CameraLockOn")) {
+		isBarActive_ = !isBarActive_;
+		playUIManager_->SetBarActive(isBarActive_);
+	}
 
 	// 計測
 	playTimer_.Update();

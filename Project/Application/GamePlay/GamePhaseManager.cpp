@@ -3,11 +3,11 @@
 // 各フェーズ
 #include "Phase/ScenePhase.h"
 
-GamePhaseManager::GamePhaseManager(Player* player, BossEnemy* bossEnemy, PlayUIManager* playUIManager) {
-
+GamePhaseManager::GamePhaseManager(GameEngine::InputCommand* inputCommand, Player* player, BossEnemy* bossEnemy, PlayUIManager* playUIManager, CameraController* cameraController) {
+	commonData_.inputCommand = inputCommand;
 
 	phases_[ScenePhase::kTitle] = std::make_unique<TitlePhase>(commonData_);
-	phases_[ScenePhase::kPlay] = std::make_unique<PlayPhase>(commonData_, player,bossEnemy, playUIManager);
+	phases_[ScenePhase::kPlay] = std::make_unique<PlayPhase>(commonData_, player, bossEnemy, playUIManager, cameraController);
 	phases_[ScenePhase::kClear] = std::make_unique<ClearPhase>(commonData_);
 }
 

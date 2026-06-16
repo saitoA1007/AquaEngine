@@ -57,7 +57,7 @@ GameScene::GameScene() {
 	auto* playUIManager = gameObjectManager_->AddObject<PlayUIManager>(playerHpGH, bossNameGH, playGuideGH);
 
 	// シーンフェーズを管理
-	gameObjectManager_->AddObject<GamePhaseManager>(player, bossEnemy, playUIManager);
+	gameObjectManager_->AddObject<GamePhaseManager>(inputCommand_, player, bossEnemy, playUIManager, cameraController_);
 }
 
 void GameScene::Initialize() {

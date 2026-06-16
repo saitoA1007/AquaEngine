@@ -544,6 +544,7 @@
     <ClCompile Include="Application\Enemy\RangedAttack\IceFall.cpp" />
     <ClCompile Include="Application\Enemy\RangedAttack\WindAttack.cpp" />
     <ClCompile Include="Application\Utils\TimeController.cpp" />
+    <ClCompile Include="Application\UI\LetterboxUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1065,6 +1066,7 @@
     <ClInclude Include="Application\Enemy\RangedAttack\IceFall.h" />
     <ClInclude Include="Application\Enemy\RangedAttack\WindAttack.h" />
     <ClInclude Include="Application\Utils\TimeController.h" />
+    <ClInclude Include="Application\UI\LetterboxUI.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />

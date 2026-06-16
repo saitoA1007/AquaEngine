@@ -5,13 +5,17 @@
 #include "IScenePhase.h"
 
 // 前方宣言
+namespace GameEngine {
+	class InputCommand;
+}
 class Player;
 class PlayUIManager;
 class BossEnemy;
+class CameraController;
 
 class GamePhaseManager : public GameEngine::IGameObject {
 public:
-	GamePhaseManager(Player* player, BossEnemy* bossEnemy, PlayUIManager* playUIManager);
+	GamePhaseManager(GameEngine::InputCommand* inputCommand, Player* player, BossEnemy* bossEnemy, PlayUIManager* playUIManager, CameraController* cameraController);
 	~GamePhaseManager() = default;
 
 	void Initialize() override;
