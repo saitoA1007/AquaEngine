@@ -1,0 +1,20 @@
+{
+    "Camera": {
+        "Follow": {
+            "Distance": 38.0,
+            "OffsetY": 1.0,
+            "RotateDamping": 0.8799999952316284,
+            "RotateSpeed": 2.0,
+            "RotateY": -1.2000000476837158
+        },
+        "LockOn": {
+            "LockOnPlayerOffsetY": 1.0,
+            "LockOnRotateRate": 0.05999999865889549,
+            "LockOnTargetOffsetY": 6.0,
+            "MinLockOnDistance": 20.0
+        },
+        "PositionLerpRate": 0.07999999821186066,
+        "SceneName": "Game",
+        "TargetLerpRate": 0.11999999731779099
+    }
+}

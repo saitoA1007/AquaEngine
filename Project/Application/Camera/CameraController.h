@@ -45,6 +45,9 @@ private:
 	// 回転の減衰率
 	float kRotateDamping_ = 0.88f;
 
+	float kFollowRotateY_ = -1.2f;
+	float kFollowFov_ = 0.45f;
+
 private:
 	GameEngine::InputCommand* inputCommand_ = nullptr;
 	const GameEngine::WorldTransform* targetWorld_ = nullptr;
@@ -65,6 +68,8 @@ private:
 
 	// 回転の移動量
 	Vector2 rotateMove_ = { 3.1f,1.0f };
+
+	float currentFov_ = 0.45f;
 
 private:
 

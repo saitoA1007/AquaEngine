@@ -91,7 +91,9 @@ void PlayerMoveAction::ProcessInput() {
 	if (inputCommand_->IsCommandActive("MoveRight")) { dir += cameraRightXZ_; }
 
 	// 目標方向
-	commonData_->targetDir = dir;
+	if (commonData_->state != PlayerState::kAttackRush) {
+		commonData_->targetDir = dir;
+	}
 
 	if (commonData_->state == PlayerState::kNone || commonData_->state == PlayerState::kJump) {
 		if (dir.x != 0.0f || dir.z != 0.0f) {
@@ -250,6 +252,7 @@ void PlayerAttackRushAction::Update() {
 		if (rushTimer_ >= 1.0f) {
 			Log("Player end attackRush");
 			commonData_->state = PlayerState::kStiffness;
+			commonData_->animator_->StartAnimation(PlayerAnimationType::kWalk, "歩き");
 		}
 	}
 

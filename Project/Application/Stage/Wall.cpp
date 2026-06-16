@@ -61,7 +61,7 @@ void Wall::Update() {
 
 void Wall::Draw() {
 	// 壁を描画
-	modelComponent_.Draw(renderQueue_);
+	modelComponent_.DrawRaytracing(renderQueue_);
 }
 
 void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {

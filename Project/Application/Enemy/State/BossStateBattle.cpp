@@ -98,6 +98,7 @@ BossBattleState BossStateBattle::SelectWeightedBattleState() {
 		totalWeight += item.weight;
 	}
 
+	if (totalWeight <= 0) { return result; }
 	uint32_t randomValue = RandomGenerator::Get(int32_t(0), int32_t(totalWeight - 1));
 
 	for (const auto& item : lotteryList_) {

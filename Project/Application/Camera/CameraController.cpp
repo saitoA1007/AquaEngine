@@ -18,11 +18,14 @@ CameraController::CameraController(GameEngine::InputCommand* inputCommand, const
 	debugParame_->Register("Distance", kDistance_, 0, "Follow");
 	debugParame_->Register("RotateSpeed", kRotateSpeed_, 0, "Follow");
 	debugParame_->Register("RotateDamping", kRotateDamping_, 0, "Follow");
+	debugParame_->Register("RotateY", kFollowRotateY_, 0, "Follow");
+	debugParame_->Register("Fov", kFollowFov_, 0, "Follow");
 
 	debugParame_->Register("LockOnRotateRate", lockOnRotateRate_, 0, "LockOn");
 	debugParame_->Register("MinLockOnDistance", kMinLockOnDistance_, 0, "LockOn");
 	debugParame_->Register("LockOnPlayerOffsetY", lockOnPlayerOffsetY_, 0, "LockOn");
 	debugParame_->Register("LockOnTargetOffsetY", lockOnTargetOffsetY_, 0, "LockOn");
+	debugParame_->Apply();
 }
 
 void CameraController::Initialize() {
@@ -57,7 +60,6 @@ void CameraController::Update() {
 
 		// プレイヤーから敵への水平方向のベクトルを計算
 		Vector3 dir = enemyPos - playerPos;
-		dir.y = 0.0f;
 
 		// 水平距離を計測
 		float dist = dir.Length();
@@ -106,6 +108,13 @@ void CameraController::Update() {
 		float currentDamping = std::powf(kRotateDamping_, dt60);
 		rotateVelocityX_ = rotateVelocityX_ * currentDamping + targetRotateSpeed * (1.0f - currentDamping);
 		rotateMove_.x += rotateVelocityX_ * FpsCounter::deltaTime;
+		rotateMove_.y = kFollowRotateY_;
+
+		// 視野を変更
+		if (currentFov_ != kFollowFov_) {
+			currentFov_ = kFollowFov_;
+			camera_->SetProjectionMatrix(currentFov_,1280.0f,720.0f,0.1f,200.0f);
+		}
 
 		// 球面座標系で移動
 		idealPosition.x = idealTarget.x + kDistance_ * std::sinf(rotateMove_.y) * std::sinf(rotateMove_.x);

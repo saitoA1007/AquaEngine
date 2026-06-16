@@ -67,7 +67,7 @@ void WindAttack::Update() {
 
 void WindAttack::Draw() {
 	// 壁を描画
-	modelComponent_.Draw(renderQueue_);
+	modelComponent_.DrawRaytracing(renderQueue_);
 }
 
 void WindAttack::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {

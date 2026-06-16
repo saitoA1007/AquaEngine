@@ -61,7 +61,7 @@ void IceFall::Update() {
 
 void IceFall::Draw() {
 	// 壁を描画
-	modelComponent_.Draw(renderQueue_);
+	modelComponent_.DrawRaytracing(renderQueue_);
 }
 
 void IceFall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {

@@ -172,6 +172,7 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 	bool isBoss = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kBoss));
 	bool isFloor = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kGround));
 	bool isIceFall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kIceFall));
+	bool isWind = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kWind));
 
 	// 床の衝突
 	if (isFloor) {
@@ -189,6 +190,11 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 			commonData_.state = PlayerState::kStiffness;
 			commonData_.animator_->StartAnimation(PlayerAnimationType::kWalk, "歩き");
 			Log("Player End attackDown");
+		}
+
+		if (commonData_.state == PlayerState::kJump) {
+			commonData_.state = PlayerState::kNone;
+			commonData_.animator_->StartAnimation(PlayerAnimationType::kWalk, "歩き");
 		}
 	}
 	
@@ -211,8 +217,10 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 	}
 
 	// ボスの衝突判定
-	if (isBoss) {
-		// ダメージを受ける
-		playerStatus_.TakeDamage(1);
+	if (isBoss || isWind) {
+		if (commonData_.state != PlayerState::kAttackDown) {
+			// ダメージを受ける
+			playerStatus_.TakeDamage(1);
+		}
 	}
 }
