@@ -45,7 +45,7 @@ void LetterboxUI::Update() {
 }
 
 void LetterboxUI::Draw() {
-	//if (!isBarDrawActive_) { return; }
+	if (!isBarDrawActive_) { return; }
 
 	// 描画
 	renderQueue_->SubmitSprite(&upBarSprite_);

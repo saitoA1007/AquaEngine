@@ -3,6 +3,7 @@
 #include <memory>
 #include "IGameObject.h"
 #include "IScenePhase.h"
+#include "Application/Utils/TimeController.h"
 
 // 前方宣言
 namespace GameEngine {
@@ -30,4 +31,7 @@ private:
 
 	// 共通データ
 	PhaseCommonData commonData_;
+
+	// 時間の管理
+	TimeController timeController_;
 };

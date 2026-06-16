@@ -55,6 +55,24 @@ private:
     Timer playTimer_;
 };
 
+// ポーズシーン
+class PausePhase : public IScenePhase {
+public:
+    PausePhase(PhaseCommonData& commonData);
+    ~PausePhase() = default;
+
+    void Enter() override;
+
+    void Update() override;
+
+    void Exit() override;
+
+private:
+
+
+
+};
+
 // クリア
 class ClearPhase : public IScenePhase {
 public:

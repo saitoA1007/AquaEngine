@@ -1,9 +1,11 @@
 #pragma once
 #include <optional>
 
+// 前方宣言
 namespace GameEngine {
     class InputCommand;
 }
+class TimeController;
 
 // 状態
 enum class ScenePhase {
@@ -31,6 +33,9 @@ struct PhaseCommonData {
 
     // 入力処理
     GameEngine::InputCommand* inputCommand = nullptr;
+
+    // 時間の管理
+    TimeController* timeController_ = nullptr;
 };
 
 class IScenePhase {
