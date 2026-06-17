@@ -1,5 +1,5 @@
-#include"EditorMenuBar.h"
-#include"ImGuiManager.h"
+#include "EditorMenuBar.h"
+#include "ImGuiManager.h"
 
 using namespace GameEngine;
 

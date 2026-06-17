@@ -47,6 +47,7 @@ namespace GameEngine {
         SceneChangeRequest* GetSceneChangeRequest() const { return sceneChangeRequest_.get(); }
         GameObjectManager* GetGameObjectManager() const { return gameObjectManager_.get(); }
         CollisionManager* GetCollisionManager() const { return collisionManager_.get(); }
+        StaticGameObjectManager* GetStaticObjectManager() const { return staticObjectManager_.get(); }
     private:
         EngineContext context_;
 

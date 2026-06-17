@@ -13,6 +13,7 @@ namespace GameEngine {
 	class EditorLayout;
 	class EditorToolBar;
 	class ViewOptionsBar;
+	class AddObjectBar;
 	class GameParamEditor;
 	// エンジン機能
 	class Input;
@@ -21,6 +22,7 @@ namespace GameEngine {
 	class RenderPassController;
 	class DebugRenderer;
 	class RenderQueue;
+	class StaticGameObjectManager;
 
 	class EditorCore {
 	public:
@@ -29,7 +31,8 @@ namespace GameEngine {
 
 		// 初期化処理
 		void Initialize(TextureManager* textureManager, SceneChangeRequest* sceneChangeRequest, RenderPassController* renderPassController, 
-			Input* input, RenderQueue* renderQueue, DebugRenderer* debugRenderer, Model* gridModel, GameParamEditor* gameParamEditor);
+			Input* input, RenderQueue* renderQueue, DebugRenderer* debugRenderer, Model* gridModel, GameParamEditor* gameParamEditor,
+			StaticGameObjectManager* staticObjectManager);
 
 		// 実行
 		void Run();
@@ -61,6 +64,9 @@ namespace GameEngine {
 
 		// ビュー
 		std::unique_ptr<ViewOptionsBar> viewOptionsBar_;
+
+		// オブジェクトの配置をおこなう
+		std::unique_ptr<AddObjectBar> addObjectBar_;
 
 	private:
 

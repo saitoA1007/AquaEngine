@@ -26,6 +26,14 @@ namespace GameEngine {
             return ptr;
         }
 
+        // オブジェクトを削除
+        void RemoveObject(IGameObject* object) {
+            // 完全に削除
+            std::erase_if(objects_, [object](const std::unique_ptr<IGameObject>& item) {
+                return item.get() == object;
+            });
+        }
+
         // 初期化処理
         void InitializeAll();
 
