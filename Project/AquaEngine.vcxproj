@@ -216,6 +216,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\3D\ParticleSystem\ParticleBehavior.cpp" />
     <ClCompile Include="EngineSource\Common\CreateBufferResource.cpp" />
     <ClCompile Include="EngineSource\Core\Engine.cpp" />
+    <ClCompile Include="EngineSource\Core\StaticGameObject.cpp" />
+    <ClCompile Include="EngineSource\Core\StaticGameObjectManager.cpp" />
     <ClCompile Include="EngineSource\Core\System\CoreSubsystem.cpp" />
     <ClCompile Include="EngineSource\Core\System\EditorSubsystem.cpp" />
     <ClCompile Include="EngineSource\Core\System\GraphicsSubsystem.cpp" />
@@ -461,6 +463,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Core\Engine.h" />
     <ClInclude Include="EngineSource\Core\EngineContext.h" />
     <ClInclude Include="EngineSource\Core\IEngineSubsystem.h" />
+    <ClInclude Include="EngineSource\Core\StaticGameObject.h" />
+    <ClInclude Include="EngineSource\Core\StaticGameObjectManager.h" />
     <ClInclude Include="EngineSource\Core\SubsystemRegistry.h" />
     <ClInclude Include="EngineSource\Core\System\CoreSubsystem.h" />
     <ClInclude Include="EngineSource\Core\System\EditorSubsystem.h" />

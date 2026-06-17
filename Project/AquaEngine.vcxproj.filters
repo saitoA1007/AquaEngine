@@ -548,6 +548,8 @@
     <ClCompile Include="Application\UI\PauseUIManager.cpp" />
     <ClCompile Include="Application\UI\DimmerUI.cpp" />
     <ClCompile Include="Application\Camera\State\CameraState.cpp" />
+    <ClCompile Include="EngineSource\Core\StaticGameObject.cpp" />
+    <ClCompile Include="EngineSource\Core\StaticGameObjectManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1074,6 +1076,8 @@
     <ClInclude Include="Application\UI\DimmerUI.h" />
     <ClInclude Include="Application\Camera\ICameraState.h" />
     <ClInclude Include="Application\Camera\State\CameraState.h" />
+    <ClInclude Include="EngineSource\Core\StaticGameObject.h" />
+    <ClInclude Include="EngineSource\Core\StaticGameObjectManager.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />
