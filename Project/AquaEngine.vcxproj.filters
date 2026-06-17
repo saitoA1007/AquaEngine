@@ -550,6 +550,7 @@
     <ClCompile Include="Application\Camera\State\CameraState.cpp" />
     <ClCompile Include="EngineSource\Core\StaticGameObject.cpp" />
     <ClCompile Include="EngineSource\Core\StaticGameObjectManager.cpp" />
+    <ClCompile Include="EngineSource\Editor\EditorMenu\AddObjectBar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1078,6 +1079,7 @@
     <ClInclude Include="Application\Camera\State\CameraState.h" />
     <ClInclude Include="EngineSource\Core\StaticGameObject.h" />
     <ClInclude Include="EngineSource\Core\StaticGameObjectManager.h" />
+    <ClInclude Include="EngineSource\Editor\EditorMenu\AddObjectBar.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />

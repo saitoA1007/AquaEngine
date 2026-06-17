@@ -80,6 +80,9 @@ namespace GameEngine {
 		// 0~360度の範囲に抑える
 		float WrapAngle(float angle);
 
+		// マウスの位置からレイの方向を取得
+		Vector3 CalculateRayDirection(Vector2 mousePos, const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix, float windowWidth = 1280.0f, float windowHeight = 720.0f);
+
 		// 最大値
 		Vector3 Max(Vector3 pos1, Vector3 pos2);
 		Vector4 MaxVector4(Vector4 pos1, Vector4 pos2);

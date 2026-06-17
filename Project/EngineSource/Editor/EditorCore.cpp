@@ -13,6 +13,7 @@
 #include "EditorMenu/EditorToolBar.h"
 #include "EditorMenu/SceneMenuBar.h"
 #include "EditorMenu/ViewOptionsBar.h"
+#include "EditorMenu/AddObjectBar.h"
 
 // デバックウィンドウ
 #include "Windows/SceneWIndow.h"
@@ -28,13 +29,15 @@ EditorCore::EditorCore() {}
 EditorCore::~EditorCore() {}
 
 void EditorCore::Initialize(TextureManager* textureManager, SceneChangeRequest* sceneChangeRequest, RenderPassController* renderPassController,
-	Input* input, RenderQueue* renderQueue, DebugRenderer* debugRenderer, Model* gridModel, GameParamEditor* gameParamEditor) {
+	Input* input, RenderQueue* renderQueue, DebugRenderer* debugRenderer, Model* gridModel, GameParamEditor* gameParamEditor,
+	StaticGameObjectManager* staticObjectManager) {
 	windowManager_ = std::make_unique<EditorWindowManager>();
 	menuBar_ = std::make_unique<EditorMenuBar>();
 	editorLayout_ = std::make_unique<EditorLayout>();
 	editorToolBar_ = std::make_unique<EditorToolBar>(textureManager);
 	sceneMenuBar_ = std::make_unique<SceneMenuBar>(sceneChangeRequest);
 	viewOptionsBar_ = std::make_unique<ViewOptionsBar>(input, renderQueue, debugRenderer, gridModel);
+	addObjectBar_ = std::make_unique<AddObjectBar>(staticObjectManager, renderQueue);
 
 	// ウィンドウの内容を登録する
 	windowManager_->RegisterWindow(std::make_unique<SceneWindow>(renderPassController));
@@ -53,6 +56,7 @@ void EditorCore::Run() {
 
 	sceneMenuBar_->Run();
 	viewOptionsBar_->Run();
+	addObjectBar_->Run();
 	menuBar_->Run(windowManager_.get());
 	editorToolBar_->Run();
 	windowManager_->DrawAllWindows();

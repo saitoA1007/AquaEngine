@@ -1,8 +1,8 @@
-#include"EditorLayout.h"
+#include "EditorLayout.h"
 #include <fstream>
 #include <iostream>
-#include<cassert>
-#include<Windows.h>
+#include <cassert>
+#include <Windows.h>
 
 using namespace GameEngine;
 

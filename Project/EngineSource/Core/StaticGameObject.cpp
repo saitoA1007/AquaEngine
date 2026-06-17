@@ -13,6 +13,11 @@ void StaticGameObject::Update() {
 	modelComponent_.Update();
 }
 
+void StaticGameObject::DebugUpdate() {
+	// 更新
+	modelComponent_.Update();
+}
+
 void StaticGameObject::Draw() {
 	// 描画
 	modelComponent_.DrawRaytracing(renderQueue_);

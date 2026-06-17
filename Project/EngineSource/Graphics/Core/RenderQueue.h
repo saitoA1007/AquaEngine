@@ -59,6 +59,9 @@ namespace GameEngine {
         // カメラリソースを取得
         GpuResource* GetCameraResource() { return mainCamera_.GetConstantBuffer(); }
 
+        // カメラを取得
+        Camera& GetMainCamera() { return mainCamera_; }
+
         // デバックカメラリソースを取得
         GpuResource* GetDebugCameraResource() { return debugCameraResource_; }
 

@@ -1,14 +1,10 @@
 #pragma once
+#include <deque>
+#include <unordered_map>
 #include "GameObjectManager.h"
 #include "ModelManager.h"
-
+#include "StaticGameObject.h"
 namespace GameEngine {
-
-	// オブジェクト配置するためのデータ
-	struct ObjectSpawnData {
-		std::string objectName_ = "None";
-		std::string modelName_ = "None";
-	};
 
 	class StaticGameObjectManager {
 	public:
@@ -16,14 +12,32 @@ namespace GameEngine {
 		~StaticGameObjectManager() = default;
 
 		void Initialize(GameObjectManager* objectManager, ModelManager* modelManager);
-		
-		void AddObject(std::string objecctName, std::string modelName);
 
+	public:
+		
+		// 追加
+		uint32_t AddObject(std::string objecctName, std::string modelName);
+
+		// 削除
+		void ReleaseObject(uint32_t id);
+
+		// オブジェクトを取得
+		StaticGameObject* GetStaticObject(uint32_t id);
+
+		// マウスの位置から選択されるオブジェクトを取得
+		int32_t SelectObject(Vector2 mousePos, const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix, const Vector3& cameraPosition);
 
 	private:
 		// オブジェクト管理
 		GameObjectManager* objectManager_ = nullptr;
 		// モデル管理
 		ModelManager* modelManager_ = nullptr;
+
+		// オブジェクト
+		std::unordered_map<uint32_t, StaticGameObject*> objects_;
+
+		// 解放されたインデックスのリスト
+		std::deque<uint32_t> freeIndices_;
+		uint32_t currentIndex_ = 0;
 	};
 }

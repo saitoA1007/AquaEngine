@@ -313,6 +313,26 @@ namespace GameEngine {
 			return angle;
 		}
 
+		Vector3 CalculateRayDirection(Vector2 mousePos, const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix, float windowWidth, float windowHeight) {
+
+			float ndcX = (2.0f * mousePos.x) / windowWidth - 1.0f;
+			float ndcY = 1.0f - (2.0f * mousePos.y) / windowHeight;
+
+			// クリップ空間前方ベクトルを作成
+			Vector3 rayClip = Vector3(ndcX, ndcY, 1.0f);
+
+			// ビュー空間へ変換
+			Matrix4x4 invProj = InverseMatrix(projectionMatrix);
+			Vector3 rayView = Transforms(rayClip, invProj);
+			rayView.z = 1.0f;
+
+			// ビュー行列の逆行列を掛けて、ワールド空間へ変換
+			Matrix4x4 invView = InverseMatrix(viewMatrix);
+			Vector3 rayWorld = Transforms(rayView, invView);
+
+			return rayWorld.Normalize();
+		}
+
 		Vector3 Max(Vector3 pos1, Vector3 pos2) {
 			return Vector3(std::max(pos1.x, pos2.x), std::max(pos1.y, pos2.y), std::max(pos1.z, pos2.z));
 		}
