@@ -7,6 +7,7 @@
 #include "SceneChangeRequest.h"
 #include "GameObjectManager.h"
 #include "CollisionManager.h"
+#include "StaticGameObjectManager.h"
 
 namespace GameEngine {
 
@@ -52,7 +53,14 @@ namespace GameEngine {
         std::unique_ptr<SceneManager> sceneManager_;
         std::unique_ptr<SceneRegistry> sceneRegistry_;
         std::unique_ptr<SceneChangeRequest> sceneChangeRequest_;
+
+        // ゲームオブジェクト管理
         std::unique_ptr<GameObjectManager> gameObjectManager_;
+
+        // 当たり判定管理
         std::unique_ptr<CollisionManager> collisionManager_;
+
+        // 配置する用のオブジェクト管理
+        std::unique_ptr<StaticGameObjectManager> staticObjectManager_;
     };
 }

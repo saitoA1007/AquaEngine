@@ -6,6 +6,7 @@
 class Player;
 class PlayUIManager;
 class BossEnemy;
+class CameraController;
 
 // タイトル
 class TitlePhase : public IScenePhase {
@@ -27,7 +28,7 @@ private:
 // プレイ
 class PlayPhase : public IScenePhase {
 public:
-    PlayPhase(PhaseCommonData& commonData, Player* player, BossEnemy* bossEnemy, PlayUIManager* playUIManager);
+    PlayPhase(PhaseCommonData& commonData, Player* player, BossEnemy* bossEnemy, PlayUIManager* playUIManager, CameraController* cameraController);
     ~PlayPhase() = default;
 
     void Enter() override;
@@ -45,9 +46,31 @@ private:
 
     // UI
     PlayUIManager* playUIManager_ = nullptr;
+    bool isBarActive_ = false;
+
+    // カメラ管理処理
+    CameraController* cameraController_ = nullptr;
 
     // プレイ時間を計測
     Timer playTimer_;
+};
+
+// ポーズシーン
+class PausePhase : public IScenePhase {
+public:
+    PausePhase(PhaseCommonData& commonData);
+    ~PausePhase() = default;
+
+    void Enter() override;
+
+    void Update() override;
+
+    void Exit() override;
+
+private:
+
+
+
 };
 
 // クリア

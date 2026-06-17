@@ -7,6 +7,7 @@ using namespace GameEngine;
 
 void SceneSubsystem::Initialize() {
     auto* renderQueue = context_.graphics->GetRenderQueue();
+    auto* modelManager = context_.resource->GetModelManager();
 
     // 当たり判定
     collisionManager_ = std::make_unique<CollisionManager>();
@@ -16,6 +17,10 @@ void SceneSubsystem::Initialize() {
     gameObjectManager_ = std::make_unique<GameObjectManager>();
     // ゲームオブジェクト基底クラスの静的初期化
     IGameObject::StaticInitialize(renderQueue);
+
+    // 配置用ゲームオブジェクト管理
+    staticObjectManager_ = std::make_unique<StaticGameObjectManager>();
+    staticObjectManager_->Initialize(gameObjectManager_.get(), modelManager);
 
     // シーン生成システム
     sceneRegistry_ = std::make_unique<SceneRegistry>();

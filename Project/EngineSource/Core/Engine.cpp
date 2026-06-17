@@ -141,6 +141,7 @@ void Engine::PreUpdate() {
     // シーン切り替えリクエストを処理
     auto* request = scene_->GetSceneChangeRequest();
     if (request->HasChangeRequest()) {
+        scene_->GetCollisionManager()->ClearList();
         scene_->ChangeScene(request->GetRequestScene());
         request->ClearChangeRequest();
         request->SetCurrentSceneName(scene_->GetCurrentSceneName());

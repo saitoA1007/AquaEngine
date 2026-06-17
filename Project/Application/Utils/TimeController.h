@@ -12,8 +12,15 @@ public:
 
 	// 時間を止める
 	void StartStopTime(float stopMaxTime) {
+		if (isStopTimeActive_) { return; }
 		stopMaxTime_ = stopMaxTime;
 		isStopTimeActive_ = true;
+	}
+
+	// リセット
+	void Reset() {
+		isStopTimeActive_ = false;
+		timer_ = 0.0f;
 	}
 
 private:

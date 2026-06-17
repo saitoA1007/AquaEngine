@@ -2,6 +2,7 @@
 #include "IGameObject.h"
 #include "HpBarUI.h"
 #include "HpContainer.h"
+#include "LetterboxUI.h"
 
 class PlayUIManager : public GameEngine::IGameObject {
 public:
@@ -35,6 +36,10 @@ public:
 		playerHpUI_->SetMaxHp(hp);
 	}
 
+	void SetBarActive(bool isActive) {
+		letterBoxUI_->SetBarActive(isActive);
+	}
+
 private:
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;
@@ -50,4 +55,7 @@ private:
 
 	// 操作説明UI
 	GameEngine::Sprite playGuideSprite_;
+
+	// 黒帯表示
+	std::unique_ptr<LetterboxUI> letterBoxUI_;
 };

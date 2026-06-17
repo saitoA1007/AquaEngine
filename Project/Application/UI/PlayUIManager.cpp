@@ -19,11 +19,15 @@ PlayUIManager::PlayUIManager(uint32_t playerHpGH, uint32_t bossNameGH, uint32_t 
 
 	// プレイヤーUI
 	playerHpUI_ = std::make_unique<HpContainer>("PlayerHpUI", playerHpGH);
+
+	// 黒帯UI
+	letterBoxUI_ = std::make_unique<LetterboxUI>("LetterboxUI");
 }
 
 void PlayUIManager::Initialize() {
 	bossHpBarUI_->Initialize();
 	playerHpUI_->Initialize();
+	letterBoxUI_->Initialize();
 }
 
 void PlayUIManager::Update() {
@@ -33,9 +37,11 @@ void PlayUIManager::Update() {
 	playGuideSprite_.Update();
 	bossHpBarUI_->Update();
 	playerHpUI_->Update();
+	letterBoxUI_->Update();
 }
 
 void PlayUIManager::Draw() {
+	letterBoxUI_->Draw();
 	bossHpBarUI_->Draw();
 	playerHpUI_->Draw();
 	renderQueue_->SubmitSprite(&bossNameSprite_);

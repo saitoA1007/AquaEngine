@@ -16,7 +16,7 @@ void TimeController::Update() {
 		// デルタタイムを0にして止める
 		FpsCounter::gameDeltaTime = 0.0f;
 
-		if (timer_ >= 0.0f) {
+		if (timer_ >= 1.0f) {
 			timer_ = 0.0f;
 			isStopTimeActive_ = false;
 		}
