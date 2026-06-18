@@ -25,7 +25,7 @@ namespace GameEngine {
 		StaticGameObject* GetStaticObject(uint32_t id);
 
 		// マウスの位置から選択されるオブジェクトを取得
-		int32_t SelectObject(Vector2 mousePos, const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix, const Vector3& cameraPosition);
+		int32_t SelectObject(Vector2 mousePos, const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix, const Vector3& cameraPosition,float width, float height);
 
 	private:
 		// オブジェクト管理

@@ -29,6 +29,10 @@ namespace GameEngine {
 
 		Matrix4x4 GetVPMatrix();
 
+		Matrix4x4 GetViewMatrix() { return viewMatrix_; }
+
+		Matrix4x4 GetProjectionMatrix() { return projectionMatrix_; }
+
 		Matrix4x4 GetRotateMatrix();
 
 		Matrix4x4 GetWorldMatrix() const { return worldMatrix_; }

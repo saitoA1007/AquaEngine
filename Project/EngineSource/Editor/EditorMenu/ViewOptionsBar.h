@@ -15,6 +15,8 @@ namespace GameEngine {
 
 		void Run();
 
+		DebugCamera* GetDebugCamera() { return debugCamera_.get(); }
+
 	private:
 		// デバック画面の描画
 		bool isDebugView_ = true;

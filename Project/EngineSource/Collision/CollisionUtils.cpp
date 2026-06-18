@@ -191,26 +191,40 @@ CollisionResult GameEngine::IsAABBSphereCollision(const AABB& aabb, const Sphere
 CollisionResult GameEngine::IsAABBSegmentCollision(const AABB& aabb, const Segment& segment) {
 	CollisionResult result;
 
-	// 各軸のnear,farを求める
-	Vector3 tNear = Math::Min({ (aabb.min.x - segment.origin.x) / segment.diff.x,(aabb.min.y - segment.origin.y) / segment.diff.y,(aabb.min.z - segment.origin.z) / segment.diff.z },
-		{ (aabb.max.x - segment.origin.x) / segment.diff.x,(aabb.max.y - segment.origin.y) / segment.diff.y,(aabb.max.z - segment.origin.z) / segment.diff.z });
-	Vector3 tFar = Math::Max({ (aabb.min.x - segment.origin.x) / segment.diff.x,(aabb.min.y - segment.origin.y) / segment.diff.y,(aabb.min.z - segment.origin.z) / segment.diff.z },
-		{ (aabb.max.x - segment.origin.x) / segment.diff.x,(aabb.max.y - segment.origin.y) / segment.diff.y,(aabb.max.z - segment.origin.z) / segment.diff.z });
+	float tNear = -std::numeric_limits<float>::infinity();
+	float tFar = std::numeric_limits<float>::infinity();
 
-	// AABBとの衝突点（貫通点）のtが小さい方
-	float tMin = std::max(std::max(tNear.x, tNear.y), tNear.z);
-	// AABBとの衝突点（貫通点）のtが大きい方
-	float tMax = std::min(std::min(tFar.x, tFar.y), tFar.z);
+	// 各軸について計算
+	for (int i = 0; i < 3; ++i) {
+		float origin = (i == 0) ? segment.origin.x : (i == 1) ? segment.origin.y : segment.origin.z;
+		float diff = (i == 0) ? segment.diff.x : (i == 1) ? segment.diff.y : segment.diff.z;
+		float min = (i == 0) ? aabb.min.x : (i == 1) ? aabb.min.y : aabb.min.z;
+		float max = (i == 0) ? aabb.max.x : (i == 1) ? aabb.max.y : aabb.max.z;
 
-	// 範囲の外を出ていたらfalse
-	if (tMin > 1.0f || tMax < 0.0f) {
-		return result;
+		if (std::abs(diff) < 1e-6f) {
+			if (origin < min || origin > max) { return result; }
+		} else {
+			float t1 = (min - origin) / diff;
+			float t2 = (max - origin) / diff;
+
+			float tMinAxis = std::min(t1, t2);
+			float tMaxAxis = std::max(t1, t2);
+
+			tNear = std::max(tNear, tMinAxis);
+			tFar = std::min(tFar, tMaxAxis);
+		}
 	}
 
-	// 衝突した時
-	if (tMin <= tMax) {
+	// 衝突判定
+	if (tNear <= tFar && tFar >= 0.0f && tNear <= 1.0f) {
 		result.isHit = true;
-	} 
+
+		float t = std::max(0.0f, tNear);
+		result.contactPosition.x = segment.origin.x + t * segment.diff.x;
+		result.contactPosition.y = segment.origin.y + t * segment.diff.y;
+		result.contactPosition.z = segment.origin.z + t * segment.diff.z;
+	}
+
 	return result;
 }
 

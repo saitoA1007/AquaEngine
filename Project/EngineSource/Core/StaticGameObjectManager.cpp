@@ -51,19 +51,21 @@ StaticGameObject* StaticGameObjectManager::GetStaticObject(uint32_t id) {
 	return object;
 }
 
-int32_t StaticGameObjectManager::SelectObject(Vector2 mousePos, const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix, const Vector3& cameraPosition) {
+int32_t StaticGameObjectManager::SelectObject(Vector2 mousePos, const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix, const Vector3& cameraPosition, float width, float height) {
 
 	Vector3 rayOrigin = cameraPosition;
-	Vector3 rayDirection = Math::CalculateRayDirection(mousePos, viewMatrix, projectionMatrix);
+	Vector3 rayDirection = Math::CalculateRayDirection(mousePos, viewMatrix, projectionMatrix, width, height);
+	float rayLength = 1000.0f;
+	Vector3 rayDiff = rayDirection * rayLength;
 
 	int32_t selectedId = -1;
 	float minDistance = FLT_MAX;
 
 	for (auto [id, object] : objects_) {
 		AABB aabb = object->GetSelectObjectAABB();
-		Segment segment = Segment(rayOrigin, rayDirection);
+		Segment segment = Segment(rayOrigin, rayDiff);
 
-		float distance;
+		float distance = 0.0f;
 		// レイとAABBの交差判定関数
 		CollisionResult result = IsAABBSegmentCollision(aabb, segment);
 

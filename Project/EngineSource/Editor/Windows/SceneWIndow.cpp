@@ -1,10 +1,11 @@
-#include"SceneWIndow.h"
-#include"ImGuiManager.h"
-
+#include "SceneWIndow.h"
+#include "ImGuiManager.h"
+#include "EditorMenu/AddObjectBar.h"
 using namespace GameEngine;
 
-SceneWindow::SceneWindow(RenderPassController* renderPassController) {
+SceneWindow::SceneWindow(RenderPassController* renderPassController, AddObjectBar* addObjectBar) {
 	renderPassController_ = renderPassController;
+	addObjectBar_ = addObjectBar;
 }
 
 void SceneWindow::Draw() {
@@ -35,5 +36,9 @@ void SceneWindow::Draw() {
 	ImGui::SetCursorScreenPos(ImVec2(cursorPos.x + offsetX, cursorPos.y));
 
 	ImGui::Image((ImTextureID)srvHandle.ptr, imageSize);
+
+	// 選択したオブジェクトのギズモを表示
+	addObjectBar_->ApplyGuizmo();
+
     ImGui::End();
 }
