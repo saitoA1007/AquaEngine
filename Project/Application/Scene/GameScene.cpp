@@ -26,16 +26,16 @@ GameScene::GameScene() {
 	renderQueue_->SetCamera(mainCamera_.get());
 
 	// プレイヤー
-	auto* playerModel = modelManager_->GetNameByModel("Player");
+	auto* playerModel = modelManager_->GetNameByModel("PlayerRush.gltf");
 	playerModel->SetDefaultIsEnableLight(true);
 	auto player = gameObjectManager_->AddObject<Player>(inputCommand_, playerModel, animationManager_);
 
 	// 敵の遠距離攻撃管理
-	auto* iceFallModel = modelManager_->GetNameByModel("Cube");
+	auto* iceFallModel = modelManager_->GetNameByModel("cube.obj");
 	auto* bossRangedAttackManager = gameObjectManager_->AddObject<BossRangedAttackManager>(gameObjectManager_, iceFallModel);
 
 	// 敵
-	auto* enemyModel = modelManager_->GetNameByModel("BossEnemy");
+	auto* enemyModel = modelManager_->GetNameByModel("BossBird_IceBreath.gltf");
 	enemyModel->SetDefaultIsEnableLight(true);
 	auto bossEnemy = gameObjectManager_->AddObject<BossEnemy>(enemyModel, player->GetWorldTransform(), animationManager_, bossRangedAttackManager);
 
@@ -44,7 +44,7 @@ GameScene::GameScene() {
 	player->SetCamera(cameraController_);
 
 	// ステージ
-	auto* wallModel = modelManager_->GetNameByModel("Cube");
+	auto* wallModel = modelManager_->GetNameByModel("cube.obj");
 	wallModel->SetDefaultIsEnableLight(true);
 	wallModel->SetDefaultColor({1,1,1,0.9f});
 	wallModel->SetDefaultIOR(1.31f);

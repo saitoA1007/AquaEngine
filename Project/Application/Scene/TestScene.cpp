@@ -15,7 +15,7 @@ TestScene::TestScene() {
 	renderQueue_->SetSkyboxTexture(skyboxGH);
 
 	// プレイヤーモデルを生成
-	model_ = modelManager_->GetNameByModel("Walk");
+	model_ = modelManager_->GetNameByModel("walk.gltf");
 	model_->SetDefaultIsEnableLight(true);
 	model_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
 	world_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
@@ -27,7 +27,7 @@ TestScene::TestScene() {
 	walkAnimator_->Initialize(model_, &walkAnimationData_["Armature|mixamo.com|Layer0"]);
 
 	// 地面
-	terrainModel_ = modelManager_->GetNameByModel("Terrain");
+	terrainModel_ = modelManager_->GetNameByModel("terrain.obj");
 	terrainModel_->SetDefaultIsEnableLight(true);
 	terrainModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
 	uint32_t grassGH = textureManager_->GetHandleByName("grass.png");
@@ -40,28 +40,28 @@ TestScene::TestScene() {
 	uint32_t effectGH = textureManager_->GetHandleByName("circle.png");
 	primitiveEffect_ = std::make_unique<ParticleBehavior>("PrimitiveEffect", 16, effectGH);
 	// エフェクト用モデル
-	effectModel_ = modelManager_->GetNameByModel("Plane");
+	effectModel_ = modelManager_->GetNameByModel("plane.obj");
 
 	// 高ポリゴン氷
-	iceHighModel_ = modelManager_->GetNameByModel("Ice_highPolygon");
+	iceHighModel_ = modelManager_->GetNameByModel("ice_highPolygon.gltf");
 	iceHighModel_->SetDefaultIsEnableLight(true);
 	iceHighModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,0.9f });
 	iceHighModel_->SetDefaultIOR(1.309f);
 	iceHighWorld_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-4.0f,2.0f,0.0f} });
 	// 中ポリゴン氷
-	iceMiddleModel_ = modelManager_->GetNameByModel("Ice_middlePolygon");
+	iceMiddleModel_ = modelManager_->GetNameByModel("ice_middlePolygon.gltf");
 	iceMiddleModel_->SetDefaultIsEnableLight(true);
 	iceMiddleModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,0.9f });
 	iceMiddleModel_->SetDefaultIOR(1.309f);
 	iceMiddleWorld_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,2.0f,0.0f} });
 	// 小ポリゴン氷
-	iceLowModel_ = modelManager_->GetNameByModel("Ice_lowPolygon");
+	iceLowModel_ = modelManager_->GetNameByModel("ice_lowPolygon.gltf");
 	iceLowModel_->SetDefaultIsEnableLight(true);
 	iceLowModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,0.9f });
 	iceLowModel_->SetDefaultIOR(1.309f);
 	iceLowWorld_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{4.0f,2.0f,0.0f} });
 	// キューブ氷
-	iceCubeModel_ = modelManager_->GetNameByModel("Cube");
+	iceCubeModel_ = modelManager_->GetNameByModel("cube.obj");
 	iceCubeModel_->SetDefaultIsEnableLight(true);
 	iceCubeModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,0.9f });
 	iceCubeModel_->SetDefaultIOR(1.309f);

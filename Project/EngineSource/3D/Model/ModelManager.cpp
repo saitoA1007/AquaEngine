@@ -17,7 +17,7 @@ void ModelManager::Initialize(ID3D12GraphicsCommandList4* cmdList, TextureManage
 void ModelManager::RegisterModel(const std::string& modelFile, const std::string& objFileName) {
 
 	// 同名のモデルが登録されている場合は早期リターン
-	auto getName = nameToHandles_.find(modelFile);
+	auto getName = nameToHandles_.find(objFileName);
 	if (getName != nameToHandles_.end()) {
 		return;
 	}
@@ -32,7 +32,7 @@ void ModelManager::RegisterModel(const std::string& modelFile, const std::string
 
 	// 登録する
 	models_[handle] = std::move(entryData);
-	nameToHandles_[modelFile] = handle;
+	nameToHandles_[objFileName] = handle;
 }
 
 void ModelManager::RegisterModel(const std::string& modelName, std::unique_ptr<Model> model) {
@@ -173,54 +173,41 @@ void ModelManager::LoadAllModel() {
 	LogManager::GetInstance().Log("Start Loading All Models from: " + kDirectoryPath);
 
 	try {
-		// "Resources/Models/" の中を検索する
-		for (const auto& dirEntry : std::filesystem::directory_iterator(kDirectoryPath)) {
+		for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(kDirectoryPath)) {
 
-			// フォルダでなければスキップ
-			if (!dirEntry.is_directory()) {
+			if (!dirEntry.is_regular_file()) {
 				continue;
 			}
 
-			// フォルダの名前を取得する
-			const std::string folderName = dirEntry.path().filename().string();
-
-			// モデルファイル名
-			std::string modelFileName;
-			// モデルファイルの取得を判断
-			bool modelFound = false;
-
-			// フォルダの中からモデルファイルを検索する
-			for (const auto& fileEntry : std::filesystem::directory_iterator(dirEntry.path())) {
-
-				if (!fileEntry.is_regular_file()) {
-					continue;
-				}
-
-				// 登録している拡張子か確認する
-				std::string extension = fileEntry.path().extension().string();
-				for (const auto& ext : allowedExtensions) {
-					if (extension == ext) {
-						// モデルのファイルを取得する
-						modelFileName = fileEntry.path().filename().string();
-						modelFound = true;
-						break;
-					}
-				}
-
-				// ファイル検索を終了する
-				if (modelFound) {
+			// 拡張子のチェック
+			std::string extension = dirEntry.path().extension().string();
+			bool isAllowed = false;
+			for (const auto& ext : allowedExtensions) {
+				if (extension == ext) {
+					isAllowed = true;
 					break;
 				}
 			}
 
-			// モデルが存在している場合、登録する
-			if (modelFound) {
-				RegisterModel(folderName, modelFileName);
+			if (isAllowed) {
+				// 拡張子付きファイル名を取得
+				std::string fileName = dirEntry.path().filename().string();
+
+				// 相対パスを取得
+				auto relativePath = std::filesystem::relative(dirEntry.path(), kDirectoryPath);
+
+				// ファイル名を除いた、拡張子が存在するまでのフォルダパスを取得
+				std::string folderPath = relativePath.parent_path().string();
+
+				// Windows環境のバックスラッシュ '\\' を '/' に置換して統一
+				std::replace(folderPath.begin(), folderPath.end(), '\\', '/');
+
+				// 登録
+				RegisterModel(folderPath, fileName);
 			}
 		}
 	}
 	catch (std::filesystem::filesystem_error& e) {
-		// ファイルシステム関連のエラー処理
 		std::cerr << "Filesystem error while loading models: " << e.what() << std::endl;
 	}
 
