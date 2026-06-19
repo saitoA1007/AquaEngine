@@ -13,6 +13,8 @@ namespace GameEngine {
 
 		void ApplyGuizmo();
 
+		void AddObjectFromPath(const std::string& filePath);
+
 	private:
 		// 配置オブジェクト管理
 		StaticGameObjectManager* staticObjectManager_ = nullptr;

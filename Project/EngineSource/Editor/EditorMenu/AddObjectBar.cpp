@@ -1,4 +1,5 @@
 #include "AddObjectBar.h"
+#include <filesystem>
 #include "ImGuiManager.h"
 #include "MyMath.h"
 #include "DebugCamera.h"
@@ -126,4 +127,28 @@ void AddObjectBar::ApplyGuizmo() {
             worldTransform.UpdateTransformMatrix();
         }
     }
+}
+
+void AddObjectBar::AddObjectFromPath(const std::string& filePath) {
+    std::filesystem::path path(filePath);
+    std::string ext = path.extension().string();
+
+    // 拡張子を小文字に統一
+    for (char& c : ext) {
+        c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+    }
+
+    // モデルファイル以外がドロップされた場合は何もしない
+    if (ext != ".obj" && ext != ".gltf") {
+        return;
+    }
+
+    // 拡張子を含んだファイル名
+    std::string modelName = path.filename().string();
+
+    // 同じモデルを複数配置してもオブジェクト名が重複しないように番号を振る
+    static int objectCount = 0;
+    std::string objectName = modelName + "_" + std::to_string(objectCount++);
+
+    staticObjectManager_->AddObject(objectName, modelName);
 }

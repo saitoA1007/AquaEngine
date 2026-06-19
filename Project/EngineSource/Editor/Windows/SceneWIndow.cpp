@@ -37,6 +37,15 @@ void SceneWindow::Draw() {
 
 	ImGui::Image((ImTextureID)srvHandle.ptr, imageSize);
 
+	// Assetウィンドウからドラッグされたファイルをこの画像上にドロップした時の処理
+	if (ImGui::BeginDragDropTarget()) {
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_PATH")) {
+			std::string droppedPath(static_cast<const char*>(payload->Data));
+			addObjectBar_->AddObjectFromPath(droppedPath);
+		}
+		ImGui::EndDragDropTarget();
+	}
+
 	// 選択したオブジェクトのギズモを表示
 	addObjectBar_->ApplyGuizmo();
 
