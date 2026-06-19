@@ -37,10 +37,10 @@ void EditorCore::Initialize(TextureManager* textureManager, SceneChangeRequest* 
 	editorToolBar_ = std::make_unique<EditorToolBar>(textureManager);
 	sceneMenuBar_ = std::make_unique<SceneMenuBar>(sceneChangeRequest);
 	viewOptionsBar_ = std::make_unique<ViewOptionsBar>(input, renderQueue, debugRenderer, gridModel);
-	addObjectBar_ = std::make_unique<AddObjectBar>(staticObjectManager, renderQueue);
+	addObjectBar_ = std::make_unique<AddObjectBar>(staticObjectManager, renderQueue, viewOptionsBar_->GetDebugCamera());
 
 	// ウィンドウの内容を登録する
-	windowManager_->RegisterWindow(std::make_unique<SceneWindow>(renderPassController));
+	windowManager_->RegisterWindow(std::make_unique<SceneWindow>(renderPassController, addObjectBar_.get()));
 	windowManager_->RegisterWindow(std::make_unique<AssetWindow>(textureManager));
 	windowManager_->RegisterWindow(std::make_unique<HierarchyWindow>(gameParamEditor));
 	windowManager_->RegisterWindow(std::make_unique<InspectorWindow>(gameParamEditor));

@@ -318,17 +318,18 @@ namespace GameEngine {
 			float ndcX = (2.0f * mousePos.x) / windowWidth - 1.0f;
 			float ndcY = 1.0f - (2.0f * mousePos.y) / windowHeight;
 
-			// クリップ空間前方ベクトルを作成
-			Vector3 rayClip = Vector3(ndcX, ndcY, 1.0f);
-
 			// ビュー空間へ変換
 			Matrix4x4 invProj = InverseMatrix(projectionMatrix);
-			Vector3 rayView = Transforms(rayClip, invProj);
-			rayView.z = 1.0f;
+			Vector3 nearView = Transforms(Vector3(ndcX, ndcY, 0.0f), invProj);
+			Vector3 farView = Transforms(Vector3(ndcX, ndcY, 1.0f), invProj);
+
+			// ビュー空間でのレイ方向
+			Vector3 rayView = farView - nearView;
+			rayView.Normalize();
 
 			// ビュー行列の逆行列を掛けて、ワールド空間へ変換
 			Matrix4x4 invView = InverseMatrix(viewMatrix);
-			Vector3 rayWorld = Transforms(rayView, invView);
+			Vector3 rayWorld = TransformNormal(rayView, invView);
 
 			return rayWorld.Normalize();
 		}

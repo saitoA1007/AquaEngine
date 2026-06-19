@@ -21,7 +21,14 @@ namespace GameEngine {
 		WorldTransform& GetWorldTransform() { return modelComponent_.worldTransform_; }
 
 		// オブジェクト選択用のAABBの当たり判定
-		AABB GetSelectObjectAABB() const { return AABB({ -1.0f,-1.0f,-1.0f }, { 1.0f,1.0f,1.0f }); }
+		AABB GetSelectObjectAABB() const {
+			AABB aabb;
+
+			aabb.min = (modelComponent_.worldTransform_.transform_.translate - 1.0f) * modelComponent_.worldTransform_.transform_.scale;
+			aabb.max = (modelComponent_.worldTransform_.transform_.translate + 1.0f) * modelComponent_.worldTransform_.transform_.scale;
+
+			return aabb;
+		}
 
 	private:
 		ModelComponent modelComponent_;
