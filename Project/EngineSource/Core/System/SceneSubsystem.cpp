@@ -34,6 +34,8 @@ void SceneSubsystem::Initialize() {
 
 void SceneSubsystem::SceneInitialize() {
     sceneManager_->Initialize(sceneRegistry_.get(), context_.resource->GetGameParamEditor(), gameObjectManager_.get());
+    // 現在のシーンのオブジェクトを読み込む
+    staticObjectManager_->LoadSceneObject(context_.resource->GetGameParamEditor()->GetActiveScene());
 }
 
 void SceneSubsystem::UpdateGameplay() {
@@ -60,6 +62,8 @@ void SceneSubsystem::ResetCurrentScene() {
 
 void SceneSubsystem::ChangeScene(const std::string& sceneName) {
     sceneManager_->ChangeScene(sceneName);
+    staticObjectManager_->Clear();
+    staticObjectManager_->LoadSceneObject(sceneName);
 }
 
 std::string SceneSubsystem::GetCurrentSceneName() const {

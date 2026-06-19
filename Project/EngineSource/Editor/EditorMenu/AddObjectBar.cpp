@@ -13,13 +13,6 @@ AddObjectBar::AddObjectBar(StaticGameObjectManager* staticObjectManager, RenderQ
     paramEditor_ = paramEditor;  
 }
 
-void AddObjectBar::LoadObjectScene() {
-    // ロードする
-    const std::string& activeSceneName = paramEditor_->GetActiveScene();
-    std::string path = kDirectoryPath_ + activeSceneName + "Scene" + filePath_;
-    staticObjectManager_->LoadSceneObject(path);
-}
-
 void AddObjectBar::Run() {
 
 	if (ImGui::BeginMainMenuBar()) {
@@ -43,15 +36,13 @@ void AddObjectBar::Run() {
             // Load
             if (ImGui::MenuItem("Load", "Ctrl+L", false)) {
                 const std::string& activeSceneName = paramEditor_->GetActiveScene();
-                std::string path = kDirectoryPath_ + activeSceneName + "Scene" + filePath_;
-                staticObjectManager_->LoadSceneObject(path);
+                staticObjectManager_->LoadSceneObject(activeSceneName);
                 commandHistory_.Clear();
             }
             // Save
             if (ImGui::MenuItem("Save", "Ctrl+S", false)) {
                 const std::string& activeSceneName = paramEditor_->GetActiveScene();
-                std::string path = kDirectoryPath_ + activeSceneName + "Scene" + filePath_;
-                staticObjectManager_->SaveSceneObject(path);
+                staticObjectManager_->SaveSceneObject(activeSceneName);
             }
 			ImGui::EndMenu();
 		}
@@ -75,15 +66,13 @@ void AddObjectBar::Run() {
         // Load
         if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_L, false)) {
             const std::string& activeSceneName = paramEditor_->GetActiveScene();
-            std::string path = kDirectoryPath_ + activeSceneName + "Scene" + filePath_;
-            staticObjectManager_->LoadSceneObject(path);
+            staticObjectManager_->LoadSceneObject(activeSceneName);
             commandHistory_.Clear();
         }
         // Save
         if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_S, false)) {
             const std::string& activeSceneName = paramEditor_->GetActiveScene();
-            std::string path = kDirectoryPath_ + activeSceneName + "Scene" + filePath_;
-            staticObjectManager_->SaveSceneObject(path);
+            staticObjectManager_->SaveSceneObject(activeSceneName);
         }
     }
 }

@@ -91,14 +91,16 @@ int32_t StaticGameObjectManager::SelectObject(Vector2 mousePos, const Matrix4x4&
 	return selectedId;
 }
 
-void StaticGameObjectManager::LoadSceneObject(const std::string& filePath) {
+void StaticGameObjectManager::LoadSceneObject(const std::string& sceneName) {
+	std::string path = kDirectoryPath_ + sceneName + filePath_;
+
 	// ファイルがなければ早期リターン
-	if (!JsonSerializer::FileExists(filePath)) {
+	if (!JsonSerializer::FileExists(path)) {
 		return;
 	}
 
 	// JSONファイルを読み込む
-	nlohmann::json root = JsonSerializer::LoadFromFile(filePath);
+	nlohmann::json root = JsonSerializer::LoadFromFile(path);
 
 	if (!root.is_array()) {
 		return;
@@ -140,7 +142,7 @@ void StaticGameObjectManager::LoadSceneObject(const std::string& filePath) {
 	}
 }
 
-void StaticGameObjectManager::SaveSceneObject(const std::string& filePath) {
+void StaticGameObjectManager::SaveSceneObject(const std::string& sceneName) {
 	nlohmann::json root = nlohmann::json::array();
 
 	for (auto [id, object] : objects_) {
@@ -165,7 +167,8 @@ void StaticGameObjectManager::SaveSceneObject(const std::string& filePath) {
 	}
 
 	// ファイルに保存
-	JsonSerializer::SaveToFile(filePath, root);
+	std::string path = kDirectoryPath_ + sceneName + filePath_;
+	JsonSerializer::SaveToFile(path, root);
 }
 
 void StaticGameObjectManager::Clear() {

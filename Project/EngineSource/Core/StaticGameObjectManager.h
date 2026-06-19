@@ -31,10 +31,10 @@ namespace GameEngine {
 		int32_t SelectObject(Vector2 mousePos, const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix, const Vector3& cameraPosition,float width, float height);
 
 		// ロードする
-		void LoadSceneObject(const std::string& filePath);
+		void LoadSceneObject(const std::string& sceneName);
 
 		// 保存する
-		void SaveSceneObject(const std::string& filePath);
+		void SaveSceneObject(const std::string& sceneName);
 
 		// クリアする
 		void Clear();
@@ -44,6 +44,10 @@ namespace GameEngine {
 		GameObjectManager* objectManager_ = nullptr;
 		// モデル管理
 		ModelManager* modelManager_ = nullptr;
+
+		// ディレクトリ
+		const std::string kDirectoryPath_ = "Resources/Json/GameData/StaticObjectData/";
+		std::string filePath_ = "StaticObjectData.json";
 
 		// オブジェクト
 		std::unordered_map<uint32_t, StaticGameObject*> objects_;

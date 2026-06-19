@@ -67,9 +67,6 @@ void Engine::Initialize(HINSTANCE hInstance) {
     auto* request = scene_->GetSceneChangeRequest();
     request->SetCurrentSceneName(scene_->GetCurrentSceneName());
     request->SetSceneNames(scene_->GetSceneRegistry()->GetSceneNames());
-
-    // ロードする
-    editor_->InitializeLoad();
 #endif
 }
 
@@ -146,6 +143,7 @@ void Engine::PreUpdate() {
     if (request->HasChangeRequest()) {
         scene_->GetCollisionManager()->ClearList();
         scene_->ChangeScene(request->GetRequestScene());
+        editor_->SceneReset();
         request->ClearChangeRequest();
         request->SetCurrentSceneName(scene_->GetCurrentSceneName());
     }

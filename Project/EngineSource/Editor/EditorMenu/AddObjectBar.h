@@ -18,7 +18,9 @@ namespace GameEngine {
 
 		void AddObjectFromPath(const std::string& filePath);
 
-		void LoadObjectScene();
+		void Clear() {
+			commandHistory_.Clear();
+		}
 
 	private:
 		// 配置オブジェクト管理
@@ -42,9 +44,6 @@ namespace GameEngine {
 		Transform transformBeforeGizmo_;
 
 		int addedObjectCount_ = 0;
-
-		const std::string kDirectoryPath_ = "Resources/Json/GameData/StaticObjectData/";
-		std::string filePath_ = "StaticObjectData.json";
 
 	private:
 

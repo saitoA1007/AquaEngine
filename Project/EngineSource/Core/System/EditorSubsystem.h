@@ -20,7 +20,7 @@ namespace GameEngine {
         bool IsActiveUpdate() const;
         bool IsPause() const;
 
-        void InitializeLoad();
+        void SceneReset();
 
         EditorCore* GetEditorCore() const { return editorCore_.get(); }
 

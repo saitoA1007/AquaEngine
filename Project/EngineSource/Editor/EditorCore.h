@@ -34,9 +34,6 @@ namespace GameEngine {
 			Input* input, RenderQueue* renderQueue, DebugRenderer* debugRenderer, Model* gridModel, GameParamEditor* gameParamEditor,
 			StaticGameObjectManager* staticObjectManager);
 
-		// 初期化のロード
-		void InitializeLoad();
-
 		// 実行
 		void Run();
 
@@ -47,6 +44,8 @@ namespace GameEngine {
 		bool IsActiveUpdate() const;
 
 		bool IsPause() const;
+
+		void Clear();
 
 	private:
 

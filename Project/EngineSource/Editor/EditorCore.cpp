@@ -51,10 +51,6 @@ void EditorCore::Initialize(TextureManager* textureManager, SceneChangeRequest* 
 	editorLayout_->LoadLayout(windowManager_->GetWindows());
 }
 
-void EditorCore::InitializeLoad() {
-	addObjectBar_->LoadObjectScene();
-}
-
 void EditorCore::Run() {
 	BeginDockSpace();
 
@@ -95,4 +91,8 @@ bool EditorCore::IsActiveUpdate() const {
 
 bool EditorCore::IsPause() const {
 	return editorToolBar_->GetIsPauce();
+}
+
+void EditorCore::Clear() {
+	addObjectBar_->Clear();
 }
