@@ -16,7 +16,7 @@ void AddObjectBar::Run() {
 	if (ImGui::BeginMainMenuBar()) {
 		if (ImGui::BeginMenu("Object")) {
 			if (ImGui::MenuItem("Cube")) {
-				staticObjectManager_->AddObject("CubeObject", "Cube");
+				staticObjectManager_->AddObject("CubeObject", "cube.obj");
 			}
 			ImGui::EndMenu();
 		}
@@ -29,8 +29,11 @@ void AddObjectBar::ApplyGuizmo() {
 
     ImGuiIO& io = ImGui::GetIO();
 
+    bool isLeftClick = ImGui::IsMouseClicked(ImGuiMouseButton_Left);
+    bool isRightClick = ImGui::IsMouseClicked(ImGuiMouseButton_Right);
+
     // マウスがクリックされた時
-    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGuizmo::IsOver() && !ImGuizmo::IsUsing()) {
+    if ((isLeftClick || isRightClick) && !ImGuizmo::IsUsing()) {
 
         // 直前に描画したImGui::Imageの左上座標
         ImVec2 imageMin = ImGui::GetItemRectMin(); 
@@ -49,20 +52,46 @@ void AddObjectBar::ApplyGuizmo() {
             mousePosInGame.x = (relX / imageSize.x) * 1280.0f;
             mousePosInGame.y = (relY / imageSize.y) * 720.0f;
 
-            int32_t id = -1;
+            selectedId_ = -1;
 
             if (renderQueue_->GetUseDebugCamera()) {
-                id = staticObjectManager_->SelectObject(mousePosInGame, debugCamera_->GetViewMatrix(), debugCamera_->GetProjectionMatrix(), debugCamera_->GetWorldPosition(), 1280.0f, 720.0f);
+                selectedId_ = staticObjectManager_->SelectObject(mousePosInGame, debugCamera_->GetViewMatrix(), debugCamera_->GetProjectionMatrix(), debugCamera_->GetWorldPosition(), 1280.0f, 720.0f);
             } else {
                 Camera& camera = renderQueue_->GetMainCamera();
-                id = staticObjectManager_->SelectObject(mousePosInGame, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetWorldPosition(), 1280.0f, 720.0f);
+                selectedId_ = staticObjectManager_->SelectObject(mousePosInGame, camera.GetViewMatrix(), camera.GetProjectionMatrix(), camera.GetWorldPosition(), 1280.0f, 720.0f);
             }
 
-            if (id <= -1) {
-                selectObject_ = nullptr;
+            if (selectedId_ <= -1) {
+                // リセット
+                if (isLeftClick) {
+                    selectObject_ = nullptr;
+                    selectedId_ = -1;
+                }
             } else {
-                selectObject_ = staticObjectManager_->GetStaticObject(static_cast<uint32_t>(id));
+                selectObject_ = staticObjectManager_->GetStaticObject(static_cast<uint32_t>(selectedId_));
+
+                // 右クリックでポップメニューを開く
+                if (isRightClick) {
+                    ImGui::OpenPopup("ObjectContextMenu");
+                }
             }
+        }
+    }
+
+    // 右クリック操作
+    if (selectObject_ != nullptr) {
+        if (ImGui::BeginPopup("ObjectContextMenu")) {
+            // 「Delete」項目がクリックされたら削除
+            if (ImGui::MenuItem("Delete")) {
+                if (selectedId_ != -1) {
+                    // オブジェクトの削除
+                    staticObjectManager_->ReleaseObject(static_cast<uint32_t>(selectedId_));
+                    // 削除したので選択状態をクリアする
+                    selectObject_ = nullptr;
+                    selectedId_ = -1;
+                }
+            }
+            ImGui::EndPopup();
         }
     }
 

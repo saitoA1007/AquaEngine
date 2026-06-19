@@ -23,5 +23,6 @@ namespace GameEngine {
 
 		// 選択中のオブジェクト
 		StaticGameObject* selectObject_ = nullptr;
+		int32_t selectedId_ = -1;
 	};
 }
