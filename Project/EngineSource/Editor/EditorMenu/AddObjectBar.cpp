@@ -1,6 +1,5 @@
 #include "AddObjectBar.h"
 #include <filesystem>
-#include "ImGuiManager.h"
 #include "MyMath.h"
 #include "DebugCamera.h"
 using namespace GameEngine;
@@ -29,15 +28,71 @@ void AddObjectBar::ApplyGuizmo() {
 
     ImGuiIO& io = ImGui::GetIO();
 
+    // 直前に描画したImGui::Imageの左上座標
+    ImVec2 imageMin = ImGui::GetItemRectMin();
+    ImVec2 imageSize = ImGui::GetItemRectSize();
+
+    // ギズモの選択状態を表示
+    if (selectObject_ != nullptr) {
+        ImGui::SetNextWindowPos(ImVec2(imageMin.x + 10.0f, imageMin.y + 10.0f), ImGuiCond_Always);
+        ImGui::SetNextWindowBgAlpha(0.6f);
+
+        ImGuiWindowFlags toolbarFlags = ImGuiWindowFlags_NoDecoration |
+            ImGuiWindowFlags_AlwaysAutoResize |
+            ImGuiWindowFlags_NoMove |
+            ImGuiWindowFlags_NoSavedSettings;
+
+        if (ImGui::Begin("##GizmoToolbar", nullptr, toolbarFlags)) {
+            // ボタンサイズ
+            ImVec2 btnSize(32.0f, 32.0f);
+
+            /// 移動
+            bool isTranslate = (currentOperation_ == ImGuizmo::TRANSLATE);
+            if (isTranslate) {
+                // 選択中の場合はボタンの色を変える
+                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ButtonActive]);
+            }
+            if (ImGui::Button("T", btnSize)) {
+                currentOperation_ = ImGuizmo::TRANSLATE;
+            }
+            if (isTranslate) ImGui::PopStyleColor();
+
+            // マウスホバー時に説明を出す
+            if (ImGui::IsItemHovered()) ImGui::SetTooltip("Translate");
+
+            /// 回転
+            bool isRotate = (currentOperation_ == ImGuizmo::ROTATE);
+            if (isRotate) {
+                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ButtonActive]);
+            }
+            if (ImGui::Button("R", btnSize)) {
+                currentOperation_ = ImGuizmo::ROTATE;
+            }
+            if (isRotate) ImGui::PopStyleColor();
+
+            if (ImGui::IsItemHovered()) ImGui::SetTooltip("Rotate");
+
+            /// 拡縮
+            bool isScale = (currentOperation_ == ImGuizmo::SCALE);
+            if (isScale) {
+                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ButtonActive]);
+            }
+            if (ImGui::Button("S", btnSize)) {
+                currentOperation_ = ImGuizmo::SCALE;
+            }
+            if (isScale) ImGui::PopStyleColor();
+
+            if (ImGui::IsItemHovered()) ImGui::SetTooltip("Scale");
+        }
+        ImGui::End();
+    }
+    
     bool isLeftClick = ImGui::IsMouseClicked(ImGuiMouseButton_Left);
     bool isRightClick = ImGui::IsMouseClicked(ImGuiMouseButton_Right);
 
     // マウスがクリックされた時
-    if ((isLeftClick || isRightClick) && !ImGuizmo::IsUsing()) {
+    if ((isLeftClick || isRightClick) && !ImGuizmo::IsUsing() && ImGui::IsItemHovered()) {
 
-        // 直前に描画したImGui::Imageの左上座標
-        ImVec2 imageMin = ImGui::GetItemRectMin(); 
-        ImVec2 imageSize = ImGui::GetItemRectSize();
         // スクリーン座標のマウス位置を取得
         Vector2 mousePosGlobal = Vector2(io.MousePos.x, io.MousePos.y);
 
@@ -112,13 +167,6 @@ void AddObjectBar::ApplyGuizmo() {
         float gizmoMatrix[16];
         std::memcpy(gizmoMatrix, &objectMatrix, sizeof(float) * 16);
 
-        static ImGuizmo::OPERATION currentOperation = ImGuizmo::TRANSLATE;
-
-        // 簡易的な切り替えUIの例
-        //if (ImGui::RadioButton("Translate", currentOperation == ImGuizmo::TRANSLATE)) currentOperation = ImGuizmo::TRANSLATE; ImGui::SameLine();
-        //if (ImGui::RadioButton("Rotate", currentOperation == ImGuizmo::ROTATE)) currentOperation = ImGuizmo::ROTATE; ImGui::SameLine();
-        //if (ImGui::RadioButton("Scale", currentOperation == ImGuizmo::SCALE)) currentOperation = ImGuizmo::SCALE;
-       
         Matrix4x4 viewMat;
         Matrix4x4 projMat;
         if (renderQueue_->GetUseDebugCamera()) {
@@ -134,7 +182,7 @@ void AddObjectBar::ApplyGuizmo() {
         bool isManipulated = ImGuizmo::Manipulate(
             reinterpret_cast<const float*>(&viewMat),
             reinterpret_cast<const float*>(&projMat),
-            currentOperation,
+            currentOperation_,
             ImGuizmo::WORLD,
             gizmoMatrix
         );

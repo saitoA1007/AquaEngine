@@ -1,6 +1,6 @@
 #pragma once
 #include "StaticGameObjectManager.h"
-
+#include "ImGuiManager.h"
 namespace GameEngine {
 
 	class DebugCamera;
@@ -24,5 +24,8 @@ namespace GameEngine {
 		// 選択中のオブジェクト
 		StaticGameObject* selectObject_ = nullptr;
 		int32_t selectedId_ = -1;
+
+		// 現在の選択状態
+		ImGuizmo::OPERATION currentOperation_ = ImGuizmo::TRANSLATE;
 	};
 }

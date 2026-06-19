@@ -24,8 +24,8 @@ namespace GameEngine {
 		AABB GetSelectObjectAABB() const {
 			AABB aabb;
 
-			aabb.min = modelComponent_.worldTransform_.transform_.translate - 1.0f;
-			aabb.max = modelComponent_.worldTransform_.transform_.translate + 1.0f;
+			aabb.min = (modelComponent_.worldTransform_.transform_.translate - 1.0f) * modelComponent_.worldTransform_.transform_.scale;
+			aabb.max = (modelComponent_.worldTransform_.transform_.translate + 1.0f) * modelComponent_.worldTransform_.transform_.scale;
 
 			return aabb;
 		}
