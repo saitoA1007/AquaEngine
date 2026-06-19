@@ -18,15 +18,8 @@ uint32_t StaticGameObjectManager::AddObject(std::string objecctName, std::string
 	auto* object = objectManager_->AddObject<StaticGameObject>(objecctName, model);
 
 	// idを取得
-	uint32_t id = 0;
-	if (!freeIndices_.empty()) {
-		uint32_t index = freeIndices_.front();
-		freeIndices_.pop_front();
-		id = index;
-	} else {
-		id = currentIndex_++;
-	}	
-
+	uint32_t id = currentIndex_++;
+	
 	// オブジェクトを追加
 	objects_[id] = object;
 
@@ -34,19 +27,28 @@ uint32_t StaticGameObjectManager::AddObject(std::string objecctName, std::string
 }
 
 void StaticGameObjectManager::ReleaseObject(uint32_t id) {
-	// 解放されたidを登録
-	freeIndices_.push_back(id);
-
 	auto it = objects_.find(id);
 	assert(it != objects_.end() && "StaticObject not found");
 	StaticGameObject* object = it->second;
-	// オブジェクトの削除
-	object->Destroy();
+	// オブジェクトの無効化
+	object->SetActive(false);
+}
+
+void StaticGameObjectManager::RestoreObject(uint32_t id) {
+	auto it = objects_.find(id);
+	assert(it != objects_.end() && "StaticObject not found");
+	StaticGameObject* object = it->second;
+	// オブジェクトの有効化
+	object->SetActive(true);
 }
 
 StaticGameObject* StaticGameObjectManager::GetStaticObject(uint32_t id) {
 	auto it = objects_.find(id);
 	assert(it != objects_.end() && "StaticObject not found");
+	if (!it->second->IsActive()) {
+		// 論理削除済みのオブジェクトはnullを返す
+		return nullptr;
+	}
 	StaticGameObject* object = it->second;
 	return object;
 }
@@ -62,6 +64,11 @@ int32_t StaticGameObjectManager::SelectObject(Vector2 mousePos, const Matrix4x4&
 	float minDistance = FLT_MAX;
 
 	for (auto [id, object] : objects_) {
+		// 論理削除済みのオブジェクトは飛ばす
+		if (!object->IsActive()) {
+			continue; 
+		}
+
 		AABB aabb = object->GetSelectObjectAABB();
 		Segment segment = Segment(rayOrigin, rayDiff);
 

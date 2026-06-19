@@ -1,5 +1,4 @@
 #pragma once
-#include <deque>
 #include <unordered_map>
 #include "GameObjectManager.h"
 #include "ModelManager.h"
@@ -18,8 +17,11 @@ namespace GameEngine {
 		// 追加
 		uint32_t AddObject(std::string objecctName, std::string modelName);
 
-		// 削除
+		// 論理削除
 		void ReleaseObject(uint32_t id);
+
+		// 論理削除したオブジェクトを再アクティブ化する
+		void RestoreObject(uint32_t id);
 
 		// オブジェクトを取得
 		StaticGameObject* GetStaticObject(uint32_t id);
@@ -36,8 +38,6 @@ namespace GameEngine {
 		// オブジェクト
 		std::unordered_map<uint32_t, StaticGameObject*> objects_;
 
-		// 解放されたインデックスのリスト
-		std::deque<uint32_t> freeIndices_;
 		uint32_t currentIndex_ = 0;
 	};
 }

@@ -2,6 +2,8 @@
 #include <filesystem>
 #include "MyMath.h"
 #include "DebugCamera.h"
+#include "Command/EditorCommand.h"
+
 using namespace GameEngine;
 
 AddObjectBar::AddObjectBar(StaticGameObjectManager* staticObjectManager, RenderQueue* renderQueue, DebugCamera* debugCamera) {
@@ -14,14 +16,42 @@ void AddObjectBar::Run() {
 
 	if (ImGui::BeginMainMenuBar()) {
 		if (ImGui::BeginMenu("Object")) {
+            // Cubeオブジェクトを追加
 			if (ImGui::MenuItem("Cube")) {
-				staticObjectManager_->AddObject("CubeObject", "cube.obj");
+                std::string objectName = "CubeObject_" + std::to_string(addedObjectCount_++);
+                // オブジェクトの追加コマンドを実行
+                commandHistory_.Execute(std::make_unique<AddObjectCommand>(staticObjectManager_, objectName, "cube.obj"));
 			}
+            // Undo
+            if (ImGui::MenuItem("Undo", "Ctrl+Z", false, commandHistory_.CanUndo())) {
+                commandHistory_.Undo();
+                ClearSelection();
+            }
+            // Redo
+            if (ImGui::MenuItem("Redo", "Ctrl+Y", false, commandHistory_.CanRedo())) {
+                commandHistory_.Redo();
+                ClearSelection();
+            }
 			ImGui::EndMenu();
 		}
 
 		ImGui::EndMainMenuBar();
 	}	
+
+    // キーボードショートカット
+    ImGuiIO& io = ImGui::GetIO();
+    if (!io.WantTextInput) {
+        // undo
+        if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_Z, false)) {
+            commandHistory_.Undo();
+            ClearSelection();
+        }
+        // redo
+        if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_Y, false)) {
+            commandHistory_.Redo();
+            ClearSelection();
+        }
+    }
 }
 
 void AddObjectBar::ApplyGuizmo() {
@@ -119,8 +149,7 @@ void AddObjectBar::ApplyGuizmo() {
             if (selectedId_ <= -1) {
                 // リセット
                 if (isLeftClick) {
-                    selectObject_ = nullptr;
-                    selectedId_ = -1;
+                    ClearSelection();
                 }
             } else {
                 selectObject_ = staticObjectManager_->GetStaticObject(static_cast<uint32_t>(selectedId_));
@@ -139,11 +168,10 @@ void AddObjectBar::ApplyGuizmo() {
             // 「Delete」項目がクリックされたら削除
             if (ImGui::MenuItem("Delete")) {
                 if (selectedId_ != -1) {
-                    // オブジェクトの削除
-                    staticObjectManager_->ReleaseObject(static_cast<uint32_t>(selectedId_));
+                    // オブジェクトの削除コマンドを実行
+                    commandHistory_.Execute(std::make_unique<DeleteObjectCommand>(staticObjectManager_, static_cast<uint32_t>(selectedId_)));
                     // 削除したので選択状態をクリアする
-                    selectObject_ = nullptr;
-                    selectedId_ = -1;
+                    ClearSelection();
                 }
             }
             ImGui::EndPopup();
@@ -178,6 +206,13 @@ void AddObjectBar::ApplyGuizmo() {
             projMat = camera.GetProjectionMatrix();
         }
 
+        // ドラッグ中でない間は、現在の値を保持する
+        if (!wasUsingGizmo_) {
+            transformBeforeGizmo_.translate = worldTransform.transform_.translate;
+            transformBeforeGizmo_.rotate = worldTransform.transform_.rotate;
+            transformBeforeGizmo_.scale = worldTransform.transform_.scale;
+        }
+
         // ギズモを動かしたかどうかの判定
         bool isManipulated = ImGuizmo::Manipulate(
             reinterpret_cast<const float*>(&viewMat),
@@ -203,6 +238,23 @@ void AddObjectBar::ApplyGuizmo() {
             // 行列の更新
             worldTransform.UpdateTransformMatrix();
         }
+
+        bool isUsingGizmoNow = ImGuizmo::IsUsing();
+
+        // ドラッグが終了した瞬間に、操作前と操作後の差分を1つのUndo履歴として積む
+        if (!isUsingGizmoNow && wasUsingGizmo_) {
+            Transform transformAfterGizmo;
+            transformAfterGizmo.translate = worldTransform.transform_.translate;
+            transformAfterGizmo.rotate = worldTransform.transform_.rotate;
+            transformAfterGizmo.scale = worldTransform.transform_.scale;
+
+            // 位置を登録
+            commandHistory_.Execute(std::make_unique<TransformObjectCommand>(
+                staticObjectManager_, static_cast<uint32_t>(selectedId_),
+                transformBeforeGizmo_, transformAfterGizmo));
+        }
+
+        wasUsingGizmo_ = isUsingGizmoNow;
     }
 }
 
@@ -227,5 +279,11 @@ void AddObjectBar::AddObjectFromPath(const std::string& filePath) {
     static int objectCount = 0;
     std::string objectName = modelName + "_" + std::to_string(objectCount++);
 
-    staticObjectManager_->AddObject(objectName, modelName);
+    // オブジェクトの追加コマンドを実行
+    commandHistory_.Execute(std::make_unique<AddObjectCommand>(staticObjectManager_, objectName, modelName));
+}
+
+void AddObjectBar::ClearSelection() {
+    selectObject_ = nullptr;
+    selectedId_ = -1;
 }

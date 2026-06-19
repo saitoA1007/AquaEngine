@@ -224,6 +224,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Core\System\InputSubsystem.cpp" />
     <ClCompile Include="EngineSource\Core\System\ResourceSubsystem.cpp" />
     <ClCompile Include="EngineSource\Core\System\SceneSubsystem.cpp" />
+    <ClCompile Include="EngineSource\Editor\Command\EditorCommand.cpp" />
     <ClCompile Include="EngineSource\Editor\DebugParameter.cpp" />
     <ClCompile Include="EngineSource\Editor\EditorMenu\AddObjectBar.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -475,10 +476,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Core\System\InputSubsystem.h" />
     <ClInclude Include="EngineSource\Core\System\ResourceSubsystem.h" />
     <ClInclude Include="EngineSource\Core\System\SceneSubsystem.h" />
+    <ClInclude Include="EngineSource\Editor\Command\EditorCommand.h" />
+    <ClInclude Include="EngineSource\Editor\Command\EditorCommandHistory.h" />
     <ClInclude Include="EngineSource\Editor\DebugParameter.h" />
     <ClInclude Include="EngineSource\Editor\EditorMenu\AddObjectBar.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="EngineSource\Editor\IEditorCommand.h" />
     <ClInclude Include="EngineSource\Editor\JsonSerializer.h" />
     <ClInclude Include="EngineSource\Graphics\Buffers\BLAS.h" />
     <ClInclude Include="EngineSource\Graphics\Buffers\RefBuffer.h" />

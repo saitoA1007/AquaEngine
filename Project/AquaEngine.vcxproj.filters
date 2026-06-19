@@ -551,6 +551,7 @@
     <ClCompile Include="EngineSource\Core\StaticGameObject.cpp" />
     <ClCompile Include="EngineSource\Core\StaticGameObjectManager.cpp" />
     <ClCompile Include="EngineSource\Editor\EditorMenu\AddObjectBar.cpp" />
+    <ClCompile Include="EngineSource\Editor\Command\EditorCommand.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1080,6 +1081,9 @@
     <ClInclude Include="EngineSource\Core\StaticGameObject.h" />
     <ClInclude Include="EngineSource\Core\StaticGameObjectManager.h" />
     <ClInclude Include="EngineSource\Editor\EditorMenu\AddObjectBar.h" />
+    <ClInclude Include="EngineSource\Editor\IEditorCommand.h" />
+    <ClInclude Include="EngineSource\Editor\Command\EditorCommand.h" />
+    <ClInclude Include="EngineSource\Editor\Command\EditorCommandHistory.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />
