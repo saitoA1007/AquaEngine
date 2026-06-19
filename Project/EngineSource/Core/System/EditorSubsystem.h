@@ -18,7 +18,9 @@ namespace GameEngine {
         void SetContext(const EngineContext& ctx) { context_ = ctx; }
 
         bool IsActiveUpdate() const;
-        bool IsPause()        const;
+        bool IsPause() const;
+
+        void InitializeLoad();
 
         EditorCore* GetEditorCore() const { return editorCore_.get(); }
 

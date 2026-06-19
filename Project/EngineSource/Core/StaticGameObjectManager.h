@@ -3,6 +3,7 @@
 #include "GameObjectManager.h"
 #include "ModelManager.h"
 #include "StaticGameObject.h"
+#include "JsonSerializer.h"
 namespace GameEngine {
 
 	class StaticGameObjectManager {
@@ -28,6 +29,15 @@ namespace GameEngine {
 
 		// マウスの位置から選択されるオブジェクトを取得
 		int32_t SelectObject(Vector2 mousePos, const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix, const Vector3& cameraPosition,float width, float height);
+
+		// ロードする
+		void LoadSceneObject(const std::string& filePath);
+
+		// 保存する
+		void SaveSceneObject(const std::string& filePath);
+
+		// クリアする
+		void Clear();
 
 	private:
 		// オブジェクト管理

@@ -3,13 +3,21 @@
 #include "MyMath.h"
 #include "DebugCamera.h"
 #include "Command/EditorCommand.h"
-
+#include "GameParamEditor.h"
 using namespace GameEngine;
 
-AddObjectBar::AddObjectBar(StaticGameObjectManager* staticObjectManager, RenderQueue* renderQueue, DebugCamera* debugCamera) {
+AddObjectBar::AddObjectBar(StaticGameObjectManager* staticObjectManager, RenderQueue* renderQueue, DebugCamera* debugCamera, GameParamEditor* paramEditor) {
 	staticObjectManager_ = staticObjectManager;
 	renderQueue_ = renderQueue;
     debugCamera_ = debugCamera;
+    paramEditor_ = paramEditor;  
+}
+
+void AddObjectBar::LoadObjectScene() {
+    // ロードする
+    const std::string& activeSceneName = paramEditor_->GetActiveScene();
+    std::string path = kDirectoryPath_ + activeSceneName + "Scene" + filePath_;
+    staticObjectManager_->LoadSceneObject(path);
 }
 
 void AddObjectBar::Run() {
@@ -32,6 +40,19 @@ void AddObjectBar::Run() {
                 commandHistory_.Redo();
                 ClearSelection();
             }
+            // Load
+            if (ImGui::MenuItem("Load", "Ctrl+L", false)) {
+                const std::string& activeSceneName = paramEditor_->GetActiveScene();
+                std::string path = kDirectoryPath_ + activeSceneName + "Scene" + filePath_;
+                staticObjectManager_->LoadSceneObject(path);
+                commandHistory_.Clear();
+            }
+            // Save
+            if (ImGui::MenuItem("Save", "Ctrl+S", false)) {
+                const std::string& activeSceneName = paramEditor_->GetActiveScene();
+                std::string path = kDirectoryPath_ + activeSceneName + "Scene" + filePath_;
+                staticObjectManager_->SaveSceneObject(path);
+            }
 			ImGui::EndMenu();
 		}
 
@@ -50,6 +71,19 @@ void AddObjectBar::Run() {
         if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_Y, false)) {
             commandHistory_.Redo();
             ClearSelection();
+        }
+        // Load
+        if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_L, false)) {
+            const std::string& activeSceneName = paramEditor_->GetActiveScene();
+            std::string path = kDirectoryPath_ + activeSceneName + "Scene" + filePath_;
+            staticObjectManager_->LoadSceneObject(path);
+            commandHistory_.Clear();
+        }
+        // Save
+        if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_S, false)) {
+            const std::string& activeSceneName = paramEditor_->GetActiveScene();
+            std::string path = kDirectoryPath_ + activeSceneName + "Scene" + filePath_;
+            staticObjectManager_->SaveSceneObject(path);
         }
     }
 }

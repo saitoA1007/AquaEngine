@@ -35,6 +35,10 @@ void EditorSubsystem::Finalize() {
     editorCore_->Finalize();
 }
 
+void EditorSubsystem::InitializeLoad() {
+    editorCore_->InitializeLoad();
+}
+
 bool EditorSubsystem::IsActiveUpdate() const {
     return editorCore_->IsActiveUpdate();
 }

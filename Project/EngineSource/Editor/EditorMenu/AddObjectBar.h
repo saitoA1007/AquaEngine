@@ -6,10 +6,11 @@
 namespace GameEngine {
 
 	class DebugCamera;
+	class GameParamEditor;
 
 	class AddObjectBar {
 	public:
-		AddObjectBar(StaticGameObjectManager* staticObjectManager, RenderQueue* renderQueue, DebugCamera* debugCamera);
+		AddObjectBar(StaticGameObjectManager* staticObjectManager, RenderQueue* renderQueue, DebugCamera* debugCamera, GameParamEditor* paramEditor);
 
 		void Run();
 
@@ -17,11 +18,14 @@ namespace GameEngine {
 
 		void AddObjectFromPath(const std::string& filePath);
 
+		void LoadObjectScene();
+
 	private:
 		// 配置オブジェクト管理
 		StaticGameObjectManager* staticObjectManager_ = nullptr;
 		RenderQueue* renderQueue_ = nullptr;
 		DebugCamera* debugCamera_ = nullptr;
+		GameParamEditor* paramEditor_ = nullptr;
 
 		// 選択中のオブジェクト
 		StaticGameObject* selectObject_ = nullptr;
@@ -38,6 +42,9 @@ namespace GameEngine {
 		Transform transformBeforeGizmo_;
 
 		int addedObjectCount_ = 0;
+
+		const std::string kDirectoryPath_ = "Resources/Json/GameData/StaticObjectData/";
+		std::string filePath_ = "StaticObjectData.json";
 
 	private:
 
