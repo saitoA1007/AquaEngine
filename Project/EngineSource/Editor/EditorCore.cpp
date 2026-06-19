@@ -37,7 +37,7 @@ void EditorCore::Initialize(TextureManager* textureManager, SceneChangeRequest* 
 	editorToolBar_ = std::make_unique<EditorToolBar>(textureManager);
 	sceneMenuBar_ = std::make_unique<SceneMenuBar>(sceneChangeRequest);
 	viewOptionsBar_ = std::make_unique<ViewOptionsBar>(input, renderQueue, debugRenderer, gridModel);
-	addObjectBar_ = std::make_unique<AddObjectBar>(staticObjectManager, renderQueue, viewOptionsBar_->GetDebugCamera());
+	addObjectBar_ = std::make_unique<AddObjectBar>(staticObjectManager, renderQueue, viewOptionsBar_->GetDebugCamera(), gameParamEditor);
 
 	// ウィンドウの内容を登録する
 	windowManager_->RegisterWindow(std::make_unique<SceneWindow>(renderPassController, addObjectBar_.get()));
@@ -91,4 +91,8 @@ bool EditorCore::IsActiveUpdate() const {
 
 bool EditorCore::IsPause() const {
 	return editorToolBar_->GetIsPauce();
+}
+
+void EditorCore::Clear() {
+	addObjectBar_->Clear();
 }

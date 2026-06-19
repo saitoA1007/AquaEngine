@@ -45,6 +45,8 @@ namespace GameEngine {
 
 		bool IsPause() const;
 
+		void Clear();
+
 	private:
 
 		// 各ウィンドウ

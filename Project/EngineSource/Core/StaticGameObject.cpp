@@ -2,9 +2,9 @@
 
 using namespace GameEngine;
 
-StaticGameObject::StaticGameObject(std::string name, Model* model) : modelComponent_(model) {
-
+StaticGameObject::StaticGameObject(std::string name, std::string modelName, Model* model) : modelComponent_(model) {
 	name_ = name;
+	modelName_ = modelName;
 
 }
 

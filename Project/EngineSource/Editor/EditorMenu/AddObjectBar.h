@@ -6,10 +6,11 @@
 namespace GameEngine {
 
 	class DebugCamera;
+	class GameParamEditor;
 
 	class AddObjectBar {
 	public:
-		AddObjectBar(StaticGameObjectManager* staticObjectManager, RenderQueue* renderQueue, DebugCamera* debugCamera);
+		AddObjectBar(StaticGameObjectManager* staticObjectManager, RenderQueue* renderQueue, DebugCamera* debugCamera, GameParamEditor* paramEditor);
 
 		void Run();
 
@@ -17,11 +18,16 @@ namespace GameEngine {
 
 		void AddObjectFromPath(const std::string& filePath);
 
+		void Clear() {
+			commandHistory_.Clear();
+		}
+
 	private:
 		// 配置オブジェクト管理
 		StaticGameObjectManager* staticObjectManager_ = nullptr;
 		RenderQueue* renderQueue_ = nullptr;
 		DebugCamera* debugCamera_ = nullptr;
+		GameParamEditor* paramEditor_ = nullptr;
 
 		// 選択中のオブジェクト
 		StaticGameObject* selectObject_ = nullptr;

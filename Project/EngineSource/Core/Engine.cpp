@@ -143,6 +143,7 @@ void Engine::PreUpdate() {
     if (request->HasChangeRequest()) {
         scene_->GetCollisionManager()->ClearList();
         scene_->ChangeScene(request->GetRequestScene());
+        editor_->SceneReset();
         request->ClearChangeRequest();
         request->SetCurrentSceneName(scene_->GetCurrentSceneName());
     }
