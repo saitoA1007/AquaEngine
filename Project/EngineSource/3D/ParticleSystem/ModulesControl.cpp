@@ -16,6 +16,8 @@ ModulesControl::ModulesControl(DebugParameter* param) {
     RegisterModule<VelocityOverLifeTimeModule>(mainGroup, "VelocityOverLifeTime");
     RegisterModule<SizeOverLifeTimeModule>(mainGroup, "SizeOverLifeTime");
     RegisterModule<AlphaOverLifeTimeModule>(mainGroup, "AlphaOverLifeTime");
+    RegisterModule<AttractionModule>(mainGroup, "Attraction");
+    RegisterModule<VortexModule>(mainGroup, "Vortex");
 }
 
 void ModulesControl::Update() {

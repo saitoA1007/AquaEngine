@@ -2,29 +2,28 @@
 #include <vector>
 #include "ParticleData.h"
 #include "Matrix4x4.h"
-#include "WorldTransforms.h"
 #include "ParticleModules.h"
 #include "DebugParameter.h"
 #include "ModulesControl.h"
+#include "IGameObject.h"
+#include "Camera.h"
+#include "WorldTransforms.h"
 
 namespace GameEngine{
 
-	class ParticleBehavior {
+	class ParticleBehavior : public IGameObject {
 	public:
-		ParticleBehavior(const std::string& name, uint32_t maxNum, uint32_t textureHandle);
+		ParticleBehavior(const std::string& name, uint32_t maxNum, uint32_t textureHandle, Model* model, Camera* camera);
+		~ParticleBehavior() = default;
 
-		/// <summary>
-		/// 初期化
-		/// </summary>
-		/// <param name="maxNum"></param>
-		/// <param name="textureHandle"></param>
-		/// <param name="particleEmitter"></param>
-		void Initialize();
+		// 初期化処理
+		void Initialize() override;
 
-		/// <summary>
-		/// 更新処理
-		/// </summary>
-		void Update(const Matrix4x4& cameraMatrix);
+		// 更新処理
+		void Update() override;
+
+		// 描画処理
+		void Draw() override;
 
 		/// <summary>
 		/// パーティクルの生成
@@ -72,9 +71,14 @@ namespace GameEngine{
 		// モジュールの管理
 		std::unique_ptr<ModulesControl> modulesControl_;
 
+		// カメラ
+		Camera* camera_ = nullptr;
+
+		// モデル
+		Model* model_ = nullptr;
+
 		// 使用テクスチャ
 		uint32_t textureHandle_ = 0;
-
 
 		// パーティクルの配列
 		std::vector<ParticleData> particles_;           

@@ -4,10 +4,12 @@
 #include "MyMath.h"
 using namespace GameEngine;
 
-ParticleBehavior::ParticleBehavior(const std::string& name, uint32_t maxNum, uint32_t textureHandle) {
+ParticleBehavior::ParticleBehavior(const std::string& name, uint32_t maxNum, uint32_t textureHandle, Model* model, Camera* camera) {
     maxNumInstance_ = maxNum;
     textureHandle_ = textureHandle;
     name_ = name;
+    camera_ = camera;
+    model_ = model;
 
     // パーティクル配列を確保
     particles_.resize(maxNumInstance_);
@@ -59,7 +61,7 @@ void ParticleBehavior::Initialize() {
     
 }
 
-void ParticleBehavior::Update(const Matrix4x4& cameraMatrix) {
+void ParticleBehavior::Update() {
     // 値の適応
     debugParame_->ApplyIfDirty();
 
@@ -77,7 +79,11 @@ void ParticleBehavior::Update(const Matrix4x4& cameraMatrix) {
     }
 
     // 移動処理
-    Move(cameraMatrix);
+    Move(camera_->GetWorldMatrix());
+}
+
+void ParticleBehavior::Draw() {
+    renderQueue_->SubmitInstancing(model_, currentNumInstance_, *worldTransforms_, 0.0f, BlendMode::kBlendModeAdd);
 }
 
 void ParticleBehavior::Emit(const Vector3& pos) {

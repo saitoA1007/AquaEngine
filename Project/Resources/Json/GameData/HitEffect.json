@@ -1,0 +1,83 @@
+{
+    "HitEffect": {
+        "Emitter": {
+            "Defalut": {
+                "EmittePos": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "Rotate": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "Scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "IsBillBoard": true,
+            "IsLoop": true,
+            "LifeTime": 3.0,
+            "RotateEmit": {
+                "Enable": false
+            },
+            "ScaleEmit": {
+                "Enable": false
+            },
+            "ShapeEmit": {
+                "Enable": true,
+                "Shape": {
+                    "_ShapeType": "Box",
+                    "_boxSize": [
+                        20.0,
+                        1.0,
+                        20.0
+                    ],
+                    "_emitFromShell": true,
+                    "_radius": 20.700000762939453
+                }
+            },
+            "SpawnCoolTime": 0.10000000149011612,
+            "SpawnMaxCount": 2,
+            "VelocityEmit": {
+                "Enable": false
+            }
+        },
+        "Particle": {
+            "AlphaOverLifeTime": {
+                "Enable": false
+            },
+            "Attraction": {
+                "Damping": 4.46999979019165,
+                "Enable": true,
+                "Strength": 37.56999969482422,
+                "TargetPos": [
+                    0.0,
+                    3.7300000190734863,
+                    0.0
+                ]
+            },
+            "SizeOverLifeTime": {
+                "Enable": false
+            },
+            "VelocityOverLifeTime": {
+                "Enable": false
+            },
+            "Vortex": {
+                "AttractionSpeed": 30.0,
+                "AxisSpeed": 2.0,
+                "CenterPos": [
+                    0.0,
+                    22.860000610351563,
+                    0.0
+                ],
+                "Enable": true,
+                "RotationSpeed": -30.0
+            }
+        },
+        "SceneName": "Test"
+    }
+}
