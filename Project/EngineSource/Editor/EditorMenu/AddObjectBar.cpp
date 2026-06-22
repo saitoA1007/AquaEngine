@@ -205,8 +205,6 @@ void AddObjectBar::ApplyGuizmo() {
     if (selectObject_ != nullptr) {
 
         ImGuizmo::SetOrthographic(false);
-        ImVec2 imageMin = ImGui::GetItemRectMin();
-        ImVec2 imageSize = ImGui::GetItemRectSize();
         ImGuizmo::SetRect(imageMin.x, imageMin.y, imageSize.x, imageSize.y);
         ImGuizmo::SetDrawlist(ImGui::GetForegroundDrawList());
 

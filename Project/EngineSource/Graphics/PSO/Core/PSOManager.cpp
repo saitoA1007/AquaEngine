@@ -375,7 +375,7 @@ void PSOManager::DefaultLoadPSO() {
     default3D.rootSigName = "Default3D";
     default3D.vsPath = L"Resources/Shaders/Rasterize/Object3d.VS.hlsl";
     default3D.psPath = L"Resources/Shaders/Rasterize/Object3d.PS.hlsl";
-    default3D.drawMode = DrawModel::FillFront;
+    default3D.drawMode = DrawModel::None;
     default3D.blendMode = { BlendMode::kBlendModeNormalAndSaveObjectAlpha };
     default3D.isDepthEnable = true;
     RootSignatureBuilder rootSigBuilder;
@@ -395,7 +395,7 @@ void PSOManager::DefaultLoadPSO() {
     RegisterPSO("Default3D", default3D, &rootSigBuilder, &inputLayoutBuilder);
 
     // 加算合成用PSO
-    default3D.blendMode = { BlendMode::kBlendModeAdd };
+    default3D.blendMode = { BlendMode::kBlendModeAddAndSaveObjectAlpha };
     RegisterPSO("Additive3D", default3D, &rootSigBuilder, &inputLayoutBuilder);
 
     // デフォルトのスプライト用PSO

@@ -9,6 +9,7 @@ namespace GameEngine {
 	class InputCommand;
 	class DebugParameter;
 }
+class PlayerEffectManager;
 
 // プレイヤーの状態
 enum class PlayerState {
@@ -39,6 +40,9 @@ struct PlayerCommonData {
 
 	// プレイヤーのアニメーション管理
 	PlayerAnimator* animator_ = nullptr;
+
+	// 演出管理
+	PlayerEffectManager* effectManager_ = nullptr;
 };
 
 // プレイヤーアクションの基底クラス

@@ -4,18 +4,24 @@
 struct Material
 {
     float4 color;
+    
     int enableLighting;
-    float3 padding0;
+    float dissolveThreshold;
+    float2 padding0;
+    
     float4x4 uvTransform;
+    
     float4 specularColor;
+    
     float shininess;
     uint textureHandle;
     float metallic;
     int isActiveShadow;
+    
     float ior;
     float roughness;
     uint normalTextureHandle;
-    float padding1;
+    uint dissolveTextureHandle;
 };
 ConstantBuffer<Material> gMaterial : register(b0);
 
@@ -122,7 +128,15 @@ PixelShaderOutput main(VertexShaderOutput input)
         output.color.a = gMaterial.color.a * textureColor.a;
     }
     else
-    { // Lighttingしない場合。
+    {   // Lighttingしない場合
+        if (gMaterial.dissolveTextureHandle != 0)
+        {
+            float mask = gTexture[gMaterial.dissolveTextureHandle].SampleLevel(gSampler, transformedUV.xy, 0).r;
+            if (mask <= gMaterial.dissolveThreshold)
+            {
+                discard;
+            }
+        }
         output.color = gMaterial.color * textureColor;
     }
     

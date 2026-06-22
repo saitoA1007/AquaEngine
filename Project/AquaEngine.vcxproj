@@ -174,9 +174,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Enemy\State\BossStateOut.cpp" />
     <ClCompile Include="Application\GamePlay\GamePhaseManager.cpp" />
     <ClCompile Include="Application\GamePlay\Phase\ScenePhase.cpp" />
+    <ClCompile Include="Application\Player\Effect\ShockFloor.cpp" />
+    <ClCompile Include="Application\Player\Effect\ShockWave.cpp" />
     <ClCompile Include="Application\Player\Player.cpp" />
     <ClCompile Include="Application\Player\PlayerAction.cpp" />
     <ClCompile Include="Application\Player\PlayerAnimator.cpp" />
+    <ClCompile Include="Application\Player\PlayerEffectManager.cpp" />
     <ClCompile Include="Application\Scene\GameScene.cpp" />
     <ClCompile Include="Application\Scene\TestScene.cpp" />
     <ClCompile Include="Application\Scene\Transition\Fade.cpp" />
@@ -422,10 +425,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\GamePlay\GamePhaseManager.h" />
     <ClInclude Include="Application\GamePlay\IScenePhase.h" />
     <ClInclude Include="Application\GamePlay\Phase\ScenePhase.h" />
+    <ClInclude Include="Application\Player\Effect\ShockFloor.h" />
+    <ClInclude Include="Application\Player\Effect\ShockWave.h" />
     <ClInclude Include="Application\Player\IPlayerAction.h" />
     <ClInclude Include="Application\Player\Player.h" />
     <ClInclude Include="Application\Player\PlayerAction.h" />
     <ClInclude Include="Application\Player\PlayerAnimator.h" />
+    <ClInclude Include="Application\Player\PlayerEffectManager.h" />
     <ClInclude Include="Application\Scene\GameScene.h" />
     <ClInclude Include="Application\Scene\Register\SetUpScenes.h" />
     <ClInclude Include="Application\Scene\TestScene.h" />

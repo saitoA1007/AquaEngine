@@ -89,6 +89,7 @@ namespace GameEngine {
 
         /// 通常モデル（ライトあり）
         void SubmitModel(const Model* model,WorldTransform& worldTransform,const float& alpha = 1.0f, const GpuResource* material = nullptr, const std::string& passName = "DefaultPass");
+        void SubmitAddModel(const Model* model,WorldTransform& worldTransform,const float& alpha = 1.0f, const GpuResource* material = nullptr, const std::string& passName = "DefaultPass");
 
         /// インスタンシング描画
         void SubmitInstancing(const Model* model,uint32_t numInstances, WorldTransforms& worldTransforms, const float& alpha = 1.0f, BlendMode blendMode = BlendMode::kBlendModeNormal, const GpuResource* material = nullptr, const std::string& passName = "DefaultPass");

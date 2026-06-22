@@ -2,29 +2,28 @@
 #include <vector>
 #include "ParticleData.h"
 #include "Matrix4x4.h"
-#include "WorldTransforms.h"
 #include "ParticleModules.h"
 #include "DebugParameter.h"
 #include "ModulesControl.h"
+#include "IGameObject.h"
+#include "Camera.h"
+#include "WorldTransforms.h"
 
 namespace GameEngine{
 
-	class ParticleBehavior {
+	class ParticleBehavior : public IGameObject {
 	public:
-		ParticleBehavior(const std::string& name, uint32_t maxNum, uint32_t textureHandle);
+		ParticleBehavior(const std::string& name, uint32_t maxNum, uint32_t textureHandle, Model* model, Camera* camera);
+		~ParticleBehavior() = default;
 
-		/// <summary>
-		/// 初期化
-		/// </summary>
-		/// <param name="maxNum"></param>
-		/// <param name="textureHandle"></param>
-		/// <param name="particleEmitter"></param>
-		void Initialize();
+		// 初期化処理
+		void Initialize() override;
 
-		/// <summary>
-		/// 更新処理
-		/// </summary>
-		void Update(const Matrix4x4& cameraMatrix);
+		// 更新処理
+		void Update() override;
+
+		// 描画処理
+		void Draw() override;
 
 		/// <summary>
 		/// パーティクルの生成
@@ -60,7 +59,27 @@ namespace GameEngine{
 		/// 発生位置を設定
 		/// </summary>
 		/// <param name="pos"></param>
-		void SetEmitterPos(const Vector3& pos) { emitterPos_ = pos; }
+		void SetEmitterPos(const Vector3& pos) {
+			emitterPos_ = pos; 
+			isSetEmitPos_ = true;
+		}
+
+		// ターゲット位置を取得
+		void SetAttractionTarget(const Vector3& targetPos) {
+			if (auto* attraction = modulesControl_->GetModule<AttractionModule>("Attraction")) {
+				attraction->SetTargetPosition(targetPos);
+			}
+
+			if (auto* Vortex = modulesControl_->GetModule<VortexModule>("Vortex")) {
+				Vortex->SetCenterPosition(targetPos);
+			}
+		}
+
+		void SetIsLoop(bool isLoop) {
+			main_.isLoop = isLoop;
+		}
+
+		bool IsLoop() const { return main_.isLoop; }
 
 	private:
 		// パラメータ機能
@@ -72,9 +91,14 @@ namespace GameEngine{
 		// モジュールの管理
 		std::unique_ptr<ModulesControl> modulesControl_;
 
+		// カメラ
+		Camera* camera_ = nullptr;
+
+		// モデル
+		Model* model_ = nullptr;
+
 		// 使用テクスチャ
 		uint32_t textureHandle_ = 0;
-
 
 		// パーティクルの配列
 		std::vector<ParticleData> particles_;           
@@ -90,6 +114,8 @@ namespace GameEngine{
 		bool isPlay_ = false;
 		bool isStop_ = false;
 		float playTimer_ = 0.0f;
+
+		bool isSetEmitPos_ = false;
 
 		// 発生する時間
 		float spawnTimer_ = 0.0f;

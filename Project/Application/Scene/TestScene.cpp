@@ -5,6 +5,9 @@ using namespace GameEngine;
 TestScene::~TestScene() {}
 
 TestScene::TestScene() {
+
+	inputCommand_->RegisterCommand("Decision", { {InputState::KeyTrigger, DIK_SPACE},{InputState::PadTrigger, XINPUT_GAMEPAD_X} });
+
 	// メインカメラの初期化
 	mainCamera_ = std::make_unique<Camera>();
 	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720);
@@ -37,10 +40,10 @@ TestScene::TestScene() {
 	uint32_t normalGH = textureManager_->GetHandleByName("testNormal.png");
 	terrainModel_->SetDefaultNormalTexture(normalGH);
 
-	uint32_t effectGH = textureManager_->GetHandleByName("circle.png");
-	primitiveEffect_ = std::make_unique<ParticleBehavior>("PrimitiveEffect", 16, effectGH);
 	// エフェクト用モデル
 	effectModel_ = modelManager_->GetNameByModel("plane.obj");
+	uint32_t effectGH = textureManager_->GetHandleByName("circle.png");
+	//gameObjectManager_->AddObject<ParticleBehavior>("HitAfterEffect", 32, effectGH, effectModel_, &renderQueue_->GetMainCamera());
 
 	// 高ポリゴン氷
 	iceHighModel_ = modelManager_->GetNameByModel("ice_highPolygon.gltf");
@@ -82,11 +85,10 @@ void TestScene::Initialize() {
 
 void TestScene::Update() {
 
+	if (inputCommand_->IsCommandActive("Decision")) { isFinished_ = true; }
+
 	// カメラの更新処理
 	mainCamera_->Update();
-
-	// エフェクトを更新
-	primitiveEffect_->Update(mainCamera_->GetWorldMatrix());
 
 	// アニメーションの更新処理
 	walkAnimator_->Update();
@@ -137,14 +139,11 @@ void TestScene::Draw() {
 	renderQueue_->SubmitRaytracingModel(terrainModel_, terrainWorld_);
 
 	// アニメーションモデル
-	renderQueue_->SubmitRaytracingModel(model_, world_);
-
-	// それぞれの氷を描画
-	renderQueue_->SubmitRaytracingModel(iceHighModel_, iceHighWorld_, &iceRefBuffers_[0]);
-	renderQueue_->SubmitRaytracingModel(iceMiddleModel_, iceMiddleWorld_, &iceRefBuffers_[1]);
-	renderQueue_->SubmitRaytracingModel(iceLowModel_, iceLowWorld_, &iceRefBuffers_[2]);
-	renderQueue_->SubmitRaytracingModel(iceCubeModel_, iceCubeWorld_, &iceRefBuffers_[3]);
-
-	// エフェクトを描画
-	renderQueue_->SubmitInstancing(effectModel_, primitiveEffect_->GetCurrentNumInstance(), *primitiveEffect_->GetWorldTransforms(), 0.0f, BlendMode::kBlendModeAdd);
+	//renderQueue_->SubmitRaytracingModel(model_, world_);
+	//
+	//// それぞれの氷を描画
+	//renderQueue_->SubmitRaytracingModel(iceHighModel_, iceHighWorld_, &iceRefBuffers_[0]);
+	//renderQueue_->SubmitRaytracingModel(iceMiddleModel_, iceMiddleWorld_, &iceRefBuffers_[1]);
+	//renderQueue_->SubmitRaytracingModel(iceLowModel_, iceLowWorld_, &iceRefBuffers_[2]);
+	//renderQueue_->SubmitRaytracingModel(iceCubeModel_, iceCubeWorld_, &iceRefBuffers_[3]);
 }

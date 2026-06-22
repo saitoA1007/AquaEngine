@@ -38,6 +38,16 @@ namespace GameEngine {
 		/// <param name="time"></param>
 		void ParticleUpdate(ParticleData& particleData, float time);
 
+		// モジュールを取得
+		template<typename T>
+		T* GetModule(const std::string& moduleName) {
+			auto it = modules_.find(moduleName);
+			if (it != modules_.end()) {
+				return dynamic_cast<T*>(it->second.get());
+			}
+			return nullptr;
+		}
+
 	private:
 		DebugParameter* param_ = nullptr;
 

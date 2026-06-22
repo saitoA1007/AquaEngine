@@ -26,6 +26,8 @@ namespace GameEngine {
 		/// </summary>
 		void UpdateTransformMatrix();
 
+		void UpdateWorldMatrix(const Matrix4x4 worldMatrix);
+
 	public:
 
 		/// <summary>

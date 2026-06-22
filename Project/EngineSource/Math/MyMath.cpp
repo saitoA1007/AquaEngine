@@ -572,6 +572,45 @@ namespace GameEngine {
 			return scaleMatrix * billboardMatrix * translateMatrix;
 		}
 
+		Matrix4x4 MakeDirectionalBillboardMatrix(const Vector3& scale, const Vector3& translate, const Matrix4x4& cameraMatrix, const Matrix4x4& viewMatrix, const Vector3& velocity) {
+			// 1. ビルボード行列（カメラの回転をコピーしてZ軸回転などをリセット）
+			Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(0.0f);
+			Matrix4x4 billboardMatrix = Multiply(backToFrontMatrix, cameraMatrix);
+			billboardMatrix.m[3][0] = 0.0f;
+			billboardMatrix.m[3][1] = 0.0f;
+			billboardMatrix.m[3][2] = 0.0f;
+
+			Vector3 viewVel;
+			viewVel.x = velocity.x * viewMatrix.m[0][0] + velocity.y * viewMatrix.m[1][0] + velocity.z * viewMatrix.m[2][0];
+			viewVel.y = velocity.x * viewMatrix.m[0][1] + velocity.y * viewMatrix.m[1][1] + velocity.z * viewMatrix.m[2][1];
+
+			// 回転行列を成分から作成
+			Matrix4x4 rotateMatrix = Matrix4x4::MakeIdentity();
+
+			// ベクトルの長さの二乗
+			float lengthSq = viewVel.x * viewVel.x + viewVel.y * viewVel.y;
+
+			// 速度が十分にある場合のみ向きを変える
+			if (lengthSq > 0.000001f) {
+				// 正規化係数 (1 / √lengthSq)
+				float invLength = 1.0f / std::sqrtf(lengthSq);
+
+				// 正規化された成分 = cosθ, sinθ に相当
+				float cosTheta = viewVel.y * invLength; // Y軸基準なのでYがCos相当
+				float sinTheta = viewVel.x * invLength; // Y軸基準なのでXがSin相当
+
+				rotateMatrix.m[0][0] = cosTheta;
+				rotateMatrix.m[0][1] = -sinTheta;
+				rotateMatrix.m[1][0] = sinTheta;
+				rotateMatrix.m[1][1] = cosTheta;
+			}
+
+			Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
+			Matrix4x4 translateMatrix = MakeTranslateMatrix(translate);
+
+			return scaleMatrix * rotateMatrix * billboardMatrix * translateMatrix;
+		}
+
 		Matrix4x4 LookAt(const Vector3& eye, const Vector3& center, const Vector3& up) {
 
 			// カメラの方向ベクトル

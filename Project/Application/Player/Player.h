@@ -7,10 +7,14 @@
 
 #include "PlayerAction.h"
 #include "Application/Camera/CameraController.h"
+#include "PlayerEffectManager.h"
+
+// 前方宣言
+class PlayerEffectManager;
 
 class Player : public GameEngine::IGameObject {
 public:
-	Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model, GameEngine::AnimationManager* animationManager);
+	Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model, GameEngine::AnimationManager* animationManager, PlayerEffectManager* effectManager);
 	~Player() = default;
 
 	// 初期化処理
@@ -71,6 +75,8 @@ private:
 
 	// アニメーション管理
 	std::unique_ptr<PlayerAnimator> animator_;
+
+	PlayerEffectManager* effectManager_ = nullptr;
 
 private:
 	// プレイヤー

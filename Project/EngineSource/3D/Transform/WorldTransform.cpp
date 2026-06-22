@@ -39,6 +39,16 @@ void WorldTransform::UpdateTransformMatrix() {
 	transformationMatrixData_->worldInverseTranspose = Math::InverseTranspose(worldMatrix_);
 }
 
+void WorldTransform::UpdateWorldMatrix(const Matrix4x4 worldMatrix) {
+	worldMatrix_ = worldMatrix;
+	// 親があれば親のワールド行列を掛ける
+	if (parent_) {
+		worldMatrix_ *= parent_->GetWorldMatrix();
+	}
+	transformationMatrixData_->World = worldMatrix_;
+	transformationMatrixData_->worldInverseTranspose = Math::InverseTranspose(worldMatrix_);
+}
+
 void WorldTransform::SetWVPMatrix(const Matrix4x4& localMatrix) {
 	transformationMatrixData_->World = localMatrix * worldMatrix_;
 	transformationMatrixData_->worldInverseTranspose = Math::InverseTranspose(worldMatrix_);

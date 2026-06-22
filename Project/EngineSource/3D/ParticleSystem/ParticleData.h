@@ -19,7 +19,7 @@ namespace GameEngine {
 		Vector3 startSize;
 		Vector3 startSpeed;
 
-		bool IsAlive() const { return lifeTime <= currentTime; }
+		bool IsAlive() const { return 1.0f <= currentTime; }
 	};
 
 	// 形状
