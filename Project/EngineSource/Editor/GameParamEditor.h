@@ -21,7 +21,7 @@ namespace GameEngine {
 		// 項目
 		struct Item {
 			std::variant<int32_t, uint32_t, float, Vector2, Vector3, Vector4, Range3, Range4, bool, std::string,
-				EmitterShape> value;
+				EmitterShape, TextureData> value;
 			int priority = INT_MAX; // 優先順位
 			bool isDirty = false; // ImGuiで値が変更されたか
 		};
@@ -315,6 +315,11 @@ namespace GameEngine {
 				jsonData["_radius"] = shape.radius;
 				jsonData["_emitFromShell"] = shape.emitFromShell;
 				jsonData["_boxSize"] = { shape.boxSize.x, shape.boxSize.y, shape.boxSize.z };
+			}
+
+			void operator()(const TextureData& value) const {
+				// テクスチャの名前を保存
+				jsonData["_TextureName"] = value.name;
 			}
 
 			template<typename T>

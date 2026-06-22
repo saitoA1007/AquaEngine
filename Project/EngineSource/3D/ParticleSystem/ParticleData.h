@@ -3,6 +3,7 @@
 #include "Vector4.h"
 #include "Transform.h"
 #include <cstdint>
+#include <string>
 
 namespace GameEngine {
 
@@ -15,6 +16,7 @@ namespace GameEngine {
 		float lifeTime; // 生存時間
 		float currentTime; // 現在の生存時間
 		Vector3 dir; // 方向
+		uint32_t textureHandle = 0; // テクスチャ
 
 		Vector3 startSize;
 		Vector3 startSpeed;
@@ -43,5 +45,11 @@ namespace GameEngine {
 
 		// Box
 		Vector3 boxSize = { 1.0f, 1.0f, 1.0f };
+	};
+
+	// テクスチャデータ
+	struct TextureData {
+		uint32_t handle = 0;
+		std::string name = "None";
 	};
 }

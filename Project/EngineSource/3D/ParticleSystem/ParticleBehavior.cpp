@@ -1,12 +1,11 @@
 #include "ParticleBehavior.h"
 #include "FPSCounter.h"
-#include "RandomGenerator.h"
 #include "MyMath.h"
+#include "ParticleEmitModules.h"
 using namespace GameEngine;
 
-ParticleBehavior::ParticleBehavior(const std::string& name, uint32_t maxNum, uint32_t textureHandle, Model* model, Camera* camera) {
+ParticleBehavior::ParticleBehavior(const std::string& name, uint32_t maxNum, TextureManager* textureManager, Model* model, Camera* camera) {
     maxNumInstance_ = maxNum;
-    textureHandle_ = textureHandle;
     name_ = name;
     camera_ = camera;
     model_ = model;
@@ -53,6 +52,11 @@ ParticleBehavior::ParticleBehavior(const std::string& name, uint32_t maxNum, uin
     debugParame_->Apply();
     modulesControl_->Update();
     debugParame_->Apply();
+
+    // テクスチャの設定
+    if (auto* textureModule = modulesControl_->GetModule<TextureModule>("TextureEmit")) {
+        textureModule->SetTexture(textureManager);
+    }
 }
 
 void ParticleBehavior::Initialize() {
@@ -167,7 +171,6 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
         // 経過時間を加算
         particle.currentTime += FpsCounter::deltaTime / particle.lifeTime;
         // 速度を追加
-        //particle.velocity += particleEmitter_.fieldAcceleration * FpsCounter::deltaTime;
         particle.transform.translate += particle.velocity * FpsCounter::deltaTime;
 
         // worldTransformsの更新
@@ -183,7 +186,7 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
         }
 
         worldTransforms_->transformDatas_[currentNumInstance_].color = particle.color;
-        worldTransforms_->transformDatas_[currentNumInstance_].textureHandle = textureHandle_;
+        worldTransforms_->transformDatas_[currentNumInstance_].textureHandle = particle.textureHandle;
         currentNumInstance_++;
     }
 

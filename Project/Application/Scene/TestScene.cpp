@@ -6,6 +6,7 @@ TestScene::~TestScene() {}
 
 TestScene::TestScene() {
 
+    // 決定ボタンコマンドを追加
 	inputCommand_->RegisterCommand("Decision", { {InputState::KeyTrigger, DIK_SPACE},{InputState::PadTrigger, XINPUT_GAMEPAD_X} });
 
 	// メインカメラの初期化
@@ -42,8 +43,7 @@ TestScene::TestScene() {
 
 	// エフェクト用モデル
 	effectModel_ = modelManager_->GetNameByModel("plane.obj");
-	uint32_t effectGH = textureManager_->GetHandleByName("circle.png");
-	//gameObjectManager_->AddObject<ParticleBehavior>("HitAfterEffect", 32, effectGH, effectModel_, &renderQueue_->GetMainCamera());
+	gameObjectManager_->AddObject<ParticleBehavior>("HitEffect", 32, textureManager_, effectModel_, &renderQueue_->GetMainCamera());
 
 	// 高ポリゴン氷
 	iceHighModel_ = modelManager_->GetNameByModel("ice_highPolygon.gltf");

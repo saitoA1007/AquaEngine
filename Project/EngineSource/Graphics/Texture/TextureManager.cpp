@@ -80,3 +80,12 @@ void TextureManager::LoadAllTexture() {
 
 	LogManager::GetInstance().Log("End Loading All Textures");
 }
+
+std::vector<std::string> TextureManager::GetRegisteredTextureNames() const {
+	std::vector<std::string> names;
+	names.reserve(textures_.size());
+	for (const auto& [name, texture] : textures_) {
+		names.push_back(name);
+	}
+	return names;
+}

@@ -23,13 +23,13 @@ PlayerEffectManager::PlayerEffectManager(GameEngine::GameObjectManager* objectMa
 	blastGH_ = textureManager->GetHandleByName("FX01_Flare_03.png");
 
 	auto* effectModel = modelManager->GetNameByModel("plane.obj");
-	uint32_t effectGH = textureManager->GetHandleByName("heightCircle.png");
-	uint32_t circleGH = textureManager->GetHandleByName("circle.png");
+	//uint32_t effectGH = textureManager->GetHandleByName("heightCircle.png");
+	//uint32_t circleGH = textureManager->GetHandleByName("circle.png");
 
-	blastEffect_ = objectManager_->AddObject<ParticleBehavior>("HitEffect", 16, effectGH, effectModel, &renderQueue_->GetMainCamera());
+	blastEffect_ = objectManager_->AddObject<ParticleBehavior>("HitEffect", 16, textureManager, effectModel, &renderQueue_->GetMainCamera());
 	blastEffect_->SetIsLoop(false);
 
-	afterEffect_ = objectManager_->AddObject<ParticleBehavior>("HitAfterEffect", 32, circleGH, effectModel, &renderQueue_->GetMainCamera());
+	afterEffect_ = objectManager_->AddObject<ParticleBehavior>("HitAfterEffect", 32, textureManager, effectModel, &renderQueue_->GetMainCamera());
 	afterEffect_->SetIsLoop(false);
 }
 

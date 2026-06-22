@@ -29,7 +29,6 @@ namespace GameEngine {
 		/// <summary>
 		/// 登録する関数
 		/// </summary>
-		/// <param name="registerName">登録名</param>
 		/// <param name="fileName">読み込む画像のファイルパス</param>
 		void RegisterTexture(const std::string& fileName);
 
@@ -49,6 +48,12 @@ namespace GameEngine {
 
 		// GPUハンドルを取得する
 		D3D12_GPU_DESCRIPTOR_HANDLE GetTextureSrvHandlesGPU(const uint32_t& textureHandle);
+
+		/// <summary>
+		/// 登録されている全てテクスチャの名前を取得
+		/// </summary>
+		/// <returns></returns>
+		std::vector<std::string> GetRegisteredTextureNames() const;
 
 	private:
 		TextureManager(const TextureManager&) = delete;

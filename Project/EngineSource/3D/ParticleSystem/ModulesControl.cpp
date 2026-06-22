@@ -1,4 +1,6 @@
-#include"ModulesControl.h"
+#include "ModulesControl.h"
+#include "ParticleEmitModules.h"
+#include "ParticleUpdateModules.h"
 using namespace GameEngine;
 
 ModulesControl::ModulesControl(DebugParameter* param) {
@@ -7,6 +9,7 @@ ModulesControl::ModulesControl(DebugParameter* param) {
     std::string mainGroup = "Emitter";
 
     // モジュールを登録
+    RegisterModule<TextureModule>(mainGroup, "TextureEmit");
     RegisterModule<VelocityEmitModule>(mainGroup, "VelocityEmit");
     RegisterModule<RotateEmitModule>(mainGroup, "RotateEmit");
     RegisterModule<ScaleEmitModule>(mainGroup, "ScaleEmit");
