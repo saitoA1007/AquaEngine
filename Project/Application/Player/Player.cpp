@@ -10,12 +10,12 @@
 #include "Application/Enemy/RangedAttack/IceFall.h"
 using namespace GameEngine;
 
-Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model, GameEngine::AnimationManager* animationManager) {
+Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model, GameEngine::AnimationManager* animationManager, PlayerEffectManager* effectManager) {
 	inputCommand_ = inputCommand;
 	model_ = model;
 	
 	// ワールド行列を初期化
-	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-2.0f,1.0f,0.0f} });
+	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,2.0f,0.0f},{-2.0f,1.0f,0.0f} });
 
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>("Player");
@@ -46,6 +46,9 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model,
 	// アニメーション管理
 	animator_ = std::make_unique<PlayerAnimator>(model, animationManager);
 	commonData_.animator_ = animator_.get();
+	// 演出管理
+	commonData_.effectManager_ = effectManager;
+	effectManager_ = effectManager;
 
 	// 移動アクション
 	moveAction_.Initialize(&commonData_, inputCommand);
@@ -67,10 +70,11 @@ void Player::Initialize() {
 	// ステータスを初期化
 	commonData_ = PlayerCommonData{};
 	commonData_.animator_ = animator_.get();
+	commonData_.effectManager_ = effectManager_;
 	commonData_.currentYaw = std::atan2f(commonData_.currentDir.x, commonData_.currentDir.z);
 
 	// 位置を初期化
-	worldTransform_.transform_.translate = { 0.0f,0.0f,0.0f };
+	worldTransform_.transform_.translate = { 0.0f,2.0f,0.0f };
 
 	// 初期化
 	animator_->Initialize();
@@ -188,6 +192,9 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 		}
 
 		if (commonData_.state == PlayerState::kAttackDown) {
+			// 地面破壊スタート
+			commonData_.effectManager_->StartShockWave(Vector3(worldTransform_.transform_.translate.x, 1.0f, worldTransform_.transform_.translate.z));
+			
 			commonData_.state = PlayerState::kStiffness;
 			commonData_.animator_->StartAnimation(PlayerAnimationType::kWalk, "歩き");
 			Log("Player End attackDown");

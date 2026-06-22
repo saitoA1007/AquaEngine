@@ -1,18 +1,18 @@
 {
-    "HitEffect": {
+    "HitAfterEffect": {
         "Emitter": {
             "ColorEmit": {
                 "Enable": true,
                 "MaxColor": [
-                    0.0,
+                    0.05882352963089943,
                     1.0,
                     1.0,
                     1.0
                 ],
                 "MinColor": [
                     0.0,
-                    0.8030886650085449,
-                    1.0,
+                    0.9768339991569519,
+                    0.8297430872917175,
                     1.0
                 ]
             },
@@ -35,7 +35,7 @@
             },
             "IsBillBoard": true,
             "IsLoop": true,
-            "LifeTime": 0.800000011920929,
+            "LifeTime": 2.0,
             "RotateEmit": {
                 "Enable": false
             },
@@ -43,12 +43,12 @@
                 "Enable": true,
                 "RangeScale": {
                     "_Max": [
-                        0.800000011920929,
+                        0.30000001192092896,
                         0.0,
                         0.0
                     ],
                     "_Min": [
-                        0.30000001192092896,
+                        0.10000000149011612,
                         0.0,
                         0.0
                     ]
@@ -58,18 +58,18 @@
             "ShapeEmit": {
                 "Enable": true,
                 "Shape": {
-                    "_ShapeType": "Hemisphere",
+                    "_ShapeType": "Box",
                     "_boxSize": [
-                        20.0,
-                        1.0,
-                        20.0
+                        4.0,
+                        0.5,
+                        4.0
                     ],
                     "_emitFromShell": true,
-                    "_radius": 0.5
+                    "_radius": 1.5
                 }
             },
             "SpawnCoolTime": 0.10000000149011612,
-            "SpawnMaxCount": 16,
+            "SpawnMaxCount": 4,
             "VelocityEmit": {
                 "Enable": false
             }
@@ -77,31 +77,39 @@
         "Particle": {
             "AlphaOverLifeTime": {
                 "Enable": true,
-                "EndAlpha": 0.0
+                "EndAlpha": 0.30000001192092896
             },
             "Attraction": {
-                "Damping": 1.0,
+                "Enable": false
+            },
+            "RotationByVelocity": {
+                "Enable": false
+            },
+            "SizeOverLifeTime": {
                 "Enable": true,
-                "Strength": -100.0,
-                "TargetPos": [
+                "EndSize": 0.0,
+                "SeparateAxes": false,
+                "SeparateAxesEndSize": [
                     0.0,
                     0.0,
                     0.0
                 ]
             },
-            "RotationByVelocity": {
-                "Enable": true
-            },
-            "SizeOverLifeTime": {
-                "Enable": false
-            },
             "VelocityOverLifeTime": {
                 "Enable": false
             },
             "Vortex": {
-                "Enable": false
+                "AttractionSpeed": 100.0,
+                "AxisSpeed": -2.5299999713897705,
+                "CenterPos": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "Enable": true,
+                "RotationSpeed": 60.0
             }
         },
-        "SceneName": "Test"
+        "SceneName": "Game"
     }
 }

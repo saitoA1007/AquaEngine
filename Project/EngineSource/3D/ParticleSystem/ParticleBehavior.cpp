@@ -21,8 +21,8 @@ ParticleBehavior::ParticleBehavior(const std::string& name, uint32_t maxNum, uin
 
     // 全パーティクルを非アクティブ化
     for (auto& particle : particles_) {
-        particle.currentTime = 0.0f;
-        particle.lifeTime = 0.0f;
+        particle.currentTime = 1.0f;
+        particle.lifeTime = 1.0f;
     }
 
     // パラメータ機能
@@ -116,6 +116,10 @@ ParticleData ParticleBehavior::MakeNewParticle() {
     // モジュールを適応
     modulesControl_->ParticleCreate(tmpParticleData);
 
+    if (isSetEmitPos_) {
+        tmpParticleData.transform.translate += emitterPos_;
+    }
+
     return tmpParticleData;
 }
 
@@ -128,7 +132,7 @@ void ParticleBehavior::Create() {
         uint32_t spawnCount = 0;
         for (uint32_t i = 0; i < maxNumInstance_; ++i) {
             // 時間が過ぎていれば新しく生成する
-            if (particles_[i].lifeTime <= particles_[i].currentTime) {
+            if (1.0f <= particles_[i].currentTime) {
                 particles_[i] = MakeNewParticle();
                 spawnCount++;
             }
@@ -143,6 +147,12 @@ void ParticleBehavior::Create() {
 
 void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
     currentNumInstance_ = 0;
+    RotationByVelocityModule* module = modulesControl_->GetModule<RotationByVelocityModule>("RotationByVelocity");
+    bool isRotateVelocity = false;
+    if (module != nullptr) {
+        isRotateVelocity = true;
+    }
+
     for (uint32_t i = 0; i < maxNumInstance_; ++i) {
         ParticleData& particle = particles_[i];
 
@@ -155,7 +165,7 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
         modulesControl_->ParticleUpdate(particle, FpsCounter::deltaTime);
 
         // 経過時間を加算
-        particle.currentTime += FpsCounter::deltaTime;
+        particle.currentTime += FpsCounter::deltaTime / particle.lifeTime;
         // 速度を追加
         //particle.velocity += particleEmitter_.fieldAcceleration * FpsCounter::deltaTime;
         particle.transform.translate += particle.velocity * FpsCounter::deltaTime;
@@ -163,7 +173,11 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
         // worldTransformsの更新
         if (main_.isBillBoard) {
             // ビルボードを適応する
-            worldTransforms_->transformDatas_[currentNumInstance_].worldMatrix = Math::MakeBillboardMatrix(particle.transform.scale, particle.transform.translate, cameraMatrix);
+            if (isRotateVelocity) {
+                worldTransforms_->transformDatas_[currentNumInstance_].worldMatrix = Math::MakeDirectionalBillboardMatrix(particle.transform.scale, particle.transform.translate, cameraMatrix, camera_->GetViewMatrix(), particle.velocity);;
+            } else {
+                worldTransforms_->transformDatas_[currentNumInstance_].worldMatrix = Math::MakeBillboardMatrix(particle.transform.scale, particle.transform.translate, cameraMatrix);
+            }
         } else {
             worldTransforms_->transformDatas_[currentNumInstance_].transform = particle.transform;
         }

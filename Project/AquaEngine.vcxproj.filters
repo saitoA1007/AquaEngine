@@ -552,6 +552,9 @@
     <ClCompile Include="EngineSource\Core\StaticGameObjectManager.cpp" />
     <ClCompile Include="EngineSource\Editor\EditorMenu\AddObjectBar.cpp" />
     <ClCompile Include="EngineSource\Editor\Command\EditorCommand.cpp" />
+    <ClCompile Include="Application\Player\PlayerEffectManager.cpp" />
+    <ClCompile Include="Application\Player\Effect\ShockWave.cpp" />
+    <ClCompile Include="Application\Player\Effect\ShockFloor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1084,6 +1087,9 @@
     <ClInclude Include="EngineSource\Editor\IEditorCommand.h" />
     <ClInclude Include="EngineSource\Editor\Command\EditorCommand.h" />
     <ClInclude Include="EngineSource\Editor\Command\EditorCommandHistory.h" />
+    <ClInclude Include="Application\Player\PlayerEffectManager.h" />
+    <ClInclude Include="Application\Player\Effect\ShockWave.h" />
+    <ClInclude Include="Application\Player\Effect\ShockFloor.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />

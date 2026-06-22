@@ -5,6 +5,9 @@ using namespace GameEngine;
 TestScene::~TestScene() {}
 
 TestScene::TestScene() {
+
+	inputCommand_->RegisterCommand("Decision", { {InputState::KeyTrigger, DIK_SPACE},{InputState::PadTrigger, XINPUT_GAMEPAD_X} });
+
 	// メインカメラの初期化
 	mainCamera_ = std::make_unique<Camera>();
 	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720);
@@ -40,9 +43,7 @@ TestScene::TestScene() {
 	// エフェクト用モデル
 	effectModel_ = modelManager_->GetNameByModel("plane.obj");
 	uint32_t effectGH = textureManager_->GetHandleByName("circle.png");
-	//primitiveEffect_ = gameObjectManager_->AddObject<ParticleBehavior>("PrimitiveEffect", 16, effectGH, effectModel_, &renderQueue_->GetMainCamera());
-
-	gameObjectManager_->AddObject<ParticleBehavior>("HitEffect", 16, effectGH, effectModel_, &renderQueue_->GetMainCamera());
+	//gameObjectManager_->AddObject<ParticleBehavior>("HitAfterEffect", 32, effectGH, effectModel_, &renderQueue_->GetMainCamera());
 
 	// 高ポリゴン氷
 	iceHighModel_ = modelManager_->GetNameByModel("ice_highPolygon.gltf");
@@ -83,6 +84,8 @@ void TestScene::Initialize() {
 }
 
 void TestScene::Update() {
+
+	if (inputCommand_->IsCommandActive("Decision")) { isFinished_ = true; }
 
 	// カメラの更新処理
 	mainCamera_->Update();

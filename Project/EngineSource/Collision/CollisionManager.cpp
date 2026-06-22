@@ -91,6 +91,7 @@ void  CollisionManager::CheckCollisionPair(Collider* colliderA, Collider* collid
 }
 
 void CollisionManager::DebugDraw(DebugRenderer* debugRenderer) {
+#ifdef USE_IMGUI
 	if (colliders_.empty() || !debugRenderer->IsEnabled()) { return; }
 	for (auto collider : colliders_) {
 		CollisionData type = collider->GetCollisionData();
@@ -126,6 +127,7 @@ void CollisionManager::DebugDraw(DebugRenderer* debugRenderer) {
 			break;
 		}		
 	}
+#endif
 }
 
 bool CollisionManager::IsActiveCollision(Collider* a, Collider* b) {

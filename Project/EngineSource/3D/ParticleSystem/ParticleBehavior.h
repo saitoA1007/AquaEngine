@@ -59,7 +59,27 @@ namespace GameEngine{
 		/// 発生位置を設定
 		/// </summary>
 		/// <param name="pos"></param>
-		void SetEmitterPos(const Vector3& pos) { emitterPos_ = pos; }
+		void SetEmitterPos(const Vector3& pos) {
+			emitterPos_ = pos; 
+			isSetEmitPos_ = true;
+		}
+
+		// ターゲット位置を取得
+		void SetAttractionTarget(const Vector3& targetPos) {
+			if (auto* attraction = modulesControl_->GetModule<AttractionModule>("Attraction")) {
+				attraction->SetTargetPosition(targetPos);
+			}
+
+			if (auto* Vortex = modulesControl_->GetModule<VortexModule>("Vortex")) {
+				Vortex->SetCenterPosition(targetPos);
+			}
+		}
+
+		void SetIsLoop(bool isLoop) {
+			main_.isLoop = isLoop;
+		}
+
+		bool IsLoop() const { return main_.isLoop; }
 
 	private:
 		// パラメータ機能
@@ -94,6 +114,8 @@ namespace GameEngine{
 		bool isPlay_ = false;
 		bool isStop_ = false;
 		float playTimer_ = 0.0f;
+
+		bool isSetEmitPos_ = false;
 
 		// 発生する時間
 		float spawnTimer_ = 0.0f;

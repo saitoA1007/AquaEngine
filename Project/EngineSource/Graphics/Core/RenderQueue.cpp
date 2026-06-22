@@ -76,6 +76,24 @@ void RenderQueue::SubmitModel(const Model* model, WorldTransform& worldTransform
     }
 }
 
+void RenderQueue::SubmitAddModel(const Model* model, WorldTransform& worldTransform, const float& alpha, const GpuResource* material, const std::string& passName) {
+    Draw3dRequest request;
+    request.type = Draw3dType::DefaultAdd;
+    request.layer = RenderLayer::Opaque;
+    request.passName = passName;
+    request.model = model;
+    request.worldTransform = &worldTransform;
+    request.material = material;
+
+    if (alpha == 1.0f) {
+        // 不透明描画に登録
+        draw3dQueueList_[passName][request.layer][Get3dPsoName(request.type)].push_back(request);
+    } else {
+        // 半透明描画に登録
+        translucentDrawQueueList_[passName].push_back(request);
+    }
+}
+
 void RenderQueue::SubmitInstancing(const Model* model, uint32_t numInstances, WorldTransforms& worldTransforms, const float& alpha, BlendMode blendMode, const GpuResource* material, const std::string& passName) {
     Draw3dRequest request;
     request.layer = RenderLayer::Opaque;
@@ -285,7 +303,7 @@ void RenderQueue::SubmitRaytracingModel(Model* model, WorldTransform& worldTrans
 const char* RenderQueue::Get3dPsoName(Draw3dType type) {
     switch (type) {
     case Draw3dType::Default: { return "Default3D"; }
-    case Draw3dType::DefaultAdd: { return "Default3D"; }
+    case Draw3dType::DefaultAdd: { return "Additive3D"; }
     case Draw3dType::Instancing: { return "Instancing3D"; }
     case Draw3dType::InstancingAdd: { return "AdditiveInstancing3D"; }
     case Draw3dType::InstancingWboit: { return "wboit3D"; }

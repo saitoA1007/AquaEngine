@@ -2,6 +2,7 @@
 using namespace GameEngine;
 
 #include "Application/Player/Player.h"
+#include "Application/Player/PlayerEffectManager.h"
 #include "Application/Stage/StageManager.h"
 #include "Application/Enemy/BossEnemy.h"
 #include "Application/Enemy/BossRangedAttackManager.h"
@@ -25,10 +26,13 @@ GameScene::GameScene() {
 	// 描画に使用するカメラを設定
 	renderQueue_->SetCamera(mainCamera_.get());
 
+	// プレイヤーエフェクト管理
+	auto* playerEffectManager = gameObjectManager_->AddObject<PlayerEffectManager>(gameObjectManager_, modelManager_, textureManager_);
+
 	// プレイヤー
 	auto* playerModel = modelManager_->GetNameByModel("PlayerRush.gltf");
 	playerModel->SetDefaultIsEnableLight(true);
-	auto player = gameObjectManager_->AddObject<Player>(inputCommand_, playerModel, animationManager_);
+	auto player = gameObjectManager_->AddObject<Player>(inputCommand_, playerModel, animationManager_, playerEffectManager);
 
 	// 敵の遠距離攻撃管理
 	auto* iceFallModel = modelManager_->GetNameByModel("cube.obj");

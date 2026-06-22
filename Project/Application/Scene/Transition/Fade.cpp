@@ -10,16 +10,16 @@ void Fade::Initialize() {
 
 void Fade::Update(float timer) {
 
-	if (timer <= 0.5f) {
-		float localT = timer / 0.5f;
-		sprite_->color_.w = Lerp(0.0f, 1.0f, localT);
-	} else {
-		float localT = (timer - 0.5f) / 0.5f;
-		sprite_->color_.w = Lerp(1.0f, 0.0f, localT);
-	}
+	//if (timer <= 0.5f) {
+	//	float localT = timer / 0.5f;
+	//	sprite_->color_.w = Lerp(0.0f, 1.0f, localT);
+	//} else {
+	//	float localT = (timer - 0.5f) / 0.5f;
+	//	sprite_->color_.w = Lerp(1.0f, 0.0f, localT);
+	//}
 
 	// 更新処理
-	sprite_->Update();
+	//sprite_->Update();
 }
 
 void Fade::Draw() {
@@ -31,5 +31,5 @@ void Fade::Draw() {
 }
 
 bool Fade::IsMidTransition(float timer) const {
-	return timer >= 0.5f;
+	return timer >= 0.25f;
 }

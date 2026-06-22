@@ -112,24 +112,34 @@ namespace GameEngine {
 		void Register(DebugParameter* param) override {
 			int index = 1;
 			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
+			param->Register("SeparateAxes", separateAxes_, index++, subGroup);
 			param->Register("RangeScale", scaleRange_, index++, subGroup);
 		}
 
 		void Remove(DebugParameter* param) override {
 			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
+			param->RemoveItem("SeparateAxes", subGroup);
 			param->RemoveItem("RangeScale", subGroup);
 		}
 
 		void Create(ParticleData& particleData) override {
-			particleData.transform.scale = {
+			if (separateAxes_) {
+				particleData.transform.scale = {
 				RandomGenerator::Get(scaleRange_.min.x, scaleRange_.max.x),
 				RandomGenerator::Get(scaleRange_.min.y, scaleRange_.max.y),
 				RandomGenerator::Get(scaleRange_.min.z, scaleRange_.max.z),
-			};
+				};
+			} else {
+				float randomScale = RandomGenerator::Get(scaleRange_.min.x, scaleRange_.max.x);
+				particleData.transform.scale = { randomScale, randomScale, randomScale };
+			}
+			
+			particleData.startSize = particleData.transform.scale;
 		}
 		
 	private:
 		Range3 scaleRange_;
+		bool separateAxes_ = false;
 	};
 
 	// 発射形状
@@ -201,6 +211,41 @@ namespace GameEngine {
 	private:
 		// 形状
 		EmitterShape emitterShape_;
+	};
+
+	// 色
+	class ColorEmitModule : public IParticleModule {
+	public:
+		~ColorEmitModule() = default;
+
+		void Register(DebugParameter* param) override {
+			int index = 1;
+			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
+			param->Register("MinColor", minColor_, index++, subGroup);
+			param->Register("MaxColor", maxColor_, index++, subGroup);
+		}
+
+		void Remove(DebugParameter* param) override {
+			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
+			param->RemoveItem("MinColor", subGroup);
+			param->RemoveItem("MaxColor", subGroup);
+		}
+
+		void Create(ParticleData& particleData) override {
+			// RGBAの各成分をMin〜Maxの間でランダムに決定
+			particleData.color = {
+				RandomGenerator::Get(minColor_.x, maxColor_.x),
+				RandomGenerator::Get(minColor_.y, maxColor_.y),
+				RandomGenerator::Get(minColor_.z, maxColor_.z),
+				RandomGenerator::Get(minColor_.w, maxColor_.w)
+			};
+			// 時間経過補間の基準にするため、初期色を保存しておく
+			particleData.startColor = particleData.color;
+		}
+
+	private:
+		Vector4 minColor_ = { 1.0f, 1.0f, 1.0f, 1.0f };
+		Vector4 maxColor_ = { 1.0f, 1.0f, 1.0f, 1.0f };
 	};
 
 	// 速度変化
@@ -408,5 +453,35 @@ namespace GameEngine {
 		float attractionSpeed_ = 1.0f;
 		// 上昇、下降の速度
 		float axisSpeed_ = 2.0f;                         
+	};
+
+	class RotationByVelocityModule : public IParticleModule {
+	public:
+		~RotationByVelocityModule() = default;
+
+		void Register([[maybe_unused]] DebugParameter* param) override {
+		}
+		
+		void Remove([[maybe_unused]] DebugParameter* param) override {}
+
+		void Update(ParticleData& particleData, [[maybe_unused]] float time) override {
+			Vector3 vel = particleData.velocity;
+			float lenSq = vel.x * vel.x + vel.y * vel.y + vel.z * vel.z;
+
+			// 速度がほぼ0のときは、直前の向きを維持す
+			if (lenSq > 0.0001f) {
+				float len = std::sqrt(lenSq);
+				Vector3 dir = { vel.x / len, vel.y / len, vel.z / len };
+
+				// 横方向の回転（Y軸まわりの回転: Yaw）
+				float yaw = std::atan2(dir.x, dir.z);
+
+				// 縦方向の回転
+				float pitch = -std::asin(dir.y);
+
+				// パーティクルの回転に適用
+				particleData.transform.rotate = { pitch, yaw, 0.0f };
+			}
+		}
 	};
 }

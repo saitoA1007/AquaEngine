@@ -105,7 +105,9 @@ void Engine::MainLoop() {
 
         PreDraw();
         scene_->Draw();
+#ifdef USE_IMGUI
         graphics_->GetRenderQueue()->SubmitDebugLine(graphics_->GetDebugRenderer());
+#endif
         PostDraw();
     }
 }

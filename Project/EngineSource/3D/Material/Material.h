@@ -13,7 +13,8 @@ namespace GameEngine {
 			Vector4 color;
 
 			int32_t enableLighting;
-			float padding[3];
+			float dissolveThreshold;
+			float padding[2];
 
 			Matrix4x4 uvTransform;
 
@@ -26,7 +27,7 @@ namespace GameEngine {
 			float ior; // 屈折率
 			float roughness; // 粗さ
 			uint32_t normalTextureHandle;
-			float padding2;
+			uint32_t dissolveTextureHandle; // ディゾルブテクスチャ
 		};
 	public:
 		Material() = default;
@@ -112,10 +113,22 @@ namespace GameEngine {
 		void SetIOR(const float& ior) { materialData_->ior = ior; }
 
 		/// <summary>
+		/// ディゾルブ用の閾値を設定
+		/// </summary>
+		/// <param name="threshold"></param>
+		void SetDissolveThreshold(float threshold) { materialData_->dissolveThreshold = threshold; }
+
+		/// <summary>
 		/// ノーマルマップのテクスチャを設定
 		/// </summary>
 		/// <param name="texture"></param>
 		void SetNormalTexture(const uint32_t& texture) { materialData_->normalTextureHandle = texture; }
+
+		/// <summary>
+		/// ディゾルブのテクスチャを設定
+		/// </summary>
+		/// <param name="texture"></param>
+		void SetDissolveTexture(const uint32_t& texture) { materialData_->dissolveTextureHandle = texture; }
 
 		void SetTextureHandle(const uint32_t& tex) {materialData_->textureHandle = tex;}
 

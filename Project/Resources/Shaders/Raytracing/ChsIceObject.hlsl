@@ -14,7 +14,8 @@ struct MaterialData
     float4 color;
     
     int enableLighting;
-    float3 padding0;
+    float dissolveThreshold;
+    float2 padding0;
     
     float4x4 uvTransform;
     
@@ -28,7 +29,7 @@ struct MaterialData
     float ior;
     float roughness;
     uint normalTextureHandle;
-    float padding1;
+    uint dissolveTextureHandle;
 };
 
 static const uint VERTEX_STRIDE = 52;

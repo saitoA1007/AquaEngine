@@ -40,7 +40,7 @@ void ModelComponent::Draw(RenderQueue* renderQueue, const Draw3dType& drawType, 
 		break;
 
 	case GameEngine::Draw3dType::DefaultAdd:
-		renderQueue->SubmitModel(model_, worldTransform_, materialData_->color.w, &defaultMaterial_.GetMaterialBuffer(), passName);
+		renderQueue->SubmitAddModel(model_, worldTransform_, materialData_->color.w, &defaultMaterial_.GetMaterialBuffer(), passName);
 		break;
 
 	case GameEngine::Draw3dType::Animation:

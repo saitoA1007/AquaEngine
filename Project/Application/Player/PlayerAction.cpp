@@ -7,6 +7,7 @@
 #include "DebugParameter.h"
 #include "EasingManager.h"
 #include "LogManager.h"
+#include "PlayerEffectManager.h"
 using namespace GameEngine;
 
 //=====================================================

@@ -18,7 +18,7 @@ public:
     bool IsMidTransition(float timer) const override;
 
     // 遷移する時間
-    float GetMaxTime() override { return 1.5f; }
+    float GetMaxTime() override { return 0.5f; }
 
 private:
     // 画像
