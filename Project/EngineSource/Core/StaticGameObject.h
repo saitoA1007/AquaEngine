@@ -2,6 +2,7 @@
 #include "Geometry.h"
 #include "IGameObject.h"
 #include "ModelComponent.h"
+#include "DebugParameter.h"
 
 namespace GameEngine {
 
@@ -34,8 +35,21 @@ namespace GameEngine {
 			return aabb;
 		}
 
+		void SetActive(bool active) override {
+			isActive_ = active;
+
+			if (isActive_) {
+				debugParame_->RegisterWorld("World", modelComponent_.worldTransform_);
+			} else {
+				debugParame_->RemoveGroup();
+			}
+		}
+
 	private:
 		ModelComponent modelComponent_;
+
+		// パラメータ機能
+		std::unique_ptr<GameEngine::DebugParameter> debugParame_;
 
 		std::string name_ = "None";
 		// モデル名

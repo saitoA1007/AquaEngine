@@ -206,6 +206,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\3D\Light\SpotLight.cpp" />
     <ClCompile Include="EngineSource\3D\Animation\AnimationManager.cpp" />
     <ClCompile Include="EngineSource\3D\Animation\Animator.cpp" />
+    <ClCompile Include="EngineSource\3D\Material\IceMaterial.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ModelComponent.cpp" />
     <ClCompile Include="EngineSource\3D\ParticleSystem\ModulesControl.cpp" />
     <ClCompile Include="EngineSource\3D\Model\Skeleton.cpp" />
@@ -462,6 +463,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\3D\Animation\AnimationData.h" />
     <ClInclude Include="EngineSource\3D\Animation\AnimationManager.h" />
     <ClInclude Include="EngineSource\3D\Animation\Animator.h" />
+    <ClInclude Include="EngineSource\3D\Material\IceMaterial.h" />
     <ClInclude Include="EngineSource\3D\Model\ModelComponent.h" />
     <ClInclude Include="EngineSource\3D\ParticleSystem\ModulesControl.h" />
     <ClInclude Include="EngineSource\3D\ParticleSystem\ParticleEmitModules.h" />

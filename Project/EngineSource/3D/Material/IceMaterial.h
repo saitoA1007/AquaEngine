@@ -1,0 +1,63 @@
+#pragma once
+#pragma once
+#include "Vector4.h"
+#include "Vector3.h"
+#include "Matrix4x4.h"
+#include "Transform.h"
+#include "StructuredBuffer.h"
+
+namespace GameEngine {
+
+	class IceMaterial {
+	public:
+		struct alignas(16) IceMaterialData {
+			Vector4 color;
+
+			int32_t enableLighting;
+			float dissolveThreshold;
+			float padding[2];
+
+			Matrix4x4 uvTransform;
+
+			Vector4 specularColor;
+
+			float shininess;
+			uint32_t textureHandle;
+			float metallic;
+			int32_t isActiveShadow;
+
+			float ior; // 屈折率
+			float roughness; // 粗さ
+			uint32_t normalTextureHandle;
+			uint32_t dissolveTextureHandle; // ディゾルブテクスチャ
+
+			float chipScale;
+			float chipStrength;
+			float edgeWidth;
+			float edgeStrength;
+
+			float microScale;
+			float microStrength;
+			float padding1[2];
+		};
+	public:
+		IceMaterial();
+		~IceMaterial();
+
+		IceMaterialData* GetMaterialData() { return materialData_; }
+
+		D3D12_GPU_VIRTUAL_ADDRESS GetGpuVirtualAddress() const { return materialBuffer_.GetGpuVirtualAddress(); }
+		StructuredBuffer<IceMaterialData>& GetMaterialBuffer() { return materialBuffer_; }
+
+		const uint32_t& GetMaterialSrvIndex() const { return materialBuffer_.GetSrvIndex(); }
+
+	public:
+
+		// マテリアルにデータを書き込む
+		IceMaterialData* materialData_ = nullptr;
+
+	private:
+		// マテリアルデータ
+		StructuredBuffer<IceMaterialData> materialBuffer_;
+	};
+}

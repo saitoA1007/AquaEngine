@@ -186,4 +186,134 @@ float3 IceFakeSSS(float3 normal, float3 lightDir, float3 incomingRayDir, float3 
     float scatter = wrapDiffuse * 0.35f + backlit * 0.65f;
     return ICE_SCATTER_COLOR * lightColor * scatter * scatterStrength;
 }
+
+// 3次元ハッシュ。-1~1の疑似乱数
+float3 Hash3D(float3 p)
+{
+    p = float3(dot(p, float3(127.1f, 311.7f, 74.7f)),
+               dot(p, float3(269.5f, 183.3f, 246.1f)),
+               dot(p, float3(113.5f, 271.9f, 124.6f)));
+    return frac(sin(p) * 43758.5453f) * 2.0f - 1.0f;
+}
+
+// 3次元ハッシュ。0~1の疑似乱数
+float Hash1D(float3 p)
+{
+    return frac(sin(dot(p, float3(91.3f, 157.2f, 138.7f))) * 43758.5453f);
+}
+
+// 3次元Voronoi
+void Voronoi3D(float3 p, float jitter, out float3 cellID, out float minDist, out float secondDist)
+{
+    float3 baseCell = floor(p);
+    minDist = 1e9f;
+    secondDist = 1e9f;
+    cellID = baseCell;
+
+    [unroll]
+    for (int x = -1; x <= 1; x++)
+    {
+        [unroll]
+        for (int y = -1; y <= 1; y++)
+        {
+            [unroll]
+            for (int z = -1; z <= 1; z++)
+            {
+                float3 neighbor = baseCell + float3(x, y, z);
+                float3 jitterOffset = Hash3D(neighbor) * 0.5f * jitter;
+                float3 cellPoint = neighbor + 0.5f + jitterOffset;
+                float d = distance(p, cellPoint);
+
+                if (d < minDist)
+                {
+                    secondDist = minDist;
+                    minDist = d;
+                    cellID = neighbor;
+                }
+                else if (d < secondDist)
+                {
+                    secondDist = d;
+                }
+            }
+        }
+    }
+}
+
+float3 ProceduralCrystalNormal(float3 baseNormal, float3 worldPos, float cellSize, float strength)
+{
+    if (strength < 0.001f)
+    {
+        return baseNormal;
+    }
+
+    // セルID
+    float3 cellID = floor(worldPos / max(cellSize, 0.001f));
+
+    float3 h;
+    h.x = frac(sin(dot(cellID, float3(127.1f, 311.7f, 74.7f))) * 43758.5453f);
+    h.y = frac(sin(dot(cellID + 1.0f, float3(269.5f, 183.3f, 246.1f))) * 43758.5453f);
+    h.z = frac(sin(dot(cellID + 2.0f, float3(113.5f, 271.9f, 124.6f))) * 43758.5453f);
+    h = h * 2.0f - 1.0f;
+    
+    h -= dot(h, baseNormal) * baseNormal;
+
+    return normalize(baseNormal + h * strength);
+}
+
+// 氷の表面表面の法線を計算
+//
+// chipScale : 大きな削り跡1個のおおよそのサイズ
+// chipStrength : 削り跡1個あたりの最大摂動強度。
+// edgeWidth : 境界線とみなす距離のしきい値
+// edgeStrength : 境界での追加摂動の強さ。
+// microScale : 表面全体に乗せる微細な荒れのサイズ
+// microStrength : 微細な荒れの強度。表面のざらつきを足す
+float3 ChiseledIceNormal(
+    float3 baseNormal,
+    float3 worldPos,
+    float chipScale,
+    float chipStrength,
+    float edgeWidth,
+    float edgeStrength,
+    float microScale,
+    float microStrength
+)
+{
+    if (chipStrength < 0.001f && microStrength < 0.001f)
+    {
+        return baseNormal;
+    }   
+
+    // Voronoiによる不規則な大きな削り跡
+    float3 cellID;
+    float d1, d2;
+    Voronoi3D(worldPos / max(chipScale, 0.001f), 0.85f, cellID, d1, d2);
+
+    // セルごとに摂動方向を決定し、接線平面に射影して連続性を保つ
+    float3 h = Hash3D(cellID);
+    h -= dot(h, baseNormal) * baseNormal;
+
+    // セルごとの強度変化
+    float perCellDepth = Hash1D(cellID * 1.37f);
+    float3 chiseledN = normalize(baseNormal + h * chipStrength * perCellDepth);
+
+    // エッジ強調
+    float edgeFactor = saturate(1.0f - (d2 - d1) / max(edgeWidth, 0.001f));
+    if (edgeFactor > 0.0f && edgeStrength > 0.0f)
+    {
+        float3 edgeH = Hash3D(cellID * 2.71f + 5.0f);
+        edgeH -= dot(edgeH, baseNormal) * baseNormal;
+        float3 edgeN = normalize(baseNormal + edgeH);
+        chiseledN = normalize(lerp(chiseledN, edgeN, edgeFactor * edgeStrength));
+    }
+
+    // 微細な表面の荒れを重ねる
+    if (microStrength > 0.001f)
+    {
+        chiseledN = ProceduralCrystalNormal(chiseledN, worldPos, microScale, microStrength);
+    }
+
+    return chiseledN;
+}
+
 #endif

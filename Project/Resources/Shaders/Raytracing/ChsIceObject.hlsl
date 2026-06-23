@@ -9,7 +9,7 @@ struct VertexData
     float4 tangent;
 };
 
-struct MaterialData
+struct IceMaterialData
 {
     float4 color;
     
@@ -30,6 +30,15 @@ struct MaterialData
     float roughness;
     uint normalTextureHandle;
     uint dissolveTextureHandle;
+    
+    float chipScale;
+    float chipStrength;
+    float edgeWidth;
+    float edgeStrength;
+
+    float microScale;
+    float microStrength;
+    float2 padding1;
 };
 
 static const uint VERTEX_STRIDE = 52;
@@ -47,7 +56,7 @@ VertexData GetHitVertex(MyAttribute attrib, uint vertexHandle, uint indexHandle)
     {
         uint index = gBufferData[indexHandle].Load<uint>((start + i) * 4);
         
-        VertexData v = gBufferData[vertexHandle].Load < VertexData > (index * VERTEX_STRIDE);
+        VertexData v = gBufferData[vertexHandle].Load<VertexData>(index * VERTEX_STRIDE);
         
         positions[i] = v.position.xyz;
         normals[i] = v.normal;
@@ -77,7 +86,7 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
     uint refHandle = InstanceID();
     BufferRef ref = gBufferRefs[refHandle];
     // マテリアルデータを取得
-    MaterialData material = gBufferData[ref.MaterialIndex].Load < MaterialData > (0);
+    IceMaterialData material = gBufferData[ref.MaterialIndex].Load < IceMaterialData > (0);
     
     // 頂点データを取得する
     VertexData vtx = GetHitVertex(attrib, ref.vertexHandle, ref.indexHandle);
@@ -121,6 +130,12 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
         payload.color = albedoColor;
         return;
     }
+
+    // 法線を取得
+    worldNormal = ChiseledIceNormal(worldNormal, worldPosition,
+                                    material.chipScale, material.chipStrength,
+                                    material.edgeWidth, material.edgeStrength,
+                                    material.microScale, material.microStrength);
     
     float3 iceColor = material.color.rgb * textureColor.rgb;
     payload.color = IceBSDF(

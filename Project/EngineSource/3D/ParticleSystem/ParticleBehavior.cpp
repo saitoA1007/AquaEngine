@@ -62,7 +62,7 @@ ParticleBehavior::ParticleBehavior(const std::string& name, uint32_t maxNum, Tex
 void ParticleBehavior::Initialize() {
 
 
-    
+
 }
 
 void ParticleBehavior::Update() {

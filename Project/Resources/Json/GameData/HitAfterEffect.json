@@ -70,6 +70,12 @@
             },
             "SpawnCoolTime": 0.10000000149011612,
             "SpawnMaxCount": 4,
+            "TextureEmit": {
+                "Enable": true,
+                "Texture": {
+                    "_TextureName": "circle.png"
+                }
+            },
             "VelocityEmit": {
                 "Enable": false
             }
