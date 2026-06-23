@@ -2,7 +2,6 @@
 #include "Player.h"
 #include <algorithm>
 #include "LogManager.h"
-#include "EasingManager.h"
 #include "MyMath.h"
 #include "FPSCounter.h"
 #include "Model.h"
@@ -13,7 +12,7 @@ using namespace GameEngine;
 Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model, GameEngine::AnimationManager* animationManager, PlayerEffectManager* effectManager) {
 	inputCommand_ = inputCommand;
 	model_ = model;
-	
+
 	// ワールド行列を初期化
 	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,2.0f,0.0f},{-2.0f,1.0f,0.0f} });
 
@@ -40,7 +39,7 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model,
 	collider_.SetUserData(userData);
 	// コールバック登録
 	collider_.SetOnCollisionCallback([this](const CollisionResult& result) {
-		this->OnCollisionStay(result); 
+		this->OnCollisionStay(result);
 		});
 
 	// アニメーション管理
@@ -102,7 +101,7 @@ void Player::Update() {
 	attackRushAction_.Update();
 	// 状態
 	playerStatus_.Update();
-	
+
 	// 範囲制限
 	ApplyClamp();
 
@@ -181,8 +180,12 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 
 	// 床の衝突
 	if (isFloor) {
-		//worldTransform_.transform_.translate.y -= result.contactNormal.y * result.penetrationDepth;
 		worldTransform_.transform_.translate.y += std::fabs(result.contactNormal.y) * result.penetrationDepth;
+		// 地面にめり込んだ時元に戻す
+		if (worldTransform_.transform_.translate.y < 0.0f) {
+			worldTransform_.transform_.translate.y = 0.0f;
+		}
+		// 速度を0にする
 		if (commonData_.velocity.y < 0.0f) {
 			commonData_.velocity.y = 0.0f;
 		}
@@ -195,7 +198,7 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 		if (commonData_.state == PlayerState::kAttackDown) {
 			// 地面破壊スタート
 			commonData_.effectManager_->StartShockWave(Vector3(worldTransform_.transform_.translate.x, 1.0f, worldTransform_.transform_.translate.z));
-			
+
 			commonData_.state = PlayerState::kStiffness;
 			commonData_.animator_->StartAnimation(PlayerAnimationType::kWalk, "歩き");
 			Log("Player End attackDown");
@@ -206,7 +209,7 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 			commonData_.animator_->StartAnimation(PlayerAnimationType::kWalk, "歩き");
 		}
 	}
-	
+
 	// 壁の衝突処理
 	if (isWall) {
 		bounceAction_.WallBounce(worldTransform_.transform_.translate, result.contactNormal, result.penetrationDepth, attackRushAction_.GetRushMaxSpeed());

@@ -84,7 +84,7 @@ void Engine::BuildSceneServices() {
     // シーンにリソース管理機能を設定
     IScene::SetResourceManager(resource_->GetTextureManager(), resource_->GetModelManager(), resource_->GetAnimationManager(), scene_->GetGameObjectManager());
     // シーンに描画機能を設定
-    IScene::SetRender(graphics_->GetRenderPassCtrl(), graphics_->GetRenderQueue());
+    IScene::SetRender(graphics_->GetRenderPassCtrl(), graphics_->GetRenderQueue(),graphics_->GetPostEffectManager());
     // デバック描画機能を設定
     IScene::SetDebug(graphics_->GetDebugRenderer());
 }
@@ -159,11 +159,11 @@ void Engine::PostUpdate() {
     graphics_->GetImGuiManager()->EndFrame();
 }
 
-void Engine::PreDraw() { 
-    //graphics_->BeginFrame(); 
+void Engine::PreDraw() {
+    //graphics_->BeginFrame();
 }
 
-void Engine::PostDraw() { 
+void Engine::PostDraw() {
     graphics_->GetDebugRenderer()->Update();
     graphics_->EndFrame();
 }

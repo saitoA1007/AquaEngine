@@ -15,7 +15,7 @@ CompileFlags:
       # プロジェクト内の追加インクルードディレクトリ
       "-iquote",
       "C:/Users/k024g/source/repos/AquaEngine/Project/",
-      "-iquote",
+      "-I",
       "C:/Users/k024g/source/repos/AquaEngine/Project/Externals/assimp/include",
       "-iquote",
       "C:/Users/k024g/source/repos/AquaEngine/Project/EngineSource/2D",

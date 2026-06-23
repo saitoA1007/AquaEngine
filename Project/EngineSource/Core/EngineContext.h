@@ -11,7 +11,8 @@ namespace GameEngine {
     /// <summary>
     /// サブシステム機能
     /// </summary>
-    struct EngineContext {
+    struct EngineContext 
+    {
         CoreSubsystem* core = nullptr;
         GraphicsSubsystem* graphics = nullptr;
         ResourceSubsystem* resource = nullptr;

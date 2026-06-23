@@ -40,6 +40,16 @@ namespace GameEngine {
 			return ptr;
 		}
 
+		// エフェクトを取得
+		template <class T>
+		T* GetPostEffect(const std::string& name){
+			auto it = effects_.find(name);
+			if(it != effects_.end()){
+				return dynamic_cast<T*>(it->second.get());
+			}
+			return nullptr;
+		}
+
 	private:
 		ID3D12GraphicsCommandList* commandList_ = nullptr;
 		SrvManager* srvManager_ = nullptr;
