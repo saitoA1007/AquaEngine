@@ -24,11 +24,11 @@ void AddObjectBar::Run() {
                 commandHistory_.Execute(std::make_unique<AddObjectCommand>(staticObjectManager_, objectName, "cube.obj"));
 			}
             // Sphereオブジェクトを追加
-            //if (ImGui::MenuItem("Sphere")) {
-            //    std::string objectName = "SphereObject_" + std::to_string(addedObjectCount_++);
-            //    // オブジェクトの追加コマンドを実行
-            //    commandHistory_.Execute(std::make_unique<AddObjectCommand>(staticObjectManager_, objectName, "sphere.obj"));
-            //}
+            if (ImGui::MenuItem("Sphere")) {
+                std::string objectName = "SphereObject_" + std::to_string(addedObjectCount_++);
+                // オブジェクトの追加コマンドを実行
+                commandHistory_.Execute(std::make_unique<AddObjectCommand>(staticObjectManager_, objectName, "sphere.obj"));
+            }
             // Undo
             if (ImGui::MenuItem("Undo", "Ctrl+Z", false, commandHistory_.CanUndo())) {
                 commandHistory_.Undo();
@@ -276,9 +276,11 @@ void AddObjectBar::ApplyGuizmo() {
             transformAfterGizmo.scale = worldTransform.transform_.scale;
 
             // 位置を登録
-            commandHistory_.Execute(std::make_unique<TransformObjectCommand>(
-                staticObjectManager_, static_cast<uint32_t>(selectedId_),
-                transformBeforeGizmo_, transformAfterGizmo));
+            if (selectedId_ >= 0) {
+                commandHistory_.Execute(std::make_unique<TransformObjectCommand>(
+                    staticObjectManager_, static_cast<uint32_t>(selectedId_),
+                    transformBeforeGizmo_, transformAfterGizmo));
+            }  
         }
 
         wasUsingGizmo_ = isUsingGizmoNow;
