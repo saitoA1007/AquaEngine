@@ -77,6 +77,9 @@ TestScene::TestScene() {
 		iceRefBuffers_[i].SetBufferMaterial(0, iceMaterial_.GetMaterialSrvIndex());
 		iceRefBuffers_[i].SetHitGroupIndex(1);
 	}
+
+	// ディゾルブテクスチャを設定
+	iceMaterial_.materialData_->dissolveTextureHandle = textureManager_->GetHandleByName("noise0.png");
 }
 
 void TestScene::Initialize() {
@@ -133,6 +136,7 @@ void TestScene::DebugUpdate() {
 	ImGui::DragFloat("IceEdgeStrength", &iceMaterial_.materialData_->edgeStrength, 0.01f, 0.0f, 1.0f);
 	ImGui::DragFloat("IceMicroScale", &iceMaterial_.materialData_->microScale, 0.01f);
 	ImGui::DragFloat("IceMicroStrength", &iceMaterial_.materialData_->microStrength, 0.01f);
+	ImGui::DragFloat("IceDissolveThreshold", &iceMaterial_.materialData_->dissolveThreshold, 0.01f,0.0f,1.0f);
 	ImGui::End();
 #endif
 }

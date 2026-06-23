@@ -130,12 +130,19 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
         payload.color = albedoColor;
         return;
     }
-
-    // 法線を取得
-    worldNormal = ChiseledIceNormal(worldNormal, worldPosition,
+    
+    if (material.dissolveTextureHandle != 0)
+    {
+        float mask = gTexture[material.dissolveTextureHandle].SampleLevel(gSampler, transformedUV.xy, 0).r;
+        if (mask <= material.dissolveThreshold)
+        {
+             // 法線を取得
+            worldNormal = ChiseledIceNormal(worldNormal, worldPosition,
                                     material.chipScale, material.chipStrength,
                                     material.edgeWidth, material.edgeStrength,
                                     material.microScale, material.microStrength);
+        }
+    }
     
     float3 iceColor = material.color.rgb * textureColor.rgb;
     payload.color = IceBSDF(

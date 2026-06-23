@@ -61,9 +61,9 @@ void SceneSubsystem::ResetCurrentScene() {
 }
 
 void SceneSubsystem::ChangeScene(const std::string& sceneName) {
-    sceneManager_->ChangeScene(sceneName);
     staticObjectManager_->Clear();
-    staticObjectManager_->LoadSceneObject(sceneName);
+    sceneManager_->ChangeScene(sceneName);
+    staticObjectManager_->LoadSceneObject(sceneName, false);
 }
 
 std::string SceneSubsystem::GetCurrentSceneName() const {

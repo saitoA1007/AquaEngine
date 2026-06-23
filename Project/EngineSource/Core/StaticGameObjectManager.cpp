@@ -91,7 +91,7 @@ int32_t StaticGameObjectManager::SelectObject(Vector2 mousePos, const Matrix4x4&
 	return selectedId;
 }
 
-void StaticGameObjectManager::LoadSceneObject(const std::string& sceneName) {
+void StaticGameObjectManager::LoadSceneObject(const std::string& sceneName, bool isClear) {
 	std::string path = kDirectoryPath_ + sceneName + filePath_;
 
 	// ファイルがなければ早期リターン
@@ -107,7 +107,9 @@ void StaticGameObjectManager::LoadSceneObject(const std::string& sceneName) {
 	}
 	
 	// オブジェクトをクリア
-	Clear();
+	if (isClear) {
+		Clear();
+	}
 
 	// オブジェクトを復元
 	for (const auto& objectJson : root) {
