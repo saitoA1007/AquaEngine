@@ -11,5 +11,6 @@ GameObjectManager* IScene::gameObjectManager_ = nullptr;
 
 RenderPassController* IScene::renderPassController_ = nullptr;
 RenderQueue* IScene::renderQueue_ = nullptr;
+PostEffectManager* IScene::postEffectManager_ = nullptr;
 
 DebugRenderer* IScene::debugRenderer_ = nullptr;

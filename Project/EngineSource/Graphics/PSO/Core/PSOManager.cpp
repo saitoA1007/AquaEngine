@@ -55,7 +55,7 @@ void PSOManager::RegisterPSO(const std::string& name, const CreatePSOData& psoDa
         rootSignatureData.parameterTypes = rootSignature->GetParameterTypes();
         // RootSignatureを保存
         rootSignatureList_[psoData.rootSigName] = rootSignatureData;
-    }    
+    }
 
     // DepthStencilStateの設定
      // DepthStencilStateの設定
@@ -310,7 +310,7 @@ void PSOManager::CreatePSO(const std::string& psoName, const CreatePSOData& psoD
     psoDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
     // 描画タイプ
     psoDesc.PrimitiveTopologyType = psoData.primitiveType;
-    
+
     // PSOの生成
     PSOData pso;
     // リンクするルートシグネチャを保存
@@ -602,9 +602,9 @@ void PSOManager::DefaultLoadPostEffectPSO() {
     defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/RadialBlur/RadialBlur.PS.hlsl";
     RegisterPSO("RadialBlur", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 
-    // アウトライン
-    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/OutLine/OutLine.PS.hlsl";
-    RegisterPSO("OutLine", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
+    // ディゾルブ
+    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/Dissolve/Dissolve.PS.hlsl";
+    RegisterPSO("Dissolve", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 
     // ラスタライズとレイトレの描画を合成する
     defaultPostEffect.rootSigName = "LightingComposite";

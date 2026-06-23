@@ -231,5 +231,4 @@ private:
 
 	bool isAttackDownPrepping_ = true;
 	float attackDownPrepareTimer_ = 0.0f;
-
 };

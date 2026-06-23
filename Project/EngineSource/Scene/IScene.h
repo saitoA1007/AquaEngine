@@ -10,6 +10,7 @@
 #include "RenderQueue.h"
 #include "RenderPass/RenderPassController.h"
 #include "DebugRenderer.h"
+#include "PostProcess/PostEffectManager.h"
 
 namespace GameEngine {
 
@@ -34,9 +35,10 @@ namespace GameEngine {
 		}
 
 		// 描画機能を取得
-		static void SetRender(RenderPassController* renderPassController, RenderQueue* renderQueue) {
+		static void SetRender(RenderPassController* renderPassController, RenderQueue* renderQueue, PostEffectManager* postEffectManager) {
 			renderPassController_ = renderPassController;
 			renderQueue_ = renderQueue;
+			postEffectManager_ = postEffectManager;
 		}
 
 		// デバック機能を主億
@@ -95,6 +97,7 @@ namespace GameEngine {
 
 		static RenderPassController* renderPassController_; // 描画パスを管理する
 		static RenderQueue* renderQueue_; // 描画コマンドを管理
+		static PostEffectManager* postEffectManager_; // ポストエフェクト管理
 
 		static DebugRenderer* debugRenderer_; // デバック描画機能
 	};

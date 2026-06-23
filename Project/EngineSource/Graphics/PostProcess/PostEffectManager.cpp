@@ -13,23 +13,23 @@ void PostEffectManager::Initialize(ID3D12GraphicsCommandList* commandList, SrvMa
     // ラジアルブラー
     renderPassController_->AddPass("RadialBlurPass");
     // アウトライン
-    renderPassController_->AddPass("OutLinePass");
+    renderPassController_->AddPass("DissolvePass");
     // ブルーム
     //renderPassController_->AddPass("BloomPass");
 
     // 実行順序を設定
-    RegisterPassOrder({"OutLinePass", "VignettingPass", "RadialBlurPass"});
+    RegisterPassOrder({"DissolvePass", "VignettingPass", "RadialBlurPass"});
 
     // psoを登録
     RegisterPSO("Vignetting", psoManager);
     RegisterPSO("RadialBlur", psoManager);
     RegisterPSO("ScanLine", psoManager);
-    RegisterPSO("OutLine", psoManager);
+    RegisterPSO("Dissolve", psoManager);
 
     // エフェクトを追加
     AddPostEffect<Vignetting>("VignettingPass", "Vignetting");
     AddPostEffect<RadialBlur>("RadialBlurPass", "RadialBlur");
-    AddPostEffect<OutLine>("OutLinePass", "OutLine");
+    AddPostEffect<Dissolve>("DissolvePass", "Dissolve");
 }
 
 void PostEffectManager::Execute() {
