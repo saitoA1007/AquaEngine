@@ -181,7 +181,8 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 
 	// 床の衝突
 	if (isFloor) {
-		worldTransform_.transform_.translate.y -= result.contactNormal.y * result.penetrationDepth;
+		//worldTransform_.transform_.translate.y -= result.contactNormal.y * result.penetrationDepth;
+		worldTransform_.transform_.translate.y += std::fabs(result.contactNormal.y) * result.penetrationDepth;
 		if (commonData_.velocity.y < 0.0f) {
 			commonData_.velocity.y = 0.0f;
 		}
