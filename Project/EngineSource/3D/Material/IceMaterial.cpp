@@ -32,14 +32,14 @@ IceMaterial::IceMaterial() {
 	// ディゾルブ用のテクスチャ
 	materialData_->dissolveTextureHandle = 0;
 	// ディゾルブ用の閾値
-	materialData_->dissolveThreshold = 0.5f;
+	materialData_->dissolveThreshold = 0.48f;
 
-	materialData_->chipScale = 0.3f;
-	materialData_->chipStrength = 0.3f;
-	materialData_->edgeWidth = 0.06f;
-	materialData_->edgeStrength = 0.2f;
-	materialData_->microScale = 0.04f;
-	materialData_->microStrength = 0.15f;
+	materialData_->chipScale = 0.23f;
+	materialData_->chipStrength = 0.66f;
+	materialData_->edgeWidth = 0.46f;
+	materialData_->edgeStrength = 0.6f;
+	materialData_->microScale = 0.01f;
+	materialData_->microStrength = 0.24f;
 }
 
 IceMaterial::~IceMaterial() {

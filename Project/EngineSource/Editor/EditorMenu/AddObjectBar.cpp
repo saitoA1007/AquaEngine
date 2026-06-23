@@ -23,6 +23,12 @@ void AddObjectBar::Run() {
                 // オブジェクトの追加コマンドを実行
                 commandHistory_.Execute(std::make_unique<AddObjectCommand>(staticObjectManager_, objectName, "cube.obj"));
 			}
+            // Sphereオブジェクトを追加
+            //if (ImGui::MenuItem("Sphere")) {
+            //    std::string objectName = "SphereObject_" + std::to_string(addedObjectCount_++);
+            //    // オブジェクトの追加コマンドを実行
+            //    commandHistory_.Execute(std::make_unique<AddObjectCommand>(staticObjectManager_, objectName, "sphere.obj"));
+            //}
             // Undo
             if (ImGui::MenuItem("Undo", "Ctrl+Z", false, commandHistory_.CanUndo())) {
                 commandHistory_.Undo();
