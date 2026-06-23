@@ -555,6 +555,9 @@
     <ClCompile Include="Application\Player\PlayerEffectManager.cpp" />
     <ClCompile Include="Application\Player\Effect\ShockWave.cpp" />
     <ClCompile Include="Application\Player\Effect\ShockFloor.cpp" />
+    <ClCompile Include="EngineSource\3D\ParticleSystem\ParticleEmitModules.cpp" />
+    <ClCompile Include="EngineSource\3D\ParticleSystem\ParticleUpdateModules.cpp" />
+    <ClCompile Include="EngineSource\3D\Material\IceMaterial.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1090,6 +1093,9 @@
     <ClInclude Include="Application\Player\PlayerEffectManager.h" />
     <ClInclude Include="Application\Player\Effect\ShockWave.h" />
     <ClInclude Include="Application\Player\Effect\ShockFloor.h" />
+    <ClInclude Include="EngineSource\3D\ParticleSystem\ParticleEmitModules.h" />
+    <ClInclude Include="EngineSource\3D\ParticleSystem\ParticleUpdateModules.h" />
+    <ClInclude Include="EngineSource\3D\Material\IceMaterial.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />

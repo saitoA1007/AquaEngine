@@ -9,6 +9,7 @@
 #include "ParticleBehavior.h"
 #include "Material.h"
 #include "RefBuffer.h"
+#include "IceMaterial.h"
 
 #include "Application/Scene/Transition/Fade.h"
 
@@ -82,7 +83,7 @@ private: // シーン機能
 	Vector4 playerColor_ = { 1.0f,1.0f,1.0f,1.0f };
 
 	// 氷で共通のマテリアル
-	GameEngine::Material iceMaterial_;
+	GameEngine::IceMaterial iceMaterial_;
 	// レイトレーシングで氷マテリアルを参照する用
 	GameEngine::RefBuffer iceRefBuffers_[4];
 

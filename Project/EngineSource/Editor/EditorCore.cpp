@@ -43,7 +43,7 @@ void EditorCore::Initialize(TextureManager* textureManager, SceneChangeRequest* 
 	windowManager_->RegisterWindow(std::make_unique<SceneWindow>(renderPassController, addObjectBar_.get()));
 	windowManager_->RegisterWindow(std::make_unique<AssetWindow>(textureManager));
 	windowManager_->RegisterWindow(std::make_unique<HierarchyWindow>(gameParamEditor));
-	windowManager_->RegisterWindow(std::make_unique<InspectorWindow>(gameParamEditor));
+	windowManager_->RegisterWindow(std::make_unique<InspectorWindow>(gameParamEditor, textureManager));
 	windowManager_->RegisterWindow(std::make_unique<ConsoleWindow>());
 	windowManager_->RegisterWindow(std::make_unique<PerformanceWindow>());
 

@@ -124,6 +124,10 @@ void GameParamEditor::DeserializeGroupFromJson(Group& group, const json& node) {
 						{ maxArray[0], maxArray[1], maxArray[2], maxArray[3] }
 					};
 				}
+			} else if (itItem->contains("_TextureName")) {
+				TextureData texData{};
+				texData.name = itItem->at("_TextureName").get<std::string>();
+				group.items[itemName].value = texData;
 			} else if (itItem->contains("_ShapeType") && itItem->contains("_radius")) {
 				EmitterShape shape{};
 				std::string typeStr = itItem->at("_ShapeType").get<std::string>();

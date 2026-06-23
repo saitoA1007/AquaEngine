@@ -30,11 +30,11 @@ namespace GameEngine {
 
 		// 有効状態
 		bool IsActive() const { return isActive_; }
-		void SetActive(bool active) { isActive_ = active; }
+		virtual void SetActive(bool active) { isActive_ = active; }
 
 		// 削除管理
 		bool IsDead() const { return isDead_; }
-		void Destroy() { isDead_ = true; }
+		virtual void Destroy() { isDead_ = true; }
 
 	protected:
 		// 描画機能

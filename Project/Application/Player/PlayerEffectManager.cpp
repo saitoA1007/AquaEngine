@@ -7,8 +7,11 @@ using namespace GameEngine;
 PlayerEffectManager::PlayerEffectManager(GameEngine::GameObjectManager* objectManager, GameEngine::ModelManager* modelManager,GameEngine::TextureManager* textureManager) {
 
 	auto* shockWaveModel = modelManager->GetNameByModel("RushPower.obj");
+	shockWaveModel->SetDefaultIsEnableLight(false);
 	auto* planeXZModel = modelManager->GetNameByModel("planeXZ.obj");
+	planeXZModel->SetDefaultIsEnableLight(false);
 	auto* planeXYmodel = modelManager->GetNameByModel("plane.obj");
+	planeXYmodel->SetDefaultIsEnableLight(false);
 
 	objectManager_ = objectManager;
 
@@ -22,14 +25,10 @@ PlayerEffectManager::PlayerEffectManager(GameEngine::GameObjectManager* objectMa
 	shockGH_ = textureManager->GetHandleByName("Power.png");
 	blastGH_ = textureManager->GetHandleByName("FX01_Flare_03.png");
 
-	auto* effectModel = modelManager->GetNameByModel("plane.obj");
-	uint32_t effectGH = textureManager->GetHandleByName("heightCircle.png");
-	uint32_t circleGH = textureManager->GetHandleByName("circle.png");
-
-	blastEffect_ = objectManager_->AddObject<ParticleBehavior>("HitEffect", 16, effectGH, effectModel, &renderQueue_->GetMainCamera());
+	blastEffect_ = objectManager_->AddObject<ParticleBehavior>("HitEffect", 16, textureManager, planeXYmodel, &renderQueue_->GetMainCamera());
 	blastEffect_->SetIsLoop(false);
 
-	afterEffect_ = objectManager_->AddObject<ParticleBehavior>("HitAfterEffect", 32, circleGH, effectModel, &renderQueue_->GetMainCamera());
+	afterEffect_ = objectManager_->AddObject<ParticleBehavior>("HitAfterEffect", 32, textureManager, planeXYmodel, &renderQueue_->GetMainCamera());
 	afterEffect_->SetIsLoop(false);
 }
 

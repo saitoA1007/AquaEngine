@@ -125,7 +125,7 @@ std::unique_ptr<Model> ModelLoader::CreateModel(const std::string& objFilename, 
 	// マテリアルを作成
 	for (uint32_t index = 0; index < modelData.materials.size(); ++index) {
 		std::unique_ptr<Material> tmpMaterial = std::make_unique<Material>();
-		tmpMaterial->Initialize(modelData.materials[index].color, modelData.materials[index].specularColor, modelData.materials[index].shininess, false);
+		tmpMaterial->Initialize(modelData.materials[index].color, modelData.materials[index].specularColor, modelData.materials[index].shininess, true);
 
 		// テクスチャ情報があればを取得
 		if (!modelData.materials[index].textureFilePath.empty()) {

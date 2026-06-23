@@ -2,18 +2,21 @@
 #include "IEditorWindow.h"
 #include "GameParamEditor.h"
 #include "ImGuiManager.h"
+#include "TextureManager.h"
 
 namespace GameEngine {
 
 	class InspectorWindow : public IEditorWindow {
 	public:
-		InspectorWindow(GameParamEditor* gameParamEditor);
+		InspectorWindow(GameParamEditor* gameParamEditor, TextureManager* textureManager);
 
 		void Draw() override;
 		std::string GetName() const override { return "ParameterInspector"; }
 
 	private:
 		GameParamEditor* gameParamEditor_ = nullptr;
+		
+		TextureManager* textureManager_ = nullptr;
 
 	private:
 
@@ -27,7 +30,9 @@ namespace GameEngine {
 	struct DebugParameterVisitor {
 		const std::string& itemName;
 		bool& isDirty;
-		explicit DebugParameterVisitor(const std::string& name,bool& dirty) : itemName(name), isDirty(dirty){}
+		TextureManager* textureManager_;
+		explicit DebugParameterVisitor(const std::string& name,bool& dirty, TextureManager* textureManager)
+			: itemName(name), isDirty(dirty), textureManager_(textureManager) {}
 
 		// ## 付きのIDを生成するヘルパー
 		std::string HiddenLabel() const {
@@ -123,6 +128,40 @@ namespace GameEngine {
 				}
 
 				ImGui::TreePop();
+			}
+		}
+
+		void operator()(TextureData& value) const {
+			// 名前からハンドルを解決する
+			if (textureManager_ && !value.name.empty()) {
+				value.handle = textureManager_->GetHandleByName(value.name);
+			}
+
+			ImGui::Text("%s", itemName.c_str());
+
+			// コンボボックスでテクスチャを選択
+			const char* comboLabel = value.name.empty() ? "None" : value.name.c_str();
+			if (ImGui::BeginCombo(HiddenLabel().c_str(), comboLabel)) {
+				if (textureManager_) {
+					for (const auto& texName : textureManager_->GetRegisteredTextureNames()) {
+						bool isSelected = (texName == value.name);
+						if (ImGui::Selectable(texName.c_str(), isSelected)) {
+							value.name = texName;
+							value.handle = textureManager_->GetHandleByName(texName);
+							isDirty = true;
+						}
+						if (isSelected) {
+							ImGui::SetItemDefaultFocus();
+						}
+					}
+				}
+				ImGui::EndCombo();
+			}
+
+			// プレビュー表示
+			if (textureManager_ && !value.name.empty()) {
+				D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = textureManager_->GetTextureSrvHandlesGPU(value.handle);
+				ImGui::Image((ImTextureID)gpuHandle.ptr, ImVec2(64, 64));
 			}
 		}
 

@@ -2,8 +2,9 @@
 
 using namespace GameEngine;
 
-InspectorWindow::InspectorWindow(GameParamEditor* gameParamEditor) {
+InspectorWindow::InspectorWindow(GameParamEditor* gameParamEditor, TextureManager* textureManager) {
     gameParamEditor_ = gameParamEditor;
+    textureManager_ = textureManager;
 }
 
 void InspectorWindow::Draw() {
@@ -103,7 +104,7 @@ void InspectorWindow::DrawItems(GameParamEditor::Group& group) {
     // ソート済みの順序で描画
     for (auto& [itemName, itemPtr] : sortedItems) {
         ImGui::PushID(itemName.c_str());
-        std::visit(DebugParameterVisitor{ itemName, itemPtr->isDirty }, itemPtr->value);
+        std::visit(DebugParameterVisitor{ itemName, itemPtr->isDirty, textureManager_ }, itemPtr->value);
         ImGui::Separator();
         ImGui::PopID();
     }

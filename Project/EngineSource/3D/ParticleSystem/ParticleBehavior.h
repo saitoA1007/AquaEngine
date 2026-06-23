@@ -8,12 +8,16 @@
 #include "IGameObject.h"
 #include "Camera.h"
 #include "WorldTransforms.h"
+#include "ParticleUpdateModules.h"
 
 namespace GameEngine{
 
+	// 前方宣言
+	class TextureManager;
+
 	class ParticleBehavior : public IGameObject {
 	public:
-		ParticleBehavior(const std::string& name, uint32_t maxNum, uint32_t textureHandle, Model* model, Camera* camera);
+		ParticleBehavior(const std::string& name, uint32_t maxNum, TextureManager* textureManager, Model* model, Camera* camera);
 		~ParticleBehavior() = default;
 
 		// 初期化処理
@@ -36,18 +40,6 @@ namespace GameEngine{
 		/// </summary>
 		/// <returns></returns>
 		WorldTransforms* GetWorldTransforms() const { return worldTransforms_.get(); }
-
-		/// <summary>
-		/// テクスチャを設定する
-		/// </summary>
-		/// <param name="texture"></param>
-		void SetTexture(const uint32_t& texture) { textureHandle_ = texture; }
-
-		/// <summary>
-		/// テクスチャの取得
-		/// </summary>
-		/// <returns></returns>
-		const uint32_t& GetTexture() const { return textureHandle_; }
 
 		/// <summary>
 		/// 現在の数
@@ -96,9 +88,6 @@ namespace GameEngine{
 
 		// モデル
 		Model* model_ = nullptr;
-
-		// 使用テクスチャ
-		uint32_t textureHandle_ = 0;
 
 		// パーティクルの配列
 		std::vector<ParticleData> particles_;           

@@ -6,6 +6,7 @@ TestScene::~TestScene() {}
 
 TestScene::TestScene() {
 
+    // 決定ボタンコマンドを追加
 	inputCommand_->RegisterCommand("Decision", { {InputState::KeyTrigger, DIK_SPACE},{InputState::PadTrigger, XINPUT_GAMEPAD_X} });
 
 	// メインカメラの初期化
@@ -42,8 +43,8 @@ TestScene::TestScene() {
 
 	// エフェクト用モデル
 	effectModel_ = modelManager_->GetNameByModel("plane.obj");
-	uint32_t effectGH = textureManager_->GetHandleByName("circle.png");
-	//gameObjectManager_->AddObject<ParticleBehavior>("HitAfterEffect", 32, effectGH, effectModel_, &renderQueue_->GetMainCamera());
+	effectModel_->SetDefaultIsEnableLight(false);
+	//gameObjectManager_->AddObject<ParticleBehavior>("HitAfterEffect", 32, textureManager_, effectModel_, &renderQueue_->GetMainCamera());
 
 	// 高ポリゴン氷
 	iceHighModel_ = modelManager_->GetNameByModel("ice_highPolygon.gltf");
@@ -71,7 +72,6 @@ TestScene::TestScene() {
 	iceCubeWorld_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{8.0f,2.0f,0.0f} });
 
 	// 氷用マテリアルを作成
-	iceMaterial_.Initialize({ 1.0f,1.0f,1.0f,1.0f }, { 1.0f,1.0f,1.0f }, 500.0f, true);
 	for (size_t i = 0; i < 4; ++i) {
 		iceRefBuffers_[i].Create();
 		iceRefBuffers_[i].SetBufferMaterial(0, iceMaterial_.GetMaterialSrvIndex());
@@ -108,13 +108,6 @@ void TestScene::DebugUpdate() {
 	ImGui::DragFloat("lightIntensity", &intensity_, 0.1f);
 	ImGui::ColorEdit4("lightColor", &lightColor_.x);
 
-	ImGui::ColorEdit4("IceColor", &color_.x);
-	ImGui::DragFloat("IceRoughness", &roughness_, 0.01f,0.0f,1.0f);
-	ImGui::DragFloat("IceIor", &ior_, 0.01f);
-	iceMaterial_.SetColor(color_);
-	iceMaterial_.SetRoughness(roughness_);
-	iceMaterial_.SetIOR(ior_);
-
 	ImGui::DragFloat3("IceHighPos", &iceHighWorld_.transform_.translate.x, 0.1f);
 	ImGui::DragFloat3("IceHighScale", &iceHighWorld_.transform_.scale.x, 0.1f);
 	iceHighWorld_.UpdateTransformMatrix();
@@ -126,6 +119,20 @@ void TestScene::DebugUpdate() {
 	light->SetDirectionalColor(lightColor_);
 	world_.UpdateTransformMatrix();
 	model_->SetDefaultColor(playerColor_);
+	ImGui::End();
+
+	
+	ImGui::Begin("IceMaterial");
+	ImGui::ColorEdit4("IceColor", &iceMaterial_.materialData_->color.x);
+	ImGui::DragFloat("IceRoughness", &iceMaterial_.materialData_->roughness, 0.01f, 0.0f, 1.0f);
+	ImGui::DragFloat("IceIor", &iceMaterial_.materialData_->ior, 0.01f);
+
+	ImGui::DragFloat("IceChipScale", &iceMaterial_.materialData_->chipScale, 0.01f);
+	ImGui::DragFloat("IceChipStrength", &iceMaterial_.materialData_->chipStrength, 0.01f, 0.0f, 1.0f);
+	ImGui::DragFloat("IceEdgeWidth", &iceMaterial_.materialData_->edgeWidth, 0.01f);
+	ImGui::DragFloat("IceEdgeStrength", &iceMaterial_.materialData_->edgeStrength, 0.01f, 0.0f, 1.0f);
+	ImGui::DragFloat("IceMicroScale", &iceMaterial_.materialData_->microScale, 0.01f);
+	ImGui::DragFloat("IceMicroStrength", &iceMaterial_.materialData_->microStrength, 0.01f);
 	ImGui::End();
 #endif
 }
@@ -139,11 +146,11 @@ void TestScene::Draw() {
 	renderQueue_->SubmitRaytracingModel(terrainModel_, terrainWorld_);
 
 	// アニメーションモデル
-	//renderQueue_->SubmitRaytracingModel(model_, world_);
+	renderQueue_->SubmitRaytracingModel(model_, world_);
 	//
 	//// それぞれの氷を描画
-	//renderQueue_->SubmitRaytracingModel(iceHighModel_, iceHighWorld_, &iceRefBuffers_[0]);
-	//renderQueue_->SubmitRaytracingModel(iceMiddleModel_, iceMiddleWorld_, &iceRefBuffers_[1]);
-	//renderQueue_->SubmitRaytracingModel(iceLowModel_, iceLowWorld_, &iceRefBuffers_[2]);
-	//renderQueue_->SubmitRaytracingModel(iceCubeModel_, iceCubeWorld_, &iceRefBuffers_[3]);
+	renderQueue_->SubmitRaytracingModel(iceHighModel_, iceHighWorld_, &iceRefBuffers_[0]);
+	renderQueue_->SubmitRaytracingModel(iceMiddleModel_, iceMiddleWorld_, &iceRefBuffers_[1]);
+	renderQueue_->SubmitRaytracingModel(iceLowModel_, iceLowWorld_, &iceRefBuffers_[2]);
+	renderQueue_->SubmitRaytracingModel(iceCubeModel_, iceCubeWorld_, &iceRefBuffers_[3]);
 }
