@@ -18,8 +18,9 @@ RadialBlur::RadialBlur() {
     // 作成
     buffer_.Create();
     buffer_.GetData()->centerPos = { 0.5f,0.5f };
-    buffer_.GetData()->numSamles = 2;
+    buffer_.GetData()->numSamles = 3;
     buffer_.GetData()->blurWidth = 0.01f;
+    isActive_ = true;
 }
 
 void RadialBlur::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
@@ -73,8 +74,6 @@ Dissolve::Dissolve() {
     // 標準偏差
     buffer_.GetData()->dissolveTextureHandle = 0;
     buffer_.GetData()->threshold = 0.5f;
-
-    isActive_ = true;
 }
 
 void Dissolve::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {

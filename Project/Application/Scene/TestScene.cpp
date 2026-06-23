@@ -81,15 +81,9 @@ TestScene::TestScene() {
 
 	// ディゾルブ用のテクスチャを取得
 	uint32_t dissolveTexture = textureManager_->GetHandleByName("noise0.png");
-
 	// ディゾルブテクスチャを設定
 	iceMaterial_.materialData_->dissolveTextureHandle = dissolveTexture;
 
-	// ディゾルブ用のテクスチャを設定
-	auto* dissolve = postEffectManager_->GetPostEffect<Dissolve>("DissolvePass");
-	if (dissolve) {
-		dissolve->SetDissolveTexture(dissolveTexture);
-	}
 }
 
 void TestScene::Initialize() {
