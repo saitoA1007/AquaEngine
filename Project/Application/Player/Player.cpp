@@ -2,7 +2,6 @@
 #include "Player.h"
 #include <algorithm>
 #include "LogManager.h"
-#include "EasingManager.h"
 #include "MyMath.h"
 #include "FPSCounter.h"
 #include "Model.h"
@@ -181,8 +180,12 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 
 	// 床の衝突
 	if (isFloor) {
-		//worldTransform_.transform_.translate.y -= result.contactNormal.y * result.penetrationDepth;
 		worldTransform_.transform_.translate.y += std::fabs(result.contactNormal.y) * result.penetrationDepth;
+		// 地面にめり込んだ時元に戻す
+		if (worldTransform_.transform_.translate.y < 0.0f) {
+			worldTransform_.transform_.translate.y = 0.0f;
+		}
+		// 速度を0にする
 		if (commonData_.velocity.y < 0.0f) {
 			commonData_.velocity.y = 0.0f;
 		}
