@@ -558,6 +558,8 @@
     <ClCompile Include="EngineSource\3D\ParticleSystem\ParticleEmitModules.cpp" />
     <ClCompile Include="EngineSource\3D\ParticleSystem\ParticleUpdateModules.cpp" />
     <ClCompile Include="EngineSource\3D\Material\IceMaterial.cpp" />
+    <ClCompile Include="EngineSource\Editor\Windows\MaterialNodeWindow.cpp" />
+    <ClCompile Include="EngineSource\Editor\NodeSystem\MaterialNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1096,6 +1098,9 @@
     <ClInclude Include="EngineSource\3D\ParticleSystem\ParticleEmitModules.h" />
     <ClInclude Include="EngineSource\3D\ParticleSystem\ParticleUpdateModules.h" />
     <ClInclude Include="EngineSource\3D\Material\IceMaterial.h" />
+    <ClInclude Include="EngineSource\Editor\NodeSystem\MaterialGraph.h" />
+    <ClInclude Include="EngineSource\Editor\Windows\MaterialNodeWindow.h" />
+    <ClInclude Include="EngineSource\Editor\NodeSystem\MaterialNode.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />

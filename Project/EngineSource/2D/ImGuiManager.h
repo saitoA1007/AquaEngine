@@ -11,9 +11,6 @@
 #include"Externals/imgui/ImGuizmo.h"
 
 #include "Externals/imgui/imgui_node_editor.h"
-namespace ed = ax::NodeEditor;
-
-static ed::EditorContext* g_NodeContext = nullptr;
 #endif
 
 namespace GameEngine {
@@ -61,6 +58,9 @@ namespace GameEngine {
 
 	private:
 
+		/// <summary>
+		/// Imguiのスタイルを適応
+		/// </summary>
 		void ApplyStyle();
 	};
 }

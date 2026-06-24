@@ -40,10 +40,6 @@ void ImGuiManager::Initialize([[maybe_unused]]ID3D12Device* device, [[maybe_unus
 		srvManager_->GetSRVHeap(),
 		cpuHandle,
 		gpuHandle);
-
-	ed::Config config;
-	config.SettingsFile = "node_editor_docked.json";
-	g_NodeContext = ed::CreateEditor(&config);
 #endif
 }
 

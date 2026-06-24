@@ -20,7 +20,6 @@ RadialBlur::RadialBlur() {
     buffer_.GetData()->centerPos = { 0.5f,0.5f };
     buffer_.GetData()->numSamles = 3;
     buffer_.GetData()->blurWidth = 0.01f;
-    isActive_ = true;
 }
 
 void RadialBlur::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
