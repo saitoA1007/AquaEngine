@@ -236,6 +236,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="EngineSource\Editor\JsonSerializer.cpp" />
+    <ClCompile Include="EngineSource\Editor\NodeSystem\MaterialNode.cpp" />
+    <ClCompile Include="EngineSource\Editor\Windows\MaterialNodeWindow.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="EngineSource\Graphics\Buffers\BLAS.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\BufferRefManager.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\SceneRenderManager.cpp" />
@@ -496,6 +501,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ClInclude>
     <ClInclude Include="EngineSource\Editor\IEditorCommand.h" />
     <ClInclude Include="EngineSource\Editor\JsonSerializer.h" />
+    <ClInclude Include="EngineSource\Editor\NodeSystem\MaterialGraph.h" />
+    <ClInclude Include="EngineSource\Editor\NodeSystem\MaterialNode.h" />
+    <ClInclude Include="EngineSource\Editor\Windows\MaterialNodeWindow.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="EngineSource\Graphics\Buffers\BLAS.h" />
     <ClInclude Include="EngineSource\Graphics\Buffers\RefBuffer.h" />
     <ClInclude Include="EngineSource\Graphics\Core\BufferRefManager.h" />
