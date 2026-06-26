@@ -13,6 +13,12 @@ void ShaderCompiler::Initialize(DXC* dxc) {
 	if (!fs::exists(csoDir)) {
 		fs::create_directories(csoDir);
 	}
+
+	// マテリアルグラフから生成されるHLSLの保存先が存在しない場合は作成
+	fs::path genDir(generatedHlslDirectory_);
+	if (!fs::exists(genDir)) {
+		fs::create_directories(genDir);
+	}
 }
 
 Microsoft::WRL::ComPtr<IDxcBlob> ShaderCompiler::CompileShader(Type type, const std::wstring& path) {
@@ -33,6 +39,19 @@ Microsoft::WRL::ComPtr<IDxcBlob> ShaderCompiler::CompileShader(Type type, const 
 	assert(blob != nullptr && "CSO file not found in Release build");
 	return blob;
 #endif
+}
+
+Microsoft::WRL::ComPtr<IDxcBlob> ShaderCompiler::CompileMaterialGraph(const MaterialGraph& graph, const std::wstring& materialName) {
+	// グラフからHLSLソースを生成
+	std::string hlslSource = MaterialShaderGenerator::Generate(graph);
+	assert(!hlslSource.empty() && "MaterialGraph: HLSL生成に失敗しました");
+
+	// 生成先のパスを決定し、ファイルを生成
+	std::wstring hlslPath = generatedHlslDirectory_ + materialName + L".PS.hlsl";
+	WriteGeneratedHlsl(hlslPath, hlslSource);
+
+	// コンパイルする
+	return CompileShader(Type::PS, hlslPath);
 }
 
 std::wstring ShaderCompiler::GetCsoPath(const std::wstring& hlslPath) {
@@ -122,4 +141,22 @@ Microsoft::WRL::ComPtr<IDxcBlob> ShaderCompiler::CompileAndSave(Type type, const
 	std::wstring csoPath = GetCsoPath(hlslPath);
 	SaveCsoFile(csoPath, shaderBlob.Get());
 	return shaderBlob;
+}
+
+void ShaderCompiler::WriteGeneratedHlsl(const std::wstring& hlslPath, const std::string& source) {
+	// 内容が変わっていなければタイムスタンプを更新しない
+	std::ifstream existing(hlslPath, std::ios::binary);
+	if (existing.is_open()) {
+		std::string existingContent(
+			(std::istreambuf_iterator<char>(existing)),
+			std::istreambuf_iterator<char>());
+		if (existingContent == source) {
+			return;
+		}
+	}
+	existing.close();
+
+	std::ofstream out(hlslPath, std::ios::binary);
+	assert(out.is_open() && "Failed to write generated material HLSL");
+	out << source;
 }

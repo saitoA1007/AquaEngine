@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include "IEditorWindow.h"
 #include "NodeSystem/MaterialGraph.h"
 #include "ImGuiManager.h"
@@ -6,45 +7,64 @@ namespace ned = ax::NodeEditor;
 
 namespace GameEngine {
 
-    class MaterialNodeWindow : public IEditorWindow {
-    public:
-        MaterialNodeWindow();
-        ~MaterialNodeWindow() = default;
+	// 前方宣言
+	class PSOManager;
 
-        void Draw() override;
-        std::string GetName() const override { return "MaterialNodeWindow"; }
+	class MaterialNodeWindow : public IEditorWindow {
+	public:
+		MaterialNodeWindow(PSOManager* psoManager);
+		~MaterialNodeWindow() = default;
 
-        void Render(MaterialGraph& graph);
+		void Draw() override;
+		std::string GetName() const override { return "MaterialNodeWindow"; }
 
-    private:
-        ned::EditorContext* context_ = nullptr;
-        MaterialGraph* graph_ = nullptr;
+		void Render(MaterialGraph& graph);
 
-        // テスト用の一時的なグラフ
-        MaterialGraph testgraph_;
+	private:
+		PSOManager* psoManager_ = nullptr;
+		ned::EditorContext* context_ = nullptr;
+		MaterialGraph* graph_ = nullptr;
 
-        // 接続開始ピン
-        int newLinkPin_ = -1;
+		// テスト用の一時的なグラフ
+		MaterialGraph testgraph_;
 
-        bool dirtyFlag_ = false;
+		// 接続開始ピン
+		int newLinkPin_ = -1;
 
-    private:
+		bool dirtyFlag_ = false;
 
-        void HandleLinkCreation(MaterialGraph& graph);
+		// 登録されているノード
+		std::unordered_map<std::string, std::function<void(MaterialGraph&)>> registerNode_;
 
-        void HandleLinkDeletion(MaterialGraph& graph);
+		// 左側の表示範囲
+		float leftPanelWidth_ = 240.0f;
+		// 最小幅
+		const float kMinPanelWidth_ = 150.0f;  
+		// 最大幅
+		const float kMaxPanelWidth_ = 600.0f;  
 
-        void HandleContextMenu(MaterialGraph& graph);
-    };
+	private:
 
-    // ヘルパー関数
-    namespace {
+		void HandleLinkCreation(MaterialGraph& graph);
 
-        // グラフ内のピンIDから対称のPinを探す
-        const Pin* FindPin(const MaterialGraph& graph, int pinId);
+		void HandleLinkDeletion(MaterialGraph& graph);
 
-        // 接続の判定をする
-        bool CanConnect(const MaterialGraph& graph, int startPinId, int endPinId);
-    }
+		void HandleContextMenu(MaterialGraph& graph);
+
+		// ノードを登録
+		template<typename T>
+		void RegisterNode(std::string nodeName) {
+			registerNode_[nodeName] = [](MaterialGraph& graph) {
+				graph.nodes.push_back(std::make_unique<T>(graph));
+			};
+		}
+	};
+
+	// ヘルパー関数
+	namespace {
+
+		// 接続の判定をする
+		bool CanConnect(const MaterialGraph& graph, int startPinId, int endPinId);
+	}
 }
 

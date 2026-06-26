@@ -31,7 +31,7 @@ EditorCore::~EditorCore() {}
 
 void EditorCore::Initialize(TextureManager* textureManager, SceneChangeRequest* sceneChangeRequest, RenderPassController* renderPassController,
 	Input* input, RenderQueue* renderQueue, DebugRenderer* debugRenderer, Model* gridModel, GameParamEditor* gameParamEditor,
-	StaticGameObjectManager* staticObjectManager) {
+	StaticGameObjectManager* staticObjectManager, PSOManager* psoManager) {
 	windowManager_ = std::make_unique<EditorWindowManager>();
 	menuBar_ = std::make_unique<EditorMenuBar>();
 	editorLayout_ = std::make_unique<EditorLayout>();
@@ -47,7 +47,7 @@ void EditorCore::Initialize(TextureManager* textureManager, SceneChangeRequest* 
 	windowManager_->RegisterWindow(std::make_unique<InspectorWindow>(gameParamEditor, textureManager));
 	windowManager_->RegisterWindow(std::make_unique<ConsoleWindow>());
 	windowManager_->RegisterWindow(std::make_unique<PerformanceWindow>());
-	windowManager_->RegisterWindow(std::make_unique<MaterialNodeWindow>());
+	windowManager_->RegisterWindow(std::make_unique<MaterialNodeWindow>(psoManager));
 
 	// レイアウトのデータを取得する
 	editorLayout_->LoadLayout(windowManager_->GetWindows());
