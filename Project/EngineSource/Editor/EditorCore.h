@@ -23,6 +23,7 @@ namespace GameEngine {
 	class DebugRenderer;
 	class RenderQueue;
 	class StaticGameObjectManager;
+	class PSOManager;
 
 	class EditorCore {
 	public:
@@ -32,7 +33,7 @@ namespace GameEngine {
 		// 初期化処理
 		void Initialize(TextureManager* textureManager, SceneChangeRequest* sceneChangeRequest, RenderPassController* renderPassController, 
 			Input* input, RenderQueue* renderQueue, DebugRenderer* debugRenderer, Model* gridModel, GameParamEditor* gameParamEditor,
-			StaticGameObjectManager* staticObjectManager);
+			StaticGameObjectManager* staticObjectManager, PSOManager* psoManager);
 
 		// 実行
 		void Run();

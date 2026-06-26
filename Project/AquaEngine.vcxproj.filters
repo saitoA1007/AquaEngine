@@ -560,6 +560,8 @@
     <ClCompile Include="EngineSource\3D\Material\IceMaterial.cpp" />
     <ClCompile Include="EngineSource\Editor\Windows\MaterialNodeWindow.cpp" />
     <ClCompile Include="EngineSource\Editor\NodeSystem\MaterialNode.cpp" />
+    <ClCompile Include="EngineSource\Editor\NodeSystem\MaterialGraph.cpp" />
+    <ClCompile Include="EngineSource\Editor\NodeSystem\MaterialShaderGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1101,6 +1103,7 @@
     <ClInclude Include="EngineSource\Editor\NodeSystem\MaterialGraph.h" />
     <ClInclude Include="EngineSource\Editor\Windows\MaterialNodeWindow.h" />
     <ClInclude Include="EngineSource\Editor\NodeSystem\MaterialNode.h" />
+    <ClInclude Include="EngineSource\Editor\NodeSystem\MaterialShaderGenerator.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />

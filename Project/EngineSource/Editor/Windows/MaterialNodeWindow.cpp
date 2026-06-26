@@ -2,11 +2,19 @@
 #include "NodeSystem/MaterialNode.h"
 using namespace GameEngine;
 
-MaterialNodeWindow::MaterialNodeWindow() {
+MaterialNodeWindow::MaterialNodeWindow(PSOManager* psoManager) {
+    // pso管理を取得
+    psoManager_ = psoManager;
+
     // マテリアルノードレイアウト設定
     ned::Config cfg;
     cfg.SettingsFile = "MaterialEditor.json";
     context_ = ned::CreateEditor(&cfg);
+
+    // 各ノードを登録
+    RegisterNode<MathNode>("Math");
+    RegisterNode<ConstantNode>("Constant");
+    RegisterNode<TextureSampleNode>("TextureSample");
 }
 
 void MaterialNodeWindow::Draw() {
@@ -20,13 +28,16 @@ void MaterialNodeWindow::Draw() {
 void MaterialNodeWindow::Render(MaterialGraph& graph) {
     graph_ = &graph;
     ned::SetCurrentEditor(context_);
-    ned::Begin("Material Editor", ImVec2(0, 0));
+    ned::Begin("MaterialEditor", ImVec2(0, 0));
 
     // ノード描画
     for (auto& node : graph.nodes) {
         ned::BeginNode(node->GetId());
         ImGui::Text("%s", node->GetLabel().c_str());
         ImGui::Dummy(ImVec2(8, 4));
+
+        // ノード固有のUIを描画
+        node->DrawNodeUI();
 
         // 入力ピン
         for (auto& pin : node->GetInputs()) {
@@ -113,13 +124,12 @@ void MaterialNodeWindow::HandleContextMenu(MaterialGraph& graph) {
 
     if (ImGui::BeginPopup("NodeEditorContext")) {
         // ノード追加メニュー
-        if (ImGui::BeginMenu("Add Node")) {
-            if (ImGui::MenuItem("Multiply")) {
-                graph.nodes.push_back(std::make_unique<MultiplyNode>(graph));
-            }
-               
-            if (ImGui::MenuItem("Texture Sample")) {
-                graph.nodes.push_back(std::make_unique<TextureSampleNode>(graph));
+        if (ImGui::BeginMenu("AddNode")) {
+            for (auto& [name, registerFunc] : registerNode_) {
+                // ノードを追加
+                if (ImGui::MenuItem(name.c_str())) {
+                    registerFunc(graph);
+                }
             }
             ImGui::EndMenu();
         }
@@ -136,21 +146,9 @@ namespace GameEngine {
 
     namespace {
 
-        const Pin* FindPin(const MaterialGraph& graph, int pinId) {
-            for (const auto& node : graph.nodes) {
-                for (const Pin& pin : node->GetInputs()) {
-                    if (pin.id == pinId) return &pin;
-                }
-                for (const Pin& pin : node->GetOutputs()) {
-                    if (pin.id == pinId) return &pin;
-                }
-            }
-            return nullptr;
-        }
-
         bool CanConnect(const MaterialGraph& graph, int startPinId, int endPinId) {
-            const Pin* startPin = FindPin(graph, startPinId);
-            const Pin* endPin = FindPin(graph, endPinId);
+            const Pin* startPin = graph.FindPin(startPinId);
+            const Pin* endPin = graph.FindPin(endPinId);
 
             // どちらかのピンが見つからなければ接続不可
             if (!startPin || !endPin) return false;

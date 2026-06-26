@@ -2,6 +2,7 @@
 #include "DXC.h"
 #include <string>
 #include <filesystem>
+#include "NodeSystem/MaterialShaderGenerator.h"
 
 namespace GameEngine {
 
@@ -26,6 +27,9 @@ namespace GameEngine {
 		// コンパイルするシェーダー
 		Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(Type type, const std::wstring& path);
 
+		// マテリアルグラフからhlslを生成してコンパイルする
+		Microsoft::WRL::ComPtr<IDxcBlob> CompileMaterialGraph(const MaterialGraph& graph, const std::wstring& materialName);
+
 	private:
 
 		DXC* dxc_ = nullptr;
@@ -39,6 +43,9 @@ namespace GameEngine {
 
 		// csoファイルのディレクトリパス
 		const std::wstring csoDirectory_ = L"Resources/Shaders/Compiled/";
+
+		// 生成するファイルパス
+		const std::wstring generatedHlslDirectory_ = L"Resources/Shaders/Material/Generated/";
 
 	private:
 
@@ -66,5 +73,12 @@ namespace GameEngine {
 		/// HLSLをコンパイルしてCSOとして保存
 		/// </summary>
 		Microsoft::WRL::ComPtr<IDxcBlob> CompileAndSave(Type type, const std::wstring& hlslPath);
+
+		/// <summary>
+		/// 生成したHLSLをファイルに書き出す
+		/// </summary>
+		/// <param name="hlslPath"></param>
+		/// <param name="source"></param>
+		void WriteGeneratedHlsl(const std::wstring& hlslPath, const std::string& source);
 	};
 }
