@@ -101,6 +101,13 @@ void PSOManager::RegisterPSO(const std::string& name, const CreatePSOData& psoDa
     LogManager::GetInstance().Log("PSO registerd name : " + name);
 }
 
+void PSOManager::RegisterPSO(const MaterialGraph& graph, const std::wstring& materialName) {
+
+    // シェーダーをコンパイル
+    shaderCompiler_.CompileMaterialGraph(graph, materialName);
+
+}
+
 void PSOManager::RegisterComputePSO(const std::string& name, const CreatePSOData& psoData, RootSignatureBuilder* rootSignature) {
 
     // 既に登録されていたら飛ばす

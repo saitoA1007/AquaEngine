@@ -22,8 +22,13 @@ namespace GameEngine {
         // ノードUIの描画
         void DrawNodeUI() override;
 
+        bool IsVariableType() const override { return true; }
+        void OnConnectTypePropagate(PinType newType) override;
+
     private:
         MathOperation operation_ = MathOperation::kAdd;
+        // 現在の使用する型
+        PinType valueType_ = PinType::kFloat4;
     };
 
     // 定数ノード
@@ -41,6 +46,19 @@ namespace GameEngine {
         float value_ = 0.0f; // 保持する数値
     };
 
+    // カラーノード
+    class ColorNode : public IMaterialNode {
+    public:
+        ColorNode(MaterialGraph& g);
+
+        std::string GenerateHLSL(const std::unordered_map<int, std::string>& pinVars) const override;
+
+        void DrawNodeUI() override;
+
+    private:
+        float color_[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    };
+
     // テクスチャノード
     class TextureSampleNode : public IMaterialNode {
     public:
@@ -49,12 +67,13 @@ namespace GameEngine {
         // HLSL生成
         std::string GenerateHLSL(const std::unordered_map<int, std::string>& pinVars) const override;
 
-        bool RequiresTextureSlot() const override { return true; }
-        std::string GenerateResourceDeclaration(int textureSlot) const override;
+        void DrawNodeUI() override;
 
     private:
         // テクスチャ名
-        std::string textureName; 
+        std::string textureName;
+        // テクスチャハンドル
+        uint32_t textureHandle_ = 0;
     };
 
     // マスターサーフェスノード
@@ -68,6 +87,35 @@ namespace GameEngine {
             pinVars;
             return "";
         }
+    };
+
+    // カメラ
+    class CameraNode : public IMaterialNode {
+    public:
+        CameraNode(MaterialGraph& g);
+
+        // HLSL生成
+        std::string GenerateHLSL(const std::unordered_map<int, std::string>& pinVars) const override;
+    };
+
+    // ライトタイプ
+    enum class LightType {
+        kDirectional,
+        kPoint,
+        kSpot
+    };
+
+    // ライトノード
+    class LightNode : public IMaterialNode {
+    public:
+        LightNode(MaterialGraph& g);
+
+        std::string GenerateHLSL(const std::unordered_map<int, std::string>& pinVars) const override;
+
+        void DrawNodeUI() override;
+
+    private:
+        LightType lightType_ = LightType::kDirectional;
     };
 
     // ヘルパー関数

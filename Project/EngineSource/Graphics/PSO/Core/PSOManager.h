@@ -76,6 +76,13 @@ namespace GameEngine {
 		void RegisterPSO(const std::string& name, const CreatePSOData& psoData,RootSignatureBuilder* rootSignature, InputLayoutBuilder* inputLayout);
 
 		/// <summary>
+		/// マテリアルノードグラフからPSOを作成する
+		/// </summary>
+		/// <param name="graph"></param>
+		/// <param name="materialName"></param>
+		void RegisterPSO(const MaterialGraph& graph, const std::wstring& materialName);
+
+		/// <summary>
 		/// コンピュートのPSOを登録する(手動生成)
 		/// </summary>
 		/// <param name="name"></param>

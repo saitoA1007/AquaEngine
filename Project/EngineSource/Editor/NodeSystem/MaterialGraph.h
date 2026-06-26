@@ -44,14 +44,17 @@ namespace GameEngine {
 		// hlsl生成
 		virtual std::string GenerateHLSL(const std::unordered_map<int, std::string>& pinVars) const = 0;
 
-		// テクスチャ等、グローバルなリソース宣言が必要かどうか
-		virtual bool RequiresTextureSlot() const { return false; }
-
 		// リソース宣言のHLSL文字列を生成する
 		virtual std::string GenerateResourceDeclaration(int textureSlot) const { return ""; }
 
 		// ノード内に独自描画
 		virtual void DrawNodeUI() {}
+
+		// 型が自動で切り替わるノード
+		virtual bool IsVariableType() const { return false; }
+
+		// リンクが接続された時に、相手の型に合わせて自分のピンを書き換えるコールバック
+		virtual void OnConnectTypePropagate(PinType newType) {}
 
 	public:
 

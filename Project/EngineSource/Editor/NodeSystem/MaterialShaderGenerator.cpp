@@ -72,54 +72,46 @@ std::string MaterialShaderGenerator::Generate(const MaterialGraph& graph) {
         }
     }
 
-    // リソース宣言を収集し、レジスタ番号をここで割り振る
-    std::string resourceDecls;
-    int textureSlot = 0;
-    for (int nodeId : order) {
-        if (IMaterialNode* node = graph.FindNode(nodeId); node && node->RequiresTextureSlot()) {
-            resourceDecls += node->GenerateResourceDeclaration(textureSlot++);
-        }
-    }
-
-    // PBROutputNodeの各入力から最終出力に使う変数名を取得
+    // PBROutputNodeの入力から最終出力に使う変数を取得
     auto& outInputs = outputNode->GetInputs();
     std::string baseColor = GetPinVar(pinVars, outInputs[0].id, "float4(0.8, 0.8, 0.8, 1.0)");
-    std::string metallic = GetPinVar(pinVars, outInputs[1].id, "0.0");
-    std::string roughness = GetPinVar(pinVars, outInputs[2].id, "0.5");
-    std::string normal = GetPinVar(pinVars, outInputs[3].id, "input.normal");
-    std::string emissive = GetPinVar(pinVars, outInputs[4].id, "float3(0,0,0)");
+    std::string emissive = GetPinVar(pinVars, outInputs[4].id, "float3(0, 0, 0)");
 
-    // テンプレートへ書き込み
     return std::format(R"(
-        {0}
-        SamplerState linearSampler : register(s0);
-        
-        struct VSOutput
-        {{
-            float4 position : SV_POSITION;
-            float3 worldPos : TEXCOORD0;
-            float3 normal   : TEXCOORD1;
-            float2 uv       : TEXCOORD2;
-        }};
-        
-        struct PSOutput
-        {{
-            float4 baseColor : SV_TARGET0;
-            float4 normal    : SV_TARGET1;
-            float4 material  : SV_TARGET2; // R:Metallic, G:Roughness
-            float4 emissive  : SV_TARGET3;
-        }};
-        
-        PSOutput main(VSOutput input)
-        {{
-            PSOutput output;
-        {1}
-            output.baseColor = {2};
-            output.material  = float4({3}, {4}, 0, 1);
-            output.normal    = float4({5}, 1);
-            output.emissive  = float4({6}, 1);
-            return output;
-        }}
-        )",
-        resourceDecls, body, baseColor, metallic, roughness, normal, emissive);
+#include "Object3d.hlsli"
+#include "../LightElement.hlsli"
+
+Texture2D<float4> gTexture[] : register(t0, space0);
+SamplerState gSampler : register(s0);
+
+struct Camera
+{{
+    float3 worldPosition;
+    float4x4 vpMatrix;
+}};
+ConstantBuffer<Camera> gCamera : register(b1);
+
+cbuffer LightGroup : register(b2)
+{{
+    DirectionalLight gDirectionalLight;
+    PointLight gPointLight;
+    SpotLight gSpotLight;
+    uint environmentTexture;
+    int isActiveEnvironment;
+}};
+
+struct PixelShaderOutput
+{{
+    float4 color : SV_TARGET0;
+}};
+
+PixelShaderOutput main(VertexShaderOutput input)
+{{
+    PixelShaderOutput output;
+{0}
+    output.color = float4({1}.rgb + {2}, {1}.a);
+    return output;
+}}
+)",
+body, baseColor, emissive);
 }

@@ -36,6 +36,13 @@ namespace GameEngine {
 		// 登録されているノード
 		std::unordered_map<std::string, std::function<void(MaterialGraph&)>> registerNode_;
 
+		// 左側の表示範囲
+		float leftPanelWidth_ = 240.0f;
+		// 最小幅
+		const float kMinPanelWidth_ = 150.0f;  
+		// 最大幅
+		const float kMaxPanelWidth_ = 600.0f;  
+
 	private:
 
 		void HandleLinkCreation(MaterialGraph& graph);
