@@ -1,4 +1,5 @@
 #include "PostEffectData.h"
+#include "FPSCounter.h"
 using namespace GameEngine;
 
 Vignetting::Vignetting() {
@@ -67,15 +68,20 @@ void GaussianBlur::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvM
     commandList->DrawInstanced(3, 1, 0, 0);
 }
 
-Dissolve::Dissolve() {
+Random::Random() {
     // 作成
     buffer_.Create();
-    // 標準偏差
-    buffer_.GetData()->dissolveTextureHandle = 0;
-    buffer_.GetData()->threshold = 0.5f;
+    buffer_.GetData()->timer = 0.0f;
+
+    isActive_ = true;
 }
 
-void Dissolve::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
+void Random::Update() {
+    // 時間経過
+    buffer_.GetData()->timer += FpsCounter::gameDeltaTime;
+}
+
+void Random::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
     commandList->SetGraphicsRootDescriptorTable(0, srvManager->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
     commandList->SetGraphicsRootConstantBufferView(1, buffer_.GetGpuVirtualAddress());
     commandList->DrawInstanced(3, 1, 0, 0);
