@@ -1,15 +1,26 @@
 #include "Wall.h"
-#include "Application/CollisionConfig.h"
 #include "FPSCounter.h"
+#include "DebugParameter.h"
+#include "Application/CollisionConfig.h"
+
 using namespace GameEngine;
 
-Wall::Wall(GameEngine::Model* model, float& respawnTime, int32_t& maxHp) : respawnTime_(respawnTime), maxHp_(maxHp), modelComponent_(model) {
-	
+Wall::Wall(GameEngine::Model* model, GameEngine::DebugParameter* parame) : modelComponent_(model) {
+	// パラメーター機能を取得
+	parame_ = parame;
+
+	std::string subGroup = "Wall";
+	int index = 0;
+	parame_->Register("ModelScale", modelComponent_.worldTransform_.transform_.scale, index++, subGroup);
+	parame_->Register("ColliderSize", colliderSize_, index++, subGroup);
+	parame_->Register("MaxHp", maxHp_, index++, subGroup);
+	parame_->Register("RespawnTime", respawnTime_, index++, subGroup);
+
 	modelComponent_.materialData_->color.w = 0.8f;
 
 	// 当たり判定
 	collider_.SetWorldPosition(modelComponent_.worldTransform_.transform_.translate);
-	collider_.SetSize(modelComponent_.worldTransform_.transform_.scale);
+	collider_.SetSize(colliderSize_);
 	collider_.UpdateOrientationsFromRotate(modelComponent_.worldTransform_.transform_.rotate);
 	collider_.SetCollisionAttribute(kCollisionAttributeTerrain);
 	collider_.SetCollisionMask(~kCollisionAttributeTerrain);
@@ -22,22 +33,25 @@ Wall::Wall(GameEngine::Model* model, float& respawnTime, int32_t& maxHp) : respa
 	collider_.SetOnCollisionCallback([this](const CollisionResult& result) {
 		this->OnCollisionEnter(result);
 		});
+
+	// 参照するマテリアルを変更
+	modelComponent_.SetBufferMaterial(0, iceMaterial_.GetMaterialSrvIndex());
+	modelComponent_.SetHitGroup(1);
 }
 
 void Wall::SetParameter(const Transform& transform) {
 	// 位置を取得
-	modelComponent_.worldTransform_.transform_ = transform;
-	modelComponent_.Update();
+	modelComponent_.worldTransform_.transform_.translate = transform.translate;
+	modelComponent_.worldTransform_.transform_.rotate = transform.rotate;
+	modelComponent_.worldTransform_.transform_.scale = { 2.0f,2.0f,1.5f };
 
-	// 当たり判定の更新
-	collider_.SetWorldPosition(modelComponent_.worldTransform_.transform_.translate);
-	collider_.SetSize(modelComponent_.worldTransform_.transform_.scale + Vector3(0.0f, 100.0f, 0.0f));
-	collider_.UpdateOrientationsFromRotate(modelComponent_.worldTransform_.transform_.rotate);
+	// 初期化
+	Initialize();
 }
 
 void Wall::Initialize() {
 	collider_.SetWorldPosition(modelComponent_.worldTransform_.transform_.translate);
-	collider_.SetSize(modelComponent_.worldTransform_.transform_.scale + Vector3(0.0f,100.0f,0.0f));
+	collider_.SetSize(colliderSize_);
 	collider_.UpdateOrientationsFromRotate(modelComponent_.worldTransform_.transform_.rotate);
 	modelComponent_.Update();
 }

@@ -316,4 +316,75 @@ float3 ChiseledIceNormal(
     return chiseledN;
 }
 
+float Hash3Dto1(float3 p)
+{
+    p = frac(p * float3(0.1031, 0.1030, 0.0973));
+    p += dot(p, p.yxz + 33.33);
+    return frac((p.x + p.y) * p.z);
+}
+
+// 2D用ハッシュ
+float Hash2Dto1(float2 p)
+{
+    p = frac(p * 0.1031);
+    p += dot(p, p.yx + 33.33);
+    return frac((p.x + p.y) * p.y);
+}
+
+// 3Dバリューノイズ
+float ValueNoise3D(float3 p)
+{
+    float3 i = floor(p);
+    float3 f = frac(p);
+    float3 u = f * f * (3.0 - 2.0 * f);
+    
+    float n000 = Hash3Dto1 (i + float3(0, 0, 0));
+    float n100 = Hash3Dto1 (i + float3(1, 0, 0));
+    float n010 = Hash3Dto1 (i + float3(0, 1, 0));
+    float n110 = Hash3Dto1 (i + float3(1, 1, 0));
+    float n001 = Hash3Dto1 (i + float3(0, 0, 1));
+    float n101 = Hash3Dto1 (i + float3(1, 0, 1));
+    float n011 = Hash3Dto1 (i + float3(0, 1, 1));
+    float n111 = Hash3Dto1(i + float3(1, 1, 1));
+    
+    return lerp(
+        lerp(lerp(n000, n100, u.x), lerp(n010, n110, u.x), u.y),
+        lerp(lerp(n001, n101, u.x), lerp(n011, n111, u.x), u.y),
+        u.z);
+}
+
+// FBMノイズ
+float FBMNoise(float3 p, int octaves)
+{
+    float value = 0.0;
+    float amplitude = 0.5;
+    float frequency = 1.0;
+    float maxValue = 0.0;
+    
+    [loop]
+    for (int i = 0; i < octaves; ++i)
+    {
+        value += amplitude * ValueNoise3D(p * frequency);
+        maxValue += amplitude;
+        amplitude *= 0.5;
+        frequency *= 2.0;
+    }
+    
+    return value / maxValue;
+}
+
+// 2Dバリューノイズ
+float ValueNoise2D(float2 p)
+{
+    float2 i = floor(p);
+    float2 f = frac(p);
+    float2 u = f * f * (3.0 - 2.0 * f);
+    
+    float n00 = Hash2Dto1(i + float2(0, 0));
+    float n10 = Hash2Dto1(i + float2(1, 0));
+    float n01 = Hash2Dto1(i + float2(0, 1));
+    float n11 = Hash2Dto1(i + float2(1, 1));
+    
+    return lerp(lerp(n00, n10, u.x), lerp(n01, n11, u.x), u.y);
+}
 #endif

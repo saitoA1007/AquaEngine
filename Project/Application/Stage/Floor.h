@@ -2,11 +2,13 @@
 #include "IGameObject.h"
 #include "WorldTransform.h"
 #include "Collider.h"
+#include "ModelComponent.h"
 #include "DebugParameter.h"
+#include "IceMaterial.h"
 
 class Floor : public GameEngine::IGameObject {
 public:
-	Floor(GameEngine::Model* model);
+	Floor(GameEngine::Model* model, uint32_t iceNormalGH, uint32_t terrainGH, uint32_t terrainNormalGH);
 	~Floor() = default;
 
 	// 初期化
@@ -20,16 +22,20 @@ public:
 
 public:
 	// ワールド行列を取得
-	GameEngine::WorldTransform& GetWorldTransform() { return worldTransform_; }
+	GameEngine::WorldTransform& GetWorldTransform() { return iceModelComponent_.worldTransform_; }
 
 private:
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;
 
-	// ワールド行列
-	GameEngine::WorldTransform worldTransform_;
-	// モデル
-	GameEngine::Model* model_;
+	// 氷のモデル
+	GameEngine::ModelComponent iceModelComponent_;
+
+	// 氷のマテリアル
+	GameEngine::IceMaterial iceMaterial_;
+
+	// 地面のモデル
+	GameEngine::ModelComponent terrainModelComponent_;
 
 	// aabbの当たり判定
 	GameEngine::AABBCollider collider_;

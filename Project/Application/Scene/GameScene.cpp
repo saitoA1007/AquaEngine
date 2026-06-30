@@ -35,7 +35,7 @@ GameScene::GameScene() {
 	auto player = gameObjectManager_->AddObject<Player>(inputCommand_, playerModel, animationManager_, playerEffectManager);
 
 	// 敵の遠距離攻撃管理
-	auto* iceFallModel = modelManager_->GetNameByModel("cube.obj");
+	auto* iceFallModel = modelManager_->GetNameByModel("iceFall.obj");
 	auto* bossRangedAttackManager = gameObjectManager_->AddObject<BossRangedAttackManager>(gameObjectManager_, iceFallModel);
 
 	// 敵
@@ -48,11 +48,12 @@ GameScene::GameScene() {
 	player->SetCamera(cameraController_);
 
 	// ステージ
-	auto* wallModel = modelManager_->GetNameByModel("cube.obj");
+	auto* floorModel = modelManager_->GetNameByModel("planeXZ.obj");
+	auto* wallModel = modelManager_->GetNameByModel("wall.obj");
 	wallModel->SetDefaultIsEnableLight(true);
 	wallModel->SetDefaultColor({1,1,1,0.9f});
 	wallModel->SetDefaultIOR(1.31f);
-	gameObjectManager_->AddObject<StageManager>(gameObjectManager_, wallModel);
+	gameObjectManager_->AddObject<StageManager>(gameObjectManager_, floorModel, wallModel, textureManager_);
 
 	// プレイ中のUI
 	uint32_t playerHpGH = textureManager_->GetHandleByName("PlayerHP.png");

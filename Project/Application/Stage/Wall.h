@@ -2,13 +2,17 @@
 #include "IGameObject.h"
 #include "ModelComponent.h"
 #include "Collider.h"
+#include "IceMaterial.h"
+
+// 前方宣言
+namespace GameEngine {
+	class DebugParameter;
+}
 
 class Wall : public GameEngine::IGameObject {
 public:
-	Wall(GameEngine::Model* model, float& respawnTime, int32_t& maxHp);
+	Wall(GameEngine::Model* model, GameEngine::DebugParameter* parame);
 	~Wall() = default;
-
-	void SetParameter(const Transform& transform);
 
 	// 初期化
 	void Initialize() override;
@@ -19,16 +23,30 @@ public:
 	// 描画処理
 	void Draw() override;
 
+	void SetParameter(const Transform& transform);
+
 private:
+
+	// 最大hp
+	int32_t maxHp_ = 3;
+
+	// 復活するまでの時間
+	float respawnTime_ = 3.0f;
+
+	// 当たり判定の大きさ
+	Vector3 colliderSize_ = { 10.0f,100.0f,0.5f };
+
+private:
+	// パラメーター機能
+	GameEngine::DebugParameter* parame_ = nullptr;
 
 	// モデル
 	GameEngine::ModelComponent modelComponent_;
 
-	// リスポーン時間
-	float& respawnTime_;
-	// 最大hp
-	int32_t& maxHp_;
+	// 氷のマテリアル
+	GameEngine::IceMaterial iceMaterial_;
 
+	// タイマー
 	float respawnTimer_ = 0.0f;
 
 	// 現在のhp

@@ -1,0 +1,44 @@
+[
+    {
+        "modelName": "BGRock.obj",
+        "name": "BGRock.obj_1",
+        "transform": {
+            "rotate": [
+                0.0,
+                -0.0,
+                0.0
+            ],
+            "scale": [
+                20.0,
+                20.0,
+                20.0
+            ],
+            "translate": [
+                0.0,
+                -22.639999389648438,
+                0.0
+            ]
+        }
+    },
+    {
+        "modelName": "BGIceRock.obj",
+        "name": "BGIceRock.obj_0",
+        "transform": {
+            "rotate": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "scale": [
+                20.0,
+                20.0,
+                20.0
+            ],
+            "translate": [
+                0.0,
+                -22.479999542236328,
+                0.0
+            ]
+        }
+    }
+]

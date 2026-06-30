@@ -6,9 +6,14 @@
 #include "Wall.h"
 #include "DebugParameter.h"
 
+// 前方宣言
+namespace GameEngine {
+	class TextureManager;
+}
+
 class StageManager : public GameEngine::IGameObject {
 public:
-	StageManager(GameEngine::GameObjectManager* objectManager, GameEngine::Model* model);
+	StageManager(GameEngine::GameObjectManager* objectManager, GameEngine::Model* floorModel, GameEngine::Model* wallModel, GameEngine::TextureManager* textureManager);
 	~StageManager() = default;
 
 	// 初期化処理
@@ -33,19 +38,7 @@ private:
 	uint32_t maxSideNumber_ = 8;
 	// 半径
 	float radius_ = 20.0f;
-
-	/// 壁のデータ
-	// 最大hp
-	int32_t maxHp_ = 3;
-	// 壁の奥行
-	float wallDepth_ = 0.5f;
-	// 壁の縦幅
-	float wallHeight_ = 2.0f;
-	// 壁の横幅の余剰分
-	float offsetWallWidth_ = -5.0f;
-	// 復活するまでの時間
-	float respawnTime_ = 3.0f;
-
+	
 	// 壁のデータ
 	std::vector<Wall*> walls_;
 

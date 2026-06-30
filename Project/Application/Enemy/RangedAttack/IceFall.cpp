@@ -36,6 +36,10 @@ IceFall::IceFall(GameEngine::Model* model, Vector3 pos, int32_t& iceFallCurrentN
 	collider_.SetOnCollisionCallback([this](const CollisionResult& result) {
 		this->OnCollisionEnter(result);
 	});
+
+	// 参照するマテリアルを変更
+	modelComponent_.SetBufferMaterial(0, iceMaterial_.GetMaterialSrvIndex());
+	modelComponent_.SetHitGroup(1);
 }
 
 IceFall::~IceFall() {

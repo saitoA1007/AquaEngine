@@ -9,6 +9,13 @@ StaticGameObject::StaticGameObject(std::string name, std::string modelName, Mode
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>(name_);
 	debugParame_->RegisterWorld("World", modelComponent_.worldTransform_);
+	std::string subGroup = "Material";
+	auto* materialData = modelComponent_.materialData_;
+	int index = 0;
+	debugParame_->Register("Color", materialData->color, index++, subGroup);
+	debugParame_->Register("SpecularColor", materialData->specularColor, index++, subGroup);
+	debugParame_->Register("Metalic", materialData->metallic, index++, subGroup);
+	debugParame_->Register("Roughness", materialData->roughness, index++, subGroup);
 }
 
 void StaticGameObject::Update() {
