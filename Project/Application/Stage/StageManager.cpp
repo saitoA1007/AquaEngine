@@ -1,14 +1,20 @@
 #include "StageManager.h"
 #include <numbers>
 #include "Floor.h"
+#include "TextureManager.h"
 using namespace GameEngine;
 
-StageManager::StageManager(GameEngine::GameObjectManager* objectManager, GameEngine::Model* model) {
+StageManager::StageManager(GameEngine::GameObjectManager* objectManager, GameEngine::Model* floorModel, GameEngine::Model* wallModel, GameEngine::TextureManager* textureManager) {
 	objectManager_ = objectManager;
-	model_ = model;
+	model_ = wallModel;
+
+	// 地面用の画像を取得
+	uint32_t iceNormalGH = textureManager->GetHandleByName("iceNormal.png");
+	uint32_t terrainGH = textureManager->GetHandleByName("aerial_grass_rock_diff_1k.jpg");
+	uint32_t terrainNormalGH = textureManager->GetHandleByName("aerial_grass_rock_nor_gl_1k.png");
 
 	// 床モデルを生成
-	objectManager_->AddObject<Floor>(model);
+	objectManager_->AddObject<Floor>(floorModel, iceNormalGH, terrainGH, terrainNormalGH);
 
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>("StageManager");
@@ -39,9 +45,6 @@ void StageManager::GenerateWalls() {
 	// 等分した角度を求める
 	float centralAngle = std::numbers::pi_v<float> *2.0f / static_cast<float>(maxSideNumber_);
 
-	// 円の1辺の長さを求める
-	float wallWidth = (std::numbers::pi_v<float> *2.0f * radius_) * (centralAngle / (std::numbers::pi_v<float> *2.0f)) + offsetWallWidth_;
-
 	// 円を生成する
 	for (uint32_t i = 0; i < maxSideNumber_; ++i) {
 		float angle = i * centralAngle;
@@ -62,11 +65,11 @@ void StageManager::GenerateWalls() {
 
 		// 座標を設定する
 		Transform transform;
-		transform.scale = Vector3(wallWidth, wallHeight_, wallDepth_);
+		transform.scale = Vector3(1.0f,1.0f,1.0f);
 		transform.rotate = Vector3(0.0f, rotateY, 0.0f);
 		transform.translate = tmpPos;
 
-		auto* wall = objectManager_->AddObject<Wall>(model_, respawnTime_, maxHp_);
+		auto* wall = objectManager_->AddObject<Wall>(model_, debugParame_.get());
 		wall->SetParameter(transform);
 
 		walls_.push_back(wall);
@@ -79,12 +82,4 @@ void StageManager::RegisterParameter() {
 	debugParame_->Register("CenterPos", centerPos_,index++, subGroup);
 	debugParame_->Register("MaxSideNumber", maxSideNumber_, index++, subGroup);
 	debugParame_->Register("Radius", radius_, index++, subGroup);
-
-	index = 0;
-	subGroup = "Wall";
-	debugParame_->Register("RespawnTime", respawnTime_, index++, subGroup);
-	debugParame_->Register("MaxHp", maxHp_, index++, subGroup);
-	debugParame_->Register("wallDepth", wallDepth_, index++, subGroup);
-	debugParame_->Register("WallHeight", wallHeight_, index++, subGroup);
-	debugParame_->Register("OffsetWallWidth", offsetWallWidth_, index++, subGroup);
 }

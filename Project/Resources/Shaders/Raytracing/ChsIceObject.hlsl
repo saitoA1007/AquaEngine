@@ -124,16 +124,9 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
     // アルベド色を取得
     float3 albedoColor = material.color.rgb * textureColor.rgb;
     
-    // ライティングをしない場合はアルベドの色を返す
-    if (!material.enableLighting)
+    if (material.dissolveThreshold > 0.0f)
     {
-        payload.color = albedoColor;
-        return;
-    }
-    
-    if (material.dissolveTextureHandle != 0)
-    {
-        float mask = gTexture[material.dissolveTextureHandle].SampleLevel(gSampler, transformedUV.xy, 0).r;
+        float mask = FBMNoise(worldPosition * 2.0f, 1);
         if (mask <= material.dissolveThreshold)
         {
              // 法線を取得

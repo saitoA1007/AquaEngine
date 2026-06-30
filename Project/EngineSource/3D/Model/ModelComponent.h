@@ -27,9 +27,21 @@ namespace GameEngine {
 		// レイトレによる描画
 		void DrawRaytracing(RenderQueue* renderQueue);
 
+	public:
+
 		// 参照値を設定
 		void SetRefType(uint32_t type) {
 			refBuffer_.SetType(type);
+		}
+
+		// 参照するマテリアルを設定
+		void SetBufferMaterial(uint32_t type, uint32_t srvIndex) {
+			refBuffer_.SetBufferMaterial(type, srvIndex);
+		}
+
+		// ヒットグループを設定
+		void SetHitGroup(uint32_t index) {
+			refBuffer_.SetHitGroupIndex(index);
 		}
 
 	public:

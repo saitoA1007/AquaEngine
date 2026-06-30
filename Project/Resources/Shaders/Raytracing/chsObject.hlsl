@@ -114,21 +114,6 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
         payload.color = albedoColor;
         return;
     }
-     
-     // ガラスの反射
-    if (ref.type == 1)
-    {
-        float3 glassColor = material.color.rgb * textureColor.rgb;
-        payload.color = GlassBSDF(
-            worldPosition,
-            worldNormal,
-            payload.recursive,
-            material.ior,
-            material.roughness,
-            glassColor
-        );
-        return;
-    }
     
     // ライト
     float3 lightDir = normalize(-gDirectionalLight.direction);

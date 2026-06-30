@@ -2,6 +2,7 @@
 #include "IGameObject.h"
 #include "ModelComponent.h"
 #include "DebugParameter.h"
+#include "IceMaterial.h"
 #include "Collider.h"
 
 class IceFall : public GameEngine::IGameObject {
@@ -24,6 +25,9 @@ private:
 
 	// モデル
 	GameEngine::ModelComponent modelComponent_;
+
+	// 氷のマテリアル
+	GameEngine::IceMaterial iceMaterial_;
 
 	// 現在の氷柱の数
 	int32_t& iceFallCurrentNum_;

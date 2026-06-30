@@ -78,8 +78,7 @@ std::string MaterialShaderGenerator::Generate(const MaterialGraph& graph) {
     std::string emissive = GetPinVar(pinVars, outInputs[4].id, "float3(0, 0, 0)");
 
     return std::format(R"(
-#include "Object3d.hlsli"
-#include "../LightElement.hlsli"
+#include "../../LightElement.hlsli"
 
 Texture2D<float4> gTexture[] : register(t0, space0);
 SamplerState gSampler : register(s0);
@@ -98,6 +97,14 @@ cbuffer LightGroup : register(b2)
     SpotLight gSpotLight;
     uint environmentTexture;
     int isActiveEnvironment;
+}};
+
+struct VertexShaderOutput
+{{
+    float4 position : SV_POSITION;
+    float2 texcoord : TEXCOORD1;
+    float3 normal : NORMAL1;
+    float3 worldPosition : POSITION1;
 }};
 
 struct PixelShaderOutput

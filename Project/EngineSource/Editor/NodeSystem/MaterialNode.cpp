@@ -19,7 +19,7 @@ void MathNode::DrawNodeUI() {
     static const char* operationNames[] = { "Add", "Subtract", "Multiply", "Divide" };
     const char* currentLabel = operationNames[static_cast<int>(operation_)];
 
-    // ノード単位でIDが衝突しないよう"###"以降を固定IDにする
+    // ノード単位でIDが衝突しないよう固定IDにする
     std::string buttonId = std::format("{}###MathOpBtn{}", currentLabel, id_);
     std::string popupId = std::format("MathOpPopup{}", id_);
 
