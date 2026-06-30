@@ -1122,6 +1122,7 @@
     <FxCompile Include="Resources\Shaders\Raytracing\ChsIceObject.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\OutLine\DepthOutLine.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\Dissolve\Dissolve.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\PostEffect\Random\Random.PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Externals\imgui\ProggyClean.ttf" />

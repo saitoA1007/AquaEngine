@@ -609,9 +609,9 @@ void PSOManager::DefaultLoadPostEffectPSO() {
     defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/RadialBlur/RadialBlur.PS.hlsl";
     RegisterPSO("RadialBlur", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 
-    // ディゾルブ
-    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/Dissolve/Dissolve.PS.hlsl";
-    RegisterPSO("Dissolve", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
+    // ランダム
+    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/Random/Random.PS.hlsl";
+    RegisterPSO("Random", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 
     // ラスタライズとレイトレの描画を合成する
     defaultPostEffect.rootSigName = "LightingComposite";

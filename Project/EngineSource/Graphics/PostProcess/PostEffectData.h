@@ -123,17 +123,18 @@ namespace GameEngine {
         ConstantBuffer<GaussianBlurData> buffer_;
     };
 
-    // ディゾルブ
-    class Dissolve : public IPostEffect {
-        struct DissolveData {
+    // ランダム
+    class Random : public IPostEffect {
+        struct RandomData {
             uint32_t textureHandle;
-            uint32_t dissolveTextureHandle;
-            float threshold;
-            float padding;
+            float timer;
+            float padding[2];
         };
 
     public:
-        Dissolve();
+        Random();
+
+        void Update() override;
 
         void Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) override;
 
@@ -141,12 +142,7 @@ namespace GameEngine {
             buffer_.GetData()->textureHandle = index;
         }
 
-        // ディゾルブ用テクスチャを設定
-        void SetDissolveTexture(uint32_t texture){
-            buffer_.GetData()->dissolveTextureHandle = texture;
-        }
-
     private:
-        ConstantBuffer<DissolveData> buffer_;
+        ConstantBuffer<RandomData> buffer_;
     };
 }
