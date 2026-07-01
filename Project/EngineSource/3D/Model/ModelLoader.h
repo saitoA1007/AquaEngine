@@ -52,6 +52,12 @@ namespace GameEngine {
         std::unique_ptr<Model> CreateRing(uint32_t ringDivide, float outerRadius, float innerRadius);
 
         /// <summary>
+        /// 円柱モデルを生成
+        /// </summary>
+        [[nodiscard]]
+        std::unique_ptr<Model> CreateCylinder(uint32_t cylinderDivide, float topRadius, float bottomRadius, float height);
+
+        /// <summary>
         /// アニメーションデータを読み込み
         /// </summary>
         [[nodiscard]]

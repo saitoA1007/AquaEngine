@@ -93,6 +93,31 @@ std::unique_ptr<Model> ModelLoader::CreateRing(uint32_t ringDivide, float outerR
 }
 
 [[nodiscard]]
+std::unique_ptr<Model> ModelLoader::CreateCylinder(uint32_t cylinderDivide, float topRadius, float bottomRadius, float height) {
+	// インスタンスを生成
+	std::unique_ptr<Model> model = std::make_unique<Model>();
+
+	// メッシュを作成
+	auto tmpMesh = std::make_unique<Mesh>();
+	tmpMesh->CreateCylinder(cylinderDivide, topRadius, bottomRadius, height);
+
+	// マテリアルを作成
+	std::unique_ptr<Material> tmpMaterial = std::make_unique<Material>();
+	tmpMaterial->Initialize({ 1.0f,1.0f,1.0f,1.0f }, { 1.0f,1.0f,1.0f }, 500.0f, false);
+	std::string materialName = tmpMesh->GetMaterialName();
+
+	model->AddMesh(std::move(tmpMesh));
+	model->AddMaterial(materialName, std::move(tmpMaterial));
+	// blasを作成
+	model->AddBLAS(cmdList_, false);
+
+	// レイトレでの参照用
+	model->CreateRefBuffer();
+
+	return model;
+}
+
+[[nodiscard]]
 std::unique_ptr<Model> ModelLoader::CreateModel(const std::string& objFilename, const std::string& filename) {
 
 	LogManager::GetInstance().Log("Start create model");

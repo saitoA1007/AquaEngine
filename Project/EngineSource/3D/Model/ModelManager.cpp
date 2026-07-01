@@ -95,6 +95,26 @@ void ModelManager::RegisterRingModel(const std::string& modelName, uint32_t ring
 	nameToHandles_[modelName] = handle;
 }
 
+void ModelManager::RegisterCylinderModel(const std::string& modelName, uint32_t cylinderDivide, float topRadius, float bottomRadius, float height) {
+	// 同名のモデルが登録されている場合は早期リターン
+	auto getName = nameToHandles_.find(modelName);
+	if (getName != nameToHandles_.end()) {
+		return;
+	}
+
+	// 新しいハンドルを取得
+	uint32_t handle = nextHandle_++;
+
+	// 登録データするを作成
+	ModelEntryData entryData;
+	entryData.name = modelName;
+	entryData.model = loader_.CreateCylinder(cylinderDivide, topRadius, bottomRadius, height);
+
+	// 登録する
+	models_[handle] = std::move(entryData);
+	nameToHandles_[modelName] = handle;
+}
+
 void ModelManager::UnregisterModel(uint32_t handle) {
 	auto getModel = models_.find(handle);
 	if (getModel == models_.end()) {

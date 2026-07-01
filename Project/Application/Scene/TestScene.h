@@ -108,4 +108,8 @@ private: // シーン機能
 	// キューブ
 	GameEngine::Model* iceCubeModel_;
 	GameEngine::WorldTransform iceCubeWorld_;
+
+	// 円柱
+	GameEngine::Model* cylinderModel_;
+	GameEngine::WorldTransform cylinderWorld_;
 };
