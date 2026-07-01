@@ -72,7 +72,7 @@ void Floor::Update() {
 
 void Floor::Draw() {
 	// 氷を描画
-	iceModelComponent_.DrawRaytracing(renderQueue_);
+	//iceModelComponent_.DrawRaytracing(renderQueue_);
 
 	// 地面を描画
 	terrainModelComponent_.DrawRaytracing(renderQueue_);

@@ -430,15 +430,21 @@ ModelData ModelLoader::LoadModelFile(const std::string& directoryPath, const std
 			if (mesh->HasTangentsAndBitangents()) {
 				aiVector3D& aiTangent = mesh->mTangents[vertexIndex];
 				aiVector3D& aiBitangent = mesh->mBitangents[vertexIndex];
-				Vector3 b = {-aiBitangent.x, aiBitangent.y, aiBitangent.z};
-				Vector3 t = { -aiTangent.x, aiTangent.y, aiTangent.z };
-				// ハンドネスの判定
-				float handedness = Math::Dot(Math::Cross(vertex.normal, t), b) < 0.0f ? -1.0f : 1.0f;
-				// 右手->左手に変換する
-				vertex.tangent = { -aiTangent.x, aiTangent.y, aiTangent.z , handedness };
+
+				if (std::abs(aiTangent.x) > 0.0001f || std::abs(aiTangent.y) > 0.0001f || std::abs(aiTangent.z) > 0.0001f) {
+					Vector3 b = { -aiBitangent.x, aiBitangent.y, aiBitangent.z };
+					Vector3 t = { -aiTangent.x, aiTangent.y, aiTangent.z };
+					// ハンドネスの判定
+					float handedness = Math::Dot(Math::Cross(vertex.normal, t), b) < 0.0f ? -1.0f : 1.0f;
+					// 右手->左手に変換する
+					vertex.tangent = { -aiTangent.x, aiTangent.y, aiTangent.z , handedness };
+				} else {
+					// 接線がない場合のデフォルト値
+					vertex.tangent = { 1.0f, 0.0f, 0.0f,-1.0f };
+				}
 			} else {
 				// 接線がない場合のデフォルト値
-				vertex.tangent = { 1.0f, 0.0f, 0.0f,1.0f };
+				vertex.tangent = { 1.0f, 0.0f, 0.0f,-1.0f };
 			}
 
 			meshData.vertices[vertexIndex] = vertex;

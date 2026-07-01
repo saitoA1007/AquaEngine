@@ -90,9 +90,10 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     }
     // ワールド空間に変換
     float3 worldPosition = mul(vtx.position, ObjectToWorld4x3());
-    float3 worldNormal = mul(localNormal, (float3x3) ObjectToWorld4x3());
+    float3x3 normalMatrix = transpose((float3x3) WorldToObject4x3());
+    float3 worldNormal = mul(localNormal, normalMatrix);
     worldNormal = normalize(worldNormal);
-    
+   
     // 深度情報を書き込む
     float4 clipPos = mul(float4(worldPosition, 1.0f), gCamera.vpMatrix);
     payload.depth = clipPos.z / clipPos.w;

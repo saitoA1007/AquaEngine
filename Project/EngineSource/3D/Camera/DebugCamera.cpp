@@ -77,7 +77,7 @@ void DebugCamera::Update() {
 
 		// ホイールで距離を調整する
 		distance_ -= input_->GetWheel() * 0.05f;
-		distance_ = std::clamp(distance_, 2.0f, 100.0f);
+		distance_ = std::clamp(distance_, 0.5f, 500.0f);
 
 		// 右クリックで回転する処理
 		if (input_->PushMouse(1)) {

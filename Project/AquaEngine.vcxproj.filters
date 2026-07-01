@@ -1133,6 +1133,7 @@
     <None Include="Externals\imgui\imgui_node_editor_internal.inl" />
     <None Include="Resources\Shaders\Raytracing\Common.hlsli" />
     <None Include="Resources\Shaders\Rasterize\WBOIT.hlsli" />
+    <None Include="Resources\Shaders\NoiseUtils.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />

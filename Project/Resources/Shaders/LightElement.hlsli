@@ -1,43 +1,43 @@
 #ifndef LIGHT_HLSLI
 #define LIGHT_HLSLI
-
+#include "NoiseUtils.hlsli"
 static const float PI = 3.14159265359f;
 
 // 平行光源
 struct DirectionalLight
 {
-    float32_t4 color; // ライトの色
-    float32_t3 direction; // ライトの向き
-    float32_t intensity; // 輝度
-    int32_t active;
-    uint32_t isDepthTexture; // 深度値を持ったテクスチャ
-    float32_t2 padding;
-    float32_t4x4 vpMatrix;
+    float4 color; // ライトの色
+    float3 direction; // ライトの向き
+    float intensity; // 輝度
+    int active;
+    uint isDepthTexture; // 深度値を持ったテクスチャ
+    float2 padding;
+    float4x4 vpMatrix;
 };
 
 // ポイントライト
 struct PointLight
 {
-    float32_t4 color; // ライトの色
-    float32_t3 position; // ライトの位置
-    float32_t intensity; // 輝度
-    int32_t active; // 有効化
-    float32_t radius; // ライトの届く最大距離
-    float32_t decay; // 減衰率
+    float4 color; // ライトの色
+    float3 position; // ライトの位置
+    float intensity; // 輝度
+    int active; // 有効化
+    float radius; // ライトの届く最大距離
+    float decay; // 減衰率
 };
 
 // スポットライト
 struct SpotLight
 {
-    float32_t4 color; // ライトの色
-    float32_t3 position; // ライトの位置
-    float32_t intensity; // 輝度
-    float32_t3 direction; // ライトの方向
-    float32_t distance; // ライトの最大距離
-    float32_t decay; // 減衰率
-    float32_t cosAngle; // 減衰率
-    float32_t cosFalloffStart; // 
-    int32_t active; // 有効化
+    float4 color; // ライトの色
+    float3 position; // ライトの位置
+    float intensity; // 輝度
+    float3 direction; // ライトの方向
+    float distance; // ライトの最大距離
+    float decay; // 減衰率
+    float cosAngle; // 減衰率
+    float cosFalloffStart; // 
+    int active; // 有効化
 };
 
 // Lambert拡散反射
@@ -187,58 +187,6 @@ float3 IceFakeSSS(float3 normal, float3 lightDir, float3 incomingRayDir, float3 
     return ICE_SCATTER_COLOR * lightColor * scatter * scatterStrength;
 }
 
-// 3次元ハッシュ。-1~1の疑似乱数
-float3 Hash3D(float3 p)
-{
-    p = float3(dot(p, float3(127.1f, 311.7f, 74.7f)),
-               dot(p, float3(269.5f, 183.3f, 246.1f)),
-               dot(p, float3(113.5f, 271.9f, 124.6f)));
-    return frac(sin(p) * 43758.5453f) * 2.0f - 1.0f;
-}
-
-// 3次元ハッシュ。0~1の疑似乱数
-float Hash1D(float3 p)
-{
-    return frac(sin(dot(p, float3(91.3f, 157.2f, 138.7f))) * 43758.5453f);
-}
-
-// 3次元Voronoi
-void Voronoi3D(float3 p, float jitter, out float3 cellID, out float minDist, out float secondDist)
-{
-    float3 baseCell = floor(p);
-    minDist = 1e9f;
-    secondDist = 1e9f;
-    cellID = baseCell;
-
-    [unroll]
-    for (int x = -1; x <= 1; x++)
-    {
-        [unroll]
-        for (int y = -1; y <= 1; y++)
-        {
-            [unroll]
-            for (int z = -1; z <= 1; z++)
-            {
-                float3 neighbor = baseCell + float3(x, y, z);
-                float3 jitterOffset = Hash3D(neighbor) * 0.5f * jitter;
-                float3 cellPoint = neighbor + 0.5f + jitterOffset;
-                float d = distance(p, cellPoint);
-
-                if (d < minDist)
-                {
-                    secondDist = minDist;
-                    minDist = d;
-                    cellID = neighbor;
-                }
-                else if (d < secondDist)
-                {
-                    secondDist = d;
-                }
-            }
-        }
-    }
-}
-
 float3 ProceduralCrystalNormal(float3 baseNormal, float3 worldPos, float cellSize, float strength)
 {
     if (strength < 0.001f)
@@ -314,77 +262,5 @@ float3 ChiseledIceNormal(
     }
 
     return chiseledN;
-}
-
-float Hash3Dto1(float3 p)
-{
-    p = frac(p * float3(0.1031, 0.1030, 0.0973));
-    p += dot(p, p.yxz + 33.33);
-    return frac((p.x + p.y) * p.z);
-}
-
-// 2D用ハッシュ
-float Hash2Dto1(float2 p)
-{
-    p = frac(p * 0.1031);
-    p += dot(p, p.yx + 33.33);
-    return frac((p.x + p.y) * p.y);
-}
-
-// 3Dバリューノイズ
-float ValueNoise3D(float3 p)
-{
-    float3 i = floor(p);
-    float3 f = frac(p);
-    float3 u = f * f * (3.0 - 2.0 * f);
-    
-    float n000 = Hash3Dto1 (i + float3(0, 0, 0));
-    float n100 = Hash3Dto1 (i + float3(1, 0, 0));
-    float n010 = Hash3Dto1 (i + float3(0, 1, 0));
-    float n110 = Hash3Dto1 (i + float3(1, 1, 0));
-    float n001 = Hash3Dto1 (i + float3(0, 0, 1));
-    float n101 = Hash3Dto1 (i + float3(1, 0, 1));
-    float n011 = Hash3Dto1 (i + float3(0, 1, 1));
-    float n111 = Hash3Dto1(i + float3(1, 1, 1));
-    
-    return lerp(
-        lerp(lerp(n000, n100, u.x), lerp(n010, n110, u.x), u.y),
-        lerp(lerp(n001, n101, u.x), lerp(n011, n111, u.x), u.y),
-        u.z);
-}
-
-// FBMノイズ
-float FBMNoise(float3 p, int octaves)
-{
-    float value = 0.0;
-    float amplitude = 0.5;
-    float frequency = 1.0;
-    float maxValue = 0.0;
-    
-    [loop]
-    for (int i = 0; i < octaves; ++i)
-    {
-        value += amplitude * ValueNoise3D(p * frequency);
-        maxValue += amplitude;
-        amplitude *= 0.5;
-        frequency *= 2.0;
-    }
-    
-    return value / maxValue;
-}
-
-// 2Dバリューノイズ
-float ValueNoise2D(float2 p)
-{
-    float2 i = floor(p);
-    float2 f = frac(p);
-    float2 u = f * f * (3.0 - 2.0 * f);
-    
-    float n00 = Hash2Dto1(i + float2(0, 0));
-    float n10 = Hash2Dto1(i + float2(1, 0));
-    float n01 = Hash2Dto1(i + float2(0, 1));
-    float n11 = Hash2Dto1(i + float2(1, 1));
-    
-    return lerp(lerp(n00, n10, u.x), lerp(n01, n11, u.x), u.y);
 }
 #endif
