@@ -72,8 +72,6 @@ Random::Random() {
     // 作成
     buffer_.Create();
     buffer_.GetData()->timer = 0.0f;
-
-    isActive_ = true;
 }
 
 void Random::Update() {

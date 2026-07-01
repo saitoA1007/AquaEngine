@@ -195,6 +195,78 @@ void Mesh::CreateRingMesh(uint32_t ringDivide, float outerRadius, float innerRad
 	vertexBuffer_.Create(vertices);
 }
 
+void Mesh::CreateCylinder(uint32_t cylinderDivide, float topRadius, float bottomRadius, float height) {
+
+	// 頂点データ
+	std::vector<VertexData> vertices;
+	
+	// インデックスデータ
+	std::vector<uint32_t> indices;
+
+	float radianPerDivide = 2.0f * std::numbers::pi_v<float> / static_cast<float>(cylinderDivide);
+	float halfHeight = height / 2.0f;
+
+	// 側面の傾きに応じた法線ベクトルの比率計算
+	float slopeX = bottomRadius - topRadius;
+	float slopeY = height;
+	float slopeLength = std::sqrtf(slopeX * slopeX + slopeY * slopeY);
+	float normalXZ = slopeY / slopeLength;
+	float normalY = slopeX / slopeLength;
+
+	for (uint32_t index = 0; index < cylinderDivide; ++index) {
+		float i = static_cast<float>(index);
+		float iNext = static_cast<float>(index + 1);
+
+		float sin = std::sinf(i * radianPerDivide);
+		float cos = std::cosf(i * radianPerDivide);
+		float sinNext = std::sinf(iNext * radianPerDivide);
+		float cosNext = std::cosf(iNext * radianPerDivide);
+		float u = i / static_cast<float>(cylinderDivide);
+		float uNext = iNext / static_cast<float>(cylinderDivide);
+
+		// 側面の頂点
+		uint32_t sideBaseIndex = static_cast<uint32_t>(vertices.size());
+
+		VertexData tmpVertex;
+
+		// 左下
+		tmpVertex.position = { cos * bottomRadius, -halfHeight, sin * bottomRadius, 1.0f };
+		tmpVertex.texcoord = { u, 1.0f };
+		tmpVertex.normal = { cos * normalXZ, normalY, sin * normalXZ };
+		vertices.push_back(tmpVertex);
+		// 左上
+		tmpVertex.position = { cos * topRadius, halfHeight, sin * topRadius, 1.0f };
+		tmpVertex.texcoord = { u, 0.0f };
+		tmpVertex.normal = { cos * normalXZ, normalY, sin * normalXZ };
+		vertices.push_back(tmpVertex);
+		// 右下
+		tmpVertex.position = { cosNext * bottomRadius, -halfHeight, sinNext * bottomRadius, 1.0f };
+		tmpVertex.texcoord = { uNext, 1.0f };
+		tmpVertex.normal = { cosNext * normalXZ, normalY, sinNext * normalXZ };
+		vertices.push_back(tmpVertex);
+		// 右上
+		tmpVertex.position = { cosNext * topRadius, halfHeight, sinNext * topRadius, 1.0f };
+		tmpVertex.texcoord = { uNext, 0.0f };
+		tmpVertex.normal = { cosNext * normalXZ, normalY, sinNext * normalXZ };
+		vertices.push_back(tmpVertex);
+
+		// 側面のインデックス
+		// 左下、左上、右上
+		indices.push_back(sideBaseIndex + 0);
+		indices.push_back(sideBaseIndex + 1);
+		indices.push_back(sideBaseIndex + 3);
+		// 左下、右上、右下
+		indices.push_back(sideBaseIndex + 0);
+		indices.push_back(sideBaseIndex + 3);
+		indices.push_back(sideBaseIndex + 2);
+	}
+
+	// インデックスデータを作成
+	indexBuffer_.Create(indices);
+	// 頂点データを作成
+	vertexBuffer_.Create(vertices);
+}
+
 void Mesh::CreateModelMesh(ModelData modelData, const uint32_t& index) {
 
 	// 要素が無ければエラー

@@ -49,6 +49,11 @@ namespace GameEngine {
 		void RegisterRingModel(const std::string& modelName, uint32_t ringDivide, float outerRadius, float innerRadius);
 
 		/// <summary>
+		/// 円柱モデルを登録する
+		/// </summary>
+		void RegisterCylinderModel(const std::string& modelName, uint32_t cylinderDivide, float topRadius, float bottomRadius, float height);
+
+		/// <summary>
 		/// 登録を外す
 		/// </summary>
 		/// <param name="handle"></param>

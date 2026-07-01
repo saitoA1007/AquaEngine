@@ -79,11 +79,9 @@ TestScene::TestScene() {
 		iceRefBuffers_[i].SetHitGroupIndex(1);
 	}
 
-	// ディゾルブ用のテクスチャを取得
-	uint32_t dissolveTexture = textureManager_->GetHandleByName("noise0.png");
-	// ディゾルブテクスチャを設定
-	iceMaterial_.materialData_->dissolveTextureHandle = dissolveTexture;
-
+	// 円柱
+	cylinderModel_ = modelManager_->GetNameByModel("Cylinder");
+	cylinderWorld_.Initialize({{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,3.0f}});
 }
 
 void TestScene::Initialize() {
@@ -155,10 +153,13 @@ void TestScene::Draw() {
 
 	// アニメーションモデル
 	renderQueue_->SubmitRaytracingModel(model_, world_);
-	//
-	//// それぞれの氷を描画
+	
+	// それぞれの氷を描画
 	renderQueue_->SubmitRaytracingModel(iceHighModel_, iceHighWorld_, &iceRefBuffers_[0]);
 	renderQueue_->SubmitRaytracingModel(iceMiddleModel_, iceMiddleWorld_, &iceRefBuffers_[1]);
 	renderQueue_->SubmitRaytracingModel(iceLowModel_, iceLowWorld_, &iceRefBuffers_[2]);
 	renderQueue_->SubmitRaytracingModel(iceCubeModel_, iceCubeWorld_, &iceRefBuffers_[3]);
+
+	// 円柱を描画
+	renderQueue_->SubmitRaytracingModel(cylinderModel_, cylinderWorld_);
 }

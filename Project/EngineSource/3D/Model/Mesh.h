@@ -43,6 +43,15 @@ namespace GameEngine {
 		void CreateRingMesh(uint32_t ringDivide, float outerRadius, float innerRadius);
 
 		/// <summary>
+		/// 円柱を作成する
+		/// </summary>
+		/// <param name="cylinderDivide"></param>
+		/// <param name="topRadius"></param>
+		/// <param name="bottomRadius"></param>
+		/// <param name="height"></param>
+		void CreateCylinder(uint32_t cylinderDivide, float topRadius, float bottomRadius, float height);
+
+		/// <summary>
 		/// モデルデータを読み込んでメッシュを作成する
 		/// </summary>
 		/// <param name="modelData">読み込んだモデルデータ</param>
