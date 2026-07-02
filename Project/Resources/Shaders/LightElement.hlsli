@@ -168,6 +168,61 @@ float3 GetNormalFromMap(float4 normalMapColor, float3 normal, float4 tangent)
     return normalize(mul(textureNormal, tbn));
 }
 
+// 視差遮蔽マッピング
+// heightMap : ハイトマップ
+// uv : UV
+// tangentViewDir : 視線ベクトル
+// heightScale : 変位の強さ
+float2 ParallaxOcclusionMapping(
+    Texture2D<float4> heightMap,
+    SamplerState samplerState,
+    float2 uv,
+    float3 tangentViewDir,
+    float heightScale)
+{
+    if (heightScale < 0.0001f)
+    {
+        return uv;
+    }
+
+    // 視線が浅いほどサンプリング数を増やしてエイリアシングを抑える
+    const float minLayers = 8.0f;
+    const float maxLayers = 32.0f;
+    float numLayers = lerp(maxLayers, minLayers, saturate(abs(tangentViewDir.z)));
+
+    float layerDepth = 1.0f / numLayers;
+    float currentLayerDepth = 0.0f;
+
+    // 1レイヤーあたりのUVオフセット量
+    float2 P = (tangentViewDir.xy / max(abs(tangentViewDir.z), 0.05f)) * heightScale;
+    float2 deltaUV = P / numLayers;
+
+    float2 currentUV = uv;
+    float currentHeight = 1.0f - heightMap.SampleLevel(samplerState, currentUV, 0).r;
+
+    // 高さマップに沿ってレイマーチングをし、視線と表面が交差する層を探す
+    [loop]
+    for (int i = 0; i < (int) maxLayers; ++i)
+    {
+        if (currentLayerDepth >= currentHeight)
+        {
+            break;
+        }
+        currentUV -= deltaUV;
+        currentHeight = 1.0f - heightMap.SampleLevel(samplerState, currentUV, 0).r;
+        currentLayerDepth += layerDepth;
+    }
+
+    // 交差の前後2点を線形補間し、階段状のアーティファクトを軽減する
+    float2 prevUV = currentUV + deltaUV;
+    float afterDepth = currentHeight - currentLayerDepth;
+    float beforeHeight = 1.0f - heightMap.SampleLevel(samplerState, prevUV, 0).r;
+    float beforeDepth = beforeHeight - (currentLayerDepth - layerDepth);
+    float weight = afterDepth / max(afterDepth - beforeDepth, 0.0001f);
+
+    return lerp(currentUV, prevUV, weight);
+}
+
 // Beer-Lambert法則による体積透過率
 float3 BeerLambert(float3 absorptionCoeff, float distance)
 {

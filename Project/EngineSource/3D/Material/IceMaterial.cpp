@@ -40,6 +40,9 @@ IceMaterial::IceMaterial() {
 	materialData_->edgeStrength = 0.6f;
 	materialData_->microScale = 0.01f;
 	materialData_->microStrength = 0.24f;
+
+	materialData_->heightTextureHandle = 0;
+	materialData_->heightScale = 0.001f;
 }
 
 IceMaterial::~IceMaterial() {

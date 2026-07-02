@@ -9,12 +9,13 @@ StageManager::StageManager(GameEngine::GameObjectManager* objectManager, GameEng
 	model_ = wallModel;
 
 	// 地面用の画像を取得
-	uint32_t iceNormalGH = textureManager->GetHandleByName("iceNormal.png");
+	uint32_t iceNormalGH = textureManager->GetHandleByName("stone_tiles_02_nor_gl_1k.png");
+	uint32_t iceHeightGH = textureManager->GetHandleByName("stone_tiles_02_disp_1k.png");
 	uint32_t terrainGH = textureManager->GetHandleByName("aerial_grass_rock_diff_1k.jpg");
 	uint32_t terrainNormalGH = textureManager->GetHandleByName("aerial_grass_rock_nor_gl_1k.png");
 
 	// 床モデルを生成
-	objectManager_->AddObject<Floor>(floorModel, iceNormalGH, terrainGH, terrainNormalGH);
+	objectManager_->AddObject<Floor>(floorModel, iceNormalGH, iceHeightGH, terrainGH, terrainNormalGH);
 
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>("StageManager");

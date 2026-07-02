@@ -8,7 +8,7 @@
 
 class Floor : public GameEngine::IGameObject {
 public:
-	Floor(GameEngine::Model* model, uint32_t iceNormalGH, uint32_t terrainGH, uint32_t terrainNormalGH);
+	Floor(GameEngine::Model* model, uint32_t iceNormalGH, uint32_t iceHeightGH, uint32_t terrainGH, uint32_t terrainNormalGH);
 	~Floor() = default;
 
 	// 初期化

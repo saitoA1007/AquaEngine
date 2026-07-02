@@ -440,11 +440,11 @@ ModelData ModelLoader::LoadModelFile(const std::string& directoryPath, const std
 					vertex.tangent = { -aiTangent.x, aiTangent.y, aiTangent.z , handedness };
 				} else {
 					// 接線がない場合のデフォルト値
-					vertex.tangent = { 1.0f, 0.0f, 0.0f,-1.0f };
+					vertex.tangent = { 1.0f, 0.0f, 0.0f,1.0f };
 				}
 			} else {
 				// 接線がない場合のデフォルト値
-				vertex.tangent = { 1.0f, 0.0f, 0.0f,-1.0f };
+				vertex.tangent = { 1.0f, 0.0f, 0.0f,1.0f };
 			}
 
 			meshData.vertices[vertexIndex] = vertex;
