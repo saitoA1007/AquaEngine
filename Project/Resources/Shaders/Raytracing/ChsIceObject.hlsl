@@ -38,7 +38,8 @@ struct IceMaterialData
 
     float microScale;
     float microStrength;
-    float2 padding1;
+    uint heightTextureHandle;
+    float heightScale;
 };
 
 static const uint VERTEX_STRIDE = 52;
@@ -86,25 +87,16 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
     uint refHandle = InstanceID();
     BufferRef ref = gBufferRefs[refHandle];
     // マテリアルデータを取得
-    IceMaterialData material = gBufferData[ref.MaterialIndex].Load < IceMaterialData > (0);
+    IceMaterialData material = gBufferData[ref.MaterialIndex].Load<IceMaterialData>(0);
     
     // 頂点データを取得する
     VertexData vtx = GetHitVertex(attrib, ref.vertexHandle, ref.indexHandle);
     // uvをトランスフォーム
     float4 transformedUV = mul(float4(vtx.texcoord, 0.0f, 1.0f), material.uvTransform);
+    vtx.tangent.xyz = normalize(vtx.tangent.xyz);
     
-    float3 localNormal = vtx.normal;
-    // ノーマルマップがあれば法線に適応
-    if (material.normalTextureHandle != 0)
-    {
-        float4 normalMapColor = gTexture[material.normalTextureHandle].SampleLevel(gSampler, transformedUV.xy, 0);
-        vtx.tangent.xyz = normalize(vtx.tangent.xyz);
-        localNormal = GetNormalFromMap(normalMapColor, vtx.normal, vtx.tangent);
-    }
     // ワールド空間に変換
     float3 worldPosition = mul(vtx.position, ObjectToWorld4x3());
-    float3 worldNormal = mul(localNormal, (float3x3) ObjectToWorld4x3());
-    worldNormal = normalize(worldNormal);
     
     // 深度情報を書き込む
     float4 clipPos = mul(float4(worldPosition, 1.0f), gCamera.vpMatrix);
@@ -112,6 +104,36 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
   
     // 視線ベクトル
     float3 viewDir = normalize(gCamera.worldPosition.xyz - worldPosition);
+       
+    float2 parallaxUV = transformedUV.xy;
+    // ハイトマップがあればUVをオフセットする
+    if (material.heightTextureHandle != 0)
+    {
+        // 視線ベクトルをオブジェクト空間へ戻す
+        float3x3 worldToObjectRot = (float3x3) WorldToObject4x3();
+        float3 localViewDir = normalize(mul(viewDir, worldToObjectRot));
+        
+        // オブジェクト空間のTBNで接空間へ変換
+        float3 N = normalize(vtx.normal);
+        float3 T = vtx.tangent.xyz;
+        float3 B = normalize(cross(N, T) * vtx.tangent.w);
+        float3x3 tbn = float3x3(T, B, N);
+        float3 tangentViewDir = normalize(mul(tbn, localViewDir));
+        
+        parallaxUV = ParallaxOcclusionMapping(
+            gTexture[material.heightTextureHandle], gSampler,
+            transformedUV.xy, tangentViewDir, material.heightScale);
+    }
+    
+    float3 localNormal = vtx.normal;
+    // ノーマルマップがあれば法線に適応
+    if (material.normalTextureHandle != 0)
+    {
+        float4 normalMapColor = gTexture[material.normalTextureHandle].SampleLevel(gSampler, parallaxUV, 0);
+        localNormal = GetNormalFromMap(normalMapColor, vtx.normal, vtx.tangent);
+    }
+    float3 worldNormal = mul(localNormal, (float3x3) ObjectToWorld4x3());
+    worldNormal = normalize(worldNormal);    
     
      // 裏面の法線を視線側に向け直す
     if (dot(worldNormal, viewDir) < 0.0f)
@@ -120,7 +142,7 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
     }
     
     // テクスチャカラーを取得
-    float4 textureColor = gTexture[material.textureHandle].SampleLevel(gSampler, transformedUV.xy, 0);
+    float4 textureColor = gTexture[material.textureHandle].SampleLevel(gSampler, parallaxUV, 0);
     // アルベド色を取得
     float3 albedoColor = material.color.rgb * textureColor.rgb;
     

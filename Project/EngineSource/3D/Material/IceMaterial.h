@@ -38,7 +38,8 @@ namespace GameEngine {
 
 			float microScale;
 			float microStrength;
-			float padding1[2];
+			uint32_t heightTextureHandle; // ハイトテクスチャ
+			float heightScale; // ハイトの高さ
 		};
 	public:
 		IceMaterial();

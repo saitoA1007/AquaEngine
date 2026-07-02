@@ -161,5 +161,5 @@ void TestScene::Draw() {
 	renderQueue_->SubmitRaytracingModel(iceCubeModel_, iceCubeWorld_, &iceRefBuffers_[3]);
 
 	// 円柱を描画
-	renderQueue_->SubmitRaytracingModel(cylinderModel_, cylinderWorld_);
+	//renderQueue_->SubmitRaytracingModel(cylinderModel_, cylinderWorld_);
 }

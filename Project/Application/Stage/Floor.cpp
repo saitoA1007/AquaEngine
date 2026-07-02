@@ -1,13 +1,16 @@
 #include "Floor.h"
 #include "Application/CollisionConfig.h"
 #include "FPSCounter.h"
+#include "ImGuiManager.h"
 using namespace GameEngine;
 
-Floor::Floor(GameEngine::Model* model, uint32_t iceNormalGH, uint32_t terrainGH, uint32_t terrainNormalGH) 
+Floor::Floor(GameEngine::Model* model, uint32_t iceNormalGH, uint32_t iceHeightGH, uint32_t terrainGH, uint32_t terrainNormalGH)
 	: iceModelComponent_(model), terrainModelComponent_(model) {
 
 	// 氷の法線マップ
 	iceMaterial_.materialData_->dissolveThreshold = 0.0f;
+	iceMaterial_.materialData_->heightScale = 0.002f;
+	iceMaterial_.materialData_->heightTextureHandle = iceHeightGH;
 	iceMaterial_.materialData_->normalTextureHandle = iceNormalGH;
 	// 地面
 	terrainModelComponent_.materialData_->textureHandle = terrainGH;
