@@ -2,6 +2,11 @@
 #include <cassert>
 #include <fstream>
 #include <filesystem>
+
+#ifdef USE_IMGUI
+#include "NodeSystem/MaterialShaderGenerator.h"
+#endif
+
 namespace fs = std::filesystem;
 using namespace GameEngine;
 
@@ -42,6 +47,7 @@ Microsoft::WRL::ComPtr<IDxcBlob> ShaderCompiler::CompileShader(Type type, const 
 }
 
 Microsoft::WRL::ComPtr<IDxcBlob> ShaderCompiler::CompileMaterialGraph(const MaterialGraph& graph, const std::wstring& materialName) {
+#ifdef USE_IMGUI
 	// グラフからHLSLソースを生成
 	std::string hlslSource = MaterialShaderGenerator::Generate(graph);
 	assert(!hlslSource.empty() && "MaterialGraph: HLSL生成に失敗しました");
@@ -52,6 +58,9 @@ Microsoft::WRL::ComPtr<IDxcBlob> ShaderCompiler::CompileMaterialGraph(const Mate
 
 	// コンパイルする
 	return CompileShader(Type::PS, hlslPath);
+#else
+	return nullptr;
+#endif
 }
 
 std::wstring ShaderCompiler::GetCsoPath(const std::wstring& hlslPath) {

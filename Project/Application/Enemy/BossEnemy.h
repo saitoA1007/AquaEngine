@@ -2,7 +2,8 @@
 #include <array>
 #include "IGameObject.h"
 #include "Collider.h"
-
+#include "ModelComponent.h"
+#include "IceMaterial.h"
 #include "IBossState.h"
 
 // 前方宣言
@@ -31,7 +32,7 @@ public:
 	/// ワールド行列を取得
 	/// </summary>
 	/// <returns></returns>
-	GameEngine::WorldTransform& GetWorldTransform() { return worldTransform_; }
+	GameEngine::WorldTransform& GetWorldTransform() { return modelComponent_.worldTransform_; }
 
 	// 現在のHpを取得
 	int32_t GetCurrentHp() const { return stateCommonData_.hp_; }
@@ -43,14 +44,14 @@ private:
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;
 
+	// モデル
+	GameEngine::ModelComponent modelComponent_;
+
+	// 氷のマテリアル
+	GameEngine::IceMaterial iceMaterial_;
+
 	// 球の当たり判定
 	GameEngine::SphereCollider collider_;
-
-	// モデル
-	GameEngine::Model* model_ = nullptr;
-
-	// ワールド行列
-	GameEngine::WorldTransform worldTransform_;
 
 	// 状態
 	std::array<std::unique_ptr<IBossState>, static_cast<size_t>(BossState::kMaxCount)> statesTable_;

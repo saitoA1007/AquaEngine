@@ -11,6 +11,9 @@ void TextureManager::Initialize(ID3D12GraphicsCommandList* commandList, SrvManag
 #ifdef USE_IMGUI
 	// 最初にwhiteの画像を読み込む
 	RegisterTexture("EngineSource/Resources/Textures/white2x2.png");
+#else
+	// 最初にwhiteの画像を読み込む
+	RegisterTexture("Resources/Textures/white2x2.png");
 #endif
 }
 
