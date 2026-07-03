@@ -2,7 +2,7 @@
 #include "DXC.h"
 #include <string>
 #include <filesystem>
-#include "NodeSystem/MaterialShaderGenerator.h"
+#include "NodeSystem/MaterialGraph.h"
 
 namespace GameEngine {
 
