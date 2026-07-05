@@ -1,6 +1,6 @@
 #include "SceneManager.h"
 #include "GameParamEditor.h"
-
+#include "StaticGameObjectManager.h"
 using namespace GameEngine;
 
 SceneManager::~SceneManager() {
@@ -8,9 +8,10 @@ SceneManager::~SceneManager() {
 	currentScene_.release();
 }
 
-void SceneManager::Initialize(SceneRegistry* sceneRegistry, GameParamEditor* gameParamEditor, GameObjectManager* gameObjectManager) {
+void SceneManager::Initialize(SceneRegistry* sceneRegistry, GameParamEditor* gameParamEditor, GameObjectManager* gameObjectManager, StaticGameObjectManager* staticObjectManager) {
 	gameParamEditor_ = gameParamEditor;
 	gameObjectManager_ = gameObjectManager;
+	staticObjectManager_ = staticObjectManager;
 
 	// シーンの生成機能を初期化
 	sceneRegistry_ = sceneRegistry;
@@ -88,8 +89,12 @@ void SceneManager::ChangeScene(const std::string& sceneName) {
 	gameParamEditor_->SetActiveScene(currentSceneName_);
 
 	// 前の要素を削除
+	staticObjectManager_->Clear();
 	gameObjectManager_->ClearAll();
 	currentScene_.reset();
+
+	// シーンの静的オブジェクトをロードする
+	staticObjectManager_->LoadSceneObject(sceneName, false);
 
 	// 新しいシーンを作成
 	currentScene_ = sceneRegistry_->CreateScene(sceneName);

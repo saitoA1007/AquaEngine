@@ -33,7 +33,7 @@ void SceneSubsystem::Initialize() {
 }
 
 void SceneSubsystem::SceneInitialize() {
-    sceneManager_->Initialize(sceneRegistry_.get(), context_.resource->GetGameParamEditor(), gameObjectManager_.get());
+    sceneManager_->Initialize(sceneRegistry_.get(), context_.resource->GetGameParamEditor(), gameObjectManager_.get(), staticObjectManager_.get());
     // 現在のシーンのオブジェクトを読み込む
     staticObjectManager_->LoadSceneObject(context_.resource->GetGameParamEditor()->GetActiveScene());
 }
@@ -61,9 +61,7 @@ void SceneSubsystem::ResetCurrentScene() {
 }
 
 void SceneSubsystem::ChangeScene(const std::string& sceneName) {
-    staticObjectManager_->Clear();
     sceneManager_->ChangeScene(sceneName);
-    staticObjectManager_->LoadSceneObject(sceneName, false);
 }
 
 std::string SceneSubsystem::GetCurrentSceneName() const {

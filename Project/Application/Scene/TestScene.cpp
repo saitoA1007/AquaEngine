@@ -23,7 +23,7 @@ TestScene::TestScene() {
 	model_ = modelManager_->GetNameByModel("walk.gltf");
 	model_->SetDefaultIsEnableLight(true);
 	model_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
-	world_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
+	world_.Initialize({ {2.0f,2.0f,2.0f},{0.0f,0.0f,0.0f},{0.0f,-1.0f,0.0f} });
 
 	// アニメーションデータを取得する
 	walkAnimationData_ = animationManager_->GetNameByAnimations("Walk");
