@@ -10,6 +10,7 @@ namespace GameEngine {
 	// 前方宣言
 	class GameParamEditor;
 	class GameObjectManager;
+	class StaticGameObjectManager;
 
 	/// <summary>
 	/// シーンの管理
@@ -23,7 +24,7 @@ namespace GameEngine {
 		/// 初期化処理
 		/// </summary>
 		/// <param name="context"></param>
-		void Initialize(SceneRegistry* sceneRegistry, GameParamEditor* gameParamEditor, GameObjectManager* gameObjectManager);
+		void Initialize(SceneRegistry* sceneRegistry, GameParamEditor* gameParamEditor, GameObjectManager* gameObjectManager, StaticGameObjectManager* staticObjectManager);
 
 		/// <summary>
 		/// 更新処理
@@ -72,6 +73,9 @@ namespace GameEngine {
 
 		// ゲームオブジェクト機能
 		GameObjectManager* gameObjectManager_ = nullptr;
+
+		// 静的ゲームオブジェクト機能
+		StaticGameObjectManager* staticObjectManager_ = nullptr;
 
 	private: // シーン機能
 

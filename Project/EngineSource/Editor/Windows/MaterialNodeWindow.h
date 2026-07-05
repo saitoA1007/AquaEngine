@@ -1,5 +1,6 @@
 #pragma once
 #include <functional>
+#include <filesystem>
 #include "IEditorWindow.h"
 #include "NodeSystem/MaterialGraph.h"
 #include "ImGuiManager.h"
@@ -23,10 +24,17 @@ namespace GameEngine {
 	private:
 		PSOManager* psoManager_ = nullptr;
 		ned::EditorContext* context_ = nullptr;
-		MaterialGraph* graph_ = nullptr;
 
-		// テスト用の一時的なグラフ
-		MaterialGraph testgraph_;
+		MaterialGraph* currentGraph_ = nullptr;
+		std::string currentMaterialName_ = "";
+		// ディレクトリ内のマテリアル名一覧
+		std::vector<std::string> materialList_;
+
+		// マテリアルノードデータが保存されている
+		std::unordered_map<std::string, MaterialGraph> graphData_;
+
+		// マテリアルノードデータが保存されているディレクトリ
+		const std::string kDirectoryPath = "EngineSource/Resources/Json/";
 
 		// 接続開始ピン
 		int newLinkPin_ = -1;
@@ -50,6 +58,15 @@ namespace GameEngine {
 		void HandleLinkDeletion(MaterialGraph& graph);
 
 		void HandleContextMenu(MaterialGraph& graph);
+
+		// マテリアルノード用のツールバー
+		void DrawMaterialToolbar();
+
+		void InitializeAndLoadAllMaterials();
+		void UpdateMaterialList();
+		void CreateNewMaterial(const std::string& name);
+		void SelectMaterial(const std::string& name);
+		void SaveCurrentMaterial();
 
 		// ノードを登録
 		template<typename T>

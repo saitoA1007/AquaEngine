@@ -1,6 +1,8 @@
 #include "MaterialNodeWindow.h"
+#include <fstream>
 #include "NodeSystem/MaterialNode.h"
 #include "PSOManager.h"
+#include "JsonSerializer.h"
 using namespace GameEngine;
 
 MaterialNodeWindow::MaterialNodeWindow(PSOManager* psoManager) {
@@ -20,24 +22,31 @@ MaterialNodeWindow::MaterialNodeWindow(PSOManager* psoManager) {
     RegisterNode<PBROutputNode>("PBROutput");
     RegisterNode<CameraNode>("Camera");
     RegisterNode<LightNode>("Light");
+
+    // 全マテリアルをフォルダからロード
+    InitializeAndLoadAllMaterials();
 }
 
 void MaterialNodeWindow::Draw() {
     if (!isActive) return;
 
     ImGui::Begin("MaterialNodeWindow", &isActive);
-    Render(testgraph_);
 
-    if (ImGui::Button("CreateHLSL")) {
-        // hlslを生成
-        psoManager_->RegisterPSO(*graph_, L"Test");
+    DrawMaterialToolbar();
+
+    ImGui::Separator();
+
+    // 選択中のマテリアルがあればノードエディタを描画
+    if (currentGraph_) {
+        Render(*currentGraph_);
+    } else {
+        ImGui::TextDisabled("No material active. Click 'New' to create one or select from the list.");
     }
 
     ImGui::End();
 }
 
 void MaterialNodeWindow::Render(MaterialGraph& graph) {
-    graph_ = &graph;
     // 左サイドバー
     ImGui::BeginChild("LeftPanel", ImVec2(leftPanelWidth_, 0), true);
 
@@ -162,8 +171,8 @@ void MaterialNodeWindow::HandleLinkCreation(MaterialGraph& graph) {
                         IMaterialNode* endNode = graph.FindNode(endPin->parentNodeId);
 
                         // startNodeにはendPinの型を、endNodeにはstartPinの型を通知
-                        if (startNode) startNode->OnConnectTypePropagate(endPin->pinType);
-                        if (endNode) endNode->OnConnectTypePropagate(startPin->pinType);
+                        if (startNode) { startNode->OnConnectTypePropagate(endPin->pinType); }
+                        if (endNode) { endNode->OnConnectTypePropagate(startPin->pinType); }
                     }
                 }
             } else {
@@ -212,6 +221,144 @@ void MaterialNodeWindow::HandleContextMenu(MaterialGraph& graph) {
         ImGui::EndPopup();
     }
     ned::Resume();
+}
+
+void MaterialNodeWindow::DrawMaterialToolbar() {
+    // マテリアル選択コンボボックス
+    std::string previewName = currentMaterialName_.empty() ? "Select Material..." : currentMaterialName_;
+    ImGui::SetNextItemWidth(200.0f);
+    if (ImGui::BeginCombo("##MaterialSelect", previewName.c_str())) {
+        for (const auto& matName : materialList_) {
+            bool isSelected = (currentMaterialName_ == matName);
+            if (ImGui::Selectable(matName.c_str(), isSelected)) {
+                SelectMaterial(matName);
+            }
+            if (isSelected) {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndCombo();
+    }
+
+    ImGui::SameLine();
+
+    // 新規作成ボタン
+    if (ImGui::Button("New")) {
+        ImGui::OpenPopup("NewMaterialPopup");
+    }
+
+    // 新規作成ポップアップ
+    if (ImGui::BeginPopup("NewMaterialPopup")) {
+        static char newMatName[64] = "NewMaterial";
+        ImGui::InputText("Name", newMatName, IM_ARRAYSIZE(newMatName));
+        if (ImGui::Button("Create", ImVec2(120, 0))) {
+            CreateNewMaterial(newMatName);
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
+
+    ImGui::SameLine();
+
+    // 保存ボタン
+    if (ImGui::Button("Save") && currentGraph_) {
+        SaveCurrentMaterial();
+    }
+
+    // 未保存の変更マーク
+    if (dirtyFlag_) {
+        ImGui::SameLine();
+        ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f), "*");
+        if (ImGui::IsItemHovered()) {
+            ImGui::SetTooltip("Unsaved changes in this material");
+        }
+    }
+
+    ImGui::SameLine();
+    ImGui::Spacing();
+    ImGui::SameLine();
+
+    // HLSL生成ボタン
+    if (currentGraph_) {
+        if (ImGui::Button("CreateHLSL")) {
+            std::wstring wName(currentMaterialName_.begin(), currentMaterialName_.end());
+            psoManager_->RegisterPSO(*currentGraph_, wName.c_str());
+        }
+    }
+}
+
+void MaterialNodeWindow::InitializeAndLoadAllMaterials() {
+    // JsonSerializerを使って、フォルダ内のJSONを一括読み込みしてキャッシュに登録
+    JsonSerializer::LoadDirectory(kDirectoryPath, [this](const std::string& stem, const nlohmann::json& root) {
+        MaterialGraph graph;
+
+        // 実際の復元処理を行う
+
+        graphData_[stem] = std::move(graph);
+    });
+
+    UpdateMaterialList();
+
+    // 1つ以上マテリアルが存在していれば、最初のアセットを選択状態にする
+    if (!materialList_.empty()) {
+        SelectMaterial(materialList_[0]);
+    }
+}
+
+void MaterialNodeWindow::UpdateMaterialList() {
+    materialList_.clear();
+    for (const auto& [name, graph] : graphData_) {
+        materialList_.push_back(name);
+    }
+}
+
+void MaterialNodeWindow::CreateNewMaterial(const std::string& name) {
+    if (name.empty()) return;
+
+    // 同名マテリアルがすでにあれば上書きを避けるか、適宜リネーム
+    std::string finalName = name;
+    int count = 1;
+    while (graphData_.find(finalName) != graphData_.end()) {
+        finalName = name + "_" + std::to_string(count++);
+    }
+
+    // メモリ上に新規グラフを作成
+    graphData_[finalName] = MaterialGraph();
+
+    // 最初からデフォルトで配置しておきたいノードがあればここで登録
+    // graphData_[finalName].nodes.push_back(std::make_unique<PBROutputNode>(graphData_[finalName]));
+
+    UpdateMaterialList();
+    SelectMaterial(finalName);
+
+    // 新規作成と同時にファイルも一度ディスクに書き出す
+    SaveCurrentMaterial();
+}
+
+void MaterialNodeWindow::SelectMaterial(const std::string& name) {
+    if (graphData_.find(name) != graphData_.end()) {
+        currentMaterialName_ = name;
+        currentGraph_ = &graphData_[name];
+        dirtyFlag_ = false;
+    }
+}
+
+void MaterialNodeWindow::SaveCurrentMaterial() {
+    if (!currentGraph_ || currentMaterialName_.empty()) return;
+
+    // グラフをjsonオブジェクトにシリアライズする
+    nlohmann::json root = nlohmann::json::object();
+
+    // 実際の保存処理
+
+    // 暫定プレースホルダー
+    root["materialName"] = currentMaterialName_;
+
+    // ファイルへ書き出し
+    std::string filePath = kDirectoryPath + currentMaterialName_ + ".json";
+    JsonSerializer::SaveToFile(filePath, root);
+
+    dirtyFlag_ = false;
 }
 
 //===========================================
