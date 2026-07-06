@@ -40,7 +40,16 @@ namespace GameEngine {
 			float microStrength;
 			uint32_t heightTextureHandle; // ハイトテクスチャ
 			float heightScale; // ハイトの高さ
+
+			float bubbleScale; // 気泡セルのスケール
+			float bubbleMaxDepth; // 探索する最大深度
+			float bubbleDensity; // 気泡の出現確率
+			float bubbleJitter; // 気泡位置のばらつき
+
+			float bubbleHighlight; // ハイライト強度
+			float padding1[3];
 		};
+
 	public:
 		IceMaterial();
 		~IceMaterial();

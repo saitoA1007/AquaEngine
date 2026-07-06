@@ -124,4 +124,61 @@ float FBMNoise(float3 p, int octaves)
     
     return value / maxValue;
 }
+
+// 気泡セルの中心、半径、存在有無を疑似乱数で決定
+// cellID : 整数セル座標
+// jitter : セル内での中心位置のばらつき
+// existProb : このセルに気泡が存在する確率
+float3 BubbleCellCenter(float3 cellID, float jitter, float existProb, out float radius, out bool exists)
+{
+    float3 h = Hash3D(cellID);
+    float existRand = Hash1D(cellID * 3.11f + 7.0f);
+    exists = existRand < existProb;
+
+    float3 center = cellID + 0.5f + h * jitter;
+
+    float radiusRand = Hash1D(cellID * 5.73f + 2.0f);
+    radius = lerp(0.08f, 0.35f, radiusRand);
+
+    return center;
+}
+
+// posCellから最も近い気泡球までの符号付き距離を返す
+float BubbleSDF(float3 posCell, float jitter, float existProb, out float3 bubbleCenter, out float bubbleRadius)
+{
+    float3 baseCell = floor(posCell);
+    float minDist = 1e9f;
+    bubbleCenter = float3(0.0f, 0.0f, 0.0f);
+    bubbleRadius = 0.0f;
+
+    [unroll]
+    for (int x = -1; x <= 1; x++)
+    {
+        [unroll]
+        for (int y = -1; y <= 1; y++)
+        {
+            [unroll]
+            for (int z = -1; z <= 1; z++)
+            {
+                float3 neighbor = baseCell + float3(x, y, z);
+                float radius;
+                bool exists;
+                float3 center = BubbleCellCenter(neighbor, jitter, existProb, radius, exists);
+                if (!exists)
+                {
+                    continue;
+                }
+
+                float d = distance(posCell, center) - radius;
+                if (d < minDist)
+                {
+                    minDist = d;
+                    bubbleCenter = center;
+                    bubbleRadius = radius;
+                }
+            }
+        }
+    }
+    return minDist;
+}
 #endif

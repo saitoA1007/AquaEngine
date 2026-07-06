@@ -318,4 +318,72 @@ float3 ChiseledIceNormal(
 
     return chiseledN;
 }
+
+// 視差遮蔽マッピングを応用した氷内部の気泡表現
+// localRayOrigin : オブジェクト空間でのレイ開始位置
+// localViewDir : オブジェクト空間の視線ベクトル
+// bubbleScale : 気泡セル1個のスケール
+// maxDepth : 気泡を探索する最大深度
+// jitter : セル内での気泡位置のばらつき
+// existProb : セルごとの気泡出現確率
+// hitPos : 気泡表面のヒット位置
+// hitNormal : 気泡表面の法線
+bool ParallaxBubbleMapping(
+    float3 localRayOrigin,
+    float3 localViewDir,
+    float bubbleScale,
+    float maxDepth,
+    float jitter,
+    float existProb,
+    out float3 hitPos,
+    out float3 hitNormal,
+    out float hitDistance)
+{
+    hitPos = localRayOrigin;
+    hitNormal = float3(0.0f, 0.0f, 0.0f);
+    hitDistance = 0.0f;
+
+    if (bubbleScale < 0.0001f || maxDepth < 0.0001f)
+    {
+        return false;
+    }
+
+    // 視線とは逆へ進む
+    float3 marchDir = -localViewDir;
+
+    const int maxSteps = 16;
+    float minStep = maxDepth / (float) maxSteps;
+
+    float traveled = 0.0f;
+
+    [loop]
+    for (int i = 0; i < maxSteps; ++i)
+    {
+        float3 samplePos = localRayOrigin + marchDir * traveled;
+        float3 cellPos = samplePos / bubbleScale;
+
+        float3 bubbleCenter;
+        float bubbleRadius;
+        float dist = BubbleSDF(cellPos, jitter, existProb, bubbleCenter, bubbleRadius);
+
+        if (dist <= 0.0f)
+        {
+            // 気泡内部に到達 -> 球面として法線を再構築
+            hitPos = samplePos;
+            float3 centerLocal = bubbleCenter * bubbleScale;
+            hitNormal = normalize(samplePos - centerLocal);
+            hitDistance = traveled;
+            return true;
+        }
+
+        // SDF距離分だけ進める
+        traveled += max(dist * bubbleScale, minStep);
+        if (traveled >= maxDepth)
+        {
+            break;
+        }
+    }
+
+    return false;
+}
 #endif
