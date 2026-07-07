@@ -52,13 +52,11 @@ private:
 	// 現在のhp
 	int32_t currentHp_ = 1;
 
-	// 生存フラグ
-	bool isAlive_ = true;
-
 	// obbの当たり判定
 	GameEngine::OBBCollider collider_;
 
-	bool isBreakParticleActive_ = false;
+	// 氷の状態
+	bool isBreakIce_ = false;
 
 private:
 
