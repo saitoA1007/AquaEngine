@@ -44,11 +44,11 @@ IceMaterial::IceMaterial() {
 	materialData_->heightTextureHandle = 0;
 	materialData_->heightScale = 0.001f;
 
-	materialData_->bubbleScale = 0.15f;
+	materialData_->bubbleScale = 0.1f;
 	materialData_->bubbleMaxDepth = 0.5f;
-	materialData_->bubbleDensity = 0.3f;
+	materialData_->bubbleDensity = 0.03f;
 	materialData_->bubbleJitter = 0.4f;
-	materialData_->bubbleHighlight = 0.2f;
+	materialData_->bubbleHighlight = 0.15f;
 }
 
 IceMaterial::~IceMaterial() {

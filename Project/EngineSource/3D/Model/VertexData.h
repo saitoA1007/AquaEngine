@@ -1,16 +1,17 @@
 #pragma once
-#include"Vector4.h"
-#include"Vector3.h"
-#include"Vector2.h"
-#include"Matrix4x4.h"
-#include"Transform.h"
+#include "Vector4.h"
+#include "Vector3.h"
+#include "Vector2.h"
+#include "Matrix4x4.h"
+#include "Transform.h"
 
-#include<iostream>
-#include<vector>
-#include<array>
-#include<map>
-#include<optional>
-#include<span>
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <array>
+#include <map>
+#include <optional>
+#include <span>
 
 struct VertexData {
 	Vector4 position;
@@ -54,7 +55,7 @@ struct ModelData {
 	std::vector<MeshData> meshes;
 	std::vector<LoadMaterialData> materials;
 	Node rootNode;
-	std::map<std::string, JointWeightData> skinClusterData;
+	std::vector<std::unordered_map<std::string, JointWeightData>> skinClusterData;
 	bool isAnimation_ = false;
 	bool isSkeleton = false;
 };

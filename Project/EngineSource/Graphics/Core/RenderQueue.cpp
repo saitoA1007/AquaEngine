@@ -275,7 +275,7 @@ void RenderQueue::SubmitRaytracingModel(Model* model, WorldTransform& worldTrans
             uint32_t vertexHandle = 0;
             if (model->IsSkeleton()) {
                 const auto& skeleton = model->GetSkeleton();
-                vertexHandle = skeleton->GetOutputVertexBufferSrvIndex();
+                vertexHandle = skeleton->GetOutputVertexBufferSrvIndex(i);
             } else {
                 vertexHandle = mesh->GetVertexBufferSrvIndex();
             }

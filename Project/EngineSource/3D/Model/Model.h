@@ -57,7 +57,7 @@ namespace GameEngine {
 				uint32_t vertexHandle = 0;
 				// スケルトンがあれば参照するデータを変える
 				if (isSkeleton_) {
-					vertexHandle = skeleton_->GetOutputVertexBufferSrvIndex();
+					vertexHandle = skeleton_->GetOutputVertexBufferSrvIndex(i);;
 				} else {
 					vertexHandle = meshes_[i]->GetVertexBufferSrvIndex();
 				}		

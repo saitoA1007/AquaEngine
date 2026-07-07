@@ -35,6 +35,9 @@ public:
 	/// </summary>
 	void Exit() override;
 
+	// 現在の状態を取得
+	BossBattleState GetBattleState() const { return currentBattleState_; }
+
 private:
 	BossStateCommonData& stateCommonData_;
 

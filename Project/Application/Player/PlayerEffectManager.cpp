@@ -33,6 +33,9 @@ PlayerEffectManager::PlayerEffectManager(GameEngine::GameObjectManager* objectMa
 }
 
 void PlayerEffectManager::StartShockWave(Vector3 pos) {
+
+	return;
+
 	// 描画
 	objectManager_->AddObject<ShockWave>(shockModel_, planeXYmodel_, blastGH_, shockGH_, dissolveNoiseGH_, pos);
 
