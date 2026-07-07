@@ -29,6 +29,7 @@ BossEnemy::BossEnemy(GameEngine::Model* model, GameEngine::WorldTransform& playe
 	debugParame_ = std::make_unique<DebugParameter>("BossEnemy");
 	debugParame_->Register("MaxHp", maxHp_);
 	debugParame_->Register("Scale", modelComponent_.worldTransform_.transform_.scale);
+	debugParame_->Register("Color", iceMaterial_.materialData_->color);
 	debugParame_->Register("ColliderRadius", colliderRadius_,0,"Collider");
 	debugParame_->Register("ColliderOffsetPosY", colliderOffsetPosY_, 1,"Collider");
 
@@ -133,4 +134,12 @@ void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRes
 void BossEnemy::OnCollisionStay([[maybe_unused]] const GameEngine::CollisionResult& result) {
 
 
+}
+
+BossBattleState BossEnemy::GetBattleState() const {
+	if (bossState_ != BossState::kBattle) { return BossBattleState::kWait; }
+
+	// 現在の状態を取得
+	BossStateBattle* battleState = dynamic_cast<BossStateBattle*>(statesTable_[static_cast<size_t>(bossState_)].get());
+	return battleState->GetBattleState();
 }

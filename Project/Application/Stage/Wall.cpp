@@ -2,7 +2,8 @@
 #include "FPSCounter.h"
 #include "DebugParameter.h"
 #include "Application/CollisionConfig.h"
-
+#include "Application/Player/Player.h"
+#include "Application/Enemy/BossEnemy.h"
 using namespace GameEngine;
 
 Wall::Wall(GameEngine::Model* model, GameEngine::DebugParameter* parame) : modelComponent_(model) {
@@ -32,7 +33,7 @@ Wall::Wall(GameEngine::Model* model, GameEngine::DebugParameter* parame) : model
 	// コールバック関数に登録する
 	collider_.SetOnCollisionCallback([this](const CollisionResult& result) {
 		this->OnCollisionEnter(result);
-		});
+	});
 
 	// 参照するマテリアルを変更
 	modelComponent_.SetBufferMaterial(0, iceMaterial_.GetMaterialSrvIndex());
@@ -60,6 +61,7 @@ void Wall::Update() {
 
 	if (currentHp_ <= 0) {
 		isAlive_ = false;
+		isBreakParticleActive_ = false;
 	}
 
 	if (isAlive_) { return; }
@@ -82,4 +84,57 @@ void Wall::Draw() {
 
 void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
 
+	bool isPlayer = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kPlayer));
+	bool isBoss = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kBoss));
+
+	Player* player = nullptr;
+	BossEnemy* boss = nullptr;
+
+	if (isPlayer) { 
+		player = result.userData.As<Player>();
+	}
+
+	if (isBoss) {
+		boss = result.userData.As<BossEnemy>();
+	}
+
+	// Hpを削る
+	if (player != nullptr) {
+		Vector3 velocity = player->GetVelocity();
+		velocity.y = 0.0f;
+		// 現在の速度の割合を取得
+		float ratio = velocity.Length() / player->GetRushMaxSpeed();
+
+		if (ratio <= 0.3f) {
+			currentHp_ -= 1;
+		} else if (ratio <= 0.7f) {
+			currentHp_ -= 2;
+		} else {
+			currentHp_ -= 3;
+		}
+
+	} else if (boss != nullptr) {
+
+		BossBattleState battleState = boss->GetBattleState();
+
+		// ボスが突進状態であれば
+		if (battleState == BossBattleState::kRushAttack) {
+			// ボスの場合、固定ダメージ
+			currentHp_ -= 2;
+		}
+	}
+
+	if (currentHp_ == 1) {
+		modelComponent_.worldTransform_.transform_.scale.z = 0.5f;
+	} else if (currentHp_ == 2) {
+		modelComponent_.worldTransform_.transform_.scale.z = 1.0f;
+	}else if (currentHp_ <= 0) {
+		currentHp_ = 0;
+		//iceMaterial_->materialData_->color.w = 0.0f;
+		isBreakParticleActive_ = true;
+	}
+
+
+
+	modelComponent_.worldTransform_.UpdateTransformMatrix();
 }

@@ -58,6 +58,8 @@ private:
 	// obbの当たり判定
 	GameEngine::OBBCollider collider_;
 
+	bool isBreakParticleActive_ = false;
+
 private:
 
 	// 当たり判定

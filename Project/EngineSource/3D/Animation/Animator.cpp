@@ -222,26 +222,23 @@ void Animator::UpdateCompute() {
 	commandList_->SetPipelineState(pipelineState_);
 
 	auto* skeleton = model_->GetSkeleton();
-	auto* outputBuffer = skeleton->GetOutputVertexBuffer();
 	const auto& meshes = model_->GetMeshes();
-	const auto& mesh = meshes[0];
 
-	// 頂点を書き込み状態に変更
-	outputBuffer->TransitionUAV(commandList_);
-	
-	commandList_->SetComputeRootDescriptorTable(0, skinCluster_->wellBuffer.GetSrvHandleGPU());
-	commandList_->SetComputeRootDescriptorTable(1, mesh->GetVertexBuffer().GetSrvGpuHandle());
-	commandList_->SetComputeRootDescriptorTable(2, skinCluster_->influenceBuffer.GetSrvGpuHandle());
-	commandList_->SetComputeRootDescriptorTable(3, outputBuffer->GetUAVGpuHandle());
-	commandList_->SetComputeRootConstantBufferView(4, skeleton->GetConstantBuffer()->GetGpuVirtualAddress());
+	for (uint32_t i = 0; i < meshes.size(); ++i) {
+		auto* outputBuffer = skeleton->GetOutputVertexBuffer(i);
+		outputBuffer->TransitionUAV(commandList_);
 
-	commandList_->Dispatch(UINT(skeleton->GetVerticesNum() + 1023) / 1024, 1, 1);
+		commandList_->SetComputeRootDescriptorTable(0, skinCluster_->wellBuffer.GetSrvHandleGPU()); // 共通パレット
+		commandList_->SetComputeRootDescriptorTable(1, meshes[i]->GetVertexBuffer().GetSrvGpuHandle());
+		commandList_->SetComputeRootDescriptorTable(2, skeleton->GetInfluenceBuffer(i)->GetSrvGpuHandle()); // メッシュ固有
+		commandList_->SetComputeRootDescriptorTable(3, outputBuffer->GetUAVGpuHandle());
+		commandList_->SetComputeRootConstantBufferView(4, skeleton->GetConstantBuffer(i)->GetGpuVirtualAddress());
 
-	// 頂点を読み取り状態に変更
-	outputBuffer->TransitionSRV(commandList_);
+		commandList_->Dispatch(UINT(skeleton->GetVerticesNum(i) + 1023) / 1024, 1, 1);
 
-	// BLASを更新する
-	mesh->GetBLAS()->Update(commandList_, outputBuffer->GetView());
+		outputBuffer->TransitionSRV(commandList_);
+		meshes[i]->GetBLAS()->Update(commandList_, outputBuffer->GetView());
+	}
 }
 
 void Animator::DebugDraw(DebugRenderer* debugRenderer, float sphereRadius, const Vector4& color) {

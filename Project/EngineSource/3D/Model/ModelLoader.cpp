@@ -460,10 +460,11 @@ ModelData ModelLoader::LoadModelFile(const std::string& directoryPath, const std
 		}
 
 		// スケルトンを取得
+		std::unordered_map<std::string, JointWeightData> meshSkinClusterData;
 		for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) {
 			aiBone* bone = mesh->mBones[boneIndex];
 			std::string jointName = bone->mName.C_Str();
-			JointWeightData& jointWeightData = modelData.skinClusterData[jointName];
+			JointWeightData& jointWeightData = meshSkinClusterData[jointName];
 			isSkeleton = true;
 
 			aiMatrix4x4 bindPoseMatrixAssimp = bone->mOffsetMatrix.Inverse();
@@ -479,6 +480,7 @@ ModelData ModelLoader::LoadModelFile(const std::string& directoryPath, const std
 		}
 
 		modelData.meshes.push_back(std::move(meshData));
+		modelData.skinClusterData.push_back(std::move(meshSkinClusterData));
 	}
 
 	// シーン全体の階層構造を作る

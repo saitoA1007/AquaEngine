@@ -24,6 +24,13 @@ Floor::Floor(GameEngine::Model* model, uint32_t iceNormalGH, uint32_t iceHeightG
 	debugParame_->RegisterWorld("world", iceModelComponent_.worldTransform_);
 	debugParame_->Register("ColliderSize", colliderSize_);
 	debugParame_->Register("ColliderAnchor", colliderAnchor_);
+	std::string subGroup = "IceMaterial";
+	int index = 0;
+	debugParame_->Register("bubbleScale", iceMaterial_.materialData_->bubbleScale, index++,subGroup);
+	debugParame_->Register("bubbleMaxDepth", iceMaterial_.materialData_->bubbleMaxDepth, index++,subGroup);
+	debugParame_->Register("bubbleDensity", iceMaterial_.materialData_->bubbleDensity, index++,subGroup);
+	debugParame_->Register("bubbleJitter", iceMaterial_.materialData_->bubbleJitter, index++,subGroup);
+	debugParame_->Register("bubbleHighlight", iceMaterial_.materialData_->bubbleHighlight, index++,subGroup);
 	debugParame_->Apply();
 
 	// 当たり判定

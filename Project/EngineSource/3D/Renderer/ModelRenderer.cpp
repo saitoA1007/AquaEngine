@@ -176,7 +176,7 @@ void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTrans
 
 		D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
 			meshes[i]->GetVertexBufferView(),
-			skeleton->GetSkinClusterData()->influenceBuffer.GetView()
+			skeleton->GetInfluenceBufferData(i)->GetView()
 		};
 
 		commandList_->IASetVertexBuffers(0, 2, vbvs);

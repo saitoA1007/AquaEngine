@@ -132,6 +132,8 @@ void TestScene::DebugUpdate() {
 	ImGui::DragFloat("IceRoughness", &iceMaterial_.materialData_->roughness, 0.01f, 0.0f, 1.0f);
 	ImGui::DragFloat("IceIor", &iceMaterial_.materialData_->ior, 0.01f);
 
+	ImGui::Separator();
+
 	ImGui::DragFloat("IceChipScale", &iceMaterial_.materialData_->chipScale, 0.01f);
 	ImGui::DragFloat("IceChipStrength", &iceMaterial_.materialData_->chipStrength, 0.01f, 0.0f, 1.0f);
 	ImGui::DragFloat("IceEdgeWidth", &iceMaterial_.materialData_->edgeWidth, 0.01f);
@@ -139,6 +141,14 @@ void TestScene::DebugUpdate() {
 	ImGui::DragFloat("IceMicroScale", &iceMaterial_.materialData_->microScale, 0.01f);
 	ImGui::DragFloat("IceMicroStrength", &iceMaterial_.materialData_->microStrength, 0.01f);
 	ImGui::DragFloat("IceDissolveThreshold", &iceMaterial_.materialData_->dissolveThreshold, 0.01f,0.0f,1.0f);
+
+	ImGui::Separator();
+
+	ImGui::DragFloat("bubbleScale", &iceMaterial_.materialData_->bubbleScale, 0.01f, 0.0f, 1.0f);
+	ImGui::DragFloat("bubbleMaxDepth", &iceMaterial_.materialData_->bubbleMaxDepth, 0.01f, 0.0f,10.0f);
+	ImGui::DragFloat("bubbleDensity", &iceMaterial_.materialData_->bubbleDensity, 0.01f, 0.0f, 1.0f);
+	ImGui::DragFloat("bubbleJitter", &iceMaterial_.materialData_->bubbleJitter, 0.01f, 0.0f, 1.0f);
+	ImGui::DragFloat("bubbleHighlight", &iceMaterial_.materialData_->bubbleHighlight, 0.01f, 0.0f, 1.0f);
 	ImGui::End();
 #endif
 }

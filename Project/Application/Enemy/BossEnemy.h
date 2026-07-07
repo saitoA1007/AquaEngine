@@ -5,6 +5,7 @@
 #include "ModelComponent.h"
 #include "IceMaterial.h"
 #include "IBossState.h"
+#include "Application/Enemy/BattleAction/IBossBattleAction.h"
 
 // 前方宣言
 namespace GameEngine {
@@ -39,6 +40,9 @@ public:
 
 	// 最大Hpを取得
 	int32_t GetMaxHp() const { return maxHp_; }
+
+	// 現在の戦闘中の状態を朱徳
+	BossBattleState GetBattleState() const;
 
 private:
 	// パラメータ機能

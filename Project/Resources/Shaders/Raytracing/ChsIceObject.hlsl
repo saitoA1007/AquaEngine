@@ -40,6 +40,14 @@ struct IceMaterialData
     float microStrength;
     uint heightTextureHandle;
     float heightScale;
+    
+    float bubbleScale;
+    float bubbleMaxDepth;
+    float bubbleDensity;
+    float bubbleJitter;
+    
+    float bubbleHighlight;
+    float3 padding1;
 };
 
 static const uint VERTEX_STRIDE = 52;
@@ -106,13 +114,12 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
     float3 viewDir = normalize(gCamera.worldPosition.xyz - worldPosition);
        
     float2 parallaxUV = transformedUV.xy;
+    // 視線ベクトルをオブジェクト空間へ戻す
+    float3x3 worldToObjectRot = (float3x3) WorldToObject4x3();
+    float3 localViewDir = normalize(mul(viewDir, worldToObjectRot));
     // ハイトマップがあればUVをオフセットする
     if (material.heightTextureHandle != 0)
     {
-        // 視線ベクトルをオブジェクト空間へ戻す
-        float3x3 worldToObjectRot = (float3x3) WorldToObject4x3();
-        float3 localViewDir = normalize(mul(viewDir, worldToObjectRot));
-        
         // オブジェクト空間のTBNで接空間へ変換
         float3 N = normalize(vtx.normal);
         float3 T = vtx.tangent.xyz;
@@ -125,6 +132,50 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
             transformedUV.xy, tangentViewDir, material.heightScale);
     }
     
+    float3 bubbleColor = float3(0.0f, 0.0f, 0.0f);
+    if (material.bubbleMaxDepth > 0.0001f)
+    {
+        // 屈折方向を計算
+        float3 localNormalForRefract = vtx.normal; // 表面法線
+        float3 incident = -localViewDir; // 入射方向を反転して内向きに
+        float eta = 1.0f / material.ior; // 空気→氷
+        float3 refractedDir = refract(incident, localNormalForRefract, eta);
+
+        if (dot(refractedDir, refractedDir) < 0.0001f)
+        {
+            refractedDir = incident;
+        }
+        
+        float3 bubbleHitPos, bubbleHitNormalLocal;
+        float hitDistance;
+        bool hitBubble = ParallaxBubbleMapping(
+            vtx.position.xyz, -refractedDir,
+            material.bubbleScale, material.bubbleMaxDepth,
+            material.bubbleJitter, material.bubbleDensity,
+            bubbleHitPos, bubbleHitNormalLocal, hitDistance);
+
+        if (hitBubble)
+        {
+            float3x3 normalMatrix = transpose((float3x3) WorldToObject4x3());
+            float3 bubbleNormalWorld = normalize(mul(normalMatrix, bubbleHitNormalLocal));
+
+            float NdotV = saturate(dot(bubbleNormalWorld, viewDir));
+            float3 lightDir = normalize(-gDirectionalLight.direction);
+            float3 halfVec = normalize(lightDir + viewDir);
+
+            float bubbleDiffuse = saturate(dot(bubbleNormalWorld, lightDir)) * 0.4f;
+            float bubbleSpec = pow(saturate(dot(bubbleNormalWorld, halfVec)), 48.0f);
+            float bubbleRim = pow(1.0f - NdotV, 3.0f) * 0.3f;
+
+            bubbleColor = float3(1.0f, 1.0f, 1.0f) * (bubbleDiffuse + bubbleSpec + bubbleRim) * material.bubbleHighlight;
+
+            // 深度に応じて減衰させ、奥にある気泡ほど淡く見せる
+            float3 absorption = float3(0.15f, 0.05f, 0.02f);
+            float3 depthAttenuation = BeerLambert(absorption, hitDistance);
+            bubbleColor *= depthAttenuation;
+        }
+    }
+    
     float3 localNormal = vtx.normal;
     // ノーマルマップがあれば法線に適応
     if (material.normalTextureHandle != 0)
@@ -133,7 +184,7 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
         localNormal = GetNormalFromMap(normalMapColor, vtx.normal, vtx.tangent);
     }
     float3 worldNormal = mul(localNormal, (float3x3) ObjectToWorld4x3());
-    worldNormal = normalize(worldNormal);    
+    worldNormal = normalize(worldNormal);
     
      // 裏面の法線を視線側に向け直す
     if (dot(worldNormal, viewDir) < 0.0f)
@@ -168,4 +219,11 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
         material.roughness,
         iceColor
     );
+    
+    // バブルを描画
+    float3 F0Ice = float3(0.02f, 0.02f, 0.02f);
+    float NdotV = saturate(dot(worldNormal, viewDir));
+    float surfaceFresnel = F_Schlick(NdotV, F0Ice).x;
+    float transmittance = 1.0f - surfaceFresnel;
+    payload.color += bubbleColor * transmittance;
 }

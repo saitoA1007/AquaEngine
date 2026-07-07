@@ -57,6 +57,12 @@ public:
 	// 攻撃力
 	float GetDamage() const { return playerAttackDownAction_.GetAttackDownPower(); }
 
+	// 突進の最大速度
+	float GetRushMaxSpeed() const { return attackRushAction_.GetRushMaxSpeed(); }
+
+	// 速度を取得
+	Vector3 GetVelocity() const { return commonData_.velocity; }
+
 private:
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;
