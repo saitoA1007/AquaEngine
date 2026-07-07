@@ -6,7 +6,7 @@
 #include "Application/Enemy/BossEnemy.h"
 using namespace GameEngine;
 
-Wall::Wall(GameEngine::Model* model, GameEngine::DebugParameter* parame) : modelComponent_(model) {
+Wall::Wall(GameEngine::Model* model, GameEngine::DebugParameter* parame) : modelComponent_(model), underWallModelComponent_(model) {
 	// パラメーター機能を取得
 	parame_ = parame;
 
@@ -38,6 +38,9 @@ Wall::Wall(GameEngine::Model* model, GameEngine::DebugParameter* parame) : model
 	// 参照するマテリアルを変更
 	modelComponent_.SetBufferMaterial(0, iceMaterial_.GetMaterialSrvIndex());
 	modelComponent_.SetHitGroup(1);
+
+	underWallModelComponent_.SetBufferMaterial(0, iceMaterial_.GetMaterialSrvIndex());
+	underWallModelComponent_.SetHitGroup(1);
 }
 
 void Wall::SetParameter(const Transform& transform) {
@@ -45,6 +48,11 @@ void Wall::SetParameter(const Transform& transform) {
 	modelComponent_.worldTransform_.transform_.translate = transform.translate;
 	modelComponent_.worldTransform_.transform_.rotate = transform.rotate;
 	modelComponent_.worldTransform_.transform_.scale = { 2.0f,2.0f,1.5f };
+
+	// 下に存在する壁を設置する
+	underWallModelComponent_.worldTransform_.transform_ = modelComponent_.worldTransform_.transform_;
+	underWallModelComponent_.worldTransform_.transform_.translate.y = -2.0f;
+	underWallModelComponent_.worldTransform_.transform_.scale * 0.8f;
 
 	// 初期化
 	Initialize();
@@ -55,6 +63,7 @@ void Wall::Initialize() {
 	collider_.SetSize(colliderSize_);
 	collider_.UpdateOrientationsFromRotate(modelComponent_.worldTransform_.transform_.rotate);
 	modelComponent_.Update();
+	underWallModelComponent_.Update();
 }
 
 void Wall::Update() {
@@ -74,6 +83,9 @@ void Wall::Update() {
 }
 
 void Wall::Draw() {
+
+	// 下に存在する壁を設置する
+	underWallModelComponent_.DrawRaytracing(renderQueue_);
 
 	if (isBreakIce_) { return; }
 
@@ -100,7 +112,8 @@ void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& 
 	// Hpを削る
 	if (player != nullptr) {
 
-		if (PlayerState::kAttackRush == player->GetCurrentState()) {
+		if (player->IsHitWall()) {
+			player->SetIsHitWall(false);
 			Vector3 velocity = player->GetVelocity();
 			velocity.y = 0.0f;
 			// 現在の速度の割合を取得

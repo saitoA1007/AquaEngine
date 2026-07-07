@@ -63,6 +63,9 @@ public:
 	// 速度を取得
 	Vector3 GetVelocity() const { return commonData_.velocity; }
 
+	bool IsHitWall() const { return bounceAction_.IsHitWall(); }
+	void SetIsHitWall(bool isHitWall) { bounceAction_.SetIsHitWall(isHitWall); }
+
 private:
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;

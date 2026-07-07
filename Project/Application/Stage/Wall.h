@@ -46,6 +46,9 @@ private:
 	// 氷のマテリアル
 	GameEngine::IceMaterial iceMaterial_;
 
+	// 下に存在する壁
+	GameEngine::ModelComponent underWallModelComponent_;
+
 	// タイマー
 	float respawnTimer_ = 0.0f;
 

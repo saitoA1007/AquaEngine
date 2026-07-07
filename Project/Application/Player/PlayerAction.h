@@ -168,6 +168,9 @@ public:
 	// パラメータを登録する
 	void RegisterParameter(GameEngine::DebugParameter* param) override;
 
+	bool IsHitWall() const { return isHitWall_; }
+	void SetIsHitWall(bool isHitWall) { isHitWall_ = isHitWall; }
+
 private:
 	// 跳ね上がり後の高さ
 	float kWallBounceUpSpeed_ = 10.0f;
@@ -185,6 +188,9 @@ private:
 	float kWallBounceReflectFactor_ = 1.0f;
 	// 通常の時の壁に衝突した際の跳ね返り倍率
 	float kWallHitReflectFactor_ = 0.2f;
+
+	// 壁のヒットフラグ
+	bool isHitWall_ = false;
 };
 
 // 急降下攻撃アクション
