@@ -25,13 +25,6 @@ namespace GameEngine {
 		SkinCluster* GetSkinCluster() { return &skinCluster_; }
 		const SkinCluster* GetSkinClusterData() const { return &skinCluster_; }
 
-		//VertexBuffer<VertexData>* GetOutputVertexBuffer() { return &outputvertexBuffer_; }
-		//ConstantBuffer<SkinningInformation>* GetConstantBuffer() { return &constBuffer_; }
-		
-		//const uint32_t& GetVerticesNum() const { return verticesNum_; }
-
-		//uint32_t GetOutputVertexBufferSrvIndex() const { return outputvertexBuffer_.GetSrvIndex(); }
-
 		// スキニング後の出力頂点バッファを取得
 		VertexBuffer<VertexData>* GetOutputVertexBuffer(uint32_t meshIndex) { return &outputVertexBuffers_[meshIndex]; }
 
@@ -56,14 +49,6 @@ namespace GameEngine {
 
 		// 全メッシュ共通の骨行列パレット、バインドポーズ逆行列
 		SkinCluster skinCluster_;
-
-		//uint32_t verticesNum_ = 0;
-
-		// アウトプット用の頂点リソース
-		//VertexBuffer<VertexData> outputvertexBuffer_;
-		// スキニング情報
-		//ConstantBuffer<SkinningInformation> constBuffer_;
-
 
 		// アウトプット用の頂点リソース
 		std::vector<VertexBuffer<VertexData>> outputVertexBuffers_;

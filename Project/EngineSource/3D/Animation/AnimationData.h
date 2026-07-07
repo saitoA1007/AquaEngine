@@ -54,9 +54,6 @@ struct WellForGPU {
 struct SkinCluster {
 	std::vector<Matrix4x4> inverseBindPoseMatrices;
 
-	//GameEngine::VertexBuffer<VertexInfluence> influenceBuffer;
-	//std::span<VertexInfluence> mappedInfluence;
-
 	GameEngine::StructuredBuffer<WellForGPU> wellBuffer;
 	std::span<WellForGPU> mappedPalette;
 };
