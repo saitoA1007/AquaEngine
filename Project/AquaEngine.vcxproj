@@ -350,7 +350,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Graphics\PSO\Core\PSOManager.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Rasterize\RasterizerBuilder.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Rasterize\ShaderCompiler.cpp" />
-    <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\BloomPSO.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\CopyPSO.cpp" />
     <ClCompile Include="EngineSource\Graphics\RenderPass\RenderPass.cpp" />
     <ClCompile Include="EngineSource\Graphics\RenderPass\RenderPassController.cpp" />
@@ -649,7 +648,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Graphics\PSO\Core\PSOManager.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Rasterize\RasterizerBuilder.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Rasterize\ShaderCompiler.h" />
-    <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\BloomPSO.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\CopyPSO.h" />
     <ClInclude Include="EngineSource\Graphics\RenderPass\RenderPass.h" />
     <ClInclude Include="EngineSource\Graphics\RenderPass\RenderPassController.h" />

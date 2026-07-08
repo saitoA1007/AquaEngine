@@ -417,9 +417,6 @@
     <ClCompile Include="EngineSource\Graphics\PSO\Rasterize\ShaderCompiler.cpp">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\BloomPSO.cpp">
-      <Filter>EngineSource\Graphics\PSO\PostProcess</Filter>
-    </ClCompile>
     <ClCompile Include="EngineSource\Graphics\PSO\PostProcess\CopyPSO.cpp">
       <Filter>EngineSource\Graphics\PSO\PostProcess</Filter>
     </ClCompile>
@@ -902,9 +899,6 @@
     </ClInclude>
     <ClInclude Include="EngineSource\Graphics\PSO\Rasterize\ShaderCompiler.h">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\BloomPSO.h">
-      <Filter>EngineSource\Graphics\PSO\PostProcess</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Graphics\PSO\PostProcess\CopyPSO.h">
       <Filter>EngineSource\Graphics\PSO\PostProcess</Filter>

@@ -15,7 +15,6 @@
 
 // あとで削除するべき処理
 #include "PostProcess/CopyPSO.h"
-#include "PostProcess/BloomPSO.h"
 #include "RaytracingPipeline.h"
 
 namespace GameEngine {
@@ -80,7 +79,6 @@ namespace GameEngine {
         std::unique_ptr<BufferRefManager> bufferRefManager_;
 
         std::unique_ptr<CopyPSO> copyPSO_;
-        std::unique_ptr<BloomPSO> bloomPSO_;
 
     private:
         void InitializePSO();
