@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include <vector>
 #include "IGameObject.h"
 #include "Collider.h"
 #include "ModelComponent.h"
@@ -52,7 +53,7 @@ private:
 	GameEngine::ModelComponent modelComponent_;
 
 	// 氷のマテリアル
-	GameEngine::IceMaterial iceMaterial_;
+	std::vector<GameEngine::IceMaterial> iceMaterial_;
 
 	// 球の当たり判定
 	GameEngine::SphereCollider collider_;
