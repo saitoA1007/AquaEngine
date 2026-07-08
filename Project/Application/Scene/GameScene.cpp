@@ -39,7 +39,7 @@ GameScene::GameScene() {
 	auto* bossRangedAttackManager = gameObjectManager_->AddObject<BossRangedAttackManager>(gameObjectManager_, iceFallModel);
 
 	// 敵
-	auto* enemyModel = modelManager_->GetNameByModel("BossBird_IceBreath.gltf");
+	auto* enemyModel = modelManager_->GetNameByModel("BossBird.gltf");
 	enemyModel->SetDefaultIsEnableLight(true);
 	auto bossEnemy = gameObjectManager_->AddObject<BossEnemy>(enemyModel, player->GetWorldTransform(), animationManager_, bossRangedAttackManager);
 

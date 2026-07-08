@@ -236,7 +236,7 @@ void RenderQueue::SubmitDebugLine(const DebugRenderer* debugRenderer, const std:
     draw3dQueueList_[passName][request.layer][Get3dPsoName(request.type)].push_back(request);
 }
 
-void RenderQueue::SubmitRaytracingModel(Model* model, WorldTransform& worldTransform, RefBuffer* customRefBuffer) {
+void RenderQueue::SubmitRaytracingModel(Model* model, WorldTransform& worldTransform, std::vector<RefBuffer>* customRefBuffer) {
     // 登録
     const auto& meshes = model->GetMeshes();
     auto& refBuffers = model->GetRefBuffers();
@@ -255,7 +255,7 @@ void RenderQueue::SubmitRaytracingModel(Model* model, WorldTransform& worldTrans
         // blasを登録
         data.blas = mesh->GetBLAS();
 
-        if (customRefBuffer == nullptr) {
+        if (customRefBuffer == nullptr || i >= customRefBuffer->size()) {
             // デフォルトのマテリアルを設定
             Material* drawMaterial = model->GetMaterial(mesh->GetMaterialName());
             auto& materialBuffer = drawMaterial->GetMaterialBuffer();
@@ -271,6 +271,8 @@ void RenderQueue::SubmitRaytracingModel(Model* model, WorldTransform& worldTrans
             // 使用するヒットグループを設定
             data.hitGroupIndexOffset = refBuffer.GetUseHitGroupIndex();
         } else {
+            auto& customRef = (*customRefBuffer)[i];
+
             // スケルトンがあれば参照するデータを変える
             uint32_t vertexHandle = 0;
             if (model->IsSkeleton()) {
@@ -281,11 +283,11 @@ void RenderQueue::SubmitRaytracingModel(Model* model, WorldTransform& worldTrans
             }
 
             // モデルデータを設定
-            customRefBuffer->SetModelData(vertexHandle, mesh->GetIndexBufferSrvIndex());
-            refIndex = customRefBuffer->GetRefIndex();
+            customRef.SetModelData(vertexHandle, mesh->GetIndexBufferSrvIndex());
+            refIndex = customRef.GetRefIndex();
 
             // 使用するヒットグループを設定
-            data.hitGroupIndexOffset = customRefBuffer->GetUseHitGroupIndex();
+            data.hitGroupIndexOffset = customRef.GetUseHitGroupIndex();
         }
 
         // 使用するデータを設定

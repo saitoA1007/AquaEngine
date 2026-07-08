@@ -1,5 +1,5 @@
 #pragma once
-#include <unordered_map>
+#include <vector>
 #include "DrawRequest.h"
 #include "WorldTransform.h"
 #include "Material.h"
@@ -22,7 +22,7 @@ namespace GameEngine {
 		void Update();
 
 		// 描画処理
-		void Draw(RenderQueue* renderQueue, const Draw3dType& drawType = Draw3dType::Default,const std::string& passName = "DefaultPass");
+		void Draw(RenderQueue* renderQueue, const Draw3dType& drawType = Draw3dType::Default, const std::string& passName = "DefaultPass");
 
 		// レイトレによる描画
 		void DrawRaytracing(RenderQueue* renderQueue);
@@ -30,18 +30,18 @@ namespace GameEngine {
 	public:
 
 		// 参照値を設定
-		void SetRefType(uint32_t type) {
-			refBuffer_.SetType(type);
+		void SetRefType(uint32_t type, uint32_t i = 0) {
+			refBuffers_[i].SetType(type);
 		}
 
 		// 参照するマテリアルを設定
-		void SetBufferMaterial(uint32_t type, uint32_t srvIndex) {
-			refBuffer_.SetBufferMaterial(type, srvIndex);
+		void SetBufferMaterial(uint32_t type, uint32_t srvIndex, uint32_t i = 0) {
+			refBuffers_[i].SetBufferMaterial(type, srvIndex);
 		}
 
 		// ヒットグループを設定
-		void SetHitGroup(uint32_t index) {
-			refBuffer_.SetHitGroupIndex(index);
+		void SetHitGroup(uint32_t hitGroupIndex, uint32_t i = 0) {
+			refBuffers_[i].SetHitGroupIndex(hitGroupIndex);
 		}
 
 	public:
@@ -57,10 +57,10 @@ namespace GameEngine {
 		Model* model_ = nullptr;
 
 		// 標準のマテリアル
-		Material defaultMaterial_;
+		std::vector<Material> defaultMaterials_;
 
 		// 参照用
-		RefBuffer refBuffer_;
+		std::vector<RefBuffer> refBuffers_;
 	};
 }
 

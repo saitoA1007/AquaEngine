@@ -85,7 +85,7 @@ private: // シーン機能
 	// 氷で共通のマテリアル
 	GameEngine::IceMaterial iceMaterial_;
 	// レイトレーシングで氷マテリアルを参照する用
-	GameEngine::RefBuffer iceRefBuffers_[4];
+	std::vector<GameEngine::RefBuffer> iceRefBuffers_[4];
 
 	Vector4 color_ = {1.0f,1.0f,1.0f,1.0f};
 	float roughness_ = 0.5f;
