@@ -17,10 +17,14 @@ BossEnemy::BossEnemy(GameEngine::Model* model, GameEngine::WorldTransform& playe
 	modelComponent_.worldTransform_.Initialize({ {3.0f,3.0f,3.0f},{0.0f,0.0f,0.0f},{0.0f,5.0f,0.0f} });
 
 	// 参照するマテリアルを変更
-	iceMaterial_.materialData_->dissolveThreshold = 0.0f;
-	iceMaterial_.materialData_->color = { 0.0f,0.2f,0.8f,1.0f };
-	modelComponent_.SetBufferMaterial(0, iceMaterial_.GetMaterialSrvIndex());
-	modelComponent_.SetHitGroup(1);
+	uint32_t meshNum = model->GetMeshes().size();
+	iceMaterial_.resize(meshNum);
+	for (uint32_t i = 0; i < meshNum; ++i) {
+		iceMaterial_[i].materialData_->dissolveThreshold = 0.0f;
+		iceMaterial_[i].materialData_->color = {0.0f,0.2f,0.8f,1.0f};
+		modelComponent_.SetBufferMaterial(0, iceMaterial_[i].GetMaterialSrvIndex(), i);
+		modelComponent_.SetHitGroup(1, i);
+	}
 
 	// アニメーション
 	animator_ = std::make_unique<BossAnimator>(model, animationManager);
@@ -29,9 +33,13 @@ BossEnemy::BossEnemy(GameEngine::Model* model, GameEngine::WorldTransform& playe
 	debugParame_ = std::make_unique<DebugParameter>("BossEnemy");
 	debugParame_->Register("MaxHp", maxHp_);
 	debugParame_->Register("Scale", modelComponent_.worldTransform_.transform_.scale);
-	debugParame_->Register("Color", iceMaterial_.materialData_->color);
 	debugParame_->Register("ColliderRadius", colliderRadius_,0,"Collider");
 	debugParame_->Register("ColliderOffsetPosY", colliderOffsetPosY_, 1,"Collider");
+
+	for (uint32_t i = 0; i < meshNum; ++i) {
+		std::string name = "Color" + std::to_string(i);
+		debugParame_->Register(name, iceMaterial_[i].materialData_->color);
+	}
 
 	// 共通データ設定
 	stateCommonData_.worldTransform = &modelComponent_.worldTransform_;

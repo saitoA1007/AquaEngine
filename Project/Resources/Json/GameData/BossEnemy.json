@@ -4,6 +4,30 @@
             "ColliderOffsetPosY": 3.950000047683716,
             "ColliderRadius": 4.0
         },
+        "Color0": [
+            0.41788285970687866,
+            0.4839336574077606,
+            0.84555983543396,
+            1.0
+        ],
+        "Color1": [
+            0.34516242146492004,
+            0.1767415702342987,
+            0.8803088665008545,
+            1.0
+        ],
+        "Color2": [
+            0.39249563217163086,
+            0.8996139168739319,
+            0.8584961891174316,
+            1.0
+        ],
+        "Color3": [
+            0.4740537405014038,
+            0.8185328245162964,
+            0.6788790822029114,
+            1.0
+        ],
         "CrossMove": {
             "CrossEndRatio": 1.2000000476837158,
             "DefaultPosY": 5.0,
@@ -42,12 +66,12 @@
         ],
         "SceneName": "Game",
         "StatusWeight": {
-            "CrossMove": 10,
-            "IceFallAttack": 10,
-            "RotateMove": 10,
-            "RushAttack": 20,
-            "Wait": 5,
-            "WindAttack": 20
+            "CrossMove": 0,
+            "IceFallAttack": 0,
+            "RotateMove": 0,
+            "RushAttack": 0,
+            "Wait": 170,
+            "WindAttack": 0
         },
         "Wait": {
             "MaxTime": 1.0

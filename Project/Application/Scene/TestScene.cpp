@@ -74,9 +74,10 @@ TestScene::TestScene() {
 
 	// 氷用マテリアルを作成
 	for (size_t i = 0; i < 4; ++i) {
-		iceRefBuffers_[i].Create();
-		iceRefBuffers_[i].SetBufferMaterial(0, iceMaterial_.GetMaterialSrvIndex());
-		iceRefBuffers_[i].SetHitGroupIndex(1);
+		iceRefBuffers_[i].resize(1);
+		iceRefBuffers_[i][0].Create();
+		iceRefBuffers_[i][0].SetBufferMaterial(0, iceMaterial_.GetMaterialSrvIndex());
+		iceRefBuffers_[i][0].SetHitGroupIndex(1);
 	}
 
 	// 円柱

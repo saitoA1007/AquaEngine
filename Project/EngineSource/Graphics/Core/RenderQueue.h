@@ -112,7 +112,7 @@ namespace GameEngine {
         void SubmitDebugLine(const DebugRenderer* debugRenderer, const std::string& passName = "DefaultPass");
 
         // レイトレーシングでのモデル
-        void SubmitRaytracingModel(Model* model, WorldTransform& worldTransform, RefBuffer* customRefBuffer = nullptr);
+        void SubmitRaytracingModel(Model* model, WorldTransform& worldTransform, std::vector<RefBuffer>* customRefBuffer = {});
 
         // psoの名前を取得
         const char* Get3dPsoName(Draw3dType type);
