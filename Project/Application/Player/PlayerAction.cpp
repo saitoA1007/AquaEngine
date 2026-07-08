@@ -302,6 +302,9 @@ void PlayerBounceAction::WallBounce(Vector3& pos, const Vector3& bounceDirection
 	// ラッシュ状態からの突進であれば上に飛ぶ
 	if (commonData_->state == PlayerState::kAttackRush) {
 
+		// ヒットフラグを有効
+		isHitWall_ = true;
+
 		// 跳ね返りアニメーション
 		commonData_->animator_->StartAnimation(PlayerAnimationType::kRushAttack, "突進_End", 1.0f, false);
 

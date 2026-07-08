@@ -46,19 +46,20 @@ private:
 	// 氷のマテリアル
 	GameEngine::IceMaterial iceMaterial_;
 
+	// 下に存在する壁
+	GameEngine::ModelComponent underWallModelComponent_;
+
 	// タイマー
 	float respawnTimer_ = 0.0f;
 
 	// 現在のhp
 	int32_t currentHp_ = 1;
 
-	// 生存フラグ
-	bool isAlive_ = true;
-
 	// obbの当たり判定
 	GameEngine::OBBCollider collider_;
 
-	bool isBreakParticleActive_ = false;
+	// 氷の状態
+	bool isBreakIce_ = false;
 
 private:
 

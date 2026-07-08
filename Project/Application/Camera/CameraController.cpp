@@ -3,6 +3,7 @@
 #include "MyMath.h"
 #include "FPSCounter.h"
 #include "EasingManager.h"
+#include "State/CameraState.h"
 using namespace GameEngine;
 
 CameraController::CameraController(GameEngine::InputCommand* inputCommand, const GameEngine::WorldTransform* targetWorld, const GameEngine::WorldTransform* playerWorld) {
@@ -10,156 +11,79 @@ CameraController::CameraController(GameEngine::InputCommand* inputCommand, const
 	targetWorld_ = targetWorld;
 	playerWorld_ = playerWorld;
 
-	// パラメータ機能
-	debugParame_ = std::make_unique<DebugParameter>("Camera");
-	debugParame_->Register("PositionLerpRate", kPositionLerpRate_);
-	debugParame_->Register("TargetLerpRate", kTargetLerpRate_);
-
-	debugParame_->Register("OffsetY", offsetY_, 0, "Follow");
-	debugParame_->Register("Distance", kDistance_, 0, "Follow");
-	debugParame_->Register("RotateSpeed", kRotateSpeed_, 0, "Follow");
-	debugParame_->Register("RotateDamping", kRotateDamping_, 0, "Follow");
-	debugParame_->Register("RotateY", kFollowRotateY_, 0, "Follow");
-	debugParame_->Register("Fov", kFollowFov_, 0, "Follow");
-
-	int i = 0;
-	debugParame_->Register("LockOnRotateRate", lockOnRotateRate_, i++, "LockOn");
-	debugParame_->Register("MinLockOnDistance", kMinLockOnDistance_, i++, "LockOn");
-	debugParame_->Register("LockOnPlayerOffsetY", lockOnPlayerOffsetY_, i++, "LockOn");
-	debugParame_->Register("LockOnTargetOffsetY", lockOnTargetOffsetY_, i++, "LockOn");
-	debugParame_->Register("LockOnNearFov", kLockOnNearFov_, i++, "LockOn");
-	debugParame_->Register("LockOnFarFov", kLockOnFarFov_, i++, "LockOn");
-	debugParame_->Register("LockOnFovMinDist", kLockOnFovMinDist_, i++, "LockOn");
-	debugParame_->Register("LockOnFovMaxDist", kLockOnFovMaxDist_, i++, "LockOn");
-	debugParame_->Register("FovLerpRate", kFovLerpRate_, i++, "LockOn");
-	debugParame_->Apply();
-}
-
-void CameraController::Initialize() {
 	// カメラの初期化
 	camera_ = std::make_unique<Camera>();
 	camera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},position_ }, 1280, 720);
 
+	// パラメータ機能
+	debugParame_ = std::make_unique<DebugParameter>("Camera");
+	
+	states_[static_cast<size_t>(CameraState::kFollow)] = std::make_unique<FollowCameraState>(this, debugParame_.get());
+	states_[static_cast<size_t>(CameraState::kLockOn)] = std::make_unique<LockOnCameraState>(this, debugParame_.get());
+
+	// パラメーターの値を適応
+	debugParame_->Apply();
+
+	currentStateType_ = CameraState::kFollow;
+	currentState_ = states_[static_cast<size_t>(currentStateType_)].get();
+	currentState_->Enter();
+}
+
+void CameraController::Initialize() {
+	// カメラの位置を初期化
+	camera_->transform_ = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,4.0f,-10.0f } };
+
 	currentTarget_ = targetWorld_->GetWorldPosition();
 	currentTarget_.y = 1.0f;
+
+	currentStateType_ = CameraState::kFollow;
+	currentState_ = states_[static_cast<size_t>(currentStateType_)].get();
+	currentState_->Enter();
 }
 
 void CameraController::Update() {
 	debugParame_->ApplyIfDirty();
-
+	
 	float dt60 = FpsCounter::deltaTime * FpsCounter::maxFrameCount;
-
-	// 目標の位置と注視点
-	Vector3 idealTarget = { 0.0f, 0.0f, 0.0f };
-	Vector3 idealPosition = position_;
-
-	if (inputCommand_->IsCommandActive("CameraLockOn")) {
-		isLockOn_ = !isLockOn_;
+	
+	// カメラを切り替える
+	CameraState next = currentState_->GetNextState();
+	if (next != CameraState::kMaxCount && next != currentStateType_) {
+		ChangeState(next);
 	}
-
-	if (isLockOn_) {
-		Vector3 playerPos = playerWorld_->transform_.translate;
-		Vector3 enemyPos = targetWorld_->transform_.translate;
-
-		// プレイヤーと敵の中間点を注視点にする
-		idealTarget = (playerPos + enemyPos) * 0.5f;
-		idealTarget.y += lockOnPlayerOffsetY_;
-
-		// プレイヤーから敵への水平方向のベクトルを計算
-		Vector3 dir = playerPos - enemyPos;
-		float heightDiff = dir.y;
-		dir.y = 0.0f;
-
-		// 水平距離を計測
-		float dist = dir.Length();
-		if (dist > 0.001f) {
-			dir.x /= dist;
-			dir.z /= dist;
-		} else {
-			// 完全に重なっている場合
-			dir = { 0.0f, 0.0f, 1.0f };
-		}
-
-		// Fovの補間
-		float t = (dist - kLockOnFovMinDist_) / (kLockOnFovMaxDist_ - kLockOnFovMinDist_);
-		t = std::clamp(t, 0.0f, 1.0f);
-		targetFov_ = Lerp(kLockOnNearFov_, kLockOnFarFov_, t);
-
-		// 距離に応じてカメラの引き具合を動的に設定
-		float currentDistance = kMinLockOnDistance_ + dist * 0.6f;
-
-		// 目標角度を求める
-		float targetAngleX = std::atan2f(-dir.x, -dir.z);
-		float angleDiff = Math::GetAngleDiff(rotateMove_.x, targetAngleX);
-
-		// カメラの旋回速度
-		float actualAngleLerp = 1.0f - std::powf(1.0f - lockOnRotateRate_, dt60);
-
-		// 角度を目標に向けて滑らかに近づける
-		rotateMove_.x += angleDiff * actualAngleLerp;
-		rotateVelocityX_ = 0.0f; // 慣性をリセット
-
-		// カメラの位置を決定
-		idealPosition.x = idealTarget.x - std::sinf(rotateMove_.x) * currentDistance;
-		idealPosition.z = idealTarget.z - std::cosf(rotateMove_.x) * currentDistance;
-		// カメラの高さを調整。距離が離れる程見下ろすような視点にする。
-		idealPosition.y = playerPos.y + lockOnTargetOffsetY_ + (dist * 0.1f) + (heightDiff * 1.0f);
-	} else {
-		idealTarget = playerWorld_->GetWorldPosition();
-		idealTarget.y += offsetY_;
-
-		// カメラ操作
-		float targetRotateSpeed = 0.0f;
-		if (inputCommand_->IsCommandActive("CameraMoveLeft")) {
-			targetRotateSpeed += kRotateSpeed_;
-		}
-
-		if (inputCommand_->IsCommandActive("CameraMoveRight")) {
-			targetRotateSpeed -= kRotateSpeed_;
-		}
-
-		// 目標の速度へ
-		float currentDamping = std::powf(kRotateDamping_, dt60);
-		rotateVelocityX_ = rotateVelocityX_ * currentDamping + targetRotateSpeed * (1.0f - currentDamping);
-		rotateMove_.x += rotateVelocityX_ * FpsCounter::gameDeltaTime;
-		rotateMove_.y = kFollowRotateY_;
-
-		// 視野を変更
-		if (currentFov_ != kFollowFov_) {
-			currentFov_ = kFollowFov_;
-			camera_->SetProjectionMatrix(currentFov_,1280,720,0.1f,200.0f);
-		}
-
-		// 球面座標系で移動
-		idealPosition.x = idealTarget.x + kDistance_ * std::sinf(rotateMove_.y) * std::sinf(rotateMove_.x);
-		idealPosition.y = idealTarget.y + kDistance_ * std::cosf(rotateMove_.y);
-		idealPosition.z = idealTarget.z + kDistance_ * std::sinf(rotateMove_.y) * std::cosf(rotateMove_.x);
-	}
-
+	
+	currentState_->Update(dt60);
+	const CameraCommonData& common = currentState_->GetCommonData();
+	
 	// 補間
-	float actualTargetLerp = 1.0f - std::powf(1.0f - kTargetLerpRate_, dt60);
-	float actualPositionLerp = 1.0f - std::powf(1.0f - kPositionLerpRate_, dt60);
-	currentTarget_ = Lerp(currentTarget_, idealTarget, actualTargetLerp);
-	position_ = Lerp(position_, idealPosition, actualPositionLerp);
-
+	float actualTargetLerp = 1.0f - std::powf(1.0f - common.targetLerpRate, dt60);
+	float actualPositionLerp = 1.0f - std::powf(1.0f - common.positionLerpRate, dt60);
+	currentTarget_ = Lerp(currentTarget_, common.idealTarget, actualTargetLerp);
+	position_ = Lerp(position_, common.idealPosition, actualPositionLerp);
 	// Fovを補間
-	float actualFovLerp = 1.0f - std::powf(1.0f - kFovLerpRate_, dt60);
+	targetFov_ = common.targetFov;
+	float actualFovLerp = 1.0f - std::powf(1.0f - common.fovLerpRate, dt60);
 	currentFov_ = currentFov_ + (targetFov_ - currentFov_) * actualFovLerp;
 	camera_->SetProjectionMatrix(currentFov_, 1280, 720, 0.1f, 200.0f);
-
+	
 	// 回転行列に変換
 	Matrix4x4 rotateMatrix_ = LookAt(position_, currentTarget_, { 0.0f,1.0f,0.0f });
-
 	// ワールド行列
 	Matrix4x4 worldMatrix_ = rotateMatrix_;
 	worldMatrix_.m[3][0] = position_.x;
 	worldMatrix_.m[3][1] = position_.y;
 	worldMatrix_.m[3][2] = position_.z;
-
-	// ワールド行列を設定
+	
+	// ワールド行を設定
 	camera_->SetWorldMatrix(worldMatrix_);
-	// ワールド行列から更新する
 	camera_->UpdateFromWorldMatrix();
+}
+
+void CameraController::ChangeState(CameraState next) {
+	currentState_->Exit();
+	currentStateType_ = next;
+	currentState_ = states_[static_cast<size_t>(next)].get();
+	currentState_->Enter();
 }
 
 Matrix4x4 CameraController::LookAt(const Vector3& eye, const Vector3& center, const Vector3& up) {

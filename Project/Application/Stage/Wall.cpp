@@ -6,7 +6,7 @@
 #include "Application/Enemy/BossEnemy.h"
 using namespace GameEngine;
 
-Wall::Wall(GameEngine::Model* model, GameEngine::DebugParameter* parame) : modelComponent_(model) {
+Wall::Wall(GameEngine::Model* model, GameEngine::DebugParameter* parame) : modelComponent_(model), underWallModelComponent_(model) {
 	// パラメーター機能を取得
 	parame_ = parame;
 
@@ -38,6 +38,9 @@ Wall::Wall(GameEngine::Model* model, GameEngine::DebugParameter* parame) : model
 	// 参照するマテリアルを変更
 	modelComponent_.SetBufferMaterial(0, iceMaterial_.GetMaterialSrvIndex());
 	modelComponent_.SetHitGroup(1);
+
+	underWallModelComponent_.SetBufferMaterial(0, iceMaterial_.GetMaterialSrvIndex());
+	underWallModelComponent_.SetHitGroup(1);
 }
 
 void Wall::SetParameter(const Transform& transform) {
@@ -45,6 +48,11 @@ void Wall::SetParameter(const Transform& transform) {
 	modelComponent_.worldTransform_.transform_.translate = transform.translate;
 	modelComponent_.worldTransform_.transform_.rotate = transform.rotate;
 	modelComponent_.worldTransform_.transform_.scale = { 2.0f,2.0f,1.5f };
+
+	// 下に存在する壁を設置する
+	underWallModelComponent_.worldTransform_.transform_ = modelComponent_.worldTransform_.transform_;
+	underWallModelComponent_.worldTransform_.transform_.translate.y = -2.0f;
+	underWallModelComponent_.worldTransform_.transform_.scale * 0.8f;
 
 	// 初期化
 	Initialize();
@@ -55,22 +63,19 @@ void Wall::Initialize() {
 	collider_.SetSize(colliderSize_);
 	collider_.UpdateOrientationsFromRotate(modelComponent_.worldTransform_.transform_.rotate);
 	modelComponent_.Update();
+	underWallModelComponent_.Update();
 }
 
 void Wall::Update() {
 
-	if (currentHp_ <= 0) {
-		isAlive_ = false;
-		isBreakParticleActive_ = false;
-	}
-
-	if (isAlive_) { return; }
+	if (!isBreakIce_) { return; }
 	respawnTimer_ += FpsCounter::gameDeltaTime / respawnTime_;
 
 	// リスポーン時間を超えたら、復活する
 	if (respawnTimer_ >= 1.0f) {
-		isAlive_ = true;
+		isBreakIce_ = false;
 		respawnTimer_ = 0.0f;
+		modelComponent_.worldTransform_.transform_.scale.z = 1.5f;
 		currentHp_ = maxHp_;
 	}
 
@@ -78,6 +83,12 @@ void Wall::Update() {
 }
 
 void Wall::Draw() {
+
+	// 下に存在する壁を設置する
+	underWallModelComponent_.DrawRaytracing(renderQueue_);
+
+	if (isBreakIce_) { return; }
+
 	// 壁を描画
 	modelComponent_.DrawRaytracing(renderQueue_);
 }
@@ -100,19 +111,22 @@ void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& 
 
 	// Hpを削る
 	if (player != nullptr) {
-		Vector3 velocity = player->GetVelocity();
-		velocity.y = 0.0f;
-		// 現在の速度の割合を取得
-		float ratio = velocity.Length() / player->GetRushMaxSpeed();
 
-		if (ratio <= 0.3f) {
-			currentHp_ -= 1;
-		} else if (ratio <= 0.7f) {
-			currentHp_ -= 2;
-		} else {
-			currentHp_ -= 3;
+		if (player->IsHitWall()) {
+			player->SetIsHitWall(false);
+			Vector3 velocity = player->GetVelocity();
+			velocity.y = 0.0f;
+			// 現在の速度の割合を取得
+			float ratio = velocity.Length() / player->GetRushMaxSpeed();
+
+			if (ratio <= 0.3f) {
+				currentHp_ -= 1;
+			} else if (ratio <= 0.7f) {
+				currentHp_ -= 2;
+			} else {
+				currentHp_ -= 3;
+			}
 		}
-
 	} else if (boss != nullptr) {
 
 		BossBattleState battleState = boss->GetBattleState();
@@ -124,17 +138,15 @@ void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& 
 		}
 	}
 
-	if (currentHp_ == 1) {
-		modelComponent_.worldTransform_.transform_.scale.z = 0.5f;
-	} else if (currentHp_ == 2) {
+	// hpによって形を帰る
+	if (currentHp_ == 2) {
 		modelComponent_.worldTransform_.transform_.scale.z = 1.0f;
+	} else if (currentHp_ == 1) {
+		modelComponent_.worldTransform_.transform_.scale.z = 0.5f;
 	}else if (currentHp_ <= 0) {
 		currentHp_ = 0;
-		//iceMaterial_->materialData_->color.w = 0.0f;
-		isBreakParticleActive_ = true;
+		isBreakIce_ = true;
 	}
-
-
 
 	modelComponent_.worldTransform_.UpdateTransformMatrix();
 }
