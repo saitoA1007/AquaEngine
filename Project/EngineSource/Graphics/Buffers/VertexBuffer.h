@@ -3,7 +3,6 @@
 #include "SrvResource.h"
 #include "CreateBufferResource.h"
 #include "ResourceGarbageCollector.h"
-#include "Externals/DirectXTex/d3dx12.h"
 
 namespace GameEngine {
 
@@ -62,9 +61,9 @@ namespace GameEngine {
 			srvDesc.Buffer.StructureByteStride = sizeof(T);
 			srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 
-			D3D12_CPU_DESCRIPTOR_HANDLE srvCPU = srvManager_->GetCPUHandle(srvIndex_);
+			srvCpuHandle_ = srvManager_->GetCPUHandle(srvIndex_);
 			srvGpuHandle_ = static_cast<CD3DX12_GPU_DESCRIPTOR_HANDLE>(srvManager_->GetGPUHandle(srvIndex_));
-			device_->CreateShaderResourceView(resource_.Get(), &srvDesc, srvCPU);
+			device_->CreateShaderResourceView(resource_.Get(), &srvDesc, srvCpuHandle_);
 
 			isCreated_ = true;
 		}
@@ -109,13 +108,7 @@ namespace GameEngine {
 			cmdList->CopyBufferRegion(resource_.Get(), 0, stagingBuffer.Get(), 0, sizeInBytes);
 
 			// リソースの状態を遷移
-			D3D12_RESOURCE_BARRIER barrier = {};
-			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-			barrier.Transition.pResource = resource_.Get();
-			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
-			barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-			cmdList->ResourceBarrier(1, &barrier);
+			TransitionResource(cmdList, resource_.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
 			// リソースの破棄を登録する
 			ResourceGarbageCollector::GetInstance().Add(stagingBuffer);
@@ -133,9 +126,9 @@ namespace GameEngine {
 				srvDesc.Buffer.StructureByteStride = sizeof(T);
 				srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 
-				D3D12_CPU_DESCRIPTOR_HANDLE srvCPU = srvManager_->GetCPUHandle(srvIndex_);
+				srvCpuHandle_ = srvManager_->GetCPUHandle(srvIndex_);
 				srvGpuHandle_ = static_cast<CD3DX12_GPU_DESCRIPTOR_HANDLE>(srvManager_->GetGPUHandle(srvIndex_));
-				device_->CreateShaderResourceView(resource_.Get(), &srvDesc, srvCPU);
+				device_->CreateShaderResourceView(resource_.Get(), &srvDesc, srvCpuHandle_);
 
 			}
 			
@@ -171,22 +164,14 @@ namespace GameEngine {
 		// 頂点数
 		uint32_t GetTotalVertices() const { return totalVertices_; }
 
-		uint32_t GetSrvIndex() const { return srvIndex_; }
-		CD3DX12_GPU_DESCRIPTOR_HANDLE GetSrvGpuHandle() const { return srvGpuHandle_; }
-
 		uint32_t GetUAVIndex() const { return uavIndex_; }
 		CD3DX12_GPU_DESCRIPTOR_HANDLE GetUAVGpuHandle() const { return uavGpuHandle_; }
 
 		// uavにリソース状態を遷移
 		void TransitionUAV(ID3D12GraphicsCommandList4* cmdList) {
 			if (!isSrvState_) { return; }
-			D3D12_RESOURCE_BARRIER barrier{};
-			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-			barrier.Transition.pResource = resource_.Get();
-			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
-			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-			barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-			cmdList->ResourceBarrier(1, &barrier);
+			// 遷移
+			TransitionResource(cmdList, resource_.Get(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 
 			isSrvState_ = false;
 		}
@@ -194,13 +179,8 @@ namespace GameEngine {
 		// srvにリソースを遷移
 		void TransitionSRV(ID3D12GraphicsCommandList4* cmdList) {
 			if (isSrvState_) { return; }
-			D3D12_RESOURCE_BARRIER barrier{};
-			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-			barrier.Transition.pResource = resource_.Get();
-			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
-			barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-			cmdList->ResourceBarrier(1, &barrier);
+			// 遷移
+			TransitionResource(cmdList, resource_.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
 			isSrvState_ = true;
 		}
@@ -212,9 +192,6 @@ namespace GameEngine {
 		T* vertexData_ = nullptr;
 		// 頂点数
 		uint32_t totalVertices_ = 0;
-
-		uint32_t srvIndex_ = 0;
-		CD3DX12_GPU_DESCRIPTOR_HANDLE srvGpuHandle_{};
 
 		uint32_t uavIndex_ = 0;
 		CD3DX12_GPU_DESCRIPTOR_HANDLE uavGpuHandle_{};

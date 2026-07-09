@@ -228,7 +228,7 @@ void Animator::UpdateCompute() {
 		auto* outputBuffer = skeleton->GetOutputVertexBuffer(i);
 		outputBuffer->TransitionUAV(commandList_);
 
-		commandList_->SetComputeRootDescriptorTable(0, skinCluster_->wellBuffer.GetSrvHandleGPU()); // 共通パレット
+		commandList_->SetComputeRootDescriptorTable(0, skinCluster_->wellBuffer.GetSrvGpuHandle()); // 共通パレット
 		commandList_->SetComputeRootDescriptorTable(1, meshes[i]->GetVertexBuffer().GetSrvGpuHandle());
 		commandList_->SetComputeRootDescriptorTable(2, skeleton->GetInfluenceBuffer(i)->GetSrvGpuHandle()); // メッシュ固有
 		commandList_->SetComputeRootDescriptorTable(3, outputBuffer->GetUAVGpuHandle());

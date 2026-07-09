@@ -31,6 +31,13 @@ namespace GameEngine {
             float weightMax; // 重みの上限
             float pad[2];
         };
+
+        struct PerView
+        {
+            Matrix4x4 viewProjection;
+            Matrix4x4 billboardMatrix;
+        };
+
     public:
         RenderQueue();
         ~RenderQueue() = default;
@@ -74,6 +81,9 @@ namespace GameEngine {
         // wboitリソースを取得
         GpuResource* GetWboitResource() { return &wboitData_; }
 
+        // Csパーティクル用のカメラリソース
+        GpuResource* GetPerViewResource() { return &perViewData_; }
+
         // 背景画像ハンドルを設定する
         void SetSkyboxTexture(const uint32_t& texture) {
             skyboxTextureIndex_ = texture;
@@ -95,6 +105,8 @@ namespace GameEngine {
         void SubmitInstancing(const Model* model,uint32_t numInstances, WorldTransforms& worldTransforms, const float& alpha = 1.0f, BlendMode blendMode = BlendMode::kBlendModeNormal, const GpuResource* material = nullptr, const std::string& passName = "DefaultPass");
 
         void SubmitInstancingWboit(const Model* model,uint32_t numInstances, WorldTransforms& worldTransforms, const float& alpha = 1.0f, BlendMode blendMode = BlendMode::kBlendModeNormal, const GpuResource* material = nullptr, const std::string& passName = "WBOITAccumulatePass");
+
+        void SubmitParticleCS(const Model* model, uint32_t numInstances, SrvResource* particle, const float& alpha = 1.0f, const std::string& passName = "DefaultPass");
 
         /// スケルタルアニメーション
         void SubmitAnimation(const Model* model, WorldTransform& worldTransform, const float& alpha = 1.0f, const GpuResource* material = nullptr, const std::string& passName = "DefaultPass");
@@ -163,6 +175,8 @@ namespace GameEngine {
 
         // wboitデータ
         ConstantBuffer<WBOITData> wboitData_;
+        // パーティクル用のデータ
+        ConstantBuffer<PerView> perViewData_;
 
         // デバックカメラを使用するか
         bool useDebugCamera_ = false;

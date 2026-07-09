@@ -65,6 +65,8 @@ void SceneRenderManager::Initialize(ID3D12GraphicsCommandList4* commandList, Srv
     RegisterPSO("wboit3D", psoManager);
     RegisterPSO("wboitResolve", psoManager);
 
+    RegisterPSO("CSParticle3D", psoManager);
+
     // レイトレとラスタライズの合成用
     RegisterPSO("LightingComposite", psoManager);
     // 深度コピー用
@@ -150,6 +152,10 @@ void SceneRenderManager::Execute3dRequest(const Draw3dRequest& request) {
 
     case Draw3dType::InstancingWboit:
         ModelRenderer::DrawWboitInstancing(request.model, request.numInstances, *request.worldTransforms, renderQueue_->GetWboitResource(), request.material);
+        break;
+
+    case Draw3dType::ParticleCS:
+        ModelRenderer::DrawParticleCS(request.model, request.numInstances, request.particleCsResource, renderQueue_->GetPerViewResource());
         break;
 
     case Draw3dType::Animation:

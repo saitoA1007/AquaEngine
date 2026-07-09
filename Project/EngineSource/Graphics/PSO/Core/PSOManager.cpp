@@ -576,6 +576,37 @@ void PSOManager::DefaultLoadPSO() {
     wboitRootSigBuilder.CreateRootSignature();
     RegisterPSO("wboit3D", wboit3D, &wboitRootSigBuilder, &inputLayoutBuilder);
 
+    // パーティクル用のコンピュートPSO設定
+    {
+        CreatePSOData computeParticle;
+        computeParticle.rootSigName = "ComputeParticle";
+        computeParticle.csPath = L"Resources/Shaders/CS/Particle.CS.hlsl";
+        RootSignatureBuilder particleCsRs;
+        particleCsRs.Initialize(device_);
+        particleCsRs.AddUAVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
+        particleCsRs.CreateRootSignature();
+        RegisterComputePSO("ComputeParticle", computeParticle, &particleCsRs);
+    }
+
+    // CSパーティクル描画用PSO
+    {
+        CreatePSOData CSParticle3D;
+        CSParticle3D.rootSigName = "CSParticle";
+        CSParticle3D.vsPath = L"Resources/Shaders/CS/ParticleC.VS.hlsl";
+        CSParticle3D.psPath = L"Resources/Shaders/CS/ParticleC.PS.hlsl";
+        CSParticle3D.drawMode = DrawModel::FillFront;
+        CSParticle3D.blendMode = { BlendMode::kBlendModeNormalAndSaveObjectAlpha };
+        CSParticle3D.isDepthEnable = true;
+        RootSignatureBuilder CsParticleRs;
+        CsParticleRs.Initialize(device_);
+        CsParticleRs.AddSRVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX);
+        CsParticleRs.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX);
+        CsParticleRs.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 0, D3D12_SHADER_VISIBILITY_PIXEL);
+        CsParticleRs.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
+        CsParticleRs.CreateRootSignature();
+        RegisterPSO("CSParticle3D", CSParticle3D, &CsParticleRs, &inputLayoutBuilder);
+    }
+
     LogManager::GetInstance().Log("Default PSOs loaded");
 }
 

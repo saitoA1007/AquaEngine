@@ -7,6 +7,7 @@
 #include "ModelRenderer.h"
 #include "CoreSubsystem.h"
 #include "Animator.h"
+#include "ParticleBehaviorGPU.h"
 using namespace GameEngine;
 
 void GraphicsSubsystem::Initialize() {
@@ -87,22 +88,14 @@ void GraphicsSubsystem::Initialize() {
     ModelRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager());
     // アニメーション用の静的初期化
     Animator::StaticInitialize(graphicsDevice_->GetCommandList(), psoManager_.get());
+    // Csパーティクル用
+    ParticleBehaviorGPU::StaticInitialize(graphicsDevice_->GetCommandList(), psoManager_.get());
 }
 
 void GraphicsSubsystem::InitializePSO() {
     // CopyPSOの初期化
     copyPSO_ = std::make_unique<CopyPSO>();
     copyPSO_->Initialize(graphicsDevice_->GetDevice(), L"Resources/Shaders/PostEffect/FullScreen.VS.hlsl", L"Resources/Shaders/PostEffect/Copy.PS.hlsl", dxc_.get());
-
-    /// PostProcessのPSOを初期化
-
-    // BloomPSOの初期化
-    bloomPSO_ = std::make_unique<BloomPSO>();
-    bloomPSO_->Initialize(graphicsDevice_->GetDevice(), L"Resources/Shaders/PostEffect/Bloom.VS.hlsl", dxc_.get(),
-        L"Resources/Shaders/PostEffect/HighLumMask.PS.hlsl",
-        L"Resources/Shaders/PostEffect/Bloom.PS.hlsl",
-        L"Resources/Shaders/PostEffect/BloomResult.PS.hlsl",
-        L"Resources/Shaders/PostEffect/BloomComposite.hlsl");
 }
 
 void GraphicsSubsystem::Finalize() {

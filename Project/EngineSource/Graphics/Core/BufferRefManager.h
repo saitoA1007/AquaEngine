@@ -50,7 +50,7 @@ namespace GameEngine {
 		BufferRef* GetBufferRef(const uint32_t& index);
 
 		// bufferRefのGPUハンドルを取得
-		const CD3DX12_GPU_DESCRIPTOR_HANDLE& GetSrvHandleGPU() const { return bufferRefs_.GetSrvHandleGPU(); }
+		const CD3DX12_GPU_DESCRIPTOR_HANDLE& GetSrvHandleGPU() const { return bufferRefs_.GetSrvGpuHandle(); }
 	private:
 		BufferRefManager(const BufferRefManager&) = delete;
 		BufferRefManager& operator=(const BufferRefManager&) = delete;

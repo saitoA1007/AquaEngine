@@ -1,20 +1,20 @@
 #include"ParticleCS.hlsli"
 
-StructuredBuffer<Particle> gParticles : register(t0);
+StructuredBuffer<ParticleCS> gParticles : register(t0);
 ConstantBuffer<PerView> gPerView : register(b0);
 
 struct VertexShaderInput
 {
-    float32_t4 position : POSITION0;
-    float32_t2 texcoord : TEXCOORD0;
-    float32_t3 normal : NORMAL0;
+    float4 position : POSITION0;
+    float2 texcoord : TEXCOORD0;
+    float3 normal : NORMAL0;
 };
 
-VertexShaderOutput main(VertexShaderInput input, uint32_t instanceId : SV_InstanceID)
+VertexShaderOutput main(VertexShaderInput input, uint instanceId : SV_InstanceID)
 {
     VertexShaderOutput output;
-    Particle particle = gParticles[instanceId];
-    float32_t4x4 worldMatrix = gParticles[instanceId]; // worldMatrixを作る
+    ParticleCS particle = gParticles[instanceId];
+    float4x4 worldMatrix = gPerView.billboardMatrix; // worldMatrixを作る
     worldMatrix[0] *= particle.scale.x;
     worldMatrix[1] *= particle.scale.y;
     worldMatrix[2] *= particle.scale.z;

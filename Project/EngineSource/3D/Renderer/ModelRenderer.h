@@ -59,6 +59,8 @@ namespace GameEngine {
 
 		static void DrawWboitInstancing(const Model* model, const uint32_t& numInstance, WorldTransforms& worldTransforms, const GpuResource* wboit,const GpuResource* material = nullptr);
 
+		static void DrawParticleCS(const Model* model, const uint32_t& numInstance, const SrvResource* particle, const GpuResource* camera);
+
 		/// <summary>
 		/// グリッドを描画
 		/// </summary>
