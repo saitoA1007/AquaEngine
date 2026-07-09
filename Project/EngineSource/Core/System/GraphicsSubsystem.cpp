@@ -7,6 +7,7 @@
 #include "ModelRenderer.h"
 #include "CoreSubsystem.h"
 #include "Animator.h"
+#include "ParticleBehaviorGPU.h"
 using namespace GameEngine;
 
 void GraphicsSubsystem::Initialize() {
@@ -87,6 +88,8 @@ void GraphicsSubsystem::Initialize() {
     ModelRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager());
     // アニメーション用の静的初期化
     Animator::StaticInitialize(graphicsDevice_->GetCommandList(), psoManager_.get());
+    // Csパーティクル用
+    ParticleBehaviorGPU::StaticInitialize(graphicsDevice_->GetCommandList(), psoManager_.get());
 }
 
 void GraphicsSubsystem::InitializePSO() {

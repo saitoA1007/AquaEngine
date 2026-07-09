@@ -36,12 +36,19 @@ void RenderQueue::Initialize() {
     wboitData->depthPow = 4.0f; // 深度感度指数
     wboitData->weightMin = 0.01f; // 重みの下限
     wboitData->weightMax = 1000.0f; // 重みの上限
+
+    // CSパーティクル用
+    perViewData_.Create();
+    perViewData_.GetData()->billboardMatrix = Matrix4x4::MakeIdentity();
+    perViewData_.GetData()->viewProjection = Matrix4x4::MakeIdentity();
 }
 
 void RenderQueue::Update() {
     // カメラを設定する
     if (cameraPtr_ != nullptr) {
         mainCamera_.SetCamera(*cameraPtr_);
+        perViewData_.GetData()->viewProjection = mainCamera_.GetVPMatrix();
+        perViewData_.GetData()->billboardMatrix = mainCamera_.GetWorldMatrix();
     }
 
     // ライトの更新
@@ -154,6 +161,24 @@ void RenderQueue::SubmitInstancingWboit(const Model* model, uint32_t numInstance
     request.numInstances = numInstances;
     request.worldTransforms = &worldTransforms;
     request.material = material;
+
+    if (alpha == 1.0f) {
+        // 不透明描画に登録
+        draw3dQueueList_[passName][request.layer][Get3dPsoName(request.type)].push_back(request);
+    } else {
+        // 半透明描画に登録
+        translucentDrawQueueList_[passName].push_back(request);
+    }
+}
+
+void RenderQueue::SubmitParticleCS(const Model* model, uint32_t numInstances, SrvResource* particle, const float& alpha, const std::string& passName) {
+    Draw3dRequest request;
+    request.layer = RenderLayer::Opaque;
+    request.type = Draw3dType::ParticleCS;
+    request.passName = passName;
+    request.model = model;
+    request.numInstances = numInstances;
+    request.particleCsResource = particle;
 
     if (alpha == 1.0f) {
         // 不透明描画に登録
@@ -309,6 +334,7 @@ const char* RenderQueue::Get3dPsoName(Draw3dType type) {
     case Draw3dType::Instancing: { return "Instancing3D"; }
     case Draw3dType::InstancingAdd: { return "AdditiveInstancing3D"; }
     case Draw3dType::InstancingWboit: { return "wboit3D"; }
+    case Draw3dType::ParticleCS: { return "CSParticle3D"; }
     case Draw3dType::Animation: { return "Animation"; }
     case Draw3dType::Skybox: { return "Skybox"; }
     case Draw3dType::ShadowMap: { return "ShadowMap"; }

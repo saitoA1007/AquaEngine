@@ -10,7 +10,7 @@ namespace GameEngine {
 
 	class ParticleBehaviorGPU : public IGameObject {
 	public:
-		ParticleBehaviorGPU(const std::string& name, uint32_t maxNum);
+		ParticleBehaviorGPU(const std::string& name, uint32_t maxNum, Model* model);
 		~ParticleBehaviorGPU() = default;
 
 		/// <summary>
@@ -37,9 +37,12 @@ namespace GameEngine {
 		// パーティクルの名前
 		std::string name_;
 
+		Model* model_ = nullptr;
+
+		uint32_t maxNum_ = 0;
+
 		// パーティクルデータ
 		StructuredBuffer<ParticleCS> particleBuffer_;
-
 	};
 }
 

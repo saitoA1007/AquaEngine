@@ -9,14 +9,16 @@ ID3D12PipelineState* ParticleBehaviorGPU::pipelineState_ = nullptr;
 void ParticleBehaviorGPU::StaticInitialize(ID3D12GraphicsCommandList4* commandList, PSOManager* psoManager) {
 	commandList_ = commandList;
 
-	auto psoData = psoManager->GetDrawPsoData("ComputeAnimation");
+	auto psoData = psoManager->GetDrawPsoData("ComputeParticle");
 	pipelineState_ = psoData.graphicsPipelineState;
 	rootSignature_ = psoData.rootSignature;
 }
 
-ParticleBehaviorGPU::ParticleBehaviorGPU(const std::string& name, uint32_t maxNum) {
+ParticleBehaviorGPU::ParticleBehaviorGPU(const std::string& name, uint32_t maxNum, Model* model) {
 
 	name_ = name;
+	model_ = model;
+	maxNum_ = maxNum;
 
 	// パーティクルの数
 	std::vector<ParticleCS> particleData;
@@ -46,4 +48,6 @@ void ParticleBehaviorGPU::Update() {
 
 void ParticleBehaviorGPU::Draw() {
 
+	// パーティクルを描画
+	renderQueue_->SubmitParticleCS(model_, maxNum_, &particleBuffer_, 0.0f);
 }

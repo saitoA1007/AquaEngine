@@ -8,6 +8,7 @@ namespace GameEngine {
     class WorldTransform;
     class WorldTransforms;
     class GpuResource;
+    class SrvResource;
     class DebugRenderer;
 
     // 描画レイヤー（実行優先順位。数値が小さいほど先に描画）
@@ -29,6 +30,7 @@ namespace GameEngine {
         Instancing,     // インスタンシング描画用
         InstancingAdd,
         InstancingWboit,
+        ParticleCS,     // GPUパーティクル
         Animation,      // アニメーション描画用
         Skybox,         // スカイボックスの描画用
         ShadowMap,      // シャドウマップ用
@@ -55,6 +57,9 @@ namespace GameEngine {
 
         // マテリアル
         const GpuResource* material = nullptr;
+
+        // GPUパーティクル
+        const SrvResource* particleCsResource = nullptr;
 
         // デバック用のラインデータ
         const DebugRenderer* debugRenderer_ = nullptr;
