@@ -14,7 +14,15 @@ void ParticleBehaviorGPU::StaticInitialize(ID3D12GraphicsCommandList4* commandLi
 	rootSignature_ = psoData.rootSignature;
 }
 
-ParticleBehaviorGPU::ParticleBehaviorGPU() {
+ParticleBehaviorGPU::ParticleBehaviorGPU(const std::string& name, uint32_t maxNum) {
+
+	name_ = name;
+
+	// パーティクルの数
+	std::vector<ParticleCS> particleData;
+	particleData.resize(maxNum);
+
+	particleBuffer_.Create(commandList_, particleData);
 
 }
 
@@ -27,21 +35,13 @@ void ParticleBehaviorGPU::Update() {
 	commandList_->SetComputeRootSignature(rootSignature_);
 	commandList_->SetPipelineState(pipelineState_);
 
-	//auto* skeleton = model_->GetSkeleton();
-	//const auto& meshes = model_->GetMeshes();
-	//
-	//auto* outputBuffer = skeleton->GetOutputVertexBuffer(i);
-	//outputBuffer->TransitionUAV(commandList_);
-	//
-	//commandList_->SetComputeRootDescriptorTable(0, skinCluster_->wellBuffer.GetSrvHandleGPU()); // 共通パレット
-	//commandList_->SetComputeRootDescriptorTable(1, meshes[i]->GetVertexBuffer().GetSrvGpuHandle());
-	//commandList_->SetComputeRootDescriptorTable(2, skeleton->GetInfluenceBuffer(i)->GetSrvGpuHandle()); // メッシュ固有
-	//commandList_->SetComputeRootDescriptorTable(3, outputBuffer->GetUAVGpuHandle());
-	//commandList_->SetComputeRootConstantBufferView(4, skeleton->GetConstantBuffer(i)->GetGpuVirtualAddress());
-	//
-	//commandList_->Dispatch(UINT(skeleton->GetVerticesNum(i) + 1023) / 1024, 1, 1);
-	//
-	//outputBuffer->TransitionSRV(commandList_);
+	particleBuffer_.TransitionUAV(commandList_);
+
+	// パーティクルを更新
+	commandList_->SetComputeRootDescriptorTable(0, particleBuffer_.GetUAVGpuHandle());	
+	commandList_->Dispatch(1024, 1, 1);
+	
+	particleBuffer_.TransitionSRV(commandList_);
 }
 
 void ParticleBehaviorGPU::Draw() {

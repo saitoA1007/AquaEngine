@@ -1,5 +1,7 @@
 #pragma once
 #include "IGameObject.h"
+#include "StructuredBuffer.h"
+#include "ParticleData.h"
 
 namespace GameEngine {
 
@@ -8,7 +10,7 @@ namespace GameEngine {
 
 	class ParticleBehaviorGPU : public IGameObject {
 	public:
-		ParticleBehaviorGPU();
+		ParticleBehaviorGPU(const std::string& name, uint32_t maxNum);
 		~ParticleBehaviorGPU() = default;
 
 		/// <summary>
@@ -32,6 +34,11 @@ namespace GameEngine {
 		static ID3D12RootSignature* rootSignature_;
 		static ID3D12PipelineState* pipelineState_;
 
+		// パーティクルの名前
+		std::string name_;
+
+		// パーティクルデータ
+		StructuredBuffer<ParticleCS> particleBuffer_;
 
 	};
 }

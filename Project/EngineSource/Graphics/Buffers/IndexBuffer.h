@@ -2,7 +2,6 @@
 #include <vector>
 #include "SrvResource.h"
 #include "CreateBufferResource.h"
-#include "Externals/DirectXTex/d3dx12.h"
 
 namespace GameEngine {
 
@@ -56,9 +55,9 @@ namespace GameEngine {
 			srvDesc.Buffer.StructureByteStride = sizeof(uint32_t);
 			srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 
-			D3D12_CPU_DESCRIPTOR_HANDLE srvCPU = srvManager_->GetCPUHandle(srvIndex_);
+			srvCpuHandle_ = srvManager_->GetCPUHandle(srvIndex_);
 			srvGpuHandle_ = static_cast<CD3DX12_GPU_DESCRIPTOR_HANDLE>(srvManager_->GetGPUHandle(srvIndex_));
-			device_->CreateShaderResourceView(resource_.Get(), &srvDesc, srvCPU);
+			device_->CreateShaderResourceView(resource_.Get(), &srvDesc, srvCpuHandle_);
 
 			isCreated_ = true;
 		}
@@ -69,16 +68,11 @@ namespace GameEngine {
 		// インデックス数
 		uint32_t GetTotalIndices() const { return totalIndices_; }
 
-		uint32_t GetSrvIndex() const { return srvIndex_; }
-		CD3DX12_GPU_DESCRIPTOR_HANDLE GetSrvGpuHandle() const { return srvGpuHandle_; }
 	private:
 		// インデックスバッファビュー
 		D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
 		// 頂点数
 		uint32_t totalIndices_ = 0;
-
-		uint32_t srvIndex_ = 0;
-		CD3DX12_GPU_DESCRIPTOR_HANDLE srvGpuHandle_{};
 
 		bool isCreated_ = false;
 	};

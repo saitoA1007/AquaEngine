@@ -24,6 +24,17 @@ namespace GameEngine {
 		bool IsAlive() const { return 1.0f <= currentTime; }
 	};
 
+	// GPU用のパーティクルデータ
+	struct ParticleCS
+	{
+		Vector3 translate;
+		Vector3 scale;
+		float lifeTime;
+		Vector3 velocity;
+		float currentTime;
+		Vector4 color;
+	};
+
 	// 形状
 	enum class EmitShapeType {
 		Point,       // 点

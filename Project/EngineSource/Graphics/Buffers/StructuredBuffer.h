@@ -2,7 +2,6 @@
 #include "SrvResource.h"
 #include "CreateBufferResource.h"
 #include "ResourceGarbageCollector.h"
-#include "Externals/DirectXTex/d3dx12.h"
 
 namespace GameEngine {
 
@@ -51,9 +50,9 @@ namespace GameEngine {
 			srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 			srvDesc.Buffer.NumElements = numElements_;
 			srvDesc.Buffer.StructureByteStride = sizeof(T);
-			srvHandleCPU_ = srvManager_->GetCPUHandle(srvIndex_);
-			srvHandleGPU_ = srvManager_->GetGPUHandle(srvIndex_);
-			device_->CreateShaderResourceView(resource_.Get(), &srvDesc, srvHandleCPU_);
+			srvCpuHandle_ = srvManager_->GetCPUHandle(srvIndex_);
+			srvGpuHandle_ = srvManager_->GetGPUHandle(srvIndex_);
+			device_->CreateShaderResourceView(resource_.Get(), &srvDesc, srvCpuHandle_);
 
 			isCreated_ = true;
 		}
@@ -78,9 +77,9 @@ namespace GameEngine {
 			srvDesc.Buffer.FirstElement = 0;
 			srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_RAW;
 			srvDesc.Buffer.NumElements = bufferSize / 4;
-			srvHandleCPU_ = srvManager_->GetCPUHandle(srvIndex_);
-			srvHandleGPU_ = srvManager_->GetGPUHandle(srvIndex_);
-			device_->CreateShaderResourceView(resource_.Get(), &srvDesc, srvHandleCPU_);
+			srvCpuHandle_ = srvManager_->GetCPUHandle(srvIndex_);
+			srvGpuHandle_ = srvManager_->GetGPUHandle(srvIndex_);
+			device_->CreateShaderResourceView(resource_.Get(), &srvDesc, srvCpuHandle_);
 
 			isCreated_ = true;
 		}
@@ -136,9 +135,9 @@ namespace GameEngine {
 				srvDesc.Buffer.StructureByteStride = sizeof(T);
 				srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
 
-				srvHandleCPU_ = srvManager_->GetCPUHandle(srvIndex_);
-				srvHandleGPU_ = static_cast<CD3DX12_GPU_DESCRIPTOR_HANDLE>(srvManager_->GetGPUHandle(srvIndex_));
-				device_->CreateShaderResourceView(resource_.Get(), &srvDesc, srvHandleCPU_);
+				srvCpuHandle_ = srvManager_->GetCPUHandle(srvIndex_);
+				srvGpuHandle_ = static_cast<CD3DX12_GPU_DESCRIPTOR_HANDLE>(srvManager_->GetGPUHandle(srvIndex_));
+				device_->CreateShaderResourceView(resource_.Get(), &srvDesc, srvCpuHandle_);
 			}
 
 			/// UAVの作成
@@ -165,9 +164,7 @@ namespace GameEngine {
 		}
 
 		T* GetData() const { return data_; }
-		const uint32_t& GetSrvIndex() const { return srvIndex_; }
 		uint32_t GetNumElements() const { return numElements_; }
-		const CD3DX12_GPU_DESCRIPTOR_HANDLE& GetSrvHandleGPU() const { return srvHandleGPU_; }
 
 		// uav
 		uint32_t GetUAVIndex() const { return uavIndex_; }
@@ -196,12 +193,6 @@ namespace GameEngine {
 
 		T* data_ = nullptr;
 		uint32_t numElements_ = 0;
-
-		uint32_t srvIndex_ = 0;
-		// CPUのシェーダリソースビューのハンドル
-		CD3DX12_CPU_DESCRIPTOR_HANDLE srvHandleCPU_;
-		// GPUのシェーダリソースビューのハンドル
-		CD3DX12_GPU_DESCRIPTOR_HANDLE srvHandleGPU_;
 
 		// uav
 		uint32_t uavIndex_ = 0;

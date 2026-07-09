@@ -166,6 +166,35 @@ void ModelRenderer::DrawWboitInstancing(const Model* model, const uint32_t& numI
 	}
 }
 
+void ModelRenderer::DrawParticleCS(const Model* model, const uint32_t& numInstance, const SrvResource* particle, const GpuResource* camera) {
+	// 描画するのが0以下の場合は早期リターン
+	if (numInstance <= 0) { return; }
+
+	// メッシュを取得
+	const std::vector<std::unique_ptr<Mesh>>& meshes = model->GetMeshes();
+
+	for (uint32_t i = 0; i < meshes.size(); ++i) {
+		commandList_->IASetVertexBuffers(0, 1, &meshes[i]->GetVertexBufferView());
+		commandList_->IASetIndexBuffer(&meshes[i]->GetIndexBufferView());
+		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		commandList_->SetGraphicsRootDescriptorTable(0, particle->GetSrvGpuHandle());
+		commandList_->SetGraphicsRootConstantBufferView(1, camera->GetGpuVirtualAddress());
+		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+
+		// マテリアルを設定
+		//const Material* drawMaterial = model->GetMaterial(meshes[i]->GetMaterialName());
+		//commandList_->SetGraphicsRootConstantBufferView(4, drawMaterial->GetGpuVirtualAddress());
+
+		if (meshes[i]->GetTotalIndices() != 0) {
+			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), numInstance, 0, 0, 0);
+		} else {
+			commandList_->DrawInstanced(meshes[i]->GetTotalVertices(), numInstance, 0, 0);
+		}
+	}
+
+}
+
 void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTransform, GpuResource* lightGroupResource, const GpuResource* material) {
 	
 	// メッシュを取得
@@ -194,7 +223,7 @@ void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTrans
 		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetGpuVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 
-		commandList_->SetGraphicsRootDescriptorTable(3, skeleton->GetSkinClusterData()->wellBuffer.GetSrvHandleGPU());
+		commandList_->SetGraphicsRootDescriptorTable(3, skeleton->GetSkinClusterData()->wellBuffer.GetSrvGpuHandle());
 		commandList_->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
 
 		commandList_->SetGraphicsRootConstantBufferView(5, lightGroupResource->GetGpuVirtualAddress());
