@@ -210,6 +210,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\3D\Model\ModelComponent.cpp" />
     <ClCompile Include="EngineSource\3D\ParticleSystem\ModulesControl.cpp" />
     <ClCompile Include="EngineSource\3D\Model\Skeleton.cpp" />
+    <ClCompile Include="EngineSource\3D\ParticleSystem\ParticleBehaviorGPU.cpp" />
     <ClCompile Include="EngineSource\3D\ParticleSystem\ParticleEmitModules.cpp" />
     <ClCompile Include="EngineSource\3D\ParticleSystem\ParticleUpdateModules.cpp" />
     <ClCompile Include="EngineSource\3D\Renderer\DebugRenderer.cpp" />
@@ -476,6 +477,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\3D\Material\IceMaterial.h" />
     <ClInclude Include="EngineSource\3D\Model\ModelComponent.h" />
     <ClInclude Include="EngineSource\3D\ParticleSystem\ModulesControl.h" />
+    <ClInclude Include="EngineSource\3D\ParticleSystem\ParticleBehaviorGPU.h" />
     <ClInclude Include="EngineSource\3D\ParticleSystem\ParticleEmitModules.h" />
     <ClInclude Include="EngineSource\3D\ParticleSystem\ParticleModules.h" />
     <ClInclude Include="EngineSource\3D\Model\Skeleton.h" />

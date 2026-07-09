@@ -40,9 +40,6 @@ ParticleBehavior::ParticleBehavior(const std::string& name, uint32_t maxNum, Tex
     debugParame_->Register("Rotate", main_.rotate, index++, subGroup);
     debugParame_->Register("Scale", main_.scale, index++, subGroup);
 
-    //subGroup = "Particle";
-    //index = 0;
-
     // 出現範囲を抑える
     if (maxNumInstance_ <= main_.spawnMaxCount) {
         main_.spawnMaxCount = maxNumInstance_;

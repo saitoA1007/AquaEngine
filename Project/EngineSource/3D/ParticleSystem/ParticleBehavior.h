@@ -29,6 +29,8 @@ namespace GameEngine{
 		// 描画処理
 		void Draw() override;
 
+	public:
+
 		/// <summary>
 		/// パーティクルの生成
 		/// </summary>
