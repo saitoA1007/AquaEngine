@@ -1,6 +1,7 @@
 #include "TestScene.h"
 #include "ImguiManager.h"
 #include "PostProcess/PostEffectData.h"
+#include "ParticleBehaviorGPU.h"
 using namespace GameEngine;
 
 TestScene::~TestScene() {}
@@ -46,6 +47,7 @@ TestScene::TestScene() {
 	effectModel_ = modelManager_->GetNameByModel("plane.obj");
 	effectModel_->SetDefaultIsEnableLight(false);
 	//gameObjectManager_->AddObject<ParticleBehavior>("HitAfterEffect", 32, textureManager_, effectModel_, &renderQueue_->GetMainCamera());
+	gameObjectManager_->AddObject<ParticleBehaviorGPU>("GpuParticle", 1024, effectModel_);
 
 	// 高ポリゴン氷
 	iceHighModel_ = modelManager_->GetNameByModel("ice_highPolygon.gltf");

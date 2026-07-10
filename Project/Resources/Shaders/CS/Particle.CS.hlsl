@@ -1,18 +1,37 @@
-#include"ParticleCS.hlsli"
+#include "ParticleCS.hlsli"
+#include "../RandomUtils.hlsli"
 
 static const uint kMaxParticles = 1024;
 RWStructuredBuffer<ParticleCS> gParticle : register(u0);
-[numthreads(1024, 1, 1)]
+RWStructuredBuffer<int> gFreeListIndex : register(u1);
+ConstantBuffer<EmitterSphere> gEmitter : register(b0);
+ConstantBuffer<PerFrame> gPerFrame : register(b1);
+
+[numthreads(1, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
-{
-    uint particleIndex = DTid.x;
-    if (particleIndex < kMaxParticles)
+{   
+    if (gEmitter.emit != 0)
     {
-        // Particle構造体の全要素を0で埋める
-        gParticle[particleIndex] = (ParticleCS) 0;
+        RandomGenerator generator;
+        generator.seed = (DTid + gPerFrame.time) * gPerFrame.time;
+        for (uint countIndex = 0; countIndex < gEmitter.count; ++countIndex)
+        {  
+            int particleIndex;
+            InterlockedAdd(gFreeListIndex[0], 1, particleIndex);
+            
+            if (particleIndex < kMaxParticles)
+            { 
+                // カウント分パーティクルを射出する
+                gParticle[particleIndex].scale = generator.Generate3d();
+                gParticle[particleIndex].translate = generator.Generate3d();
+                gParticle[particleIndex].color.rgb = generator.Generate3d();
+                gParticle[particleIndex].color.a = 1.0f;
+                
+                gParticle[particleIndex].velocity = generator.Generate3d();
+                
+                gParticle[particleIndex].lifeTime = 1.0f;
+                gParticle[particleIndex].currentTime = 0.0f;
+            }
+        }
     }
-    
-    gParticle[particleIndex] = (ParticleCS) 0;
-    gParticle[particleIndex].scale = float3(0.5f, 0.5f, 0.5f);
-    gParticle[particleIndex].color = float4(1.0f, 1.0f, 1.0f, 1.0f);
 }

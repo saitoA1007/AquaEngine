@@ -37,9 +37,6 @@ void ViewOptionsBar::Run() {
 		ImGui::EndMainMenuBar();
 	}
 
-	// デバックカメラを設定
-	renderQueue_->SetUseDebugCamera(isDebugView_);
-
 	// デバック
 	if (isDebugView_) {
 		// デバックカメラを操作
@@ -49,6 +46,9 @@ void ViewOptionsBar::Run() {
 		gridWorldTransform_.transform_.translate = Vector3(debugCamera_->GetTargetPosition().x, -0.1f, debugCamera_->GetTargetPosition().z);
 		gridWorldTransform_.UpdateTransformMatrix();
 	}
+
+	// デバックカメラを設定
+	renderQueue_->SetUseDebugCamera(isDebugView_, debugCamera_->GetVPMatrix(), debugCamera_->GetWorldMatrix());
 
 	// デバック描画
 	if (isDebugDraw_) {

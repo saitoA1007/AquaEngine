@@ -57,8 +57,22 @@ namespace GameEngine {
             debugCameraResource_ = cameraResource;  
         }
 
-        void SetUseDebugCamera(const bool& useDebugCamera) {
+        void SetUseDebugCamera(const bool& useDebugCamera,const Matrix4x4& vpMatrix4x4, const Matrix4x4& worldMatrix) {
             useDebugCamera_ = useDebugCamera;
+
+            if (useDebugCamera_) {
+                auto* perViewData = perViewData_.GetData();
+                perViewData->viewProjection = vpMatrix4x4;
+
+                // ビルボードの回転行列を作成
+                //Matrix4x4 backToFrontMatrix = Math::MakeRotateYMatrix(0.0f);
+                //Matrix4x4 billboardMatrix = backToFrontMatrix * worldMatrix;
+                //billboardMatrix.m[3][0] = 0.0f;
+                //billboardMatrix.m[3][1] = 0.0f;
+                //billboardMatrix.m[3][2] = 0.0f;
+
+                perViewData->billboardMatrix = worldMatrix;
+            }
         }
 
         const bool& GetUseDebugCamera() const { return useDebugCamera_; }

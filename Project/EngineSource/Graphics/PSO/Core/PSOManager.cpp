@@ -579,13 +579,28 @@ void PSOManager::DefaultLoadPSO() {
     // パーティクル用のコンピュートPSO設定
     {
         CreatePSOData computeParticle;
-        computeParticle.rootSigName = "ComputeParticle";
+        computeParticle.rootSigName = "EmitComputeParticle";
         computeParticle.csPath = L"Resources/Shaders/CS/Particle.CS.hlsl";
         RootSignatureBuilder particleCsRs;
         particleCsRs.Initialize(device_);
         particleCsRs.AddUAVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
+        particleCsRs.AddUAVDescriptorTable(1, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
+        particleCsRs.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_ALL);
+        particleCsRs.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_ALL);
         particleCsRs.CreateRootSignature();
-        RegisterComputePSO("ComputeParticle", computeParticle, &particleCsRs);
+        RegisterComputePSO("EmitComputeParticle", computeParticle, &particleCsRs);
+    }
+
+    {
+        CreatePSOData computeParticle;
+        computeParticle.rootSigName = "UpdateComputeParticle";
+        computeParticle.csPath = L"Resources/Shaders/CS/ParticleUpdate.CS.hlsl";
+        RootSignatureBuilder particleCsRs;
+        particleCsRs.Initialize(device_);
+        particleCsRs.AddUAVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
+        particleCsRs.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_ALL);
+        particleCsRs.CreateRootSignature();
+        RegisterComputePSO("UpdateComputeParticle", computeParticle, &particleCsRs);
     }
 
     // CSパーティクル描画用PSO
@@ -595,7 +610,7 @@ void PSOManager::DefaultLoadPSO() {
         CSParticle3D.vsPath = L"Resources/Shaders/CS/ParticleC.VS.hlsl";
         CSParticle3D.psPath = L"Resources/Shaders/CS/ParticleC.PS.hlsl";
         CSParticle3D.drawMode = DrawModel::FillFront;
-        CSParticle3D.blendMode = { BlendMode::kBlendModeNormalAndSaveObjectAlpha };
+        CSParticle3D.blendMode = { BlendMode::kBlendModeAddAndSaveObjectAlpha };
         CSParticle3D.isDepthEnable = true;
         RootSignatureBuilder CsParticleRs;
         CsParticleRs.Initialize(device_);

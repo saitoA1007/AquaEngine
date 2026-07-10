@@ -179,6 +179,15 @@ namespace GameEngine {
 			isSrvState_ = false;
 		}
 
+		// uavからuavへ
+		void BarrierUAVForUAV(ID3D12GraphicsCommandList4* cmdList) {
+			D3D12_RESOURCE_BARRIER barrier{};
+			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+			barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+			barrier.Transition.pResource = resource_.Get();
+			cmdList->ResourceBarrier(1, &barrier);
+		}
+
 		// srvにリソースを遷移
 		void TransitionSRV(ID3D12GraphicsCommandList4* cmdList) {
 			if (!enableUAV_ || isSrvState_) { return; }

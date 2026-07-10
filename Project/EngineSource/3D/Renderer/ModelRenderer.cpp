@@ -192,7 +192,6 @@ void ModelRenderer::DrawParticleCS(const Model* model, const uint32_t& numInstan
 			commandList_->DrawInstanced(meshes[i]->GetTotalVertices(), numInstance, 0, 0);
 		}
 	}
-
 }
 
 void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTransform, GpuResource* lightGroupResource, const GpuResource* material) {

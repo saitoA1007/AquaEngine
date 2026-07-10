@@ -1,12 +1,33 @@
 #pragma once
 #include "IGameObject.h"
 #include "StructuredBuffer.h"
+#include "ConstantBuffer.h"
 #include "ParticleData.h"
 
 namespace GameEngine {
 
 	// 前方宣言
 	class PSOManager;
+
+	// エミッター
+	struct EmitterSphere {
+		Vector3 translate; // 位置
+		float radius;	   // 射出半径
+		uint32_t count;	   // 射出数
+		float frequency;   // 射出間隔
+		float frequencyTime; // 射出間隔調整時間
+		uint32_t emit; // 射出許可
+	};
+
+	// 時間
+	struct PerFrame {
+		float time;
+		float deltaTime;
+	};
+
+	struct FreeCounter {
+		int32_t count;
+	};
 
 	class ParticleBehaviorGPU : public IGameObject {
 	public:
@@ -31,8 +52,11 @@ namespace GameEngine {
 
 	private:
 		static ID3D12GraphicsCommandList4* commandList_;
-		static ID3D12RootSignature* rootSignature_;
-		static ID3D12PipelineState* pipelineState_;
+		static ID3D12RootSignature* emitRootSignature_;
+		static ID3D12PipelineState* emitPipelineState_;
+
+		static ID3D12RootSignature* updateRootSignature_;
+		static ID3D12PipelineState* updatePipelineState_;
 
 		// パーティクルの名前
 		std::string name_;
@@ -43,6 +67,23 @@ namespace GameEngine {
 
 		// パーティクルデータ
 		StructuredBuffer<ParticleCS> particleBuffer_;
+
+		StructuredBuffer<FreeCounter> gFreeCounterBuffer_;
+
+		// エミッター
+		ConstantBuffer<EmitterSphere> emitterSphere_;
+
+		// 時間
+		ConstantBuffer<PerFrame> perFrame_;
+
+	private:
+
+		void EmitParticleDispatch();
+
+		void UpdateParticleDispatch();
+
+		void UpdateCompute();
+
 	};
 }
 
