@@ -39,16 +39,29 @@ void RenderQueue::Initialize() {
 
     // CSパーティクル用
     perViewData_.Create();
-    perViewData_.GetData()->billboardMatrix = Matrix4x4::MakeIdentity();
-    perViewData_.GetData()->viewProjection = Matrix4x4::MakeIdentity();
+    auto* perViewData = perViewData_.GetData();
+    perViewData->billboardMatrix = Matrix4x4::MakeIdentity();
+    perViewData->viewProjection = Matrix4x4::MakeIdentity();
 }
 
 void RenderQueue::Update() {
     // カメラを設定する
     if (cameraPtr_ != nullptr) {
         mainCamera_.SetCamera(*cameraPtr_);
-        perViewData_.GetData()->viewProjection = mainCamera_.GetVPMatrix();
-        perViewData_.GetData()->billboardMatrix = mainCamera_.GetWorldMatrix();
+
+        if (!useDebugCamera_) {
+            auto* perViewData = perViewData_.GetData();
+            perViewData->viewProjection = mainCamera_.GetVPMatrix();
+
+            // ビルボードの回転行列を作成
+            Matrix4x4 backToFrontMatrix = Math::MakeRotateYMatrix(0.0f);
+            Matrix4x4 billboardMatrix = backToFrontMatrix * mainCamera_.GetWorldMatrix();
+            billboardMatrix.m[3][0] = 0.0f;
+            billboardMatrix.m[3][1] = 0.0f;
+            billboardMatrix.m[3][2] = 0.0f;
+
+            perViewData->billboardMatrix = billboardMatrix;
+        }
     }
 
     // ライトの更新

@@ -15,6 +15,22 @@ struct PerView
     float4x4 billboardMatrix;
 };
 
+struct EmitterSphere
+{
+    float3 translate;
+    float radius;
+    uint count;
+    float frequency;
+    float frequencyTime;
+    uint emit;
+};
+
+struct PerFrame
+{
+    float time;
+    float deltaTime;
+};
+
 struct VertexShaderOutput
 {
     float4 position : SV_POSITION;

@@ -33,6 +33,8 @@ namespace GameEngine {
 		/// 要素数を指定してバッファを作成
 		/// </summary>
 		void Create(uint32_t numElements = 1, SrvHeapType type = SrvHeapType::Buffer) {
+			if (isCreated_) { return; }
+
 			numElements_ = numElements;
 
 			// リソースを作成
@@ -58,6 +60,8 @@ namespace GameEngine {
 		}
 
 		void CreateTypeless(uint32_t numElements = 1, SrvHeapType type = SrvHeapType::Buffer) {
+			if (isCreated_) { return; }
+
 			numElements_ = numElements;
 
 			// 4バイト境界に切り上げたサイズを計算
@@ -85,7 +89,8 @@ namespace GameEngine {
 		}
 
 		void Create(ID3D12GraphicsCommandList4* cmdList, const std::vector<T>& data, SrvHeapType type = SrvHeapType::Buffer) {
-			
+			if (isCreated_) { return; }
+
 			numElements_ = static_cast<uint32_t>(data.size());
 			size_t sizeInBytes = sizeof(T) * numElements_;
 
@@ -163,6 +168,63 @@ namespace GameEngine {
 			isSrvState_ = true;
 		}
 
+		void CreateForUAV(uint32_t numElements, SrvHeapType type = SrvHeapType::Buffer) {
+			if (isCreated_) { return; }
+
+			numElements_ = numElements;
+			size_t sizeInBytes = sizeof(T) * numElements_;
+
+			// 最初からuavとして作成
+			resource_ = CreateBufferResource(
+				device_,
+				sizeInBytes,
+				D3D12_HEAP_TYPE_DEFAULT,
+				D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+				D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS
+			);
+
+			/// SRVの作成
+			{
+				srvIndex_ = srvManager_->AllocateSrvIndex(type);
+
+				D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+				srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+				srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+				srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+				srvDesc.Buffer.FirstElement = 0;
+				srvDesc.Buffer.NumElements = numElements_;
+				srvDesc.Buffer.StructureByteStride = sizeof(T);
+				srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+
+				srvCpuHandle_ = srvManager_->GetCPUHandle(srvIndex_);
+				srvGpuHandle_ = static_cast<CD3DX12_GPU_DESCRIPTOR_HANDLE>(srvManager_->GetGPUHandle(srvIndex_));
+				device_->CreateShaderResourceView(resource_.Get(), &srvDesc, srvCpuHandle_);
+			}
+
+			/// UAVの作成
+			{
+				uavIndex_ = srvManager_->AllocateSrvIndex(type);
+
+				D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+				uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+				uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+				uavDesc.Buffer.FirstElement = 0;
+				uavDesc.Buffer.NumElements = numElements_;
+				uavDesc.Buffer.StructureByteStride = sizeof(T);
+				uavDesc.Buffer.CounterOffsetInBytes = 0;
+				uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
+
+				D3D12_CPU_DESCRIPTOR_HANDLE uavCPU = srvManager_->GetCPUHandle(uavIndex_);
+				uavGpuHandle_ = static_cast<CD3DX12_GPU_DESCRIPTOR_HANDLE>(srvManager_->GetGPUHandle(uavIndex_));
+				device_->CreateUnorderedAccessView(resource_.Get(), nullptr, &uavDesc, uavCPU);
+			}
+
+			// 状態フラグの設定
+			isCreated_ = true;
+			enableUAV_ = true;
+			isSrvState_ = false;
+		}
+
 		T* GetData() const { return data_; }
 		uint32_t GetNumElements() const { return numElements_; }
 
@@ -177,6 +239,15 @@ namespace GameEngine {
 			TransitionResource(cmdList, resource_.Get(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 
 			isSrvState_ = false;
+		}
+
+		// uavからuavへ
+		void BarrierUAVForUAV(ID3D12GraphicsCommandList4* cmdList) {
+			D3D12_RESOURCE_BARRIER barrier{};
+			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+			barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+			barrier.Transition.pResource = resource_.Get();
+			cmdList->ResourceBarrier(1, &barrier);
 		}
 
 		// srvにリソースを遷移
