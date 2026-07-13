@@ -10,26 +10,33 @@ void PostEffectManager::Initialize(ID3D12GraphicsCommandList* commandList, SrvMa
 
     // ヴィネットで描画するパス
     renderPassController_->AddPass("VignettingPass");
-    // ラジアルブラー
-    renderPassController_->AddPass("RadialBlurPass");
-    // アウトライン
-    renderPassController_->AddPass("RandomPass");
+    // ぼかし
+    renderPassController_->AddPass("GaussVerticalPass");
+    renderPassController_->AddPass("GaussHorizontalPass");
+    // 輝度マスク
+    renderPassController_->AddPass("HighLumMaskPass");
     // ブルーム
-    //renderPassController_->AddPass("BloomPass");
+    renderPassController_->AddPass("BloomPass");
 
     // 実行順序を設定
-    RegisterPassOrder({"RandomPass", "VignettingPass", "RadialBlurPass"});
+    RegisterPassOrder({"HighLumMaskPass", "GaussVerticalPass", "GaussHorizontalPass", "BloomPass", "VignettingPass"});
 
     // psoを登録
     RegisterPSO("Vignetting", psoManager);
-    RegisterPSO("RadialBlur", psoManager);
-    RegisterPSO("ScanLine", psoManager);
-    RegisterPSO("Random", psoManager);
+    //RegisterPSO("RadialBlur", psoManager);
+    //RegisterPSO("ScanLine", psoManager);
+    RegisterPSO("HighLumMask", psoManager);
+    RegisterPSO("GaussVertical", psoManager);
+    RegisterPSO("GaussHorizontal", psoManager);
+    RegisterPSO("Bloom", psoManager);
 
     // エフェクトを追加
     AddPostEffect<Vignetting>("VignettingPass", "Vignetting");
-    AddPostEffect<RadialBlur>("RadialBlurPass", "RadialBlur");
-    AddPostEffect<Random>("RandomPass", "Random");
+    AddPostEffect<HighLumMask>("HighLumMaskPass", "HighLumMask");
+    AddPostEffect<GaussVertical>("GaussVerticalPass", "GaussVertical");
+    AddPostEffect<GaussHorizontal>("GaussHorizontalPass", "GaussHorizontal");
+    auto* bloom = AddPostEffect<Bloom>("BloomPass", "Bloom");
+    bloom->SetGamePassIndex(renderPassController_->GetSrvIndex(renderPassController_->GetSceneFinalPass()));
 }
 
 void PostEffectManager::Execute() {

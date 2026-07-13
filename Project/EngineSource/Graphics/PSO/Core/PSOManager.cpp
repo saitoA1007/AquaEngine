@@ -650,17 +650,21 @@ void PSOManager::DefaultLoadPostEffectPSO() {
     rootSigBuilder.CreateRootSignature();
     RegisterPSO("Vignetting", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 
-    // スキャンラインを作成
-    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/ScanLine/ScanLine.PS.hlsl";
-    RegisterPSO("ScanLine", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 
-    // ラジアルブラーを作成
-    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/RadialBlur/RadialBlur.PS.hlsl";
-    RegisterPSO("RadialBlur", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
+    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/HighLumMask.PS.hlsl";
+    RegisterPSO("HighLumMask", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 
-    // ランダム
-    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/Random/Random.PS.hlsl";
-    RegisterPSO("Random", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
+    // 縦のぼかし
+    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/Smoothing/Gauss9x9Vertical.PS.hlsl";
+    RegisterPSO("GaussVertical", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
+
+    // 横のぼかし
+    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/Smoothing/Gauss9x9Horizontal.PS.hlsl";
+    RegisterPSO("GaussHorizontal", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
+
+    // 合成
+    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/Bloom.PS.hlsl";
+    RegisterPSO("Bloom", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 
     // ラスタライズとレイトレの描画を合成する
     defaultPostEffect.rootSigName = "LightingComposite";

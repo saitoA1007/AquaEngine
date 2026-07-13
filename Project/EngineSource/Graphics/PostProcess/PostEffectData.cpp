@@ -29,57 +29,61 @@ void RadialBlur::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvMan
     commandList->DrawInstanced(3, 1, 0, 0);
 }
 
-ScanLine::ScanLine() {
+HighLumMask::HighLumMask() {
     // 作成
     buffer_.Create();
-    buffer_.GetData()->interval = 96.0f;
-    buffer_.GetData()->speed = -2.0f;
-    buffer_.GetData()->time = 0.0f;
-    buffer_.GetData()->lineColor = { 0.3f,0.3f,0.3f };
+    // 標準偏差
+    buffer_.GetData()->highLumMask = 0.8f;
+
+    isActive_ = true;
 }
 
-void ScanLine::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
+void HighLumMask::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
     commandList->SetGraphicsRootDescriptorTable(0, srvManager->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
     commandList->SetGraphicsRootConstantBufferView(1, buffer_.GetGpuVirtualAddress());
     commandList->DrawInstanced(3, 1, 0, 0);
 }
 
-Grayscale::Grayscale() {
-    // 作成
-    buffer_.Create();
-}
-
-void Grayscale::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
-    commandList->SetGraphicsRootDescriptorTable(0, srvManager->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
-    commandList->SetGraphicsRootConstantBufferView(1, buffer_.GetGpuVirtualAddress());
-    commandList->DrawInstanced(3, 1, 0, 0);
-}
-
-GaussianBlur::GaussianBlur() {
+GaussVertical::GaussVertical() {
     // 作成
     buffer_.Create();
     // 標準偏差
     buffer_.GetData()->sd = 2.0f;
+
+    isActive_ = true;
 }
 
-void GaussianBlur::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
+void GaussVertical::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
     commandList->SetGraphicsRootDescriptorTable(0, srvManager->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
     commandList->SetGraphicsRootConstantBufferView(1, buffer_.GetGpuVirtualAddress());
     commandList->DrawInstanced(3, 1, 0, 0);
 }
 
-Random::Random() {
+GaussHorizontal::GaussHorizontal() {
     // 作成
     buffer_.Create();
-    buffer_.GetData()->timer = 0.0f;
+    // 標準偏差
+    buffer_.GetData()->sd = 2.0f;
+
+    isActive_ = true;
 }
 
-void Random::Update() {
-    // 時間経過
-    buffer_.GetData()->timer += FpsCounter::gameDeltaTime;
+void GaussHorizontal::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
+    commandList->SetGraphicsRootDescriptorTable(0, srvManager->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+    commandList->SetGraphicsRootConstantBufferView(1, buffer_.GetGpuVirtualAddress());
+    commandList->DrawInstanced(3, 1, 0, 0);
 }
 
-void Random::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
+Bloom::Bloom() {
+    // 作成
+    buffer_.Create();
+    // 標準偏差
+    buffer_.GetData()->intensity = 1.0f;
+
+    isActive_ = true;
+}
+
+void Bloom::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
     commandList->SetGraphicsRootDescriptorTable(0, srvManager->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
     commandList->SetGraphicsRootConstantBufferView(1, buffer_.GetGpuVirtualAddress());
     commandList->DrawInstanced(3, 1, 0, 0);

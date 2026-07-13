@@ -1,18 +1,24 @@
-#include"FullScreen.hlsli"
-#include"GaussianBlur.hlsli"
+#include "FullScreen.hlsli"
 
-Texture2D<float32_t4> gTexture : register(t0);
-Texture2D<float32_t4> gTexHighLum : register(t1);
-
+Texture2D<float4> gTexture[] : register(t0);
 SamplerState gSampler : register(s0);
+
+struct Material
+{
+    uint blurTextureHandle;
+    uint gameTextureHandle;
+    float intensity;
+    float pad;
+};
+ConstantBuffer<Material> gMaterial : register(b0);
 
 float4 main(VertexShaderOutput input) : SV_TARGET
 {
-    
-    float32_t w, h, levels;
-    gTexture.GetDimensions(0, w, h, levels);
-    float32_t dx = 1.0f / w;
-    float32_t dy = 1.0f / h;
-    
-    return Get3x3GaussianBlur(gTexHighLum, gSampler, input.texcoord, dx, dy, float32_t4(0, 0, 1, 1));
+    float4 texColor = gTexture[gMaterial.gameTextureHandle].Sample(gSampler, input.texcoord);
+    float4 result = texColor;
+	
+    float4 bloomColor = gTexture[gMaterial.blurTextureHandle].Sample(gSampler, input.texcoord);
+    result += bloomColor * gMaterial.intensity;
+
+    return result;
 }
