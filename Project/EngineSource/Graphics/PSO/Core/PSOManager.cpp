@@ -585,6 +585,7 @@ void PSOManager::DefaultLoadPSO() {
         particleCsRs.Initialize(device_);
         particleCsRs.AddUAVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
         particleCsRs.AddUAVDescriptorTable(1, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
+        particleCsRs.AddUAVDescriptorTable(2, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
         particleCsRs.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_ALL);
         particleCsRs.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_ALL);
         particleCsRs.CreateRootSignature();
@@ -598,6 +599,8 @@ void PSOManager::DefaultLoadPSO() {
         RootSignatureBuilder particleCsRs;
         particleCsRs.Initialize(device_);
         particleCsRs.AddUAVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
+        particleCsRs.AddUAVDescriptorTable(1, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
+        particleCsRs.AddUAVDescriptorTable(2, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
         particleCsRs.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_ALL);
         particleCsRs.CreateRootSignature();
         RegisterComputePSO("UpdateComputeParticle", computeParticle, &particleCsRs);

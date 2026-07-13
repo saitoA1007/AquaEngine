@@ -35,9 +35,17 @@ ParticleBehaviorGPU::ParticleBehaviorGPU(const std::string& name, uint32_t maxNu
 	// パーティクルデータを作成
 	particleBuffer_.Create(commandList_, particleData);
 
-	std::vector<FreeCounter> FreeCounterData;
+	std::vector<FreeListIndex> FreeCounterData;
 	FreeCounterData.resize(1);
-	gFreeCounterBuffer_.Create(commandList_, FreeCounterData);
+	FreeCounterData[0].count = maxNum - 1;
+	gFreeListIndexBuffer_.Create(commandList_, FreeCounterData);
+
+	std::vector<FreeList> freeListData;
+	freeListData.resize(maxNum);
+	for (uint32_t i = 0; i < maxNum; ++i) {
+		freeListData[i].index = i;
+	}
+	gFreeListBuffer_.Create(commandList_, freeListData);
 
 	// エミッターを作成
 	emitterSphere_.Create();
@@ -108,9 +116,10 @@ void ParticleBehaviorGPU::EmitParticleDispatch() {
 	commandList_->SetPipelineState(emitPipelineState_);
 
 	commandList_->SetComputeRootDescriptorTable(0, particleBuffer_.GetUAVGpuHandle());
-	commandList_->SetComputeRootDescriptorTable(1, gFreeCounterBuffer_.GetUAVGpuHandle());
-	commandList_->SetComputeRootConstantBufferView(2, emitterSphere_.GetGpuVirtualAddress());
-	commandList_->SetComputeRootConstantBufferView(3, perFrame_.GetGpuVirtualAddress());
+	commandList_->SetComputeRootDescriptorTable(1, gFreeListIndexBuffer_.GetUAVGpuHandle());
+	commandList_->SetComputeRootDescriptorTable(2, gFreeListBuffer_.GetUAVGpuHandle());
+	commandList_->SetComputeRootConstantBufferView(3, emitterSphere_.GetGpuVirtualAddress());
+	commandList_->SetComputeRootConstantBufferView(4, perFrame_.GetGpuVirtualAddress());
 	commandList_->Dispatch(1, 1, 1);
 }
 
@@ -119,6 +128,8 @@ void ParticleBehaviorGPU::UpdateParticleDispatch() {
 	commandList_->SetPipelineState(updatePipelineState_);
 
 	commandList_->SetComputeRootDescriptorTable(0, particleBuffer_.GetUAVGpuHandle());
-	commandList_->SetComputeRootConstantBufferView(1, perFrame_.GetGpuVirtualAddress());
+	commandList_->SetComputeRootDescriptorTable(1, gFreeListIndexBuffer_.GetUAVGpuHandle());
+	commandList_->SetComputeRootDescriptorTable(2, gFreeListBuffer_.GetUAVGpuHandle());
+	commandList_->SetComputeRootConstantBufferView(3, perFrame_.GetGpuVirtualAddress());
 	commandList_->Dispatch(1, 1, 1);
 }

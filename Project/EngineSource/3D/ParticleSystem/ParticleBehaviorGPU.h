@@ -25,8 +25,12 @@ namespace GameEngine {
 		float deltaTime;
 	};
 
-	struct FreeCounter {
+	struct FreeListIndex {
 		int32_t count;
+	};
+
+	struct FreeList {
+		uint32_t index;
 	};
 
 	class ParticleBehaviorGPU : public IGameObject {
@@ -68,7 +72,9 @@ namespace GameEngine {
 		// パーティクルデータ
 		StructuredBuffer<ParticleCS> particleBuffer_;
 
-		StructuredBuffer<FreeCounter> gFreeCounterBuffer_;
+		StructuredBuffer<FreeListIndex> gFreeListIndexBuffer_;
+
+		StructuredBuffer<FreeList> gFreeListBuffer_;
 
 		// エミッター
 		ConstantBuffer<EmitterSphere> emitterSphere_;
