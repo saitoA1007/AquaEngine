@@ -1112,14 +1112,16 @@
     <FxCompile Include="Resources\Shaders\Rasterize\WBOITAccumulate.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\WBOITResolve.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\Rasterize\WBOITAccumulate.VS.hlsl" />
-    <FxCompile Include="Resources\Shaders\PostEffect\Smoothing\BoxFilter3x3.PS.hlsl" />
-    <FxCompile Include="Resources\Shaders\PostEffect\Smoothing\BoxFilter5x5.PS.hlsl" />
-    <FxCompile Include="Resources\Shaders\PostEffect\Smoothing\GaussianFilter.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\Raytracing\ChsIceObject.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\OutLine\DepthOutLine.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\Dissolve\Dissolve.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\Random\Random.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\CS\ParticleUpdate.CS.hlsl" />
+    <FxCompile Include="Resources\Shaders\PostEffect\Smoothing\Gauss5x5Vertical.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\PostEffect\Smoothing\Gauss5x5Horizontal.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\PostEffect\Bloom.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\PostEffect\Smoothing\Gauss9x9Vertical.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\PostEffect\Smoothing\Gauss9x9Horizontal.PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Externals\imgui\ProggyClean.ttf" />

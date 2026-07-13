@@ -56,41 +56,16 @@ namespace GameEngine {
         ConstantBuffer<RadialBlurData> buffer_;
     };
 
-    /// <summary>
-    /// スキャンライン
-    /// </summary>
-    class ScanLine : public IPostEffect {
-    public:
-        struct alignas(16) ScanLineData {
-            float interval; // 間隔
-            float time; // 時間
-            float speed; // 速度
-            float pad;
-            Vector3 lineColor; // 線の色
-            uint32_t textureHandle; // 加工する画像
-        };
-    public:
-        ScanLine();
-
-        void Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) override;
-
-        void SetPassIndex(const uint32_t& index) override {
-            buffer_.GetData()->textureHandle = index;
-        }
-
-    private:
-        ConstantBuffer<ScanLineData> buffer_;
-    };
-
-    // グレースケール
-    class Grayscale : public IPostEffect {
-        struct GrayscaleData {
+    // 輝度マスク
+    class HighLumMask : public IPostEffect {
+        struct HighLumMaskData {
             uint32_t textureHandle;
-            float padding[3];
+            float highLumMask; // マスク範囲
+            float padding[2];
         };
 
     public:
-        Grayscale();
+        HighLumMask();
 
         void Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) override;
 
@@ -99,11 +74,11 @@ namespace GameEngine {
         }
 
     private:
-        ConstantBuffer<GrayscaleData> buffer_;
+        ConstantBuffer<HighLumMaskData> buffer_;
     };
 
-    // ぼかし
-    class GaussianBlur : public IPostEffect {
+    // 縦のぼかし
+    class GaussVertical : public IPostEffect {
         struct GaussianBlurData {
             uint32_t textureHandle;
             float sd; // 標準偏差
@@ -111,7 +86,7 @@ namespace GameEngine {
         };
 
     public:
-        GaussianBlur();
+        GaussVertical();
 
         void Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) override;
 
@@ -123,18 +98,16 @@ namespace GameEngine {
         ConstantBuffer<GaussianBlurData> buffer_;
     };
 
-    // ランダム
-    class Random : public IPostEffect {
-        struct RandomData {
+    // 横のぼかし
+    class GaussHorizontal : public IPostEffect {
+        struct GaussianBlurData {
             uint32_t textureHandle;
-            float timer;
+            float sd; // 標準偏差
             float padding[2];
         };
 
     public:
-        Random();
-
-        void Update() override;
+        GaussHorizontal();
 
         void Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) override;
 
@@ -143,6 +116,32 @@ namespace GameEngine {
         }
 
     private:
-        ConstantBuffer<RandomData> buffer_;
+        ConstantBuffer<GaussianBlurData> buffer_;
+    };
+
+    // ブルーム
+    class Bloom : public IPostEffect {
+        struct BloomData {
+            uint32_t blurTextureHandle;
+            uint32_t gameTextureHandle;
+            float intensity;
+            float pad;
+        };
+
+    public:
+        Bloom();
+
+        void Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) override;
+
+        void SetPassIndex(const uint32_t& index) override {
+            buffer_.GetData()->blurTextureHandle = index;
+        }
+
+        void SetGamePassIndex(uint32_t index) {
+            buffer_.GetData()->gameTextureHandle = index;
+        }
+
+    private:
+        ConstantBuffer<BloomData> buffer_;
     };
 }
