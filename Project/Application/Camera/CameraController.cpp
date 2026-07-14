@@ -47,13 +47,21 @@ void CameraController::Update() {
 	float dt60 = FpsCounter::deltaTime * FpsCounter::maxFrameCount;
 	
 	// カメラを切り替える
-	CameraState next = currentState_->GetNextState();
-	if (next != CameraState::kMaxCount && next != currentStateType_) {
-		ChangeState(next);
+	CameraCommonData& common = currentState_->GetCommonData();
+
+	// 内部からの切り替え
+	if (common.requestState.has_value()) {
+		ChangeState(common.requestState.value());
+		common.requestState = std::nullopt;
 	}
-	
+	// 外部からの切り替え
+	if (requestState.has_value()) {
+		ChangeState(requestState.value());
+		requestState = std::nullopt;
+	}
+
+	// 更新
 	currentState_->Update(dt60);
-	const CameraCommonData& common = currentState_->GetCommonData();
 	
 	// 補間
 	float actualTargetLerp = 1.0f - std::powf(1.0f - common.targetLerpRate, dt60);
