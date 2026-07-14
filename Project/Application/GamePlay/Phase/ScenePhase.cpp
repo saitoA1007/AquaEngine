@@ -5,11 +5,14 @@
 #include "Application/Enemy/BossEnemy.h"
 #include "Application/Camera/CameraController.h"
 #include "Application/Utils/TimeController.h"
+
 TitlePhase::TitlePhase(PhaseCommonData& commonData) : IScenePhase(commonData) {
 
 }
 
 void TitlePhase::Enter() {
+
+
 
 }
 
@@ -19,6 +22,48 @@ void TitlePhase::Update() {
 
 void TitlePhase::Exit() {
 
+}
+
+//=====================================================
+// チュートリアル
+//=====================================================
+
+TutorialPhase::TutorialPhase(PhaseCommonData& commonData, CameraController* cameraController, BossEnemy* bossEnemy,PlayUIManager* playUIManager) : IScenePhase(commonData) {
+
+	// カメラ管理を取得
+	cameraController_ = cameraController;
+
+	// ボスを取得
+	bossEnemy_ = bossEnemy;
+
+	// UIを朱徳
+	playUIManager_ = playUIManager;
+}
+
+void TutorialPhase::Enter() {
+
+	// UI表示
+	playUIManager_->SetIsDrawGamePlayUI(false);
+	playUIManager_->SetIsDrawPlayGuide(true);
+}
+
+void TutorialPhase::Update() {
+
+	if (bossEnemy_->IsBreakEgg()) {
+		playUIManager_->SetIsDrawGamePlayUI(false);
+		playUIManager_->SetIsDrawPlayGuide(false);
+	}
+
+	// ボスの入りのアニメーションが終わればプレイシーンに移行
+	if (BossState::kBattle == bossEnemy_->GetBossState()) {
+		commonData_.requestPhase = ScenePhase::kPlay;
+	}
+}
+
+void TutorialPhase::Exit() {
+	// 表示させる
+	playUIManager_->SetIsDrawGamePlayUI(true);
+	playUIManager_->SetIsDrawPlayGuide(true);
 }
 
 //===========================================
@@ -32,13 +77,11 @@ PlayPhase::PlayPhase(PhaseCommonData& commonData, Player* player, BossEnemy* bos
 	bossEnemy_ = bossEnemy;
 	// プレイUIを取得
 	playUIManager_ = playUIManager;
-	playUIManager_->SetActive(false);
 	// カメラ管理を取得
 	cameraController_ = cameraController;
 }
 
 void PlayPhase::Enter() {
-	playUIManager_->SetActive(true);
 	// 計測開始
 	playTimer_.Reset();
 	playTimer_.Start();

@@ -63,11 +63,14 @@ public:
 	EnterMovieCameraState(CameraController* controller, GameEngine::DebugParameter* param);
 
 	void Enter() override;
+
 	void Update(float dt60) override;
 	
 private:
 	
 private:
+
+
 
 };
 

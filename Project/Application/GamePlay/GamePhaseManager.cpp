@@ -8,13 +8,14 @@ GamePhaseManager::GamePhaseManager(GameEngine::InputCommand* inputCommand, Playe
 	commonData_.timeController_ = &timeController_;
 
 	phases_[ScenePhase::kTitle] = std::make_unique<TitlePhase>(commonData_);
+	phases_[ScenePhase::kTutorial] = std::make_unique<TutorialPhase>(commonData_, cameraController, bossEnemy, playUIManager);
 	phases_[ScenePhase::kPlay] = std::make_unique<PlayPhase>(commonData_, player, bossEnemy, playUIManager, cameraController);
 	phases_[ScenePhase::kClear] = std::make_unique<ClearPhase>(commonData_);
 }
 
 void GamePhaseManager::Initialize() {
 
-	commonData_.currentPhase = ScenePhase::kPlay;
+	commonData_.currentPhase = ScenePhase::kTutorial;
 
 	phases_[commonData_.currentPhase]->Enter();
 }

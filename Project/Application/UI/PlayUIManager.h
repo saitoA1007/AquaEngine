@@ -40,9 +40,26 @@ public:
 		letterBoxUI_->SetBarActive(isActive);
 	}
 
+	void SetIsDrawGamePlayUI(bool isDraw) {
+		isDrawGamePlayUI_ = isDraw;
+	}
+
+	void SetIsDrawPlayGuide(bool isDraw) {
+		isDrawPlayGuide_ = isDraw;
+	}
+
+	void SetIsDrawTutorialGuide(bool isDraw) {
+		isDrawTutorialGuide_ = isDraw;
+	}
+
 private:
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;
+
+	// 表示フラグ
+	bool isDrawPlayGuide_ = true;
+	bool isDrawTutorialGuide_ = true;
+	bool isDrawGamePlayUI_ = true;
 
 	// ボスのHpUI
 	std::unique_ptr<HpBarUI> bossHpBarUI_;

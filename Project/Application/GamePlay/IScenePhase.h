@@ -58,12 +58,6 @@ public:
     /// </summary>
     virtual void Exit() = 0;
 
-    /// <summary>
-    /// 終了したかどうか
-    /// </summary>
-    bool IsFinished() const { return isFinished_; }
-
 protected:
     PhaseCommonData& commonData_;
-    bool isFinished_ = false;
 };

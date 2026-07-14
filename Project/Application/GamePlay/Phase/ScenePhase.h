@@ -25,6 +25,30 @@ private:
 
 };
 
+// チュートリアル
+class TutorialPhase : public IScenePhase {
+public:
+    TutorialPhase(PhaseCommonData& commonData, CameraController* cameraController, BossEnemy* bossEnemy, PlayUIManager* playUIManager);
+    ~TutorialPhase() = default;
+
+    void Enter() override;
+
+    void Update() override;
+
+    void Exit() override;
+
+private:
+    // ボス
+    BossEnemy* bossEnemy_ = nullptr;
+
+    // UI
+    PlayUIManager* playUIManager_ = nullptr;
+
+    // カメラ管理処理
+    CameraController* cameraController_ = nullptr;
+
+};
+
 // プレイ
 class PlayPhase : public IScenePhase {
 public:

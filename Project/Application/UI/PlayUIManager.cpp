@@ -41,9 +41,18 @@ void PlayUIManager::Update() {
 }
 
 void PlayUIManager::Draw() {
+	// 黒帯を描画
 	letterBoxUI_->Draw();
-	bossHpBarUI_->Draw();
-	playerHpUI_->Draw();
-	renderQueue_->SubmitSprite(&bossNameSprite_);
-	renderQueue_->SubmitSprite(&playGuideSprite_);
+
+	if (isDrawGamePlayUI_) {
+		// ボスHpを描画
+		bossHpBarUI_->Draw();
+		renderQueue_->SubmitSprite(&bossNameSprite_);
+		// プレイヤーHpを描画
+		playerHpUI_->Draw();
+	}
+	
+	if (isDrawPlayGuide_) {
+		renderQueue_->SubmitSprite(&playGuideSprite_);
+	}
 }
