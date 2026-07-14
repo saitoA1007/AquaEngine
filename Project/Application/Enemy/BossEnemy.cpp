@@ -10,8 +10,11 @@
 
 using namespace GameEngine;
 
-BossEnemy::BossEnemy(GameEngine::Model* model, GameEngine::WorldTransform& playerWorld, GameEngine::AnimationManager* animationManager, BossRangedAttackManager* rangedAttackManager)
+BossEnemy::BossEnemy(GameEngine::Model* model, GameEngine::Model* eggModel, GameEngine::WorldTransform& playerWorld, GameEngine::AnimationManager* animationManager, BossRangedAttackManager* rangedAttackManager)
 	: modelComponent_(model) {
+
+	// 卵モデルを取得
+	eggModel_ = eggModel;
 
 	// 初期化
 	modelComponent_.worldTransform_.Initialize({ {3.0f,3.0f,3.0f},{0.0f,0.0f,0.0f},{0.0f,5.0f,0.0f} });

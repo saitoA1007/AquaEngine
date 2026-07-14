@@ -16,7 +16,7 @@ class BossRangedAttackManager;
 
 class BossEnemy : public GameEngine::IGameObject {
 public:
-	BossEnemy(GameEngine::Model* model, GameEngine::WorldTransform& playerWorld, GameEngine::AnimationManager* animationManager, BossRangedAttackManager* rangedAttackManager);
+	BossEnemy(GameEngine::Model* model, GameEngine::Model* eggModel, GameEngine::WorldTransform& playerWorld, GameEngine::AnimationManager* animationManager, BossRangedAttackManager* rangedAttackManager);
 	~BossEnemy() = default;
 
 	// 初期化処理
@@ -51,6 +51,9 @@ private:
 
 	// モデル
 	GameEngine::ModelComponent modelComponent_;
+
+	// 卵モデル
+	GameEngine::Model* eggModel_;
 
 	// 氷のマテリアル
 	std::vector<GameEngine::IceMaterial> iceMaterial_;
