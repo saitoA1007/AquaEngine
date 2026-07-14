@@ -10,7 +10,7 @@ BossStateIn::BossStateIn(BossStateCommonData& commonData) : stateCommonData_(com
 
 void BossStateIn::Enter() {
 	// 初期位置
-	stateCommonData_.worldTransform->transform_.translate = { 0.0f,8.0f,0.0f };
+	stateCommonData_.worldTransform->transform_.translate = { 0.0f,0.0f,0.0f };
 	stateCommonData_.worldTransform->transform_.rotate = { 0.0f,3.2f,0.0f };
 
 	// 初期化
@@ -19,6 +19,8 @@ void BossStateIn::Enter() {
 }
 
 void BossStateIn::Update() {
+
+	if (!stateCommonData_.isBreakEgg) { return; }
 
 	if (isMove_) {
 		timer_ += FpsCounter::gameDeltaTime / maxInTime_;
@@ -40,7 +42,7 @@ void BossStateIn::Update() {
 		}
 	} else {
 		// 待機タイマー
-		timer_ += FpsCounter::deltaTime / maxWaitTime_;
+		timer_ += FpsCounter::gameDeltaTime / maxWaitTime_;
 
 		if (timer_ >= 1.0f) {
 			stateCommonData_.bossStateRequest = BossState::kBattle;

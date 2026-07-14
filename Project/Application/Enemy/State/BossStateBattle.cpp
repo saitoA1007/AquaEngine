@@ -59,6 +59,12 @@ void BossStateBattle::Enter() {
 }
 
 void BossStateBattle::Update() {
+
+	// hpが0になれば撃破状態に遷移
+	if (stateCommonData_.hp_ <= 0) {
+		stateCommonData_.bossStateRequest = BossState::kOut;
+	}
+
 	// 切り替え処理
 	if (battleStatesTable_[currentBattleState_]->IsFinished()) {
 		// 終了処理をおこなう

@@ -10,11 +10,14 @@
 
 using namespace GameEngine;
 
-BossEnemy::BossEnemy(GameEngine::Model* model, GameEngine::WorldTransform& playerWorld, GameEngine::AnimationManager* animationManager, BossRangedAttackManager* rangedAttackManager)
+BossEnemy::BossEnemy(GameEngine::Model* model, GameEngine::Model* eggModel, GameEngine::WorldTransform& playerWorld, GameEngine::AnimationManager* animationManager, BossRangedAttackManager* rangedAttackManager)
 	: modelComponent_(model) {
 
+	// 卵モデルを取得
+	eggModel_ = eggModel;
+
 	// 初期化
-	modelComponent_.worldTransform_.Initialize({ {3.0f,3.0f,3.0f},{0.0f,0.0f,0.0f},{0.0f,5.0f,0.0f} });
+	modelComponent_.worldTransform_.Initialize({ {3.0f,3.0f,3.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
 
 	// 参照するマテリアルを変更
 	uint32_t meshNum = model->GetMeshes().size();
@@ -79,11 +82,18 @@ BossEnemy::BossEnemy(GameEngine::Model* model, GameEngine::WorldTransform& playe
 }
 
 void BossEnemy::Initialize() {
-	modelComponent_.worldTransform_.transform_.translate = { 0.0f,5.0f,0.0f };
+	modelComponent_.worldTransform_.transform_.translate = { 0.0f,0.0f,0.0f };
 	// アニメーション初期化
 	animator_->Initialize();
 
 	stateCommonData_.hp_ = maxHp_;
+
+	stateCommonData_.isBreakEgg = false;
+
+	// 初期化
+	bossState_ = BossState::kIn;
+	currentState_ = statesTable_[static_cast<size_t>(BossState::kIn)].get();
+	currentState_->Enter();
 }
 
 void BossEnemy::Update() {
@@ -104,12 +114,16 @@ void BossEnemy::Update() {
 	currentState_->Update();
 
 	// 行列の更新
-	//worldTransform_.UpdateTransformMatrix();
 	modelComponent_.Update();
 
 	// 当たり判定の位置を更新
-	collider_.SetWorldPosition(modelComponent_.worldTransform_.GetWorldPosition() + Vector3(0.0f, colliderOffsetPosY_, 0.0f));
-	collider_.SetRadius(colliderRadius_);
+	if (stateCommonData_.isBreakEgg) {
+		collider_.SetWorldPosition(modelComponent_.worldTransform_.GetWorldPosition() + Vector3(0.0f, colliderOffsetPosY_, 0.0f));
+		collider_.SetRadius(colliderRadius_);
+	} else {
+		collider_.SetWorldPosition(modelComponent_.worldTransform_.GetWorldPosition() + Vector3(0.0f, 0.0f, 0.0f));
+		collider_.SetRadius(colliderRadius_);
+	}
 
 	// アニメーションの更新
 	animator_->Update();
@@ -117,26 +131,46 @@ void BossEnemy::Update() {
 
 void BossEnemy::Draw() {
 
-	// 描画
-	modelComponent_.DrawRaytracing(renderQueue_);
+	if (stateCommonData_.isBreakEgg) {
+		// 描画
+		modelComponent_.DrawRaytracing(renderQueue_);
+	} else {
+
+		// 卵モデルを描画
+		renderQueue_->SubmitRaytracingModel(eggModel_, modelComponent_.worldTransform_);	
+	}
 }
 
 void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
 
+
 	bool isPlayer = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kPlayer));
 
+	Player* player = nullptr;
 	if (isPlayer) {
 		// プレイヤーを取得
-		Player* player = result.userData.As<Player>();
+		player = result.userData.As<Player>();
 		if (player == nullptr) { return; }
-
-		// プレイヤーが攻撃状態の時にダメージを受ける
-		if (player->GetCurrentState() == PlayerState::kAttackDown) {
-			float damage = player->GetDamage();
-			stateCommonData_.hp_ -= static_cast<int32_t>(damage);
-		}
 	}
 
+	if (bossState_ == BossState::kIn) {
+
+		// 卵の破壊フラグを有効
+		if (player != nullptr) {
+			if (player->GetCurrentState() == PlayerState::kAttackDown) {
+				stateCommonData_.isBreakEgg = true;
+			}
+		}
+	} else {
+
+		if (player != nullptr) {
+			// プレイヤーが攻撃状態の時にダメージを受ける
+			if (player->GetCurrentState() == PlayerState::kAttackDown) {
+				float damage = player->GetDamage();
+				stateCommonData_.hp_ -= static_cast<int32_t>(damage);
+			}
+		}
+	}
 }
 
 void BossEnemy::OnCollisionStay([[maybe_unused]] const GameEngine::CollisionResult& result) {

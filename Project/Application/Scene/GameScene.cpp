@@ -17,8 +17,8 @@ GameScene::GameScene() {
 	InputRegisterCommand();
 
 	// 背景を設定
-	uint32_t skyboxGH = textureManager_->GetHandleByName("rogland_clear_night_1k.dds");
-	renderQueue_->SetSkyboxTexture(skyboxGH);
+	//uint32_t skyboxGH = textureManager_->GetHandleByName("rogland_clear_night_1k.dds");
+	//renderQueue_->SetSkyboxTexture(skyboxGH);
 
 	// メインカメラの初期化
 	mainCamera_ = std::make_unique<Camera>();
@@ -41,7 +41,8 @@ GameScene::GameScene() {
 	// 敵
 	auto* enemyModel = modelManager_->GetNameByModel("BossBird.gltf");
 	enemyModel->SetDefaultIsEnableLight(true);
-	auto bossEnemy = gameObjectManager_->AddObject<BossEnemy>(enemyModel, player->GetWorldTransform(), animationManager_, bossRangedAttackManager);
+	auto* eggModel = modelManager_->GetNameByModel("BossEgg.obj");
+	auto bossEnemy = gameObjectManager_->AddObject<BossEnemy>(enemyModel, eggModel, player->GetWorldTransform(), animationManager_, bossRangedAttackManager);
 
 	// カメラ操作
 	cameraController_ = gameObjectManager_->AddObject<CameraController>(inputCommand_, &bossEnemy->GetWorldTransform(), &player->GetWorldTransform());

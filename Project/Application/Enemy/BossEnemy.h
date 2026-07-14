@@ -16,7 +16,7 @@ class BossRangedAttackManager;
 
 class BossEnemy : public GameEngine::IGameObject {
 public:
-	BossEnemy(GameEngine::Model* model, GameEngine::WorldTransform& playerWorld, GameEngine::AnimationManager* animationManager, BossRangedAttackManager* rangedAttackManager);
+	BossEnemy(GameEngine::Model* model, GameEngine::Model* eggModel, GameEngine::WorldTransform& playerWorld, GameEngine::AnimationManager* animationManager, BossRangedAttackManager* rangedAttackManager);
 	~BossEnemy() = default;
 
 	// 初期化処理
@@ -45,12 +45,20 @@ public:
 	// 現在の戦闘中の状態を朱徳
 	BossBattleState GetBattleState() const;
 
+	// 現在の状態を取得
+	BossState GetBossState() const {
+		return bossState_;
+	}
+
 private:
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;
 
 	// モデル
 	GameEngine::ModelComponent modelComponent_;
+
+	// 卵モデル
+	GameEngine::Model* eggModel_;
 
 	// 氷のマテリアル
 	std::vector<GameEngine::IceMaterial> iceMaterial_;
