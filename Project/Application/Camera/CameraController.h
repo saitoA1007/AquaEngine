@@ -25,6 +25,14 @@ public:
 	/// <returns></returns>
 	GameEngine::Camera& GetCamera() const { return *camera_.get(); }
 
+	/// <summary>
+	/// カメラの状態切り替え
+	/// </summary>
+	/// <param name="state">状態</param>
+	void SetChangeState(CameraState state) {
+		requestState = state;
+	}
+
 	Matrix4x4 GetWorldMatrix() const { return camera_->GetWorldMatrix(); }
 
 	GameEngine::InputCommand* GetInputCommand() const { return inputCommand_; }
@@ -56,6 +64,10 @@ private:
 
 	float targetFov_ = 0.45f;
 
+	// 外部からのカメラの遷移切り替え
+	std::optional<CameraState> requestState = std::nullopt;
+
+	// 各カメラの状態
 	std::array<std::unique_ptr<ICameraState>, static_cast<size_t>(CameraState::kMaxCount)> states_;
 	ICameraState* currentState_ = nullptr;
 	CameraState currentStateType_ = CameraState::kFollow;

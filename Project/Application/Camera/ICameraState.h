@@ -1,12 +1,15 @@
 #pragma once
+#include <optional>
 #include "Vector3.h"
 
 // 前方宣言
 class CameraController;
 
 enum class CameraState {
-	kLockOn,
-	kFollow,
+	kLockOn,	 // ボスにロックオンするカメラ
+	kFollow,	 // プレイヤーに追従するカメラ
+	kEnterMovie, // 入りのムービーカメラ
+	kClearMovie, // クリアのムービーカメラ
 
 	kMaxCount
 };
@@ -23,6 +26,9 @@ struct CameraCommonData {
 	float positionLerpRate = 0.07f;
 	// Fovの補間
 	float fovLerpRate = 0.05f;
+
+	// カメラの遷移切り替え
+	std::optional<CameraState> requestState = std::nullopt;
 };
 
 class ICameraState {
@@ -34,9 +40,7 @@ public:
 	virtual void Update(float dt60) = 0;
 	virtual void Exit() {}
 
-	virtual CameraState GetNextState() const { return CameraState::kMaxCount; }
-
-	const CameraCommonData& GetCommonData() const { return commonData_; }
+	CameraCommonData& GetCommonData() { return commonData_; }
 
 protected:
 	CameraController* controller_ = nullptr;

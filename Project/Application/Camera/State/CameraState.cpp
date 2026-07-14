@@ -28,6 +28,12 @@ void FollowCameraState::Enter() {
 }
 
 void FollowCameraState::Update(float dt60) {
+
+	// カメラの切り替え処理
+	if (controller_->GetInputCommand()->IsCommandActive("CameraLockOn")) {
+		commonData_.requestState = CameraState::kLockOn;
+	}
+
 	Vector2& rotateMove = controller_->GetRotateMove();
 
 	Vector3 idealTarget = controller_->GetPlayerWorld()->GetWorldPosition();
@@ -58,13 +64,6 @@ void FollowCameraState::Update(float dt60) {
 	commonData_.targetFov = kFollowFov_;
 }
 
-CameraState FollowCameraState::GetNextState() const {
-	if (controller_->GetInputCommand()->IsCommandActive("CameraLockOn")) {
-		return CameraState::kLockOn;
-	}
-	return CameraState::kMaxCount;
-}
-
 //======================================================================
 // ロックオンカメラ
 //======================================================================
@@ -86,6 +85,12 @@ LockOnCameraState::LockOnCameraState(CameraController* controller, GameEngine::D
 }
 
 void LockOnCameraState::Update(float dt60) {
+
+	// カメラの切り替え処理
+	if (controller_->GetInputCommand()->IsCommandActive("CameraLockOn")) {
+		commonData_.requestState = CameraState::kFollow;
+	}
+
 	Vector2& rotateMove = controller_->GetRotateMove();
 
 	Vector3 playerPos = controller_->GetPlayerWorld()->transform_.translate;
@@ -127,9 +132,41 @@ void LockOnCameraState::Update(float dt60) {
 	commonData_.targetFov = targetFov;
 }
 
-CameraState LockOnCameraState::GetNextState() const {
-	if (controller_->GetInputCommand()->IsCommandActive("CameraLockOn")) {
-		return CameraState::kFollow;
-	}
-	return CameraState::kMaxCount;
+//=================================================================================
+// 入りのムービーカメラ
+//=================================================================================
+
+EnterMovieCameraState::EnterMovieCameraState(CameraController* controller, GameEngine::DebugParameter* param) : ICameraState(controller) {
+	std::string subGroup = "EnterMovie";
+	int index = 0;
+	param->Register("PositionLerpRate", commonData_.positionLerpRate, index++, subGroup);
+	param->Register("TargetLerpRate", commonData_.targetLerpRate, index++, subGroup);
+}
+
+void EnterMovieCameraState::Enter() {
+	
+}
+
+void EnterMovieCameraState::Update(float dt60) {
+	
+}
+
+//=================================================================================
+// クリアのムービーカメラ
+//=================================================================================
+
+ClearMovieCameraState::ClearMovieCameraState(CameraController* controller, GameEngine::DebugParameter* param) : ICameraState(controller) {
+	std::string subGroup = "ClearMovie";
+	int index = 0;
+	param->Register("PositionLerpRate", commonData_.positionLerpRate, index++, subGroup);
+	param->Register("TargetLerpRate", commonData_.targetLerpRate, index++, subGroup);
+	
+}
+
+void ClearMovieCameraState::Enter() {
+
+}
+
+void ClearMovieCameraState::Update(float dt60) {
+
 }

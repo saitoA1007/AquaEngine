@@ -13,7 +13,6 @@ public:
 
 	void Enter() override;
 	void Update(float dt60) override;
-	CameraState GetNextState() const override;
 
 private:
 	// 距離
@@ -39,7 +38,6 @@ public:
 	LockOnCameraState(CameraController* controller, GameEngine::DebugParameter* param);
 
 	void Update(float dt60) override;
-	CameraState GetNextState() const override;
 
 private:
 	// 敵が近くにいる時のFov
@@ -57,4 +55,32 @@ private:
 	float lockOnTargetOffsetY_ = 6.0f;
 	// 旋回速度
 	float lockOnRotateRate_ = 0.06f;
+};
+
+// 入りのムービーカメラ
+class EnterMovieCameraState : public ICameraState {
+public:
+	EnterMovieCameraState(CameraController* controller, GameEngine::DebugParameter* param);
+
+	void Enter() override;
+	void Update(float dt60) override;
+	
+private:
+	
+private:
+
+};
+
+// クリアのムービーカメラ
+class ClearMovieCameraState : public ICameraState {
+public:
+	ClearMovieCameraState(CameraController* controller, GameEngine::DebugParameter* param);
+
+	void Enter() override;
+	void Update(float dt60) override;
+
+private:
+
+private:
+
 };
