@@ -18,6 +18,9 @@ struct BossStateCommonData {
 	// ワールド行列
 	GameEngine::WorldTransform* worldTransform = nullptr;
 
+	// 卵が壊れているか
+	bool isBreakEgg = false;
+
 	// hp
 	int32_t hp_ = 1;
 

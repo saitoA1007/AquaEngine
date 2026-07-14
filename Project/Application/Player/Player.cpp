@@ -1,12 +1,13 @@
 #define NOMINMAX
-#include "Player.h"
 #include <algorithm>
+#include "Player.h"
 #include "LogManager.h"
 #include "MyMath.h"
 #include "FPSCounter.h"
 #include "Model.h"
 #include "Application/CollisionConfig.h"
 #include "Application/Enemy/RangedAttack/IceFall.h"
+#include "Application/Enemy/BossEnemy.h"
 using namespace GameEngine;
 
 Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model, GameEngine::AnimationManager* animationManager, PlayerEffectManager* effectManager) {
@@ -14,7 +15,7 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model,
 	model_ = model;
 
 	// ワールド行列を初期化
-	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,2.0f,0.0f},{-2.0f,1.0f,0.0f} });
+	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,2.0f,0.0f},{0.0f,2.0f,10.0f} });
 
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>("Player");
@@ -73,7 +74,7 @@ void Player::Initialize() {
 	commonData_.currentYaw = std::atan2f(commonData_.currentDir.x, commonData_.currentDir.z);
 
 	// 位置を初期化
-	worldTransform_.transform_.translate = { 0.0f,2.0f,0.0f };
+	worldTransform_.transform_.translate = { 0.0f,2.0f,12.0f };
 
 	// 初期化
 	animator_->Initialize();
@@ -230,9 +231,20 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 
 	// ボスの衝突判定
 	if (isBoss || isWind) {
-		if (commonData_.state != PlayerState::kAttackDown) {
-			// ダメージを受ける
-			playerStatus_.TakeDamage(1);
+
+		BossEnemy* boss = result.userData.As<BossEnemy>();
+		if (boss == nullptr) { return; }
+
+		if (boss->GetBossState() == BossState::kIn) {
+			// 跳ね返る
+			bounceAction_.WallBounce(worldTransform_.transform_.translate, result.contactNormal * -1.0f, result.penetrationDepth, attackRushAction_.GetRushMaxSpeed());
+		} else {
+
+			if (commonData_.state != PlayerState::kAttackDown) {
+
+				// ダメージを受ける
+				playerStatus_.TakeDamage(1);
+			}
 		}
 	}
 }

@@ -45,6 +45,11 @@ public:
 	// 現在の戦闘中の状態を朱徳
 	BossBattleState GetBattleState() const;
 
+	// 現在の状態を取得
+	BossState GetBossState() const {
+		return bossState_;
+	}
+
 private:
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;
