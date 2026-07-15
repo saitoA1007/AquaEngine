@@ -561,6 +561,8 @@
     <ClCompile Include="EngineSource\Editor\NodeSystem\MaterialShaderGenerator.cpp" />
     <ClCompile Include="EngineSource\3D\ParticleSystem\ParticleBehaviorGPU.cpp" />
     <ClCompile Include="Application\UI\Managers\TitleUIManager.cpp" />
+    <ClCompile Include="Application\UI\Managers\GameOverUIManager.cpp" />
+    <ClCompile Include="Application\UI\Managers\ClearUIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1102,6 +1104,8 @@
     <ClInclude Include="EngineSource\Editor\NodeSystem\MaterialShaderGenerator.h" />
     <ClInclude Include="EngineSource\3D\ParticleSystem\ParticleBehaviorGPU.h" />
     <ClInclude Include="Application\UI\Managers\TitleUIManager.h" />
+    <ClInclude Include="Application\UI\Managers\GameOverUIManager.h" />
+    <ClInclude Include="Application\UI\Managers\ClearUIManager.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />

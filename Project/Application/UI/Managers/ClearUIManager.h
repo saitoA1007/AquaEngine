@@ -9,12 +9,12 @@ namespace GameEngine {
 }
 
 /// <summary>
-/// ポーズUIの管理
+/// クリアUIの管理
 /// </summary>
-class PauseUIManager : public GameEngine::IGameObject {
+class ClearUIManager : public GameEngine::IGameObject {
 public:
-	PauseUIManager(GameEngine::TextureManager* textureManager);
-	~PauseUIManager() = default;
+	ClearUIManager(GameEngine::TextureManager* textureManager);
+	~ClearUIManager() = default;
 
 	// 初期化処理
 	void Initialize() override;
@@ -29,8 +29,8 @@ private:
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;
 
-	// ポーズ文字UI
-	GameEngine::Sprite pauseTextSprite_;
+	// クリア文字UI
+	GameEngine::Sprite clearTextSprite_;
 
 
 
