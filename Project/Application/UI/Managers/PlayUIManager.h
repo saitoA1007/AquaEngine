@@ -1,12 +1,20 @@
 #pragma once
 #include "IGameObject.h"
-#include "HpBarUI.h"
-#include "HpContainer.h"
-#include "LetterboxUI.h"
+#include "Application/UI/Widgets/HpBarUI.h"
+#include "Application/UI/Widgets/HpContainer.h"
+#include "Application/UI/Effects/LetterboxUI.h"
 
+// 前方宣言
+namespace GameEngine {
+	class TextureManager;
+}
+
+/// <summary>
+/// プレイUIの管理
+/// </summary>
 class PlayUIManager : public GameEngine::IGameObject {
 public:
-	PlayUIManager(uint32_t playerHpGH, uint32_t bossNameGH, uint32_t playGuideGH);
+	PlayUIManager(GameEngine::TextureManager* textureManager);
 	~PlayUIManager() = default;
 
 	// 初期化処理
@@ -40,9 +48,29 @@ public:
 		letterBoxUI_->SetBarActive(isActive);
 	}
 
+	// プレイヤーや敵のHpUIなどの表示フラグ
+	void SetIsDrawGamePlayUI(bool isDraw) {
+		isDrawGamePlayUI_ = isDraw;
+	}
+
+	// 操作方法UIの表示フラグ
+	void SetIsDrawPlayGuide(bool isDraw) {
+		isDrawPlayGuide_ = isDraw;
+	}
+
+	// チュートリアルの表示フラグ
+	void SetIsDrawTutorialGuide(bool isDraw) {
+		isDrawTutorialGuide_ = isDraw;
+	}
+
 private:
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;
+
+	// 表示フラグ
+	bool isDrawPlayGuide_ = true;
+	bool isDrawTutorialGuide_ = true;
+	bool isDrawGamePlayUI_ = true;
 
 	// ボスのHpUI
 	std::unique_ptr<HpBarUI> bossHpBarUI_;
@@ -55,6 +83,9 @@ private:
 
 	// 操作説明UI
 	GameEngine::Sprite playGuideSprite_;
+
+	// チュートリアルUI
+	std::vector<GameEngine::Sprite> tutorialTextSprites_;
 
 	// 黒帯表示
 	std::unique_ptr<LetterboxUI> letterBoxUI_;

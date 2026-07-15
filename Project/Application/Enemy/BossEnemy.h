@@ -50,6 +50,9 @@ public:
 		return bossState_;
 	}
 
+	// 卵が割れたか
+	bool IsBreakEgg() const { return stateCommonData_.isBreakEgg; }
+
 private:
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;

@@ -5,6 +5,9 @@
 #include "WorldTransform.h"
 #include "DebugParameter.h"
 
+/// <summary>
+/// バータイプのHP表示
+/// </summary>
 class HpBarUI : public GameEngine::IGameObject {
 public:
 

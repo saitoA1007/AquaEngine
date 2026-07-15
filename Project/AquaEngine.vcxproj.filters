@@ -528,22 +528,22 @@
     <ClCompile Include="Application\Enemy\BattleAction\BossBattleAction.cpp" />
     <ClCompile Include="Application\GamePlay\GamePhaseManager.cpp" />
     <ClCompile Include="Application\GamePlay\Phase\ScenePhase.cpp" />
-    <ClCompile Include="Application\UI\HpBarUI.cpp" />
-    <ClCompile Include="Application\UI\HpContainer.cpp" />
+    <ClCompile Include="Application\UI\Widgets\HpBarUI.cpp" />
+    <ClCompile Include="Application\UI\Widgets\HpContainer.cpp" />
     <ClCompile Include="Application\Player\PlayerAnimator.cpp" />
-    <ClCompile Include="Application\UI\PlayUIManager.cpp" />
+    <ClCompile Include="Application\UI\Managers\PlayUIManager.cpp" />
     <ClCompile Include="Application\Enemy\BossAnimator.cpp" />
     <ClCompile Include="Application\Scene\TestScene.cpp" />
     <ClCompile Include="Application\Utils\Timer.cpp" />
-    <ClCompile Include="Application\UI\TimeUI.cpp" />
+    <ClCompile Include="Application\UI\Widgets\TimeUI.cpp" />
     <ClCompile Include="Application\Stage\Floor.cpp" />
     <ClCompile Include="Application\Enemy\BossRangedAttackManager.cpp" />
     <ClCompile Include="Application\Enemy\RangedAttack\IceFall.cpp" />
     <ClCompile Include="Application\Enemy\RangedAttack\WindAttack.cpp" />
     <ClCompile Include="Application\Utils\TimeController.cpp" />
-    <ClCompile Include="Application\UI\LetterboxUI.cpp" />
-    <ClCompile Include="Application\UI\PauseUIManager.cpp" />
-    <ClCompile Include="Application\UI\DimmerUI.cpp" />
+    <ClCompile Include="Application\UI\Effects\LetterboxUI.cpp" />
+    <ClCompile Include="Application\UI\Managers\PauseUIManager.cpp" />
+    <ClCompile Include="Application\UI\Effects\DimmerUI.cpp" />
     <ClCompile Include="Application\Camera\State\CameraState.cpp" />
     <ClCompile Include="EngineSource\Core\StaticGameObject.cpp" />
     <ClCompile Include="EngineSource\Core\StaticGameObjectManager.cpp" />
@@ -560,6 +560,7 @@
     <ClCompile Include="EngineSource\Editor\NodeSystem\MaterialGraph.cpp" />
     <ClCompile Include="EngineSource\Editor\NodeSystem\MaterialShaderGenerator.cpp" />
     <ClCompile Include="EngineSource\3D\ParticleSystem\ParticleBehaviorGPU.cpp" />
+    <ClCompile Include="Application\UI\Managers\TitleUIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1065,22 +1066,22 @@
     <ClInclude Include="Application\GamePlay\GamePhaseManager.h" />
     <ClInclude Include="Application\GamePlay\IScenePhase.h" />
     <ClInclude Include="Application\GamePlay\Phase\ScenePhase.h" />
-    <ClInclude Include="Application\UI\HpBarUI.h" />
-    <ClInclude Include="Application\UI\HpContainer.h" />
+    <ClInclude Include="Application\UI\Widgets\HpBarUI.h" />
+    <ClInclude Include="Application\UI\Widgets\HpContainer.h" />
     <ClInclude Include="Application\Player\PlayerAnimator.h" />
-    <ClInclude Include="Application\UI\PlayUIManager.h" />
+    <ClInclude Include="Application\UI\Managers\PlayUIManager.h" />
     <ClInclude Include="Application\Enemy\BossAnimator.h" />
     <ClInclude Include="Application\Scene\TestScene.h" />
     <ClInclude Include="Application\Utils\Timer.h" />
-    <ClInclude Include="Application\UI\TimeUI.h" />
+    <ClInclude Include="Application\UI\Widgets\TimeUI.h" />
     <ClInclude Include="Application\Stage\Floor.h" />
     <ClInclude Include="Application\Enemy\BossRangedAttackManager.h" />
     <ClInclude Include="Application\Enemy\RangedAttack\IceFall.h" />
     <ClInclude Include="Application\Enemy\RangedAttack\WindAttack.h" />
     <ClInclude Include="Application\Utils\TimeController.h" />
-    <ClInclude Include="Application\UI\LetterboxUI.h" />
-    <ClInclude Include="Application\UI\PauseUIManager.h" />
-    <ClInclude Include="Application\UI\DimmerUI.h" />
+    <ClInclude Include="Application\UI\Effects\LetterboxUI.h" />
+    <ClInclude Include="Application\UI\Managers\PauseUIManager.h" />
+    <ClInclude Include="Application\UI\Effects\DimmerUI.h" />
     <ClInclude Include="Application\Camera\ICameraState.h" />
     <ClInclude Include="Application\Camera\State\CameraState.h" />
     <ClInclude Include="EngineSource\Core\StaticGameObject.h" />
@@ -1100,6 +1101,7 @@
     <ClInclude Include="EngineSource\Editor\NodeSystem\MaterialNode.h" />
     <ClInclude Include="EngineSource\Editor\NodeSystem\MaterialShaderGenerator.h" />
     <ClInclude Include="EngineSource\3D\ParticleSystem\ParticleBehaviorGPU.h" />
+    <ClInclude Include="Application\UI\Managers\TitleUIManager.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />

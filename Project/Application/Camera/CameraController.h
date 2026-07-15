@@ -41,6 +41,9 @@ public:
 
 	Vector2& GetRotateMove() { return rotateMove_; }
 
+	// 黒帯を表示させるか
+	bool UseLetterBoxUI() const { return currentStateType_ == CameraState::kLockOn; }
+
 private:
 	GameEngine::InputCommand* inputCommand_ = nullptr;
 	const GameEngine::WorldTransform* targetWorld_ = nullptr;

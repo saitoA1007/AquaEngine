@@ -5,6 +5,9 @@
 #include "WorldTransform.h"
 #include "DebugParameter.h"
 
+/// <summary>
+/// 個数タイプのHP表示
+/// </summary>
 class HpContainer : public GameEngine::IGameObject {
 public:
 	HpContainer(std::string name, uint32_t texture);

@@ -63,11 +63,14 @@ public:
 	EnterMovieCameraState(CameraController* controller, GameEngine::DebugParameter* param);
 
 	void Enter() override;
+
 	void Update(float dt60) override;
 	
 private:
 	
 private:
+
+
 
 };
 
@@ -75,6 +78,20 @@ private:
 class ClearMovieCameraState : public ICameraState {
 public:
 	ClearMovieCameraState(CameraController* controller, GameEngine::DebugParameter* param);
+
+	void Enter() override;
+	void Update(float dt60) override;
+
+private:
+
+private:
+
+};
+
+// タイトルカメラ
+class TitleCameraState : public ICameraState {
+public:
+	TitleCameraState(CameraController* controller, GameEngine::DebugParameter* param);
 
 	void Enter() override;
 	void Update(float dt60) override;
