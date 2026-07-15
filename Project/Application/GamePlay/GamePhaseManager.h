@@ -10,13 +10,15 @@ namespace GameEngine {
 	class InputCommand;
 }
 class Player;
+class TitleUIManager;
 class PlayUIManager;
 class BossEnemy;
 class CameraController;
 
 class GamePhaseManager : public GameEngine::IGameObject {
 public:
-	GamePhaseManager(GameEngine::InputCommand* inputCommand, Player* player, BossEnemy* bossEnemy, PlayUIManager* playUIManager, CameraController* cameraController);
+	GamePhaseManager(GameEngine::InputCommand* inputCommand, Player* player, BossEnemy* bossEnemy,
+		TitleUIManager* titleUIManager, PlayUIManager* playUIManager, CameraController* cameraController);
 	~GamePhaseManager() = default;
 
 	void Initialize() override;

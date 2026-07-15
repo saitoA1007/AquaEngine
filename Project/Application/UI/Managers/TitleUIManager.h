@@ -29,9 +29,9 @@ public:
 
 	// 表示の有効設定
 	void SetIsDraw(bool isActive) {
-		isDraw = isActive;
+		isDraw_ = isActive;
 
-		if (isDraw) {
+		if (isDraw_) {
 			titleTextSprite_.color_.w = 1.0f;
 			buttonTextSprite_.color_.w = 1.0f;
 		} else {
@@ -39,6 +39,9 @@ public:
 			isActiveFadeOut_ = true;
 		}
 	}
+
+	bool IsDraw() const { return isDraw_; }
+	bool IsActiveFadeOut() const { return isActiveFadeOut_; }
 
 private:
 	// パラメータ機能
@@ -50,7 +53,7 @@ private:
 	// ボタンUI
 	GameEngine::Sprite buttonTextSprite_;
 
-	bool isDraw = true;
+	bool isDraw_ = true;
 	bool isActiveFadeOut_ = false;
 
 	float timer_ = 0.0f;

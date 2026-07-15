@@ -53,6 +53,9 @@ void PlayUIManager::Initialize() {
 	bossHpBarUI_->Initialize();
 	playerHpUI_->Initialize();
 	letterBoxUI_->Initialize();
+
+	// 更新して適応させる
+	Update();
 }
 
 void PlayUIManager::Update() {

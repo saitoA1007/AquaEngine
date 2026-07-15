@@ -1,27 +1,44 @@
 #include "ScenePhase.h"
 #include "InputCommand.h"
+#include "Application/UI/Managers/TitleUIManager.h"
 #include "Application/UI/Managers/PlayUIManager.h"
 #include "Application/Player/Player.h"
 #include "Application/Enemy/BossEnemy.h"
 #include "Application/Camera/CameraController.h"
 #include "Application/Utils/TimeController.h"
 
-TitlePhase::TitlePhase(PhaseCommonData& commonData) : IScenePhase(commonData) {
+//=============================================================
+// タイトル
+//=============================================================
 
+TitlePhase::TitlePhase(PhaseCommonData& commonData, TitleUIManager* titleUIManager) : IScenePhase(commonData) {
+	titleUIManager_ = titleUIManager;
 }
 
 void TitlePhase::Enter() {
-
-
-
+	// UIを有効
+	titleUIManager_->SetActive(true);
+	// 初期化
+	titleUIManager_->Initialize();
 }
 
 void TitlePhase::Update() {
 
+	// 決定ボタン
+	if (commonData_.inputCommand->IsCommandActive("Decision")) {
+		// UIを表示させない
+		titleUIManager_->SetIsDraw(false);
+	}
+
+	// タイトル文字のフェードが終わればチュートリアルシーンに移行
+	if (!titleUIManager_->IsDraw() && !titleUIManager_->IsActiveFadeOut()) {
+		commonData_.requestPhase = ScenePhase::kTutorial;
+	}
 }
 
 void TitlePhase::Exit() {
-
+	// UIを有効
+	titleUIManager_->SetActive(false);
 }
 
 //=====================================================
@@ -36,11 +53,17 @@ TutorialPhase::TutorialPhase(PhaseCommonData& commonData, CameraController* came
 	// ボスを取得
 	bossEnemy_ = bossEnemy;
 
-	// UIを朱徳
+	// UIを取得
 	playUIManager_ = playUIManager;
+
+	// UIを無効
+	playUIManager_->SetActive(false);
 }
 
 void TutorialPhase::Enter() {
+
+	// UIを有効
+	playUIManager_->SetActive(true);
 
 	// UI表示
 	playUIManager_->SetIsDrawGamePlayUI(false);
@@ -153,6 +176,26 @@ void PausePhase::Update() {
 
 void PausePhase::Exit() {
 	commonData_.timeController_->Reset();
+}
+
+//=============================================================
+// ゲームオーバー
+//=============================================================
+
+GameOverPhase::GameOverPhase(PhaseCommonData& commonData) : IScenePhase(commonData) {
+
+}
+
+void GameOverPhase::Enter() {
+
+}
+
+void GameOverPhase::Update() {
+
+}
+
+void GameOverPhase::Exit() {
+
 }
 
 //===========================================

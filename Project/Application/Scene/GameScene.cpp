@@ -7,6 +7,7 @@ using namespace GameEngine;
 #include "Application/Enemy/BossEnemy.h"
 #include "Application/Enemy/BossRangedAttackManager.h"
 #include "Application/GamePlay/GamePhaseManager.h"
+#include "Application/UI/Managers/TitleUIManager.h"
 #include "Application/UI/Managers/PlayUIManager.h"
 
 GameScene::~GameScene() {
@@ -56,11 +57,14 @@ GameScene::GameScene() {
 	wallModel->SetDefaultIOR(1.31f);
 	gameObjectManager_->AddObject<StageManager>(gameObjectManager_, floorModel, wallModel, textureManager_);
 
+	// タイトル中のUI
+	auto* titleUIManager = gameObjectManager_->AddObject<TitleUIManager>(textureManager_);
+
 	// プレイ中のUI
 	auto* playUIManager = gameObjectManager_->AddObject<PlayUIManager>(textureManager_);
 
 	// シーンフェーズを管理
-	gameObjectManager_->AddObject<GamePhaseManager>(inputCommand_, player, bossEnemy, playUIManager, cameraController_);
+	gameObjectManager_->AddObject<GamePhaseManager>(inputCommand_, player, bossEnemy, titleUIManager, playUIManager, cameraController_);
 }
 
 void GameScene::Initialize() {
@@ -81,6 +85,10 @@ void GameScene::Draw() {
 }
 
 void GameScene::InputRegisterCommand() {
+
+	// 決定ボタン
+	inputCommand_->RegisterCommand("Decision", { {InputState::KeyTrigger, DIK_SPACE},{InputState::PadTrigger, XINPUT_GAMEPAD_A} });
+
 	// 移動の入力コマンドを登録する
 	inputCommand_->RegisterCommand("MoveUp", { {InputState::KeyPush, DIK_W },{InputState::PadLeftStick,0,{0.0f,1.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_UP } });
 	inputCommand_->RegisterCommand("MoveDown", { {InputState::KeyPush, DIK_S },{InputState::PadLeftStick,0,{0.0f,-1.0f},0.2f}, {InputState::PadPush, XINPUT_GAMEPAD_DPAD_DOWN} });

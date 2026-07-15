@@ -14,6 +14,7 @@ TitleUIManager::TitleUIManager(GameEngine::TextureManager* textureManager) {
 	debugParame_ = std::make_unique<DebugParameter>("TitleUI");
 	debugParame_->RegisterSprite("TitleText", titleTextSprite_);
 	debugParame_->RegisterSprite("ButtonText", buttonTextSprite_);
+	debugParame_->Apply();
 
 	// テクスチャを設定
 	titleTextSprite_.textureHandle_ = titleTextGH;
@@ -23,14 +24,14 @@ TitleUIManager::TitleUIManager(GameEngine::TextureManager* textureManager) {
 void TitleUIManager::Initialize() {
 	titleTextSprite_.color_.w = 1.0f;
 	buttonTextSprite_.color_.w = 1.0f;
-	isDraw = true;
+	isDraw_ = true;
 	isActiveFadeOut_ = false;
 }
 
 void TitleUIManager::Update() {
 	debugParame_->ApplyIfDirty();
 
-	if (!isDraw && isActiveFadeOut_) {
+	if (!isDraw_ && isActiveFadeOut_) {
 		timer_ += FpsCounter::gameDeltaTime / kFadeOutMaxTime_;
 
 		// 透明にする
@@ -51,7 +52,7 @@ void TitleUIManager::Update() {
 }
 
 void TitleUIManager::Draw() {
-	if (isDraw || isActiveFadeOut_) {
+	if (isDraw_ || isActiveFadeOut_) {
 		renderQueue_->SubmitSprite(&titleTextSprite_);
 		renderQueue_->SubmitSprite(&buttonTextSprite_);
 	}	
