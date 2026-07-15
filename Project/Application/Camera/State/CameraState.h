@@ -87,3 +87,17 @@ private:
 private:
 
 };
+
+// タイトルカメラ
+class TitleCameraState : public ICameraState {
+public:
+	TitleCameraState(CameraController* controller, GameEngine::DebugParameter* param);
+
+	void Enter() override;
+	void Update(float dt60) override;
+
+private:
+
+private:
+
+};

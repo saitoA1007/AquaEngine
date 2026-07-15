@@ -70,7 +70,6 @@ private:
 
     // UI
     PlayUIManager* playUIManager_ = nullptr;
-    bool isBarActive_ = false;
 
     // カメラ管理処理
     CameraController* cameraController_ = nullptr;

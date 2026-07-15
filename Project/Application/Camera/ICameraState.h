@@ -10,6 +10,7 @@ enum class CameraState {
 	kFollow,	 // プレイヤーに追従するカメラ
 	kEnterMovie, // 入りのムービーカメラ
 	kClearMovie, // クリアのムービーカメラ
+	kTitle,      // タイトルのカメラ
 
 	kMaxCount
 };

@@ -1,10 +1,12 @@
 #pragma once
-#include <list>
 #include "IGameObject.h"
 #include "Sprite.h"
 #include "WorldTransform.h"
 #include "DebugParameter.h"
 
+/// <summary>
+/// 画面を覆う上下の黒帯を表示
+/// </summary>
 class LetterboxUI : public GameEngine::IGameObject {
 public:
 	LetterboxUI(std::string name);

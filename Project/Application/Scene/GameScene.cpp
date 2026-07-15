@@ -7,7 +7,7 @@ using namespace GameEngine;
 #include "Application/Enemy/BossEnemy.h"
 #include "Application/Enemy/BossRangedAttackManager.h"
 #include "Application/GamePlay/GamePhaseManager.h"
-#include "Application/UI/PlayUIManager.h"
+#include "Application/UI/Managers/PlayUIManager.h"
 
 GameScene::~GameScene() {
 }
@@ -57,10 +57,7 @@ GameScene::GameScene() {
 	gameObjectManager_->AddObject<StageManager>(gameObjectManager_, floorModel, wallModel, textureManager_);
 
 	// プレイ中のUI
-	uint32_t playerHpGH = textureManager_->GetHandleByName("PlayerHP.png");
-	uint32_t bossNameGH = textureManager_->GetHandleByName("BossName.png");
-	uint32_t playGuideGH = textureManager_->GetHandleByName("playerGuide.png");
-	auto* playUIManager = gameObjectManager_->AddObject<PlayUIManager>(playerHpGH, bossNameGH, playGuideGH);
+	auto* playUIManager = gameObjectManager_->AddObject<PlayUIManager>(textureManager_);
 
 	// シーンフェーズを管理
 	gameObjectManager_->AddObject<GamePhaseManager>(inputCommand_, player, bossEnemy, playUIManager, cameraController_);
@@ -97,8 +94,6 @@ void GameScene::InputRegisterCommand() {
 	inputCommand_->RegisterCommand("CameraMoveRight", { { InputState::KeyPush, DIK_RIGHT },{InputState::PadRightStick,0,{1.0f,0.0f},0.2f} });
 	// ロックオン
 	inputCommand_->RegisterCommand("CameraLockOn", { {InputState::KeyTrigger, DIK_L},{InputState::PadTriggerRightTrigger,0,{0.0f,0.0f},0.2f},{InputState::PadTriggerLeftTrigger,0,{0.0f,0.0f},0.2f} });
-
-	// 決定ボタン
 
 	// AttackDownコマンド
 	inputCommand_->RegisterCommand("AttackDown", { {InputState::MouseTrigger, 1}, {InputState::PadTrigger, XINPUT_GAMEPAD_X} });

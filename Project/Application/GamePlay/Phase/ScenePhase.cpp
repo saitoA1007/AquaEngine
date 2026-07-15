@@ -1,6 +1,6 @@
 #include "ScenePhase.h"
 #include "InputCommand.h"
-#include "Application/UI/PlayUIManager.h"
+#include "Application/UI/Managers/PlayUIManager.h"
 #include "Application/Player/Player.h"
 #include "Application/Enemy/BossEnemy.h"
 #include "Application/Camera/CameraController.h"
@@ -44,6 +44,7 @@ void TutorialPhase::Enter() {
 
 	// UI表示
 	playUIManager_->SetIsDrawGamePlayUI(false);
+	playUIManager_->SetIsDrawTutorialGuide(true);
 	playUIManager_->SetIsDrawPlayGuide(true);
 }
 
@@ -51,7 +52,13 @@ void TutorialPhase::Update() {
 
 	if (bossEnemy_->IsBreakEgg()) {
 		playUIManager_->SetIsDrawGamePlayUI(false);
+		playUIManager_->SetIsDrawTutorialGuide(false);
 		playUIManager_->SetIsDrawPlayGuide(false);
+	} else {
+		// 黒帯UIを表示
+		if (commonData_.inputCommand->IsCommandActive("CameraLockOn")) {
+			playUIManager_->SetBarActive(cameraController_->UseLetterBoxUI());
+		}
 	}
 
 	// ボスの入りのアニメーションが終わればプレイシーンに移行
@@ -86,8 +93,6 @@ void PlayPhase::Enter() {
 	playTimer_.Reset();
 	playTimer_.Start();
 
-	isBarActive_ = false;
-
 	// Hpを設定
 	playUIManager_->SetCurrentBossHp(bossEnemy_->GetCurrentHp());
 	playUIManager_->SetMaxBossHp(bossEnemy_->GetMaxHp());
@@ -99,8 +104,7 @@ void PlayPhase::Update() {
 
 	// 黒帯UIを表示
 	if (commonData_.inputCommand->IsCommandActive("CameraLockOn")) {
-		isBarActive_ = !isBarActive_;
-		playUIManager_->SetBarActive(isBarActive_);
+		playUIManager_->SetBarActive(cameraController_->UseLetterBoxUI());
 	}
 
 	// 現在のHpを設定
@@ -125,7 +129,6 @@ void PlayPhase::Exit() {
 	// 計測停止
 	playTimer_.Stop();
 	commonData_.playTime_ = playTimer_.GetTimer();
-	playUIManager_->SetActive(false);
 }
 
 //=========================================================

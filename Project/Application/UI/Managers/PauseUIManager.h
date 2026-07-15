@@ -3,6 +3,9 @@
 #include "DebugParameter.h"
 #include "Sprite.h"
 
+/// <summary>
+/// ポーズUIの管理
+/// </summary>
 class PauseUIManager : public GameEngine::IGameObject {
 public:
 	PauseUIManager();
