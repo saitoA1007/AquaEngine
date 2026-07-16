@@ -24,6 +24,32 @@ public:
 		sprite_.SetParent(parent);
 	}
 
+	// 色を設定
+	void SetColor(Vector3 color) {
+		sprite_.color_.x = color.x;
+		sprite_.color_.y = color.y;
+		sprite_.color_.z = color.z;
+	}
+	void SetColor(Vector4 color) {
+		sprite_.color_ = color;
+	}
+
+	void SetAlpha(float alpha) {
+		sprite_.color_.w = alpha;
+	}
+
+	// テクスチャを設定
+	void SetTexture(uint32_t texture) {
+		sprite_.textureHandle_ = texture;
+	}
+
+	// アニメーションさせる
+	void Play() {
+		if (!isPlay_) {
+			isPlay_ = true;
+		}
+	}
+
 private:
 
 	// 時間

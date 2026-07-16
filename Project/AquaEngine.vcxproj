@@ -187,6 +187,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Stage\StageManager.cpp" />
     <ClCompile Include="Application\Stage\Wall.cpp" />
     <ClCompile Include="Application\UI\Effects\DimmerUI.cpp" />
+    <ClCompile Include="Application\UI\Managers\ClearUIManager.cpp" />
+    <ClCompile Include="Application\UI\Managers\GameOverUIManager.cpp" />
     <ClCompile Include="Application\UI\Widgets\HpBarUI.cpp" />
     <ClCompile Include="Application\UI\Widgets\HpContainer.cpp" />
     <ClCompile Include="Application\UI\Effects\LetterboxUI.cpp" />
@@ -455,6 +457,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Stage\StageManager.h" />
     <ClInclude Include="Application\Stage\Wall.h" />
     <ClInclude Include="Application\UI\Effects\DimmerUI.h" />
+    <ClInclude Include="Application\UI\Managers\ClearUIManager.h" />
+    <ClInclude Include="Application\UI\Managers\GameOverUIManager.h" />
     <ClInclude Include="Application\UI\Widgets\HpBarUI.h" />
     <ClInclude Include="Application\UI\Widgets\HpContainer.h" />
     <ClInclude Include="Application\UI\Effects\LetterboxUI.h" />

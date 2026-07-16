@@ -3,12 +3,17 @@
 #include "DebugParameter.h"
 #include "Sprite.h"
 
+// 前方宣言
+namespace GameEngine {
+	class TextureManager;
+}
+
 /// <summary>
 /// ポーズUIの管理
 /// </summary>
 class PauseUIManager : public GameEngine::IGameObject {
 public:
-	PauseUIManager();
+	PauseUIManager(GameEngine::TextureManager* textureManager);
 	~PauseUIManager() = default;
 
 	// 初期化処理
@@ -27,6 +32,9 @@ private:
 	// ポーズ文字UI
 	GameEngine::Sprite pauseTextSprite_;
 
-
+	// 半透明の背景
+	GameEngine::Sprite bgSprite_;
+	// 隠れるフレーム部分
+	GameEngine::Sprite frameSprite_;
 
 };

@@ -4,14 +4,17 @@
 
 // 前方宣言
 class Player;
-class PlayUIManager;
 class BossEnemy;
 class CameraController;
+class TitleUIManager;
+class PlayUIManager;
+class GameOverUIManager;
+class ClearUIManager;
 
 // タイトル
 class TitlePhase : public IScenePhase {
 public:
-    TitlePhase(PhaseCommonData& commonData);
+    TitlePhase(PhaseCommonData& commonData, TitleUIManager* titleUIManager, Player* player);
     ~TitlePhase() = default;
 
     void Enter() override;
@@ -21,8 +24,9 @@ public:
     void Exit() override;
 
 private:
+    TitleUIManager* titleUIManager_ = nullptr;
 
-
+    Player* player_ = nullptr;
 };
 
 // チュートリアル
@@ -96,10 +100,28 @@ private:
 
 };
 
+// ゲームオーバーシーン
+class GameOverPhase : public IScenePhase {
+public:
+    GameOverPhase(PhaseCommonData& commonData, GameOverUIManager* gameOverUIManager);
+    ~GameOverPhase() = default;
+
+    void Enter() override;
+
+    void Update() override;
+
+    void Exit() override;
+
+private:
+    GameOverUIManager* gameOverUIManager_ = nullptr;
+
+
+};
+
 // クリア
 class ClearPhase : public IScenePhase {
 public:
-    ClearPhase(PhaseCommonData& commonData);
+    ClearPhase(PhaseCommonData& commonData, ClearUIManager* clearUIManager);
     ~ClearPhase() = default;
 
     void Enter() override;
@@ -109,7 +131,7 @@ public:
     void Exit() override;
 
 private:
-
+    ClearUIManager* clearUIManager_ = nullptr;
 
 
 };

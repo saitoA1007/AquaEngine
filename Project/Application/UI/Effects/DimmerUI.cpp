@@ -34,7 +34,7 @@ void DimmerUI::Update() {
 		}
 
 		if (timer_ >= 1.0f) {
-			sprite_.color_ = { 1.0f,1.0f,1.0f,1.0f };
+			sprite_.scale_ = startScale_;
 			timer_ = 0.0f;
 			isPlay_ = false;
 		}

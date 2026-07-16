@@ -1,4 +1,5 @@
 #pragma once
+#include <unordered_map>
 #include "IGameObject.h"
 #include "Camera.h"
 #include "InputCommand.h"
@@ -71,7 +72,7 @@ private:
 	std::optional<CameraState> requestState = std::nullopt;
 
 	// 各カメラの状態
-	std::array<std::unique_ptr<ICameraState>, static_cast<size_t>(CameraState::kMaxCount)> states_;
+	std::unordered_map<CameraState, std::unique_ptr<ICameraState>> states_;
 	ICameraState* currentState_ = nullptr;
 	CameraState currentStateType_ = CameraState::kFollow;
 private:

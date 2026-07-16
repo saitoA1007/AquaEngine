@@ -10,13 +10,18 @@ namespace GameEngine {
 	class InputCommand;
 }
 class Player;
-class PlayUIManager;
 class BossEnemy;
 class CameraController;
+class TitleUIManager;
+class PlayUIManager;
+class GameOverUIManager;
+class ClearUIManager;
 
 class GamePhaseManager : public GameEngine::IGameObject {
 public:
-	GamePhaseManager(GameEngine::InputCommand* inputCommand, Player* player, BossEnemy* bossEnemy, PlayUIManager* playUIManager, CameraController* cameraController);
+	GamePhaseManager(GameEngine::InputCommand* inputCommand, Player* player, BossEnemy* bossEnemy,
+		TitleUIManager* titleUIManager, PlayUIManager* playUIManager, GameOverUIManager* gameOverUIManager, ClearUIManager* clearUIManager,
+		CameraController* cameraController);
 	~GamePhaseManager() = default;
 
 	void Initialize() override;
@@ -34,4 +39,15 @@ private:
 
 	// 時間の管理
 	TimeController timeController_;
+
+	Player* player_ = nullptr;
+	BossEnemy* bossEnemy_ = nullptr;
+	PlayUIManager* playUIManager_ = nullptr;
+
+private:
+
+	/// <summary>
+	/// シーンを正常な状態にリセットする
+	/// </summary>
+	void SceneReset();
 };

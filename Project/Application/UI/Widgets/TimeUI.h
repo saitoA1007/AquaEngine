@@ -44,20 +44,48 @@ public:
 		baseWorld_.SetParent(parent);
 	}
 
+	// 色の設定
+	void SetColor(Vector3 color) {
+		for (size_t i = 0; i < numSprite_.size(); ++i) {
+			numSprite_[i].sprite_->color_.x = color.x;
+			numSprite_[i].sprite_->color_.y = color.y;
+			numSprite_[i].sprite_->color_.z = color.z;
+		}
+		dotSprite_->color_.x = color.x;
+		dotSprite_->color_.y = color.y;
+		dotSprite_->color_.z = color.z;
+	}
+
+	// 色の設定
+	void SetColor(Vector4 color) {
+		for (size_t i = 0; i < numSprite_.size(); ++i) {
+			numSprite_[i].sprite_->color_ = color;
+			dotSprite_->color_ = color;
+		}
+	}
+
+	// 透明度の設定
+	void SetAlpha(float alpha) {
+		for (size_t i = 0; i < numSprite_.size(); ++i) {
+			numSprite_[i].sprite_->color_.w = alpha;
+			dotSprite_->color_.w = alpha;
+		}
+	}
+
 private:
 
 	// 使用テクスチャ
 	const std::array<std::string, 10> numTexture_ = {
-		"circle.png",
-		"circle.png",
-		"circle.png",
-		"circle.png",
-		"circle.png",
-		"circle.png",
-		"circle.png",
-		"circle.png",
-		"circle.png",
-		"circle.png",
+		"0.png",
+		"1.png",
+		"2.png",
+		"3.png",
+		"4.png",
+		"5.png",
+		"6.png",
+		"7.png",
+		"8.png",
+		"9.png",
 	};
 
 private:
