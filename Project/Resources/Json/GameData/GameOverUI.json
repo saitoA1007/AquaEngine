@@ -3,7 +3,7 @@
         "BackTitleUI": {
             "MaxTime": 1.0,
             "ScaleRatio": 0.75,
-            "SpriteSprite": {
+            "TextSprite": {
                 "AnchorPoint": [
                     0.5,
                     0.5
@@ -29,7 +29,7 @@
                 ]
             }
         },
-        "BgSpriteSprite": {
+        "BgSprite": {
             "AnchorPoint": [
                 0.0,
                 0.0
@@ -82,7 +82,7 @@
         "RetryUI": {
             "MaxTime": 1.0,
             "ScaleRatio": 0.75,
-            "SpriteSprite": {
+            "TextSprite": {
                 "AnchorPoint": [
                     0.5,
                     0.5

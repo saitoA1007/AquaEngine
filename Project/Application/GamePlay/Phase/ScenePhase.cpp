@@ -4,6 +4,7 @@
 #include "Application/UI/Managers/PlayUIManager.h"
 #include "Application/UI/Managers/GameOverUIManager.h"
 #include "Application/UI/Managers/ClearUIManager.h"
+#include "Application/UI/Managers/PauseUIManager.h"
 #include "Application/Player/Player.h"
 #include "Application/Enemy/BossEnemy.h"
 #include "Application/Camera/CameraController.h"
@@ -92,6 +93,11 @@ void TutorialPhase::Update() {
 		if (commonData_.inputCommand->IsCommandActive("CameraLockOn")) {
 			playUIManager_->SetBarActive(cameraController_->UseLetterBoxUI());
 		}
+
+		// ポーズ画面を開く
+		if (commonData_.inputCommand->IsCommandActive("PauseAction")) {
+			commonData_.requestPhase = ScenePhase::kPause;
+		}
 	}
 
 	// ボスの入りのアニメーションが終わればプレイシーンに移行
@@ -102,8 +108,10 @@ void TutorialPhase::Update() {
 
 void TutorialPhase::Exit() {
 	// 表示させる
-	playUIManager_->SetIsDrawGamePlayUI(true);
-	playUIManager_->SetIsDrawPlayGuide(true);
+	if (commonData_.requestPhase != ScenePhase::kPause) {
+		playUIManager_->SetIsDrawGamePlayUI(true);
+		playUIManager_->SetIsDrawPlayGuide(true);
+	}
 }
 
 //===========================================
@@ -122,8 +130,12 @@ PlayPhase::PlayPhase(PhaseCommonData& commonData, Player* player, BossEnemy* bos
 }
 
 void PlayPhase::Enter() {
+
+	if (ScenePhase::kPause != commonData_.GetPrePhase()) {
+		// リセット
+		playTimer_.Reset();
+	}
 	// 計測開始
-	playTimer_.Reset();
 	playTimer_.Start();
 
 	// Hpを設定
@@ -134,6 +146,11 @@ void PlayPhase::Enter() {
 }
 
 void PlayPhase::Update() {
+
+	// ポーズ画面を開く
+	if (commonData_.inputCommand->IsCommandActive("PauseAction")) {
+		commonData_.requestPhase = ScenePhase::kPause;
+	}
 
 	// 黒帯UIを表示
 	if (commonData_.inputCommand->IsCommandActive("CameraLockOn")) {
@@ -159,21 +176,27 @@ void PlayPhase::Update() {
 }
 
 void PlayPhase::Exit() {
-	// 計測停止
-	playTimer_.Stop();
-	commonData_.playTime_ = playTimer_.GetTimer();
+	if (commonData_.requestPhase != ScenePhase::kPause) {
+		// 計測停止
+		playTimer_.Stop();
+		commonData_.playTime_ = playTimer_.GetTimer();
+	}
 }
 
 //=========================================================
 // ポーズ
 //=========================================================
 
-PausePhase::PausePhase(PhaseCommonData& commonData) : IScenePhase(commonData) {
-
+PausePhase::PausePhase(PhaseCommonData& commonData, PauseUIManager* pauseUIManager) : IScenePhase(commonData) {
+	pauseUIManager_ = pauseUIManager;
+	pauseUIManager_->SetActive(false);
 }
 
 void PausePhase::Enter() {
-
+	pauseUIManager_->SetActive(true);
+	pauseUIManager_->Initialize();
+	// 入りのアニメーション
+	pauseUIManager_->Play(PauseUIManager::Phase::kIn);
 }
 
 void PausePhase::Update() {
@@ -181,11 +204,65 @@ void PausePhase::Update() {
 	// 時間を停止する
 	commonData_.timeController_->StartStopTime(3600.0f);
 
+	if (!pauseUIManager_->IsAnimation()) {
+		// 操作
+		if (commonData_.inputCommand->IsCommandActive("SelectUp")) {
 
+			if (selectNum_ >= 1) {
+				selectNum_--;
+			}
+			pauseUIManager_->SetType(static_cast<PauseUIManager::SelectType>(selectNum_));
+		}
+
+		if (commonData_.inputCommand->IsCommandActive("SelectDown")) {
+
+			if (selectNum_ <= 1) {
+				selectNum_++;
+			}
+			pauseUIManager_->SetType(static_cast<PauseUIManager::SelectType>(selectNum_));
+		}
+
+
+		// 決定
+		if (commonData_.inputCommand->IsCommandActive("Decision")) {
+
+			if (PauseUIManager::SelectType::kRetry == pauseUIManager_->GetType()) {
+				// やり直す
+				commonData_.requestPhase = ScenePhase::kTutorial;
+			} else if (PauseUIManager::SelectType::kBackTitle == pauseUIManager_->GetType()) {
+				// タイトルへ戻る
+				commonData_.requestPhase = ScenePhase::kTitle;
+			} else {
+
+				// 戻る場合はアニメーション
+				pauseUIManager_->Play(PauseUIManager::Phase::kOut);
+			}
+		}
+
+		// 戻る
+		if (commonData_.inputCommand->IsCommandActive("PauseAction")) {
+			// 戻る場合はアニメーション
+			pauseUIManager_->Play(PauseUIManager::Phase::kOut);
+		}
+	}
+
+	// アニメーションが終了したら遷移する
+	if (PauseUIManager::SelectType::kBack == pauseUIManager_->GetType()) {
+		if (PauseUIManager::Phase::kOut == pauseUIManager_->GetPhase()) {
+			if (!pauseUIManager_->IsAnimation()) {
+
+				if (PauseUIManager::SelectType::kBack == pauseUIManager_->GetType()) {
+					// 前のフェーズへ戻る
+					commonData_.requestPhase = commonData_.GetPrePhase();
+				}
+			}
+		}
+	}
 }
 
 void PausePhase::Exit() {
 	commonData_.timeController_->Reset();
+	pauseUIManager_->SetActive(false);
 }
 
 //=============================================================

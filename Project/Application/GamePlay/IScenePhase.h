@@ -39,6 +39,18 @@ struct PhaseCommonData {
 
     // シーンの状態をリセットする
     bool resetScene = false;
+
+    // 前のフェーズを設定
+    void SetPrePhase() {
+        prePhase = currentPhase;
+    }
+
+    // 前のフェーズを取得
+    ScenePhase GetPrePhase() const { return prePhase; }
+
+private:
+    // 前のフェーズ
+    ScenePhase prePhase = ScenePhase::kTitle;
 };
 
 class IScenePhase {

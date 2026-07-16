@@ -82,4 +82,9 @@ private:
 	bool isEnterAnimation_ = false;
 	float timer_ = 0.0f;
 	float kEnterMaxTime_ = 1.0f;
+
+private:
+
+	// 入りのアニメーション
+	void EnterAnimation();
 };

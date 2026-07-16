@@ -8,7 +8,7 @@
 
 GamePhaseManager::GamePhaseManager(GameEngine::InputCommand* inputCommand, Player* player, BossEnemy* bossEnemy,
 	TitleUIManager* titleUIManager, PlayUIManager* playUIManager, GameOverUIManager* gameOverUIManager, ClearUIManager* clearUIManager,
-	CameraController* cameraController) {
+	PauseUIManager* pauseUIManager,CameraController* cameraController) {
 	commonData_.inputCommand = inputCommand;
 	commonData_.timeController_ = &timeController_;
 
@@ -17,7 +17,7 @@ GamePhaseManager::GamePhaseManager(GameEngine::InputCommand* inputCommand, Playe
 	phases_[ScenePhase::kPlay] = std::make_unique<PlayPhase>(commonData_, player, bossEnemy, playUIManager, cameraController);
 	phases_[ScenePhase::kGameOver] = std::make_unique<GameOverPhase>(commonData_, gameOverUIManager);
 	phases_[ScenePhase::kClear] = std::make_unique<ClearPhase>(commonData_, clearUIManager);
-	phases_[ScenePhase::kPause] = std::make_unique<PausePhase>(commonData_);
+	phases_[ScenePhase::kPause] = std::make_unique<PausePhase>(commonData_, pauseUIManager);
 
 	player_ = player;
 	bossEnemy_ = bossEnemy;
@@ -44,6 +44,9 @@ void GamePhaseManager::Update() {
 			SceneReset();
 			commonData_.resetScene = false;
 		}
+		// 現在のフェーズを前のフェーズとして保存
+		commonData_.SetPrePhase();
+		// 現在のフェーズを変更
 		commonData_.currentPhase = commonData_.requestPhase.value();
 		commonData_.requestPhase = std::nullopt;
 		phases_[commonData_.currentPhase]->Enter();

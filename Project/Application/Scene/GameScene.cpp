@@ -11,6 +11,7 @@ using namespace GameEngine;
 #include "Application/UI/Managers/PlayUIManager.h"
 #include "Application/UI/Managers/GameOverUIManager.h"
 #include "Application/UI/Managers/ClearUIManager.h"
+#include "Application/UI/Managers/PauseUIManager.h"
 
 GameScene::~GameScene() {
 }
@@ -67,9 +68,12 @@ GameScene::GameScene() {
 	auto* gameOverUIManager = gameObjectManager_->AddObject<GameOverUIManager>(textureManager_);
 	// クリアのUI
 	auto* clearUIManager = gameObjectManager_->AddObject<ClearUIManager>(textureManager_);
+	// ポーズのUI
+	auto* pauseUIManager = gameObjectManager_->AddObject<PauseUIManager>(textureManager_);
 
 	// シーンフェーズを管理
-	gameObjectManager_->AddObject<GamePhaseManager>(inputCommand_, player, bossEnemy, titleUIManager, playUIManager, gameOverUIManager, clearUIManager, cameraController_);
+	gameObjectManager_->AddObject<GamePhaseManager>(inputCommand_, player, bossEnemy, titleUIManager, playUIManager, gameOverUIManager, clearUIManager,
+		pauseUIManager, cameraController_);
 }
 
 void GameScene::Initialize() {
@@ -92,9 +96,10 @@ void GameScene::Draw() {
 void GameScene::InputRegisterCommand() {
 
 	// 決定ボタン
+	inputCommand_->RegisterCommand("PauseAction", { {InputState::KeyTrigger, DIK_M},{InputState::PadTrigger, XINPUT_GAMEPAD_START} });
 	inputCommand_->RegisterCommand("Decision", { {InputState::KeyTrigger, DIK_SPACE},{InputState::PadTrigger, XINPUT_GAMEPAD_A} });
-	inputCommand_->RegisterCommand("SelectUp", { {InputState::KeyPush, DIK_W },{InputState::PadLeftStick,0,{0.0f,1.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_UP } });
-	inputCommand_->RegisterCommand("SelectDown", { {InputState::KeyPush, DIK_S },{InputState::PadLeftStick,0,{0.0f,-1.0f},0.2f}, {InputState::PadPush, XINPUT_GAMEPAD_DPAD_DOWN} });
+	inputCommand_->RegisterCommand("SelectUp", { {InputState::KeyTrigger, DIK_W },{InputState::PadLeftStick,0,{0.0f,1.0f},0.2f}, { InputState::PadTrigger, XINPUT_GAMEPAD_DPAD_UP } });
+	inputCommand_->RegisterCommand("SelectDown", { {InputState::KeyTrigger, DIK_S },{InputState::PadLeftStick,0,{0.0f,-1.0f},0.2f}, {InputState::PadTrigger, XINPUT_GAMEPAD_DPAD_DOWN} });
 
 	// 移動の入力コマンドを登録する
 	inputCommand_->RegisterCommand("MoveUp", { {InputState::KeyPush, DIK_W },{InputState::PadLeftStick,0,{0.0f,1.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_UP } });
