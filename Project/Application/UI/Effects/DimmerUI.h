@@ -5,7 +5,7 @@
 
 class DimmerUI : public GameEngine::IGameObject {
 public:
-	DimmerUI(std::string name, GameEngine::DebugParameter* debugParame);
+	DimmerUI(std::string name, GameEngine::DebugParameter* debugParame, bool isFrameActive = false);
 	~DimmerUI() = default;
 
 	// 初期化処理
@@ -21,7 +21,7 @@ public:
 
 	// 基準点に親を設定
 	void SetParent(GameEngine::WorldTransform* parent) {
-		sprite_.SetParent(parent);
+		world_.SetParent(parent);
 	}
 
 	// 色を設定
@@ -50,6 +50,10 @@ public:
 		}
 	}
 
+public:
+	// 基準
+	GameEngine::WorldTransform world_;
+
 private:
 
 	// 時間
@@ -60,15 +64,21 @@ private:
 
 private:
 
-	// 画像
-	GameEngine::Sprite sprite_;
+	// 名前
+	std::string name_;
 
 	bool isPlay_ = false;
 
+	bool isFrameActive_ = false;
+
 	float timer_ = 0.0f;
 
-	Vector2 startScale_;
-	Vector2 endScale_;
+	Vector3 startScale_;
+	Vector3 endScale_;
 
-	std::string name_;
+	// 画像
+	GameEngine::Sprite sprite_;
+	
+	// 背景のフレーム
+	std::unique_ptr<GameEngine::Sprite> frameSprite_;
 };

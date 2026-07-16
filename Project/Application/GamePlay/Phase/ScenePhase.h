@@ -10,6 +10,7 @@ class TitleUIManager;
 class PlayUIManager;
 class GameOverUIManager;
 class ClearUIManager;
+class PauseUIManager;
 
 // タイトル
 class TitlePhase : public IScenePhase {
@@ -85,7 +86,7 @@ private:
 // ポーズシーン
 class PausePhase : public IScenePhase {
 public:
-    PausePhase(PhaseCommonData& commonData);
+    PausePhase(PhaseCommonData& commonData, PauseUIManager* pauseUIManager);
     ~PausePhase() = default;
 
     void Enter() override;
@@ -95,9 +96,9 @@ public:
     void Exit() override;
 
 private:
+    PauseUIManager* pauseUIManager_ = nullptr;
 
-
-
+    int32_t selectNum_ = 0;
 };
 
 // ゲームオーバーシーン

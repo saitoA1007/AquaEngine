@@ -14,7 +14,7 @@ GameOverUIManager::GameOverUIManager(GameEngine::TextureManager* textureManager)
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>("GameOverUI");
 	debugParame_->RegisterSprite("GameOverText", gameOverTextSprite_);
-	debugParame_->RegisterSprite("BgSprite", bgSprite_);
+	debugParame_->RegisterSprite("Bg", bgSprite_);
 
 	// リトライ
 	retryUI_ = std::make_unique<DimmerUI>("RetryUI", debugParame_.get());
@@ -52,23 +52,7 @@ void GameOverUIManager::Update() {
 	debugParame_->ApplyIfDirty();
 
 	if (isEnterAnimation_) {
-		timer_ += FpsCounter::gameDeltaTime / kEnterMaxTime_;
-
-		// 透明度
-		float alpha = Lerp(0.0f, 1.0f, timer_);
-		retryUI_->SetAlpha(alpha);
-		backTitleUI_->SetAlpha(alpha);
-		gameOverTextSprite_.color_.w = alpha;
-		bgSprite_.color_.w = alpha;
-
-		if (timer_ >= 1.0f) {
-			alpha = 1.0f;
-			retryUI_->SetAlpha(alpha);
-			backTitleUI_->SetAlpha(alpha);
-			gameOverTextSprite_.color_.w = alpha;
-			bgSprite_.color_.w = alpha;
-			isEnterAnimation_ = false;
-		}
+		EnterAnimation();
 	}
 
 	switch (type_)
@@ -97,5 +81,25 @@ void GameOverUIManager::Draw() {
 	renderQueue_->SubmitSprite(&gameOverTextSprite_);
 	retryUI_->Draw();
 	backTitleUI_->Draw();
+}
+
+void GameOverUIManager::EnterAnimation() {
+	timer_ += FpsCounter::gameDeltaTime / kEnterMaxTime_;
+
+	// 透明度
+	float alpha = Lerp(0.0f, 1.0f, timer_);
+	retryUI_->SetAlpha(alpha);
+	backTitleUI_->SetAlpha(alpha);
+	gameOverTextSprite_.color_.w = alpha;
+	bgSprite_.color_.w = alpha;
+
+	if (timer_ >= 1.0f) {
+		alpha = 1.0f;
+		retryUI_->SetAlpha(alpha);
+		backTitleUI_->SetAlpha(alpha);
+		gameOverTextSprite_.color_.w = alpha;
+		bgSprite_.color_.w = alpha;
+		isEnterAnimation_ = false;
+	}
 }
 	
