@@ -9,6 +9,8 @@ using namespace GameEngine;
 #include "Application/GamePlay/GamePhaseManager.h"
 #include "Application/UI/Managers/TitleUIManager.h"
 #include "Application/UI/Managers/PlayUIManager.h"
+#include "Application/UI/Managers/GameOverUIManager.h"
+#include "Application/UI/Managers/ClearUIManager.h"
 
 GameScene::~GameScene() {
 }
@@ -59,12 +61,15 @@ GameScene::GameScene() {
 
 	// タイトル中のUI
 	auto* titleUIManager = gameObjectManager_->AddObject<TitleUIManager>(textureManager_);
-
 	// プレイ中のUI
 	auto* playUIManager = gameObjectManager_->AddObject<PlayUIManager>(textureManager_);
+	// ゲームオーバーのUI
+	auto* gameOverUIManager = gameObjectManager_->AddObject<GameOverUIManager>(textureManager_);
+	// クリアのUI
+	auto* clearUIManager = gameObjectManager_->AddObject<ClearUIManager>(textureManager_);
 
 	// シーンフェーズを管理
-	gameObjectManager_->AddObject<GamePhaseManager>(inputCommand_, player, bossEnemy, titleUIManager, playUIManager, cameraController_);
+	gameObjectManager_->AddObject<GamePhaseManager>(inputCommand_, player, bossEnemy, titleUIManager, playUIManager, gameOverUIManager, clearUIManager, cameraController_);
 }
 
 void GameScene::Initialize() {
@@ -88,6 +93,8 @@ void GameScene::InputRegisterCommand() {
 
 	// 決定ボタン
 	inputCommand_->RegisterCommand("Decision", { {InputState::KeyTrigger, DIK_SPACE},{InputState::PadTrigger, XINPUT_GAMEPAD_A} });
+	inputCommand_->RegisterCommand("SelectUp", { {InputState::KeyPush, DIK_W },{InputState::PadLeftStick,0,{0.0f,1.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_UP } });
+	inputCommand_->RegisterCommand("SelectDown", { {InputState::KeyPush, DIK_S },{InputState::PadLeftStick,0,{0.0f,-1.0f},0.2f}, {InputState::PadPush, XINPUT_GAMEPAD_DPAD_DOWN} });
 
 	// 移動の入力コマンドを登録する
 	inputCommand_->RegisterCommand("MoveUp", { {InputState::KeyPush, DIK_W },{InputState::PadLeftStick,0,{0.0f,1.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_UP } });

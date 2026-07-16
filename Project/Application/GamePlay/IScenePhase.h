@@ -36,6 +36,9 @@ struct PhaseCommonData {
 
     // 時間の管理
     TimeController* timeController_ = nullptr;
+
+    // シーンの状態をリセットする
+    bool resetScene = false;
 };
 
 class IScenePhase {

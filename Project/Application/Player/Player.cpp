@@ -229,8 +229,14 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 		bounceAction_.WallBounce(worldTransform_.transform_.translate, result.contactNormal * -1.0f, result.penetrationDepth, attackRushAction_.GetRushMaxSpeed());
 	}
 
+	// 風による攻撃
+	if (isWind) {
+		// ダメージを受ける
+		playerStatus_.TakeDamage(1);
+	}
+
 	// ボスの衝突判定
-	if (isBoss || isWind) {
+	if (isBoss) {
 
 		BossEnemy* boss = result.userData.As<BossEnemy>();
 		if (boss == nullptr) { return; }

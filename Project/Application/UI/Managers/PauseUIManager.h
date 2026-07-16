@@ -32,6 +32,9 @@ private:
 	// ポーズ文字UI
 	GameEngine::Sprite pauseTextSprite_;
 
-
+	// 半透明の背景
+	GameEngine::Sprite bgSprite_;
+	// 隠れるフレーム部分
+	GameEngine::Sprite frameSprite_;
 
 };

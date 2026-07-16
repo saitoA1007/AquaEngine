@@ -2,6 +2,8 @@
 #include "InputCommand.h"
 #include "Application/UI/Managers/TitleUIManager.h"
 #include "Application/UI/Managers/PlayUIManager.h"
+#include "Application/UI/Managers/GameOverUIManager.h"
+#include "Application/UI/Managers/ClearUIManager.h"
 #include "Application/Player/Player.h"
 #include "Application/Enemy/BossEnemy.h"
 #include "Application/Camera/CameraController.h"
@@ -11,8 +13,10 @@
 // タイトル
 //=============================================================
 
-TitlePhase::TitlePhase(PhaseCommonData& commonData, TitleUIManager* titleUIManager) : IScenePhase(commonData) {
+TitlePhase::TitlePhase(PhaseCommonData& commonData, TitleUIManager* titleUIManager, Player* player) : IScenePhase(commonData) {
 	titleUIManager_ = titleUIManager;
+
+	player_ = player;
 }
 
 void TitlePhase::Enter() {
@@ -20,6 +24,9 @@ void TitlePhase::Enter() {
 	titleUIManager_->SetActive(true);
 	// 初期化
 	titleUIManager_->Initialize();
+
+	// プレイヤーの無効化
+	player_->SetActive(false);
 }
 
 void TitlePhase::Update() {
@@ -39,13 +46,16 @@ void TitlePhase::Update() {
 void TitlePhase::Exit() {
 	// UIを有効
 	titleUIManager_->SetActive(false);
+
+	// プレイヤーを有効化
+	player_->SetActive(true);
 }
 
 //=====================================================
 // チュートリアル
 //=====================================================
 
-TutorialPhase::TutorialPhase(PhaseCommonData& commonData, CameraController* cameraController, BossEnemy* bossEnemy,PlayUIManager* playUIManager) : IScenePhase(commonData) {
+TutorialPhase::TutorialPhase(PhaseCommonData& commonData, CameraController* cameraController, BossEnemy* bossEnemy, PlayUIManager* playUIManager) : IScenePhase(commonData) {
 
 	// カメラ管理を取得
 	cameraController_ = cameraController;
@@ -136,12 +146,12 @@ void PlayPhase::Update() {
 
 	// ボスが撃破されればクリアへ移行
 	if (bossEnemy_->GetCurrentHp() <= 0) {
-
+		commonData_.requestPhase = ScenePhase::kClear;
 	}
 
-	// プレイヤーが撃破されればゲームオーバーへ以降
+	// プレイヤーが撃破されればゲームオーバーへ移行
 	if (player_->GetCurrentHp() <= 0) {
-
+		commonData_.requestPhase = ScenePhase::kGameOver;
 	}
 
 	// 計測
@@ -182,32 +192,69 @@ void PausePhase::Exit() {
 // ゲームオーバー
 //=============================================================
 
-GameOverPhase::GameOverPhase(PhaseCommonData& commonData) : IScenePhase(commonData) {
+GameOverPhase::GameOverPhase(PhaseCommonData& commonData, GameOverUIManager* gameOverUIManager) : IScenePhase(commonData) {
 
+	gameOverUIManager_ = gameOverUIManager;
+	gameOverUIManager_->SetActive(false);
 }
 
 void GameOverPhase::Enter() {
-
+	// UIを有効化
+	gameOverUIManager_->SetActive(true);
+	// 初期化
+	gameOverUIManager_->Initialize();
+	gameOverUIManager_->StartEnterAnimation();
 }
 
 void GameOverPhase::Update() {
 
+	// 操作
+	if (commonData_.inputCommand->IsCommandActive("SelectUp")) {
+		gameOverUIManager_->SetType(GameOverUIManager::SelectType::kRetry);
+	}
+
+	if (commonData_.inputCommand->IsCommandActive("SelectDown")) {
+		gameOverUIManager_->SetType(GameOverUIManager::SelectType::kBackTitle);
+	}
+
+	// 決定
+	if (commonData_.inputCommand->IsCommandActive("Decision")) {
+		gameOverUIManager_->Play();
+
+		// リセットする
+		commonData_.resetScene = true;
+
+		// 遷移させる
+		if (gameOverUIManager_->GetType() == GameOverUIManager::SelectType::kRetry) {
+			// やり直す
+			commonData_.requestPhase = ScenePhase::kTutorial;
+		} else {
+			// タイトルへ戻る
+			commonData_.requestPhase = ScenePhase::kTitle;
+		}
+	}
 }
 
 void GameOverPhase::Exit() {
-
+	// UIを無効化
+	gameOverUIManager_->SetActive(false);
 }
 
 //===========================================
 // クリア
 //===========================================
 
-ClearPhase::ClearPhase(PhaseCommonData& commonData) : IScenePhase(commonData) {
+ClearPhase::ClearPhase(PhaseCommonData& commonData, ClearUIManager* clearUIManager) : IScenePhase(commonData) {
 
+	clearUIManager_ = clearUIManager;
+	clearUIManager_->SetActive(false);
 }
 
 void ClearPhase::Enter() {
-
+	// UIを有効化
+	clearUIManager_->SetActive(true);
+	// 初期化
+	clearUIManager_->Initialize();
 }
 
 void ClearPhase::Update() {
@@ -215,5 +262,6 @@ void ClearPhase::Update() {
 }
 
 void ClearPhase::Exit() {
-
+	// UIを無効化
+	clearUIManager_->SetActive(false);
 }

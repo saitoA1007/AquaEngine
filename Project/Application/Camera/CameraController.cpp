@@ -18,14 +18,15 @@ CameraController::CameraController(GameEngine::InputCommand* inputCommand, const
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>("Camera");
 	
-	states_[static_cast<size_t>(CameraState::kFollow)] = std::make_unique<FollowCameraState>(this, debugParame_.get());
-	states_[static_cast<size_t>(CameraState::kLockOn)] = std::make_unique<LockOnCameraState>(this, debugParame_.get());
+	// 登録
+	states_[CameraState::kFollow] = std::make_unique<FollowCameraState>(this, debugParame_.get());
+	states_[CameraState::kLockOn] = std::make_unique<LockOnCameraState>(this, debugParame_.get());
 
 	// パラメーターの値を適応
 	debugParame_->Apply();
 
 	currentStateType_ = CameraState::kFollow;
-	currentState_ = states_[static_cast<size_t>(currentStateType_)].get();
+	currentState_ = states_[currentStateType_].get();
 	currentState_->Enter();
 }
 
@@ -37,7 +38,7 @@ void CameraController::Initialize() {
 	currentTarget_.y = 1.0f;
 
 	currentStateType_ = CameraState::kFollow;
-	currentState_ = states_[static_cast<size_t>(currentStateType_)].get();
+	currentState_ = states_[currentStateType_].get();
 	currentState_->Enter();
 }
 
@@ -90,7 +91,7 @@ void CameraController::Update() {
 void CameraController::ChangeState(CameraState next) {
 	currentState_->Exit();
 	currentStateType_ = next;
-	currentState_ = states_[static_cast<size_t>(next)].get();
+	currentState_ = states_[currentStateType_].get();
 	currentState_->Enter();
 }
 

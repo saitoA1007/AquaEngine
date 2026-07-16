@@ -17,8 +17,10 @@ TimeUI::TimeUI(std::string name, GameEngine::TextureManager* textureManager) {
 		numSprite_[i].num_ = numGH_[0];
 	}
 
+	// 中間点
 	dotSprite_ = std::make_unique<Sprite>();
 	dotSprite_->SetParent(&baseWorld_);
+	dotSprite_->textureHandle_ = textureManager->GetHandleByName("dotto.png");
 
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>(name);
