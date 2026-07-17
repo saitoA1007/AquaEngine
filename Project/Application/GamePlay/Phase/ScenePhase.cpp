@@ -97,6 +97,8 @@ void TutorialPhase::Update() {
 		playUIManager_->SetIsDrawGamePlayUI(false);
 		playUIManager_->SetIsDrawTutorialGuide(false);
 		playUIManager_->SetIsDrawPlayGuide(false);
+		// 演出カメラに変更
+		cameraController_->SetChangeState(CameraState::kEnterMovie);
 	} else {
 		// 黒帯UIを表示
 		playUIManager_->SetBarActive(cameraController_->UseLetterBoxUI());
@@ -118,6 +120,8 @@ void TutorialPhase::Exit() {
 	if (commonData_.requestPhase != ScenePhase::kPause) {
 		playUIManager_->SetIsDrawGamePlayUI(true);
 		playUIManager_->SetIsDrawPlayGuide(true);
+		// フォローカメラに変更
+		cameraController_->SetChangeState(CameraState::kFollow);
 	}
 }
 

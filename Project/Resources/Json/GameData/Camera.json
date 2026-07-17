@@ -1,5 +1,29 @@
 {
     "Camera": {
+        "ClearMovie": {
+            "PositionLerpRate": 0.07000000029802322,
+            "TargetLerpRate": 0.10000000149011612
+        },
+        "EnterMovie": {
+            "Fov": 0.699999988079071,
+            "MoveFov": 0.8999999761581421,
+            "MoveMaxTime": 2.0,
+            "MoveOffsetY": 2.0,
+            "MovePosition": [
+                0.0,
+                0.0,
+                -15.0
+            ],
+            "PositionLerpRate": 1.0,
+            "TargetLerpRate": 0.800000011920929,
+            "WaitFov": 0.699999988079071,
+            "WaitMaxTime": 1.0,
+            "WaitPosition": [
+                0.0,
+                10.0,
+                -30.0
+            ]
+        },
         "Follow": {
             "Distance": 38.0,
             "Fov": 0.44999998807907104,

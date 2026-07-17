@@ -60,6 +60,13 @@ private:
 // 入りのムービーカメラ
 class EnterMovieCameraState : public ICameraState {
 public:
+	// カメラの状態
+	enum class Phase {
+		kMove,
+		kWait,
+	};
+
+public:
 	EnterMovieCameraState(CameraController* controller, GameEngine::DebugParameter* param);
 
 	void Enter() override;
@@ -67,11 +74,21 @@ public:
 	void Update(float dt60) override;
 	
 private:
-	
+
+	float kMoveMaxTime_ = 2.0f;
+	float kWaitMaxTime_ = 1.0f;
+
+	Vector3 kMovePos_ = { 0.0f,0.0f,0.0f };
+	float kMoveOfferY_ = 0.0f;
+	float kMoveFov_ = 0.9f;
+
+	Vector3 kWaitPos_ = { 0.0f,0.0f,0.0f };
+	float kWaitFov_ = 0.7f;
 private:
 
+	float timer_ = 0.0f;
 
-
+	Phase phase_ = Phase::kMove;
 };
 
 // クリアのムービーカメラ
