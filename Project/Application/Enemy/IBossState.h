@@ -20,6 +20,7 @@ struct BossStateCommonData {
 
 	// 卵が壊れているか
 	bool isBreakEgg = false;
+	bool isDrawEgg = false;
 
 	// hp
 	int32_t hp_ = 1;

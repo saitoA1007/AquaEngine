@@ -75,7 +75,9 @@ public:
 	
 private:
 
+	// カメラの動く時間
 	float kMoveMaxTime_ = 2.0f;
+	// カメラの待機時間
 	float kWaitMaxTime_ = 1.0f;
 
 	Vector3 kMovePos_ = { 0.0f,0.0f,0.0f };

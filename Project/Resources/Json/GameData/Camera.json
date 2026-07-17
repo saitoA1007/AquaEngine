@@ -7,7 +7,7 @@
         "EnterMovie": {
             "Fov": 0.699999988079071,
             "MoveFov": 0.8999999761581421,
-            "MoveMaxTime": 2.0,
+            "MoveMaxTime": 2.5,
             "MoveOffsetY": 2.0,
             "MovePosition": [
                 0.0,

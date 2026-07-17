@@ -15,6 +15,7 @@ void BossStateIn::Enter() {
 
 	// 初期化
 	isMove_ = true;
+	delayBreakEgg_ = true;
 	timer_ = 0.0f;
 }
 
@@ -22,7 +23,18 @@ void BossStateIn::Update() {
 
 	if (!stateCommonData_.isBreakEgg) { return; }
 
-	if (isMove_) {
+	if (delayBreakEgg_) {
+		timer_ += FpsCounter::gameDeltaTime / delayMaxTime_;
+
+		if (timer_ >= 1.0f) {
+			timer_ = 0.0f;
+			delayBreakEgg_ = false;
+			// 卵を描画しない
+			stateCommonData_.isDrawEgg = false;
+		}
+	}
+
+	if (isMove_ && !delayBreakEgg_) {
 		timer_ += FpsCounter::gameDeltaTime / maxInTime_;
 
 		// 上昇
@@ -36,6 +48,7 @@ void BossStateIn::Update() {
 		stateCommonData_.worldTransform->transform_.rotate.y = targetRad;
 
 		if (timer_ >= 1.0f) {
+			stateCommonData_.worldTransform->transform_.rotate.y = 1620.0f * (std::numbers::pi_v<float> / 180.0f);
 			isMove_ = false;
 			// 次フェーズへ向けてタイマーリセット
 			timer_ = 0.0f;
