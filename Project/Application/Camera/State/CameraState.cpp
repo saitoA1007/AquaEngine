@@ -176,11 +176,13 @@ void ClearMovieCameraState::Update(float dt60) {
 //================================================================================
 
 TitleCameraState::TitleCameraState(CameraController* controller, GameEngine::DebugParameter* param) : ICameraState(controller) {
-	std::string subGroup = "ClearMovie";
+	std::string subGroup = "Title";
 	int index = 0;
 	param->Register("PositionLerpRate", commonData_.positionLerpRate, index++, subGroup);
 	param->Register("TargetLerpRate", commonData_.targetLerpRate, index++, subGroup);
-
+	param->Register("IdealTarget", commonData_.idealTarget, index++, subGroup);
+	param->Register("IdealPosition", commonData_.idealPosition, index++, subGroup);
+	param->Register("Fov", commonData_.targetFov, index++, subGroup);
 }
 
 void TitleCameraState::Enter() {

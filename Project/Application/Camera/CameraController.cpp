@@ -21,6 +21,7 @@ CameraController::CameraController(GameEngine::InputCommand* inputCommand, const
 	// 登録
 	states_[CameraState::kFollow] = std::make_unique<FollowCameraState>(this, debugParame_.get());
 	states_[CameraState::kLockOn] = std::make_unique<LockOnCameraState>(this, debugParame_.get());
+	states_[CameraState::kTitle] = std::make_unique<TitleCameraState>(this, debugParame_.get());
 
 	// パラメーターの値を適応
 	debugParame_->Apply();

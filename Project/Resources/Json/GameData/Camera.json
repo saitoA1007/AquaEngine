@@ -4,9 +4,11 @@
             "Distance": 38.0,
             "Fov": 0.44999998807907104,
             "OffsetY": 1.0,
+            "PositionLerpRate": 0.07000000029802322,
             "RotateDamping": 0.8799999952316284,
             "RotateSpeed": 2.0,
-            "RotateY": -1.2000000476837158
+            "RotateY": -1.2000000476837158,
+            "TargetLerpRate": 0.10000000149011612
         },
         "LockOn": {
             "FovLerpRate": 0.05000000074505806,
@@ -17,10 +19,27 @@
             "LockOnPlayerOffsetY": 1.0,
             "LockOnRotateRate": 0.05999999865889549,
             "LockOnTargetOffsetY": 13.399999618530273,
-            "MinLockOnDistance": 29.940000534057617
+            "MinLockOnDistance": 29.940000534057617,
+            "PositionLerpRate": 0.07000000029802322,
+            "TargetLerpRate": 0.10000000149011612
         },
         "PositionLerpRate": 0.07999999821186066,
         "SceneName": "Game",
-        "TargetLerpRate": 0.11999999731779099
+        "TargetLerpRate": 0.11999999731779099,
+        "Title": {
+            "Fov": 0.699999988079071,
+            "IdealPosition": [
+                20.0,
+                40.0,
+                -50.0
+            ],
+            "IdealTarget": [
+                -20.0,
+                10.0,
+                0.0
+            ],
+            "PositionLerpRate": 1.0,
+            "TargetLerpRate": 1.0
+        }
     }
 }
