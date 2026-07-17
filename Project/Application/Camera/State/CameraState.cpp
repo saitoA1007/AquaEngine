@@ -141,14 +141,53 @@ EnterMovieCameraState::EnterMovieCameraState(CameraController* controller, GameE
 	int index = 0;
 	param->Register("PositionLerpRate", commonData_.positionLerpRate, index++, subGroup);
 	param->Register("TargetLerpRate", commonData_.targetLerpRate, index++, subGroup);
+	param->Register("MovePosition", kMovePos_, index++, subGroup);
+	param->Register("MoveOffsetY", kMoveOfferY_, index++, subGroup);
+	param->Register("WaitPosition", kWaitPos_, index++, subGroup);
+	param->Register("MoveFov", kMoveFov_, index++, subGroup);
+	param->Register("WaitFov", kWaitFov_, index++, subGroup);
+	param->Register("MoveMaxTime", kMoveMaxTime_, index++, subGroup);
+	param->Register("WaitMaxTime", kWaitMaxTime_, index++, subGroup);
 }
 
 void EnterMovieCameraState::Enter() {
-	
+	phase_ = Phase::kMove;
 }
 
 void EnterMovieCameraState::Update(float dt60) {
-	
+
+
+	Vector3 enemyPos = controller_->GetTargetWorld()->transform_.translate;
+	commonData_.idealTarget = enemyPos;
+
+	switch (phase_)
+	{
+	case EnterMovieCameraState::Phase::kMove:
+		
+		timer_ += FpsCounter::gameDeltaTime / kMoveMaxTime_;
+
+		commonData_.idealTarget.y += kMoveOfferY_;
+		commonData_.idealPosition = kMovePos_;
+		commonData_.targetFov = kMoveFov_;
+
+		if (timer_ >= 1.0f) {
+			timer_ = 0.0f;
+			phase_ = Phase::kWait;
+		}
+		break;
+
+
+	case EnterMovieCameraState::Phase::kWait:
+		timer_ += FpsCounter::gameDeltaTime / kWaitMaxTime_;
+
+		commonData_.idealPosition = kWaitPos_;
+		commonData_.targetFov = kWaitFov_;
+
+		if (timer_ >= 1.0f) {
+
+		}
+		break;
+	}
 }
 
 //=================================================================================

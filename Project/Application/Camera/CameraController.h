@@ -31,6 +31,7 @@ public:
 	/// </summary>
 	/// <param name="state">状態</param>
 	void SetChangeState(CameraState state) {
+		if (currentStateType_ == state) { return; }
 		requestState = state;
 	}
 
