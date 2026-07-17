@@ -1,6 +1,23 @@
 {
     "GameOverUI": {
         "BackTitleUI": {
+            "BaseWorldWorldTransform": {
+                "Rotate": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "Scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Translate": [
+                    640.0,
+                    580.0,
+                    0.0
+                ]
+            },
             "MaxTime": 1.0,
             "ScaleRatio": 0.75,
             "TextSprite": {
@@ -19,13 +36,13 @@
                     1.0
                 ],
                 "Position": [
-                    640.0,
-                    580.0
+                    0.0,
+                    0.0
                 ],
                 "Rotate": 0.0,
                 "Scale": [
                     200.0,
-                    100.0
+                    80.0
                 ]
             }
         },
@@ -76,10 +93,27 @@
             "Rotate": 0.0,
             "Scale": [
                 512.0,
-                128.0
+                108.04000091552734
             ]
         },
         "RetryUI": {
+            "BaseWorldWorldTransform": {
+                "Rotate": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "Scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Translate": [
+                    640.0,
+                    450.0,
+                    0.0
+                ]
+            },
             "MaxTime": 1.0,
             "ScaleRatio": 0.75,
             "TextSprite": {
@@ -98,13 +132,13 @@
                     1.0
                 ],
                 "Position": [
-                    640.0,
-                    450.0
+                    0.0,
+                    0.0
                 ],
                 "Rotate": 0.0,
                 "Scale": [
                     200.0,
-                    100.0
+                    80.0
                 ]
             }
         },

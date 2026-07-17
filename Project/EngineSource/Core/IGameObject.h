@@ -41,7 +41,7 @@ namespace GameEngine {
 		static RenderQueue* renderQueue_;
 
 		// 更新処理順
-		int32_t updateOrder_ = 0;
+		int32_t updateOrder_ = 1;
 		// 有効状態
 		bool isActive_ = true;
 		// 削除管理
