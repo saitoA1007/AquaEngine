@@ -89,6 +89,7 @@ void BossEnemy::Initialize() {
 	stateCommonData_.hp_ = maxHp_;
 
 	stateCommonData_.isBreakEgg = false;
+	stateCommonData_.isDrawEgg = true;
 
 	// 初期化
 	bossState_ = BossState::kIn;
@@ -131,13 +132,12 @@ void BossEnemy::Update() {
 
 void BossEnemy::Draw() {
 
-	if (stateCommonData_.isBreakEgg) {
+	if (stateCommonData_.isDrawEgg) {
+		// 卵モデルを描画
+		renderQueue_->SubmitRaytracingModel(eggModel_, modelComponent_.worldTransform_);
+	} else {
 		// 描画
 		modelComponent_.DrawRaytracing(renderQueue_);
-	} else {
-
-		// 卵モデルを描画
-		renderQueue_->SubmitRaytracingModel(eggModel_, modelComponent_.worldTransform_);	
 	}
 }
 

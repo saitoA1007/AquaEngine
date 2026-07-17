@@ -32,8 +32,11 @@ private:
 
 	float timer_ = 0.0f;
 
+	float delayMaxTime_ = 1.0f;
 	float maxInTime_ = 2.0f;
 	float maxWaitTime_ = 2.0f;
+
+	bool delayBreakEgg_ = false;
 
 	bool isMove_ = true;
 };
