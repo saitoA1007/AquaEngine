@@ -15,7 +15,7 @@ class PauseUIManager;
 // タイトル
 class TitlePhase : public IScenePhase {
 public:
-    TitlePhase(PhaseCommonData& commonData, TitleUIManager* titleUIManager, Player* player);
+    TitlePhase(PhaseCommonData& commonData, CameraController* cameraController, TitleUIManager* titleUIManager, Player* player);
     ~TitlePhase() = default;
 
     void Enter() override;
@@ -25,6 +25,8 @@ public:
     void Exit() override;
 
 private:
+    CameraController* cameraController_ = nullptr;
+
     TitleUIManager* titleUIManager_ = nullptr;
 
     Player* player_ = nullptr;

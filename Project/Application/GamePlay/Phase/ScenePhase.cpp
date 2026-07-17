@@ -14,7 +14,10 @@
 // タイトル
 //=============================================================
 
-TitlePhase::TitlePhase(PhaseCommonData& commonData, TitleUIManager* titleUIManager, Player* player) : IScenePhase(commonData) {
+TitlePhase::TitlePhase(PhaseCommonData& commonData, CameraController* cameraController, TitleUIManager* titleUIManager, Player* player) : IScenePhase(commonData) {
+
+	cameraController_ = cameraController;
+
 	titleUIManager_ = titleUIManager;
 
 	player_ = player;
@@ -22,9 +25,12 @@ TitlePhase::TitlePhase(PhaseCommonData& commonData, TitleUIManager* titleUIManag
 
 void TitlePhase::Enter() {
 	// UIを有効
-	titleUIManager_->SetActive(false);
+	titleUIManager_->SetActive(true);
 	// 初期化
 	titleUIManager_->Initialize();
+
+	// タイトルのカメラに変更
+	cameraController_->SetChangeState(CameraState::kTitle);
 
 	// プレイヤーの無効化
 	player_->SetActive(false);
@@ -47,6 +53,9 @@ void TitlePhase::Update() {
 void TitlePhase::Exit() {
 	// UIを有効
 	titleUIManager_->SetActive(false);
+
+	// フォローカメラに変更
+	cameraController_->SetChangeState(CameraState::kFollow);
 
 	// プレイヤーを有効化
 	player_->SetActive(true);
