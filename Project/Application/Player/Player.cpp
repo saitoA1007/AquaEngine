@@ -186,29 +186,32 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 		if (worldTransform_.transform_.translate.y < 0.0f) {
 			worldTransform_.transform_.translate.y = 0.0f;
 		}
-		// 速度を0にする
-		if (commonData_.velocity.y < 0.0f) {
+	
+		if (commonData_.velocity.y <= 0.0f) {
+
+			// 速度を0にする
 			commonData_.velocity.y = 0.0f;
-		}
 
-		// 空中浮遊状態なら歩き状態へ
-		if (commonData_.animator_->GetCurrentType() == PlayerAnimationType::kAirMove) {
-			commonData_.animator_->StartAnimation(PlayerAnimationType::kWalk, "歩き");
-		}
+			// 空中浮遊状態なら歩き状態へ
+			if (commonData_.animator_->GetCurrentType() == PlayerAnimationType::kAirMove) {
+				commonData_.animator_->StartAnimation(PlayerAnimationType::kWalk, "歩き");
+			}
 
-		if (commonData_.state == PlayerState::kAttackDown) {
-			// 地面破壊スタート
-			commonData_.effectManager_->StartShockWave(Vector3(worldTransform_.transform_.translate.x, 1.0f, worldTransform_.transform_.translate.z));
+			if (commonData_.state == PlayerState::kAttackDown) {
+				// 地面破壊スタート
+				commonData_.effectManager_->StartShockWave(Vector3(worldTransform_.transform_.translate.x, 1.0f, worldTransform_.transform_.translate.z));
 
-			commonData_.state = PlayerState::kStiffness;
-			commonData_.animator_->StartAnimation(PlayerAnimationType::kWalk, "歩き");
-			Log("Player End attackDown");
-		}
+				commonData_.state = PlayerState::kStiffness;
+				commonData_.animator_->StartAnimation(PlayerAnimationType::kWalk, "歩き");
+				Log("Player End attackDown");
+			}
 
-		if (commonData_.state == PlayerState::kJump) {
-			commonData_.state = PlayerState::kNone;
-			commonData_.animator_->StartAnimation(PlayerAnimationType::kWalk, "歩き");
-		}
+			// 地面に接触状態
+			if (commonData_.state == PlayerState::kJump) {
+				commonData_.state = PlayerState::kNone;
+				commonData_.animator_->StartAnimation(PlayerAnimationType::kWalk, "歩き");
+			}
+		}	
 	}
 
 	// 壁の衝突処理
