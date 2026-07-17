@@ -30,10 +30,12 @@ public:
 
 	// バー表示の有効設定
 	void SetBarActive(bool isActive) {
-		timer_ = 0.0f;
+
+		if (isBarActive_ != isActive) {
+			timer_ = 0.0f;
+		}
+
 		isBarActive_ = isActive;
-		// 表示させる
-		if (isActive) { isBarDrawActive_ = true; }
 	}
 
 private:
@@ -62,7 +64,6 @@ private:
 	float timer_ = 1.0f;
 
 	bool isBarActive_ = false;
-	bool isBarDrawActive_ = false;
 
 private:
 

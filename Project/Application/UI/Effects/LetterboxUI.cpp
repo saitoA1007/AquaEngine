@@ -27,7 +27,6 @@ void LetterboxUI::Initialize() {
 
 	timer_ = 1.0f;
 	isBarActive_ = false;
-	isBarDrawActive_ = false;
 	upBarSprite_.position_.y = upBarEndPosY_;
 	downBarSprite_.position_.y = downBarEndPosY_;
 }
@@ -45,7 +44,6 @@ void LetterboxUI::Update() {
 }
 
 void LetterboxUI::Draw() {
-	if (!isBarDrawActive_) { return; }
 
 	// 描画
 	renderQueue_->SubmitSprite(&upBarSprite_);
@@ -73,7 +71,6 @@ void LetterboxUI::BarAnimation() {
 		upBarSprite_.position_.y = Lerp(upBarStartPosY_, upBarEndPosY_, EaseOut(timer_));
 		downBarSprite_.position_.y = Lerp(downBarStartPosY_, downBarEndPosY_, EaseOut(timer_));
 		if (timer_ >= 1.0f) {
-			isBarDrawActive_ = false;
 			upBarSprite_.position_.y = upBarEndPosY_;
 			downBarSprite_.position_.y = downBarEndPosY_;
 		}

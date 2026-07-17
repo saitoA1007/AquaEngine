@@ -99,9 +99,7 @@ void TutorialPhase::Update() {
 		playUIManager_->SetIsDrawPlayGuide(false);
 	} else {
 		// 黒帯UIを表示
-		if (commonData_.inputCommand->IsCommandActive("CameraLockOn")) {
-			playUIManager_->SetBarActive(cameraController_->UseLetterBoxUI());
-		}
+		playUIManager_->SetBarActive(cameraController_->UseLetterBoxUI());
 
 		// ポーズ画面を開く
 		if (commonData_.inputCommand->IsCommandActive("PauseAction")) {
@@ -162,9 +160,7 @@ void PlayPhase::Update() {
 	}
 
 	// 黒帯UIを表示
-	if (commonData_.inputCommand->IsCommandActive("CameraLockOn")) {
-		playUIManager_->SetBarActive(cameraController_->UseLetterBoxUI());
-	}
+	playUIManager_->SetBarActive(cameraController_->UseLetterBoxUI());
 
 	// 現在のHpを設定
 	playUIManager_->SetCurrentBossHp(bossEnemy_->GetCurrentHp());
