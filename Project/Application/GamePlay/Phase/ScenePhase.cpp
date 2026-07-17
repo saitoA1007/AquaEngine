@@ -22,7 +22,7 @@ TitlePhase::TitlePhase(PhaseCommonData& commonData, TitleUIManager* titleUIManag
 
 void TitlePhase::Enter() {
 	// UIを有効
-	titleUIManager_->SetActive(true);
+	titleUIManager_->SetActive(false);
 	// 初期化
 	titleUIManager_->Initialize();
 
@@ -221,7 +221,6 @@ void PausePhase::Update() {
 			}
 			pauseUIManager_->SetType(static_cast<PauseUIManager::SelectType>(selectNum_));
 		}
-
 
 		// 決定
 		if (commonData_.inputCommand->IsCommandActive("Decision")) {

@@ -9,6 +9,9 @@
 GamePhaseManager::GamePhaseManager(GameEngine::InputCommand* inputCommand, Player* player, BossEnemy* bossEnemy,
 	TitleUIManager* titleUIManager, PlayUIManager* playUIManager, GameOverUIManager* gameOverUIManager, ClearUIManager* clearUIManager,
 	PauseUIManager* pauseUIManager,CameraController* cameraController) {
+
+	updateOrder_ = 0;
+
 	commonData_.inputCommand = inputCommand;
 	commonData_.timeController_ = &timeController_;
 
