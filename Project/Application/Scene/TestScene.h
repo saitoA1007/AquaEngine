@@ -112,4 +112,7 @@ private: // シーン機能
 	// 円柱
 	GameEngine::Model* cylinderModel_;
 	GameEngine::WorldTransform cylinderWorld_;
+
+
+	GameEngine::Model* testModel_;
 };

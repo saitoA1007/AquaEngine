@@ -1106,6 +1106,8 @@
     <ClInclude Include="Application\UI\Managers\TitleUIManager.h" />
     <ClInclude Include="Application\UI\Managers\GameOverUIManager.h" />
     <ClInclude Include="Application\UI\Managers\ClearUIManager.h" />
+    <ClInclude Include="EngineSource\3D\Model\FractureData.h" />
+    <ClInclude Include="EngineSource\Graphics\Buffers\PackedGeometryBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />
