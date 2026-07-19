@@ -99,6 +99,8 @@ void TutorialPhase::Update() {
 		playUIManager_->SetIsDrawPlayGuide(false);
 		// 演出カメラに変更
 		cameraController_->SetChangeState(CameraState::kEnterMovie);
+		// 黒帯を表示させる
+		playUIManager_->SetBarActive(true);
 	} else {
 		// 黒帯UIを表示
 		playUIManager_->SetBarActive(cameraController_->UseLetterBoxUI());
@@ -340,10 +342,14 @@ void ClearPhase::Enter() {
 	clearUIManager_->SetActive(true);
 	// 初期化
 	clearUIManager_->Initialize();
+
+	// プレイ時間を取得
+	clearUIManager_->SetTime(commonData_.playTime_);
 }
 
 void ClearPhase::Update() {
-
+	// リセットする
+	commonData_.resetScene = true;
 }
 
 void ClearPhase::Exit() {

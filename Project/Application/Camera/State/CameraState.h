@@ -115,8 +115,4 @@ public:
 	void Enter() override;
 	void Update(float dt60) override;
 
-private:
-
-private:
-
 };

@@ -85,6 +85,8 @@ TestScene::TestScene() {
 	// 円柱
 	cylinderModel_ = modelManager_->GetNameByModel("Cylinder");
 	cylinderWorld_.Initialize({{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,3.0f}});
+
+	//testModel_ = modelManager_->GetNameByModel("test.gltf");
 }
 
 void TestScene::Initialize() {

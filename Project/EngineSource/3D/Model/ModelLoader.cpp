@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include "ModelLoader.h"
 #include <cassert>
 #include "LogManager.h"
@@ -136,12 +137,41 @@ std::unique_ptr<Model> ModelLoader::CreateModel(const std::string& objFilename, 
 	// モデルが無事に作成されたログを出す
 	LogManager::GetInstance().Log("Create From Assimp : Success loaded Model file: " + filename + objFilename);
 
+	// 破壊のチャンクデータ
+	std::unordered_map<std::string, std::vector<MeshData>> chunkMeshesByGroup;
+
 	// メッシュを作成
 	for (uint32_t index = 0; index < modelData.meshes.size(); ++index) {
-		std::unique_ptr<Mesh> tmpMesh = std::make_unique<Mesh>();
-		tmpMesh->CreateModelMesh(modelData, index);
 
-		model->AddMesh(std::move(tmpMesh));
+		// 破壊のチャンクデータであれば1つのデータに詰め込む
+		const auto& meshData = modelData.meshes[index];
+		if (meshData.fractureInfo.has_value()) {
+			chunkMeshesByGroup[meshData.fractureInfo->groupName].push_back(meshData);
+		} else {
+			// 破壊データでなければメッシュを作成
+			std::unique_ptr<Mesh> tmpMesh = std::make_unique<Mesh>();
+			tmpMesh->CreateModelMesh(modelData, index);
+
+			model->AddMesh(std::move(tmpMesh));
+		}
+	}
+
+	// 破壊のチャンクデータを作成する
+	for (auto& [groupName, chunkMeshes] : chunkMeshesByGroup) {
+		auto packedBuffer = std::make_unique<PackedGeometryBuffer>();
+		packedBuffer->Build(chunkMeshes);
+
+		std::vector<FractureChunkEntry> entries;
+		entries.reserve(chunkMeshes.size());
+		for (const auto& meshData : chunkMeshes) {
+			FractureChunkEntry entry;
+			entry.materialName = meshData.materialName;
+			entry.range = packedBuffer->GetRange(meshData.fractureInfo->chunkId);
+			entry.info = meshData.fractureInfo.value();
+			entries.push_back(std::move(entry));
+		}
+
+		model->AddFractureGroup(groupName, std::move(packedBuffer), std::move(entries));
 	}
 
 	// Meshを元にBLASを作成する。アニメーションがあればBLASを更新用に作成
@@ -386,6 +416,12 @@ ModelData ModelLoader::LoadModelFile(const std::string& directoryPath, const std
 		modelData.materials.push_back(std::move(materialData));
 	}
 
+	// 破壊チャンク情報があるか判断
+	std::vector<std::optional<FractureChunkInfo>> chunkInfoByMeshIndex(scene->mNumMeshes);
+	std::vector<std::optional<aiMatrix4x4>> nodeTransformByMeshIndex(scene->mNumMeshes);
+	std::unordered_map<std::string, uint32_t> chunkCounterByGroup;
+	DetectFractureChunks(scene->mRootNode, aiMatrix4x4(), chunkInfoByMeshIndex, nodeTransformByMeshIndex, chunkCounterByGroup);
+
 	// Mesh解析
 	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
 		aiMesh* mesh = scene->mMeshes[meshIndex];
@@ -412,6 +448,17 @@ ModelData ModelLoader::LoadModelFile(const std::string& directoryPath, const std
 		for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex) {
 			aiVector3D& position = mesh->mVertices[vertexIndex];
 			aiVector3D& normal = mesh->mNormals[vertexIndex];
+
+			// 破壊チャンクの場合、ノード側が個別のtransformを持っているため頂点に焼き込む
+			if (nodeTransformByMeshIndex[meshIndex].has_value()) {
+				const aiMatrix4x4& nodeTransform = nodeTransformByMeshIndex[meshIndex].value();
+				position = nodeTransform * position;
+
+				aiMatrix3x3 normalMatrix(nodeTransform);
+				normal = normalMatrix * normal;
+				normal.Normalize();
+			}
+
 			VertexData vertex;
 			// 右手->左手に変換する
 			vertex.position = { -position.x, position.y, position.z, 1.0f };
@@ -479,9 +526,17 @@ ModelData ModelLoader::LoadModelFile(const std::string& directoryPath, const std
 			}
 		}
 
+		// 破壊チャンク情報があれば割り当てる
+		if (chunkInfoByMeshIndex[meshIndex].has_value()) {
+			meshData.fractureInfo = chunkInfoByMeshIndex[meshIndex];
+		}
+
 		modelData.meshes.push_back(std::move(meshData));
 		modelData.skinClusterData.push_back(std::move(meshSkinClusterData));
 	}
+
+	// 破壊チャンクのAABBから隣接関係を構築する
+	BuildFractureAdjacency(modelData);
 
 	// シーン全体の階層構造を作る
 	modelData.rootNode = ReadNode(scene->mRootNode);
@@ -529,4 +584,104 @@ int32_t ModelLoader::CreateJoint(const Node& node, const std::optional<int32_t>&
 		joints[joint.index].children.push_back(childIndex);
 	}
 	return joint.index;
+}
+
+void ModelLoader::DetectFractureChunks(aiNode* node, const aiMatrix4x4& parentTransform,
+	std::vector<std::optional<FractureChunkInfo>>& outChunkInfoByMeshIndex,
+	std::vector<std::optional<aiMatrix4x4>>& outNodeTransformByMeshIndex,
+	std::unordered_map<std::string, uint32_t>& chunkCounterByGroup) {
+
+	aiMatrix4x4 worldTransform = parentTransform * node->mTransformation;
+	std::string nodeName = node->mName.C_Str();
+	std::string groupName;
+
+	// ノード名に_cellが含まれていれば、このノードが参照するメッシュをチャンクとして登録する
+	if (TryExtractFractureGroupName(nodeName, groupName)) {
+		// グループごとに検出順で連番を振る
+		uint32_t chunkId = chunkCounterByGroup[groupName]++;
+
+		for (uint32_t i = 0; i < node->mNumMeshes; ++i) {
+			uint32_t meshIndex = node->mMeshes[i];
+
+			FractureChunkInfo info;
+			info.groupName = groupName;
+			info.chunkId = chunkId;
+			outChunkInfoByMeshIndex[meshIndex] = info;
+			outNodeTransformByMeshIndex[meshIndex] = worldTransform;
+		}
+	}
+
+	// 子ノードも再帰的に走査する
+	for (uint32_t childIndex = 0; childIndex < node->mNumChildren; ++childIndex) {
+		DetectFractureChunks(node->mChildren[childIndex], worldTransform, outChunkInfoByMeshIndex, outNodeTransformByMeshIndex, chunkCounterByGroup);
+	}
+}
+
+[[nodiscard]]
+bool ModelLoader::TryExtractFractureGroupName(const std::string& nodeName, std::string& outGroupName) {
+	// _cellを含むノードだけを破壊チャンクと判断
+	size_t pos = nodeName.find(kFractureChunkMarker_);
+	if (pos == std::string::npos) {
+		return false;
+	}
+
+	outGroupName = nodeName.substr(0, pos);
+	return true;
+}
+
+void ModelLoader::BuildFractureAdjacency(ModelData& modelData, float threshold) {
+
+	// 各チャンクのAABBと重心を計算する
+	for (auto& meshData : modelData.meshes) {
+		if (!meshData.fractureInfo.has_value() || meshData.vertices.empty()) {
+			continue;
+		}
+
+		Vector3 aabbMin = { meshData.vertices[0].position.x, meshData.vertices[0].position.y, meshData.vertices[0].position.z };
+		Vector3 aabbMax = aabbMin;
+
+		for (const auto& vertex : meshData.vertices) {
+			aabbMin.x = std::min(aabbMin.x, vertex.position.x);
+			aabbMin.y = std::min(aabbMin.y, vertex.position.y);
+			aabbMin.z = std::min(aabbMin.z, vertex.position.z);
+			aabbMax.x = std::max(aabbMax.x, vertex.position.x);
+			aabbMax.y = std::max(aabbMax.y, vertex.position.y);
+			aabbMax.z = std::max(aabbMax.z, vertex.position.z);
+		}
+
+		meshData.fractureInfo->aabb.min = aabbMin;
+		meshData.fractureInfo->aabb.max = aabbMax;
+		meshData.fractureInfo->centroid = {
+			(aabbMin.x + aabbMax.x) * 0.5f,
+			(aabbMin.y + aabbMax.y) * 0.5f,
+			(aabbMin.z + aabbMax.z) * 0.5f,
+		};
+	}
+
+	// AABBが近接、重なっているかどうかを判定するラムダ
+	auto isNearOrOverlapping = [threshold](const Vector3& minA, const Vector3& maxA, const Vector3& minB, const Vector3& maxB) {
+		return (minA.x - threshold <= maxB.x && maxA.x + threshold >= minB.x) &&
+			(minA.y - threshold <= maxB.y && maxA.y + threshold >= minB.y) &&
+			(minA.z - threshold <= maxB.z && maxA.z + threshold >= minB.z);
+		};
+
+	// 同じグループ内のチャンク同士の総当たりで隣接関係を構築する
+	for (size_t i = 0; i < modelData.meshes.size(); ++i) {
+		auto& chunkA = modelData.meshes[i].fractureInfo;
+		if (!chunkA.has_value()) {
+			continue;
+		}
+
+		for (size_t j = i + 1; j < modelData.meshes.size(); ++j) {
+			auto& chunkB = modelData.meshes[j].fractureInfo;
+			if (!chunkB.has_value() || chunkB->groupName != chunkA->groupName) {
+				continue;
+			}
+
+			if (isNearOrOverlapping(chunkA->aabb.min, chunkA->aabb.max, chunkB->aabb.min, chunkB->aabb.max)) {
+				chunkA->neighborChunkIds.push_back(chunkB->chunkId);
+				chunkB->neighborChunkIds.push_back(chunkA->chunkId);
+			}
+		}
+	}
 }

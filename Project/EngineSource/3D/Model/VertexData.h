@@ -4,6 +4,7 @@
 #include "Vector2.h"
 #include "Matrix4x4.h"
 #include "Transform.h"
+#include "FractureData.h"
 
 #include <iostream>
 #include <vector>
@@ -39,6 +40,7 @@ struct MeshData {
 	std::vector<VertexData> vertices;
 	std::vector<uint32_t> indices;
 	std::string materialName; // 使用するマテリアル名
+	std::optional<GameEngine::FractureChunkInfo> fractureInfo; // 事前分割チャンク情報
 };
 
 struct VertexWeightData {

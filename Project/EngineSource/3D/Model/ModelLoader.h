@@ -2,6 +2,7 @@
 #include "AnimationData.h"
 #include "TextureManager.h"
 #include "SrvManager.h"
+#include "FractureData.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -89,6 +90,12 @@ namespace GameEngine {
 
         static inline const std::string kDirectoryPath_ = "Resources/Models";
 
+        // ノード名にこの文字列が含まれていればチャンクと判断する
+        static inline const std::string kFractureChunkMarker_ = "_cell";
+
+        // 破片ノード同士がこの距離以内ならAABBが近接/重なっているとみなす
+        static constexpr float kFractureAdjacencyThreshold_ = 0.01f;
+
     private:
 
         /// <summary>
@@ -118,5 +125,30 @@ namespace GameEngine {
         /// <returns></returns>
         [[nodiscard]]
         int32_t CreateJoint(const Node& node, const std::optional<int32_t>& parent, std::vector<Joint>& joints);
+
+        /// <summary>
+        /// ノード階層を調べて、名前に_cellが書いてあるノードをチャンクとして取得する
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="parentTransform"></param>
+        /// <param name="outChunkInfoByMeshIndex"></param>
+        /// <param name="outNodeTransformByMeshIndex"></param>
+        /// <param name="chunkCounterByGroup"></param>
+        void DetectFractureChunks(aiNode* node, const aiMatrix4x4& parentTransform,
+            std::vector<std::optional<FractureChunkInfo>>& outChunkInfoByMeshIndex,
+            std::vector<std::optional<aiMatrix4x4>>& outNodeTransformByMeshIndex,
+            std::unordered_map<std::string, uint32_t>& chunkCounterByGroup);
+
+        /// <summary>
+        /// ノード名から破壊グループ名を抽出する。_cellを含まない場合はfalseを返す
+        /// </summary>
+        [[nodiscard]]
+        bool TryExtractFractureGroupName(const std::string& nodeName, std::string& outGroupName);
+
+        /// <summary>
+        /// 各チャンクのAABBから、同じグループ内で近接、重なっているチャンク同士を隣接として登録する
+        /// </summary>
+        void BuildFractureAdjacency(ModelData& modelData, float threshold = kFractureAdjacencyThreshold_);
+
 	};
 }

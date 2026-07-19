@@ -7,8 +7,15 @@
 #include "TransformationMatrix.h"
 #include "Skeleton.h"
 #include "RefBuffer.h"
+#include "PackedGeometryBuffer.h"
 
 namespace GameEngine {
+
+	struct FractureChunkEntry {
+		std::string materialName = "default";
+		GeometryRange range;
+		FractureChunkInfo info;
+	};
 	
 	class Model final {
 	public:
@@ -30,6 +37,12 @@ namespace GameEngine {
 			for (auto& mesh : meshes_) {
 				mesh->CreateBLAS(cmdList, isUpdate);
 			}
+		}
+
+		// 破壊オブジェクトのグループを追加する
+		void AddFractureGroup(const std::string& groupName, std::unique_ptr<PackedGeometryBuffer> buffer, std::vector<FractureChunkEntry> chunks) {
+			fractureBuffers_[groupName] = std::move(buffer);
+			fractureChunks_[groupName] = std::move(chunks);
 		}
 
 		// 外部読み込み用のデータを設定
@@ -179,6 +192,11 @@ namespace GameEngine {
 		// 参照用バッファ
 		std::vector<RefBuffer>& GetRefBuffers() {return refBuffers_; }
 
+		// 破壊グループのPackedGeometryBufferを取得
+		const std::unordered_map<std::string, std::unique_ptr<PackedGeometryBuffer>>& GetFractureBuffers() const { return fractureBuffers_; }
+		// 破壊グループのチャンク一覧を取得
+		const std::unordered_map<std::string, std::vector<FractureChunkEntry>>& GetFractureChunks() const { return fractureChunks_; }
+
 	private:
 		Model(Model&) = delete;
 		Model& operator=(Model&) = delete;
@@ -194,6 +212,10 @@ namespace GameEngine {
 
 		// 参照用バッファ
 		std::vector<RefBuffer> refBuffers_;
+
+		// 破壊オブジェクトのグループ
+		std::unordered_map<std::string, std::unique_ptr<PackedGeometryBuffer>> fractureBuffers_;
+		std::unordered_map<std::string, std::vector<FractureChunkEntry>> fractureChunks_;
 
 		// Nodeのローカル行列を保持しておく変数
 		Node node_;
