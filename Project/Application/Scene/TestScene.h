@@ -10,6 +10,7 @@
 #include "Material.h"
 #include "RefBuffer.h"
 #include "IceMaterial.h"
+#include "FractureInstance.h"
 
 #include "Application/Scene/Transition/Fade.h"
 
@@ -115,4 +116,6 @@ private: // シーン機能
 
 
 	GameEngine::Model* testModel_;
+
+	GameEngine::FractureInstance fractureInstance_;
 };
