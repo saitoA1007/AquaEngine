@@ -7,6 +7,7 @@
 #include "Model.h"
 #include "WorldTransform.h"
 #include "WorldTransforms.h"
+#include "FractureInstance.h"
 
 namespace GameEngine {
 
@@ -60,6 +61,9 @@ namespace GameEngine {
 		static void DrawWboitInstancing(const Model* model, const uint32_t& numInstance, WorldTransforms& worldTransforms, const GpuResource* wboit,const GpuResource* material = nullptr);
 
 		static void DrawParticleCS(const Model* model, const uint32_t& numInstance, const SrvResource* particle, const GpuResource* camera);
+
+		// 破片を描画
+		static void DrawFracture(const Model* model, FractureInstance& fractureInstance, ID3D12CommandSignature* sig, const GpuResource* material = nullptr);
 
 		/// <summary>
 		/// グリッドを描画

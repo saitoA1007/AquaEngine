@@ -194,6 +194,38 @@ void ModelRenderer::DrawParticleCS(const Model* model, const uint32_t& numInstan
 	}
 }
 
+void ModelRenderer::DrawFracture(const Model* model,FractureInstance& fractureInstance, ID3D12CommandSignature* sig, const GpuResource* material) {
+
+	for (auto& [groupName, chunks] : model->GetFractureChunks()) {
+		PackedGeometryBuffer* buffer = model->GetFractureBuffers().at(groupName).get();
+
+		auto vbView = buffer->GetVertexBufferView();
+		auto ibView = buffer->GetIndexBufferView();
+		commandList_->IASetVertexBuffers(0, 1, &vbView);
+		commandList_->IASetIndexBuffer(&ibView);
+		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		if (material == nullptr) {
+			// マテリアルを設定
+			const Material* drawMaterial = model->GetMaterial(chunks.begin()->materialName);
+			commandList_->SetGraphicsRootConstantBufferView(0, drawMaterial->GetGpuVirtualAddress());
+		} else {
+			commandList_->SetGraphicsRootConstantBufferView(0, material->GetGpuVirtualAddress());
+		}
+
+		commandList_->SetGraphicsRootDescriptorTable(1, fractureInstance.GetInstancingSrvGPU());
+		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+		commandList_->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
+
+		commandList_->ExecuteIndirect(
+			sig, // コマンドシグネチャ
+			fractureInstance.GetNumInstance(),
+			fractureInstance.GetArgumentBuffer().GetResource(),
+			0, nullptr, 0
+		);
+	}
+}
+
 void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTransform, GpuResource* lightGroupResource, const GpuResource* material) {
 	
 	// メッシュを取得

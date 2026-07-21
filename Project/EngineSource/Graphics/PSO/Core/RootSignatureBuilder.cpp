@@ -53,6 +53,18 @@ void RootSignatureBuilder::AddSampler(uint32_t shaderRegister, D3D12_FILTER filt
     staticSamplers_.push_back(samplerDesc);
 }
 
+void RootSignatureBuilder::Add32BitConstantsParameter(uint32_t num32BitValues, uint32_t shaderRegister, D3D12_SHADER_VISIBILITY visibility, uint32_t space) {
+    D3D12_ROOT_PARAMETER param = {};
+    param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
+    param.ShaderVisibility = visibility;
+    param.Constants.Num32BitValues = num32BitValues;
+    param.Constants.ShaderRegister = shaderRegister;
+    param.Constants.RegisterSpace = space;
+
+    rootParameters_.push_back(param);
+    parameterTypes_.push_back(ParameterType::RootConstant);
+}
+
 void RootSignatureBuilder::CreateRootSignature(D3D12_ROOT_SIGNATURE_FLAGS flags) {
     SerializeAndCreate(flags);
 }

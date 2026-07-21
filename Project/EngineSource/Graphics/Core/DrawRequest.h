@@ -10,6 +10,7 @@ namespace GameEngine {
     class GpuResource;
     class SrvResource;
     class DebugRenderer;
+    class FractureInstance;
 
     // 描画レイヤー（実行優先順位。数値が小さいほど先に描画）
     enum class RenderLayer : uint32_t {
@@ -36,6 +37,7 @@ namespace GameEngine {
         ShadowMap,      // シャドウマップ用
         Grid,           // デバックのグリッド描画用
         DebugLine,      // デバックのライン描画用
+        Fracture,       // 破片の描画
     };
 
     enum class Draw2dType {
@@ -54,6 +56,9 @@ namespace GameEngine {
         // インスタンシング描画
         uint32_t numInstances = 1;
         WorldTransforms* worldTransforms = nullptr;
+
+        // 破片のデータ
+        FractureInstance* fractureInstance = nullptr;
 
         // マテリアル
         const GpuResource* material = nullptr;

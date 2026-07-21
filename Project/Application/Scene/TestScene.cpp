@@ -2,6 +2,7 @@
 #include "ImguiManager.h"
 #include "PostProcess/PostEffectData.h"
 #include "ParticleBehaviorGPU.h"
+#include "RandomGenerator.h"
 using namespace GameEngine;
 
 TestScene::~TestScene() {}
@@ -86,7 +87,23 @@ TestScene::TestScene() {
 	cylinderModel_ = modelManager_->GetNameByModel("Cylinder");
 	cylinderWorld_.Initialize({{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,3.0f}});
 
-	//testModel_ = modelManager_->GetNameByModel("test.gltf");
+	testModel_ = modelManager_->GetNameByModel("test.gltf");
+
+	int i = 0;
+
+	for (auto& [groupName, chunks] : testModel_->GetFractureChunks()) {
+		if (i != 0) { continue; }
+		PackedGeometryBuffer* buffer = testModel_->GetFractureBuffers().at(groupName).get();
+
+		std::vector<uint32_t> chunkIds;
+		const auto& fractureChunks = testModel_->GetFractureChunks().begin()->second;
+		for (const auto& chunk : fractureChunks) {
+			chunkIds.push_back(chunk.info.chunkId);
+		}
+
+		fractureInstance_.Initialize(chunkIds, *buffer);
+		i++;
+	}
 }
 
 void TestScene::Initialize() {
@@ -102,6 +119,16 @@ void TestScene::Update() {
 
 	// アニメーションの更新処理
 	walkAnimator_->Update();
+
+	auto& transforms = fractureInstance_.GetTransformDatas();
+	for (size_t i = 0; i < transforms.size(); ++i) {
+		// ここで物理演算や簡単な移動計算を行う
+		transforms[i].transform.translate.y -= 0.098f; // 重力で落とす例
+		transforms[i].transform.translate.x += RandomGenerator::Get(-1.0f, 1.0f);
+		transforms[i].transform.translate.z += RandomGenerator::Get(-1.0f, 1.0f);
+		transforms[i].transform.rotate.x += 0.05f;    // 回転させる例
+	}
+	fractureInstance_.Update();
 }
 
 void TestScene::DebugUpdate() {
@@ -167,13 +194,16 @@ void TestScene::Draw() {
 	renderQueue_->SubmitRaytracingModel(terrainModel_, terrainWorld_);
 
 	// アニメーションモデル
-	renderQueue_->SubmitRaytracingModel(model_, world_);
+	//renderQueue_->SubmitRaytracingModel(model_, world_);
+
+	// 破片を描画
+	renderQueue_->SubmitFracture(testModel_, fractureInstance_);
 	
 	// それぞれの氷を描画
-	renderQueue_->SubmitRaytracingModel(iceHighModel_, iceHighWorld_, &iceRefBuffers_[0]);
-	renderQueue_->SubmitRaytracingModel(iceMiddleModel_, iceMiddleWorld_, &iceRefBuffers_[1]);
-	renderQueue_->SubmitRaytracingModel(iceLowModel_, iceLowWorld_, &iceRefBuffers_[2]);
-	renderQueue_->SubmitRaytracingModel(iceCubeModel_, iceCubeWorld_, &iceRefBuffers_[3]);
+	//renderQueue_->SubmitRaytracingModel(iceHighModel_, iceHighWorld_, &iceRefBuffers_[0]);
+	//renderQueue_->SubmitRaytracingModel(iceMiddleModel_, iceMiddleWorld_, &iceRefBuffers_[1]);
+	//renderQueue_->SubmitRaytracingModel(iceLowModel_, iceLowWorld_, &iceRefBuffers_[2]);
+	//renderQueue_->SubmitRaytracingModel(iceCubeModel_, iceCubeWorld_, &iceRefBuffers_[3]);
 
 	// 円柱を描画
 	//renderQueue_->SubmitRaytracingModel(cylinderModel_, cylinderWorld_);
