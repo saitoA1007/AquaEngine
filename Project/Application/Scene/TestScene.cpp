@@ -86,7 +86,20 @@ TestScene::TestScene() {
 	cylinderModel_ = modelManager_->GetNameByModel("Cylinder");
 	cylinderWorld_.Initialize({{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,3.0f}});
 
-	//testModel_ = modelManager_->GetNameByModel("test.gltf");
+	testModel_ = modelManager_->GetNameByModel("test.gltf");
+
+	for (auto& [groupName, chunks] : testModel_->GetFractureChunks()) {
+		PackedGeometryBuffer* buffer = testModel_->GetFractureBuffers().at(groupName).get();
+
+		std::vector<uint32_t> chunkIds;
+		const auto& fractureChunks = testModel_->GetFractureChunks().at("default");
+		for (const auto& chunk : fractureChunks) {
+			chunkIds.push_back(chunk.info.chunkId);
+		}
+
+		fractureInstance_.Initialize(chunkIds, *buffer);
+	}
+	
 }
 
 void TestScene::Initialize() {

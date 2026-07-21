@@ -25,6 +25,13 @@ namespace GameEngine {
 			resource_->Map(0, nullptr, reinterpret_cast<void**>(&data_));
 		}
 
+		void Create(uint32_t num) {
+			resource_ = CreateBufferResource(device_, sizeof(T) * num);
+
+			// データを書き込むためのポインタを取得し、保持し続ける
+			resource_->Map(0, nullptr, reinterpret_cast<void**>(&data_));
+		}
+
 		// データを取得する
 		T* GetData() const { return data_; }
 

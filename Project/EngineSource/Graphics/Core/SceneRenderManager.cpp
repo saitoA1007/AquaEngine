@@ -71,6 +71,12 @@ void SceneRenderManager::Initialize(ID3D12GraphicsCommandList4* commandList, Srv
     RegisterPSO("LightingComposite", psoManager);
     // 深度コピー用
     RegisterPSO("DepthCopy", psoManager);
+  
+    // 破片描画用PSO
+    RegisterPSO("Fracture3D", psoManager);
+
+    // 破片描画用のコマンドルートシグネチャ
+    fractureCommandSignature_ = psoManager->GetCommandSignature("DrawIndexedIndirect");
 
     // bufferのsrvIndexのスタート位置を設定
     bufferStartSrvIndex_ = srvManager_->GetStartSrvIndex(SrvHeapType::Buffer);
@@ -176,6 +182,10 @@ void SceneRenderManager::Execute3dRequest(const Draw3dRequest& request) {
 
     case Draw3dType::DebugLine:
         ModelRenderer::DrawDebugLine(request.debugRenderer_->GetVertexBufferView(), request.debugRenderer_->GetTotalVertices());
+        break;
+
+    case Draw3dType::Fracture:
+        ModelRenderer::DrawFracture(request.model, request.numInstances, *request.fractureInstance, fractureCommandSignature_);
         break;
 
     default:

@@ -111,6 +111,14 @@ namespace GameEngine {
 		/// </summary>
 		void DefaultLoadPostEffectPSO();
 
+		/// <summary>
+		/// コマンドシグネチャを手動登録する
+		/// </summary>
+		void RegisterCommandSignature(const std::string& name, ID3D12CommandSignature* commandSignature);
+
+		// ゲッターの追加
+		ID3D12CommandSignature* GetCommandSignature(const std::string& name);
+
 	public:
 
 		ID3D12RootSignature* GetRootSignature(const std::string& name);
@@ -128,6 +136,9 @@ namespace GameEngine {
 
 		// ルートシグネチャリスト
 		std::unordered_map<std::string, RootSignatureData> rootSignatureList_;
+
+		// コマンドシグネチャ管理用のリストを追加
+		std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12CommandSignature>> commandSignatureList_;
 
 		// シェーダーコンパイラ
 		ShaderCompiler shaderCompiler_;

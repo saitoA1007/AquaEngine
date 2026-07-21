@@ -340,6 +340,27 @@ void RenderQueue::SubmitRaytracingModel(Model* model, WorldTransform& worldTrans
     }
 }
 
+void RenderQueue::SubmitFracture(const Model* model, uint32_t numInstances, FractureInstance& fractureInstance, const float& alpha, const GpuResource* material, const std::string& passName) {
+    
+    Draw3dRequest request;
+    request.layer = RenderLayer::Opaque;
+    // ブレンド設定
+    request.type = Draw3dType::Fracture;
+    request.passName = passName;
+    request.model = model;
+    request.numInstances = numInstances;
+    request.fractureInstance = &fractureInstance;
+    request.material = material;
+
+    if (alpha == 1.0f) {
+        // 不透明描画に登録
+        draw3dQueueList_[passName][request.layer][Get3dPsoName(request.type)].push_back(request);
+    } else {
+        // 半透明描画に登録
+        translucentDrawQueueList_[passName].push_back(request);
+    }
+}
+
 const char* RenderQueue::Get3dPsoName(Draw3dType type) {
     switch (type) {
     case Draw3dType::Default: { return "Default3D"; }
@@ -353,6 +374,7 @@ const char* RenderQueue::Get3dPsoName(Draw3dType type) {
     case Draw3dType::ShadowMap: { return "ShadowMap"; }
     case Draw3dType::Grid: { return "Grid"; }
     case Draw3dType::DebugLine: { return "Line"; }
+    case Draw3dType::Fracture: { return "Fracture3D"; }
     default: { return "Default3D"; }
     }
 }

@@ -373,6 +373,26 @@ DrawPsoData PSOManager::GetDrawPsoData(const std::string& PsoName) const {
     return drawData;
 }
 
+void PSOManager::RegisterCommandSignature(const std::string& name, ID3D12CommandSignature* commandSignature) {
+    // 既に登録されていたら飛ばす
+    if (commandSignatureList_.find(name) != commandSignatureList_.end()) {
+        return;
+    }
+    commandSignatureList_[name] = commandSignature;
+    LogManager::GetInstance().Log("CommandSignature registered name : " + name);
+}
+
+ID3D12CommandSignature* PSOManager::GetCommandSignature(const std::string& name) {
+    auto it = commandSignatureList_.find(name);
+    if (it != commandSignatureList_.end()) {
+        return it->second.Get();
+    }
+
+    LogManager::GetInstance().Log("CommandSignature not found: " + name);
+    assert(0);
+    return nullptr;
+}
+
 void PSOManager::DefaultLoadPSO() {
 
     LogManager::GetInstance().Log("Loading default PSOs");
@@ -624,6 +644,46 @@ void PSOManager::DefaultLoadPSO() {
         CsParticleRs.CreateRootSignature();
         RegisterPSO("CSParticle3D", CSParticle3D, &CsParticleRs, &inputLayoutBuilder);
     }
+
+    // 破片描画用PSO
+    {
+        CreatePSOData fracture3D;
+        fracture3D.rootSigName = "Instancing3D";
+        fracture3D.vsPath = L"Resources/Shaders/Fracture.VS.hlsl";
+        fracture3D.psPath = L"Resources/Shaders/Fracture.PS.hlsl";
+        fracture3D.drawMode = DrawModel::FillFront;
+        fracture3D.blendMode = { BlendMode::kBlendModeNormalAndSaveObjectAlpha };
+        fracture3D.isDepthEnable = true;
+        RootSignatureBuilder fractureRs;
+        fractureRs.Initialize(device_);
+        fractureRs.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_PIXEL);
+        fractureRs.AddSRVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX);
+        fractureRs.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 0, D3D12_SHADER_VISIBILITY_PIXEL);
+        fractureRs.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX);
+        fractureRs.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
+        fractureRs.CreateRootSignature();
+        RegisterPSO("Fracture3D", fracture3D, &fractureRs, &inputLayoutBuilder);
+    }
+
+    // ----------------------------------------------------
+    // 一時的なテストのためここにExecuteIndirect用のコマンドシグネチャを作成
+    // ----------------------------------------------------
+    Microsoft::WRL::ComPtr<ID3D12CommandSignature> indirectCommandSignature;
+
+    D3D12_INDIRECT_ARGUMENT_DESC argumentDesc = {};
+    argumentDesc.Type = D3D12_INDIRECT_ARGUMENT_TYPE_DRAW_INDEXED;
+
+    D3D12_COMMAND_SIGNATURE_DESC sigDesc = {};
+    sigDesc.ByteStride = sizeof(D3D12_DRAW_INDEXED_ARGUMENTS);
+    sigDesc.NumArgumentDescs = 1;
+    sigDesc.pArgumentDescs = &argumentDesc;
+    sigDesc.NodeMask = 0;
+
+    HRESULT hr = device_->CreateCommandSignature(&sigDesc, nullptr, IID_PPV_ARGS(&indirectCommandSignature));
+    assert(SUCCEEDED(hr));
+
+    // 登録
+    RegisterCommandSignature("DrawIndexedIndirect", indirectCommandSignature.Get());
 
     LogManager::GetInstance().Log("Default PSOs loaded");
 }
