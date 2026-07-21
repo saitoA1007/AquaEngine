@@ -1,7 +1,5 @@
 #include "FractureInstance.h"
 #include "MyMath.h"
-#include "CreateBufferResource.h"
-#include "DescriptorHandle.h"
 using namespace GameEngine;
 
 FractureInstance::~FractureInstance() {
