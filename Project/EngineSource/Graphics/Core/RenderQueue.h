@@ -141,7 +141,7 @@ namespace GameEngine {
         void SubmitRaytracingModel(Model* model, WorldTransform& worldTransform, std::vector<RefBuffer>* customRefBuffer = {});
 
         // 破片の描画
-        void SubmitFracture(const Model* model, uint32_t numInstances, FractureInstance& fractureInstance, const float& alpha = 1.0f, const GpuResource* material = nullptr, const std::string& passName = "DefaultPass");
+        void SubmitFracture(const Model* model, FractureInstance& fractureInstance, const float& alpha = 1.0f, const GpuResource* material = nullptr, const std::string& passName = "DefaultPass");
 
         // psoの名前を取得
         const char* Get3dPsoName(Draw3dType type);

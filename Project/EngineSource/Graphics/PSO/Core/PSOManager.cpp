@@ -1,6 +1,7 @@
 #include "PSOManager.h"
 #include "LogManager.h"
 #include <cassert>
+#include "FractureInstance.h"
 
 using namespace GameEngine;
 
@@ -648,7 +649,7 @@ void PSOManager::DefaultLoadPSO() {
     // 破片描画用PSO
     {
         CreatePSOData fracture3D;
-        fracture3D.rootSigName = "Instancing3D";
+        fracture3D.rootSigName = "Fracture3D";
         fracture3D.vsPath = L"Resources/Shaders/Fracture.VS.hlsl";
         fracture3D.psPath = L"Resources/Shaders/Fracture.PS.hlsl";
         fracture3D.drawMode = DrawModel::FillFront;
@@ -660,30 +661,41 @@ void PSOManager::DefaultLoadPSO() {
         fractureRs.AddSRVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX);
         fractureRs.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 0, D3D12_SHADER_VISIBILITY_PIXEL);
         fractureRs.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX);
+        fractureRs.Add32BitConstantsParameter(1, 1, D3D12_SHADER_VISIBILITY_VERTEX);
         fractureRs.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
         fractureRs.CreateRootSignature();
         RegisterPSO("Fracture3D", fracture3D, &fractureRs, &inputLayoutBuilder);
+
+        // ----------------------------------------------------
+        // 一時的なテストのためここにExecuteIndirect用のコマンドシグネチャを作成
+        // ----------------------------------------------------
+        Microsoft::WRL::ComPtr<ID3D12CommandSignature> indirectCommandSignature;
+
+        // 破片描画
+        UINT kFractureInstanceIndexRootParam = 4;
+
+        D3D12_INDIRECT_ARGUMENT_DESC argumentDescs[2] = {};
+        argumentDescs[0].Type = D3D12_INDIRECT_ARGUMENT_TYPE_CONSTANT;
+        argumentDescs[0].Constant.RootParameterIndex = kFractureInstanceIndexRootParam;
+        argumentDescs[0].Constant.DestOffsetIn32BitValues = 0;
+        argumentDescs[0].Constant.Num32BitValuesToSet = 1;
+
+        argumentDescs[1].Type = D3D12_INDIRECT_ARGUMENT_TYPE_DRAW_INDEXED;
+
+        D3D12_COMMAND_SIGNATURE_DESC sigDesc = {};
+        sigDesc.ByteStride = sizeof(FractureIndirectCommand);
+        sigDesc.NumArgumentDescs = _countof(argumentDescs);
+        sigDesc.pArgumentDescs = argumentDescs;
+
+        HRESULT hr = device_->CreateCommandSignature(
+            &sigDesc,
+            fractureRs.GetRootSignature(),
+            IID_PPV_ARGS(&indirectCommandSignature));
+        assert(SUCCEEDED(hr));
+
+        // 登録
+        RegisterCommandSignature("DrawIndexedIndirect", indirectCommandSignature.Get());
     }
-
-    // ----------------------------------------------------
-    // 一時的なテストのためここにExecuteIndirect用のコマンドシグネチャを作成
-    // ----------------------------------------------------
-    Microsoft::WRL::ComPtr<ID3D12CommandSignature> indirectCommandSignature;
-
-    D3D12_INDIRECT_ARGUMENT_DESC argumentDesc = {};
-    argumentDesc.Type = D3D12_INDIRECT_ARGUMENT_TYPE_DRAW_INDEXED;
-
-    D3D12_COMMAND_SIGNATURE_DESC sigDesc = {};
-    sigDesc.ByteStride = sizeof(D3D12_DRAW_INDEXED_ARGUMENTS);
-    sigDesc.NumArgumentDescs = 1;
-    sigDesc.pArgumentDescs = &argumentDesc;
-    sigDesc.NodeMask = 0;
-
-    HRESULT hr = device_->CreateCommandSignature(&sigDesc, nullptr, IID_PPV_ARGS(&indirectCommandSignature));
-    assert(SUCCEEDED(hr));
-
-    // 登録
-    RegisterCommandSignature("DrawIndexedIndirect", indirectCommandSignature.Get());
 
     LogManager::GetInstance().Log("Default PSOs loaded");
 }

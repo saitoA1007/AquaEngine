@@ -340,7 +340,7 @@ void RenderQueue::SubmitRaytracingModel(Model* model, WorldTransform& worldTrans
     }
 }
 
-void RenderQueue::SubmitFracture(const Model* model, uint32_t numInstances, FractureInstance& fractureInstance, const float& alpha, const GpuResource* material, const std::string& passName) {
+void RenderQueue::SubmitFracture(const Model* model, FractureInstance& fractureInstance, const float& alpha, const GpuResource* material, const std::string& passName) {
     
     Draw3dRequest request;
     request.layer = RenderLayer::Opaque;
@@ -348,7 +348,6 @@ void RenderQueue::SubmitFracture(const Model* model, uint32_t numInstances, Frac
     request.type = Draw3dType::Fracture;
     request.passName = passName;
     request.model = model;
-    request.numInstances = numInstances;
     request.fractureInstance = &fractureInstance;
     request.material = material;
 

@@ -18,6 +18,12 @@ struct Camera
 };
 ConstantBuffer<Camera> gCamera : register(b0);
 
+struct InstanceIndexConstant
+{
+    uint instanceIndex;
+};
+ConstantBuffer<InstanceIndexConstant> gInstanceIndex : register(b1);
+
 struct VertexShaderInput
 {
     float4 position : POSITION0;
@@ -26,12 +32,11 @@ struct VertexShaderInput
     float4 tangent : TANGENT0;
 };
 
-VertexShaderOutput main(VertexShaderInput input, uint instanceId : SV_InstanceID)
+VertexShaderOutput main(VertexShaderInput input)
 {
-    
     VertexShaderOutput output;
     
-    float4 worldPos = mul(input.position, gFracture[instanceId].World);
+    float4 worldPos = mul(input.position, gFracture[gInstanceIndex.instanceIndex].World);
     output.position = mul(worldPos, gCamera.vpMatrix);
     output.texcoord = input.texcoord;
     output.color = float4(1.0f,1.0f,1.0f,1.0f);

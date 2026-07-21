@@ -44,17 +44,18 @@ void FractureInstance::Initialize(const std::vector<uint32_t>& chunkIds, const P
 		instancingData_[index].chunkId = chunkId;
 
 		// ExecuteIndirect 用のDrawコマンド引数を設定
-		argumentData_[index].IndexCountPerInstance = range.indexCount;         // 破片のインデックス数
-		argumentData_[index].InstanceCount = 1;                                // 1回につき1個描画
-		argumentData_[index].StartIndexLocation = range.indexOffset;           // インデックスの開始位置
-		argumentData_[index].BaseVertexLocation = static_cast<INT>(range.vertexOffset); // 頂点の開始位置
-		argumentData_[index].StartInstanceLocation = index;
+		argumentData_[index].instanceIndex = index;
+		argumentData_[index].drawArguments.IndexCountPerInstance = range.indexCount; // 破片のインデックス数
+		argumentData_[index].drawArguments.InstanceCount = 1;                        // 1回につき1個描画
+		argumentData_[index].drawArguments.StartIndexLocation = range.indexOffset;   // インデックスの開始位置
+		argumentData_[index].drawArguments.BaseVertexLocation = static_cast<INT>(range.vertexOffset); // 頂点の開始位置
+		argumentData_[index].drawArguments.StartInstanceLocation = 0;
 	}
 }
 
-void FractureInstance::Update(const uint32_t& numInstance) {
+void FractureInstance::Update() {
 	// 数によって更新を変える
-	for (uint32_t i = 0; i < numInstance; ++i) {
+	for (uint32_t i = 0; i < transformDatas_.size(); ++i) {
 		instancingData_[i].World = Math::MakeAffineMatrix(transformDatas_[i].transform.scale, transformDatas_[i].transform.rotate, transformDatas_[i].transform.translate);
 	}
 }

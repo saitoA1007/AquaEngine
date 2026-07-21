@@ -23,6 +23,11 @@ namespace GameEngine {
 		uint32_t chunkId; // シェーダー側で gParticle を引くためのID
 	};
 
+	struct FractureIndirectCommand {
+		uint32_t instanceIndex;
+		D3D12_DRAW_INDEXED_ARGUMENTS drawArguments;
+	};
+
 	/// <summary>
 	/// 複数描画用のワールド行列
 	/// </summary>
@@ -40,7 +45,7 @@ namespace GameEngine {
 		/// <summary>
 		/// SRTを適応
 		/// </summary>
-		void Update(const uint32_t& numInstance);
+		void Update();
 
 		const CD3DX12_GPU_DESCRIPTOR_HANDLE& GetInstancingSrvGPU() const { return buffer_.GetSrvGpuHandle(); }
 
@@ -55,7 +60,7 @@ namespace GameEngine {
 
 		StructuredBuffer<FractureForGPU>& GetBuffer() { return buffer_; }
 
-		ConstantBuffer<D3D12_DRAW_INDEXED_ARGUMENTS>& GetArgumentBuffer() { return argumentBuffer_; }
+		ConstantBuffer<FractureIndirectCommand>& GetArgumentBuffer() { return argumentBuffer_; }
 	private:
 		// コピー禁止
 		FractureInstance(const FractureInstance&) = delete;
@@ -74,8 +79,8 @@ namespace GameEngine {
 		std::vector<FractureChunkState> transformDatas_;
 
 		// ExecuteIndirect 用の間接描画引数バッファ
-		ConstantBuffer<D3D12_DRAW_INDEXED_ARGUMENTS> argumentBuffer_;
-		D3D12_DRAW_INDEXED_ARGUMENTS* argumentData_ = nullptr;
+		ConstantBuffer<FractureIndirectCommand> argumentBuffer_;
+		FractureIndirectCommand* argumentData_ = nullptr;
 	};
 }
 

@@ -12,7 +12,8 @@ namespace GameEngine {
 	enum class ParameterType {
 		CBV,
 		SRV,
-		UAV
+		UAV,
+		RootConstant,
 	};
 
 	// パラメータの情報を保持するデータ
@@ -77,6 +78,15 @@ namespace GameEngine {
 		/// <param name="texAddress">範囲外の振る舞い</param>
 		/// <param name="visibility">使用するシェーダー</param>
 		void AddSampler(uint32_t shaderRegister, D3D12_FILTER filter, D3D12_TEXTURE_ADDRESS_MODE texAddress, D3D12_SHADER_VISIBILITY visibility, D3D12_COMPARISON_FUNC func = D3D12_COMPARISON_FUNC_NEVER);
+
+		/// <summary>
+		/// 32bitルート定数を追加する
+		/// </summary>
+		/// <param name="num32BitValues">32bit値の個数</param>
+		/// <param name="shaderRegister">レジスタ番号</param>
+		/// <param name="visibility">使用するシェーダー</param>
+		/// <param name="space">レジスタスペース</param>
+		void Add32BitConstantsParameter(uint32_t num32BitValues, uint32_t shaderRegister, D3D12_SHADER_VISIBILITY visibility, uint32_t space = 0);
 
 		/// <summary>
 		/// ルートシグネチャを手動生成
