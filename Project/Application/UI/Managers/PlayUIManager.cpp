@@ -56,6 +56,10 @@ void PlayUIManager::Initialize() {
 
 	// 更新して適応させる
 	Update();
+
+	isDrawGamePlayUI_ = false;
+	isDrawPlayGuide_ = false;
+	isDrawTutorialGuide_ = false;
 }
 
 void PlayUIManager::Update() {

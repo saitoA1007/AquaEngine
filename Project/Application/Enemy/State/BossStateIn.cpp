@@ -34,7 +34,9 @@ void BossStateIn::Update() {
 		}
 	}
 
-	if (isMove_ && !delayBreakEgg_) {
+	if (delayBreakEgg_) { return; }
+
+	if (isMove_) {
 		timer_ += FpsCounter::gameDeltaTime / maxInTime_;
 
 		// 上昇
