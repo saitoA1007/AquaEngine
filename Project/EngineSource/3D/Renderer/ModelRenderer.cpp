@@ -194,7 +194,7 @@ void ModelRenderer::DrawParticleCS(const Model* model, const uint32_t& numInstan
 	}
 }
 
-void ModelRenderer::DrawFracture(const Model* model,FractureInstance& fractureInstance, ID3D12CommandSignature* sig, const GpuResource* material) {
+void ModelRenderer::DrawFracture(const Model* model,FractureInstance& fractureInstance, ID3D12CommandSignature* sig, GpuResource* lightGroupResource, const GpuResource* material) {
 
 	for (auto& [groupName, chunks] : model->GetFractureChunks()) {
 		PackedGeometryBuffer* buffer = model->GetFractureBuffers().at(groupName).get();
@@ -216,6 +216,7 @@ void ModelRenderer::DrawFracture(const Model* model,FractureInstance& fractureIn
 		commandList_->SetGraphicsRootDescriptorTable(1, fractureInstance.GetInstancingSrvGPU());
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 		commandList_->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(4, lightGroupResource->GetGpuVirtualAddress());
 
 		commandList_->ExecuteIndirect(
 			sig, // コマンドシグネチャ

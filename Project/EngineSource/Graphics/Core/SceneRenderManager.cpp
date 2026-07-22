@@ -185,7 +185,7 @@ void SceneRenderManager::Execute3dRequest(const Draw3dRequest& request) {
         break;
 
     case Draw3dType::Fracture:
-        ModelRenderer::DrawFracture(request.model, *request.fractureInstance, fractureCommandSignature_);
+        ModelRenderer::DrawFracture(request.model, *request.fractureInstance, fractureCommandSignature_, renderQueue_->GetLightResource());
         break;
 
     default:

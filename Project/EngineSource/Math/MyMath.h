@@ -50,6 +50,7 @@ namespace GameEngine {
 		float AngleBetweenRadians(Vector3 v1, Vector3 v2);
 
 		// ベクトルの長さを求める
+		float Length(const Vector4& v);
 		float Length(const Vector3& v);
 		float Length(const Vector2& v);
 		// ベクトルの正規化
