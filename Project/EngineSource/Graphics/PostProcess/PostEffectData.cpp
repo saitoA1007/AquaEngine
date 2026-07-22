@@ -2,14 +2,26 @@
 #include "FPSCounter.h"
 using namespace GameEngine;
 
-Vignetting::Vignetting() {
+ColorGrading::ColorGrading() {
     // 作成
     buffer_.Create();
-    buffer_.GetData()->intensity = 16.0f;
-    buffer_.GetData()->time = 0.15f;
+    auto* data = buffer_.GetData();
+    
+    data->enableGrayscale = 0;
+    data->enableSepia = 0;
+    data->enableRandom = 0;
+    data->enableVignetting = 0;
+
+    data->vignettingIntensity = 16.0f;
+    data->vignettingTime = 0.15f;
+
+    data->randomIntensity = 0.05f;
+    data->randomTime = 1.0f;
+
+    isActive_ = true;
 }
 
-void Vignetting::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
+void ColorGrading::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
     commandList->SetGraphicsRootDescriptorTable(0, srvManager->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
     commandList->SetGraphicsRootConstantBufferView(1, buffer_.GetGpuVirtualAddress());
     commandList->DrawInstanced(3, 1, 0, 0);

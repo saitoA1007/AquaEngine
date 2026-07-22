@@ -8,18 +8,27 @@
 namespace GameEngine {
 
     /// <summary>
-    /// ヴィネット
+    /// 色調補正、画面装飾の処理
     /// </summary>
-    class Vignetting : public IPostEffect {
+    class ColorGrading : public IPostEffect {
     public:
-        struct alignas(16) VignettingData {
-            float intensity; // ぼかさない円の範囲
-            float time; // ぼかしぐわい
-            uint32_t textureHandle; // 加工する画像
-            float padding;
+        struct alignas(16) ColorGradingData {
+            uint32_t textureHandle;
+            float padding[3];
+
+            uint32_t enableGrayscale;
+            uint32_t enableSepia;
+            uint32_t enableRandom;
+            uint32_t enableVignetting;
+
+            float vignettingIntensity; // ぼかさない円の範囲
+            float vignettingTime; // ぼかしぐわい
+
+            float randomIntensity;
+            float randomTime;
         };
     public:
-        Vignetting();
+        ColorGrading();
 
         void Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) override;
 
@@ -28,7 +37,7 @@ namespace GameEngine {
         }
 
     private:
-        ConstantBuffer<VignettingData> buffer_;
+        ConstantBuffer<ColorGradingData> buffer_;
     };
 
     /// <summary>

@@ -1121,14 +1121,12 @@
     <FxCompile Include="Resources\Shaders\CS\Skinning.CS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\LightingComposite.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\DepthCopy.PS.hlsl" />
-    <FxCompile Include="Resources\Shaders\PostEffect\Grayscale\Grayscale.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\Rasterize\WBOITAccumulate.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\WBOITResolve.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\Rasterize\WBOITAccumulate.VS.hlsl" />
     <FxCompile Include="Resources\Shaders\Raytracing\ChsIceObject.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\OutLine\DepthOutLine.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\Dissolve\Dissolve.PS.hlsl" />
-    <FxCompile Include="Resources\Shaders\PostEffect\Random\Random.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\CS\ParticleUpdate.CS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\Smoothing\Gauss5x5Vertical.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\Smoothing\Gauss5x5Horizontal.PS.hlsl" />
@@ -1137,6 +1135,7 @@
     <FxCompile Include="Resources\Shaders\PostEffect\Smoothing\Gauss9x9Horizontal.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\Fracture.VS.hlsl" />
     <FxCompile Include="Resources\Shaders\Fracture.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\PostEffect\ColorGrading.PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Externals\imgui\ProggyClean.ttf" />

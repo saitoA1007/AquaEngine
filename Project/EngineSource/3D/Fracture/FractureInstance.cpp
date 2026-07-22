@@ -95,6 +95,7 @@ void FractureInstance::WriteInstance(uint32_t index, const GeometryRange& range,
 	transformData_[index].transform.translate = { 0.0f, 0.0f, 0.0f };
 
 	instancingData_[index].world = Matrix4x4::MakeIdentity();
+	instancingData_[index].worldInverseTranspose = Matrix4x4::MakeIdentity();
 	instancingData_[index].vertexOffset = range.vertexOffset;
 	instancingData_[index].indexOffset = range.indexOffset;
 	instancingData_[index].indexCount = range.indexCount;
