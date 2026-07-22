@@ -9,7 +9,7 @@ void PostEffectManager::Initialize(ID3D12GraphicsCommandList* commandList, SrvMa
     renderPassController_ = renderPassController;
 
     // ヴィネットで描画するパス
-    renderPassController_->AddPass("VignettingPass");
+    renderPassController_->AddPass("ColorGradingPass");
     // ぼかし
     renderPassController_->AddPass("GaussVerticalPass");
     renderPassController_->AddPass("GaussHorizontalPass");
@@ -19,19 +19,17 @@ void PostEffectManager::Initialize(ID3D12GraphicsCommandList* commandList, SrvMa
     renderPassController_->AddPass("BloomPass");
 
     // 実行順序を設定
-    RegisterPassOrder({"HighLumMaskPass", "GaussVerticalPass", "GaussHorizontalPass", "BloomPass", "VignettingPass"});
+    RegisterPassOrder({"HighLumMaskPass", "GaussVerticalPass", "GaussHorizontalPass", "BloomPass", "ColorGradingPass"});
 
     // psoを登録
-    RegisterPSO("Vignetting", psoManager);
-    //RegisterPSO("RadialBlur", psoManager);
-    //RegisterPSO("ScanLine", psoManager);
+    RegisterPSO("ColorGrading", psoManager);
     RegisterPSO("HighLumMask", psoManager);
     RegisterPSO("GaussVertical", psoManager);
     RegisterPSO("GaussHorizontal", psoManager);
     RegisterPSO("Bloom", psoManager);
 
     // エフェクトを追加
-    AddPostEffect<Vignetting>("VignettingPass", "Vignetting");
+    AddPostEffect<ColorGrading>("ColorGradingPass", "ColorGrading");
     AddPostEffect<HighLumMask>("HighLumMaskPass", "HighLumMask");
     AddPostEffect<GaussVertical>("GaussVerticalPass", "GaussVertical");
     AddPostEffect<GaussHorizontal>("GaussHorizontalPass", "GaussHorizontal");

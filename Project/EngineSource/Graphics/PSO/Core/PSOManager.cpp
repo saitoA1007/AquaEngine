@@ -706,11 +706,11 @@ void PSOManager::DefaultLoadPostEffectPSO() {
     InputLayoutBuilder inputLayoutBuilder;
     inputLayoutBuilder.CreateNone();
 
-    // ヴィネットを作成
+    // 色調調整、画像装飾のポストエフェクト
     CreatePSOData defaultPostEffect;
     defaultPostEffect.rootSigName = "DefaultPostEffect";
     defaultPostEffect.vsPath = L"Resources/Shaders/PostEffect/FullScreen.VS.hlsl";
-    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/Vignetting/Vignetting.PS.hlsl";
+    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/ColorGrading.PS.hlsl";
     defaultPostEffect.drawMode = DrawModel::FillFront;
     defaultPostEffect.blendMode = { BlendMode::kBlendModeNone };
     defaultPostEffect.isDepthEnable = false;
@@ -721,7 +721,7 @@ void PSOManager::DefaultLoadPostEffectPSO() {
     rootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_PIXEL);
     rootSigBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
     rootSigBuilder.CreateRootSignature();
-    RegisterPSO("Vignetting", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
+    RegisterPSO("ColorGrading", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 
 
     defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/HighLumMask.PS.hlsl";
