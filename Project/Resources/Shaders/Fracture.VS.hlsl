@@ -3,6 +3,7 @@
 struct FractureForGPU
 {
     float4x4 World;
+    float4x4 WorldInverseTranspose;
     
     uint vertexOffset; // PackedGeometryBuffer内でのチャンクの頂点開始位置
     uint indexOffset; // PackedGeometryBuffer内でのチャンクのインデックス開始位置
@@ -11,18 +12,20 @@ struct FractureForGPU
 };
 StructuredBuffer<FractureForGPU> gFracture : register(t0);
 
-struct Camera
-{
-    float3 worldPosition;
-    float4x4 vpMatrix;
-};
-ConstantBuffer<Camera> gCamera : register(b0);
-
 struct InstanceIndexConstant
 {
     uint instanceIndex;
 };
-ConstantBuffer<InstanceIndexConstant> gInstanceIndex : register(b1);
+ConstantBuffer<InstanceIndexConstant> gInstanceIndex : register(b0);
+
+struct Camera
+{
+    float3 worldPosition;
+    float4x4 vpMatrix;
+    float4x4 mtxViewInv;
+    float4x4 mtxProjInv;
+};
+ConstantBuffer<Camera> gCamera : register(b1);
 
 struct VertexShaderInput
 {
@@ -40,5 +43,7 @@ VertexShaderOutput main(VertexShaderInput input)
     output.position = mul(worldPos, gCamera.vpMatrix);
     output.texcoord = input.texcoord;
     output.color = float4(1.0f,1.0f,1.0f,1.0f);
+    output.normal = normalize(mul(input.normal, (float3x3) gFracture[gInstanceIndex.instanceIndex].WorldInverseTranspose));
+    output.worldPosition = worldPos.xyz;
     return output;
 }

@@ -3,6 +3,9 @@
 #include "PostProcess/PostEffectData.h"
 #include "ParticleBehaviorGPU.h"
 #include "RandomGenerator.h"
+#include "FPSCounter.h"
+#include "DestructibleObject.h"
+#include "Application/CollisionConfig.h"
 using namespace GameEngine;
 
 TestScene::~TestScene() {}
@@ -48,7 +51,7 @@ TestScene::TestScene() {
 	effectModel_ = modelManager_->GetNameByModel("plane.obj");
 	effectModel_->SetDefaultIsEnableLight(false);
 	//gameObjectManager_->AddObject<ParticleBehavior>("HitAfterEffect", 32, textureManager_, effectModel_, &renderQueue_->GetMainCamera());
-	gameObjectManager_->AddObject<ParticleBehaviorGPU>("GpuParticle", 1024, effectModel_);
+	//gameObjectManager_->AddObject<ParticleBehaviorGPU>("GpuParticle", 1024, effectModel_);
 
 	// 高ポリゴン氷
 	iceHighModel_ = modelManager_->GetNameByModel("ice_highPolygon.gltf");
@@ -87,23 +90,9 @@ TestScene::TestScene() {
 	cylinderModel_ = modelManager_->GetNameByModel("Cylinder");
 	cylinderWorld_.Initialize({{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,3.0f}});
 
+	// 破片のテスト
 	testModel_ = modelManager_->GetNameByModel("test.gltf");
-
-	int i = 0;
-
-	for (auto& [groupName, chunks] : testModel_->GetFractureChunks()) {
-		if (i != 0) { continue; }
-		PackedGeometryBuffer* buffer = testModel_->GetFractureBuffers().at(groupName).get();
-
-		std::vector<uint32_t> chunkIds;
-		const auto& fractureChunks = testModel_->GetFractureChunks().begin()->second;
-		for (const auto& chunk : fractureChunks) {
-			chunkIds.push_back(chunk.info.chunkId);
-		}
-
-		fractureInstance_.Initialize(chunkIds, *buffer);
-		i++;
-	}
+	gameObjectManager_->AddObject<DestructibleObject>(testModel_, static_cast<uint32_t>(CollisionTypeID::kPlayer), kCollisionAttributePlayer);
 }
 
 void TestScene::Initialize() {
@@ -119,16 +108,6 @@ void TestScene::Update() {
 
 	// アニメーションの更新処理
 	walkAnimator_->Update();
-
-	auto& transforms = fractureInstance_.GetTransformDatas();
-	for (size_t i = 0; i < transforms.size(); ++i) {
-		// ここで物理演算や簡単な移動計算を行う
-		transforms[i].transform.translate.y -= 0.098f; // 重力で落とす例
-		transforms[i].transform.translate.x += RandomGenerator::Get(-1.0f, 1.0f);
-		transforms[i].transform.translate.z += RandomGenerator::Get(-1.0f, 1.0f);
-		transforms[i].transform.rotate.x += 0.05f;    // 回転させる例
-	}
-	fractureInstance_.Update();
 }
 
 void TestScene::DebugUpdate() {
@@ -195,9 +174,6 @@ void TestScene::Draw() {
 
 	// アニメーションモデル
 	//renderQueue_->SubmitRaytracingModel(model_, world_);
-
-	// 破片を描画
-	renderQueue_->SubmitFracture(testModel_, fractureInstance_);
 	
 	// それぞれの氷を描画
 	//renderQueue_->SubmitRaytracingModel(iceHighModel_, iceHighWorld_, &iceRefBuffers_[0]);

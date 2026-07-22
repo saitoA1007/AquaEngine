@@ -563,7 +563,8 @@
     <ClCompile Include="Application\UI\Managers\TitleUIManager.cpp" />
     <ClCompile Include="Application\UI\Managers\GameOverUIManager.cpp" />
     <ClCompile Include="Application\UI\Managers\ClearUIManager.cpp" />
-    <ClCompile Include="EngineSource\3D\Transform\FractureInstance.cpp" />
+    <ClCompile Include="EngineSource\3D\Fracture\FractureInstance.cpp" />
+    <ClCompile Include="EngineSource\3D\Fracture\DestructibleObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1107,9 +1108,11 @@
     <ClInclude Include="Application\UI\Managers\TitleUIManager.h" />
     <ClInclude Include="Application\UI\Managers\GameOverUIManager.h" />
     <ClInclude Include="Application\UI\Managers\ClearUIManager.h" />
-    <ClInclude Include="EngineSource\3D\Model\FractureData.h" />
+    <ClInclude Include="EngineSource\3D\Fracture\FractureData.h" />
     <ClInclude Include="EngineSource\Graphics\Buffers\PackedGeometryBuffer.h" />
-    <ClInclude Include="EngineSource\3D\Transform\FractureInstance.h" />
+    <ClInclude Include="EngineSource\3D\Fracture\FractureInstance.h" />
+    <ClInclude Include="EngineSource\Graphics\Buffers\RuntimeFractureBuffer.h" />
+    <ClInclude Include="EngineSource\3D\Fracture\DestructibleObject.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />

@@ -21,8 +21,8 @@ GameScene::GameScene() {
 	InputRegisterCommand();
 
 	// 背景を設定
-	//uint32_t skyboxGH = textureManager_->GetHandleByName("rogland_clear_night_1k.dds");
-	//renderQueue_->SetSkyboxTexture(skyboxGH);
+	uint32_t skyboxGH = textureManager_->GetHandleByName("qwantani_moon_noon_puresky_1k.dds");
+	renderQueue_->SetSkyboxTexture(skyboxGH);
 
 	// メインカメラの初期化
 	mainCamera_ = std::make_unique<Camera>();

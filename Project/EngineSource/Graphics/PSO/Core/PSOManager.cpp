@@ -660,8 +660,9 @@ void PSOManager::DefaultLoadPSO() {
         fractureRs.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_PIXEL);
         fractureRs.AddSRVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX);
         fractureRs.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 0, D3D12_SHADER_VISIBILITY_PIXEL);
-        fractureRs.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_VERTEX);
-        fractureRs.Add32BitConstantsParameter(1, 1, D3D12_SHADER_VISIBILITY_VERTEX);
+        fractureRs.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_ALL);
+        fractureRs.AddCBVParameter(2, D3D12_SHADER_VISIBILITY_PIXEL);
+        fractureRs.Add32BitConstantsParameter(1, 0, D3D12_SHADER_VISIBILITY_VERTEX);
         fractureRs.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
         fractureRs.CreateRootSignature();
         RegisterPSO("Fracture3D", fracture3D, &fractureRs, &inputLayoutBuilder);
@@ -672,7 +673,7 @@ void PSOManager::DefaultLoadPSO() {
         Microsoft::WRL::ComPtr<ID3D12CommandSignature> indirectCommandSignature;
 
         // 破片描画
-        UINT kFractureInstanceIndexRootParam = 4;
+        UINT kFractureInstanceIndexRootParam = 5;
 
         D3D12_INDIRECT_ARGUMENT_DESC argumentDescs[2] = {};
         argumentDescs[0].Type = D3D12_INDIRECT_ARGUMENT_TYPE_CONSTANT;

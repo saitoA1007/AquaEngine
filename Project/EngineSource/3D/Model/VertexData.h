@@ -43,6 +43,12 @@ struct MeshData {
 	std::optional<GameEngine::FractureChunkInfo> fractureInfo; // 事前分割チャンク情報
 };
 
+// ランタイムカットで作成した1個の破片
+struct Fragment {
+	std::vector<VertexData> vertices;
+	std::vector<uint32_t> indices;
+};
+
 struct VertexWeightData {
 	float weight;
 	uint32_t vertexIndex;

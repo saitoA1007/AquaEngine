@@ -5,7 +5,6 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "VertexData.h"
-#include "FractureData.h"
 
 namespace GameEngine {
 
@@ -41,6 +40,10 @@ namespace GameEngine {
 
 				rangesByChunkId_[meshData.fractureInfo->chunkId] = range;
 			}
+
+			// ランタイムカット用に保持しておく
+			cpuVertices_ = packedVertices;
+			cpuIndices_ = packedIndices;
 			
 			vertexBuffer_.Create(packedVertices);
 			indexBuffer_.Create(packedIndices);
@@ -51,6 +54,21 @@ namespace GameEngine {
 			auto it = rangesByChunkId_.find(chunkId);
 			assert(it != rangesByChunkId_.end() && "指定されたchunkIdのGeometryRangeが見つかりません");
 			return it->second;
+		}
+
+		// 指定チャンクの頂点を取得
+		Fragment ExtractChunk(uint32_t chunkId) const {
+			const GeometryRange& range = GetRange(chunkId);
+
+			Fragment frag;
+			frag.vertices.assign(
+				cpuVertices_.begin() + range.vertexOffset,
+				cpuVertices_.begin() + range.vertexOffset + range.vertexCount);
+
+			frag.indices.assign(
+				cpuIndices_.begin() + range.indexOffset,
+				cpuIndices_.begin() + range.indexOffset + range.indexCount);
+			return frag;
 		}
 
 		// バッファは1本しかないため、ビューは全チャンクで共有する
@@ -66,5 +84,9 @@ namespace GameEngine {
 
 		// このバッファ内での描画範囲
 		std::unordered_map<uint32_t, GeometryRange> rangesByChunkId_;
+
+		// ランタイムカット用のCPU側コピー
+		std::vector<VertexData> cpuVertices_;
+		std::vector<uint32_t> cpuIndices_;
 	};
 }

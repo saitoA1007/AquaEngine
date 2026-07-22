@@ -204,6 +204,10 @@ namespace GameEngine {
 			return std::acos(dot);
 		}
 
+		float Length(const Vector4& v) {
+			return std::sqrtf(v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w);
+		}
+
 		float Length(const Vector3& v) {
 			return std::sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
 		}
