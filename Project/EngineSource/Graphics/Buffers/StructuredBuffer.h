@@ -225,6 +225,28 @@ namespace GameEngine {
 			isSrvState_ = false;
 		}
 
+		// 解放する。
+		void Release() {
+			if (!isCreated_) { return; }
+			// Unmap
+			if (data_) {
+				resource_->Unmap(0, nullptr);
+				data_ = nullptr;
+			}
+			// srvの解放
+			if (srvManager_) {
+				srvManager_->ReleaseIndex(srvIndex_);
+				if (enableUAV_) {
+					srvManager_->ReleaseIndex(uavIndex_);
+				}
+			}
+			resource_.Reset();
+			numElements_ = 0;
+			enableUAV_ = false;
+			isSrvState_ = false;
+			isCreated_ = false;
+		}
+
 		T* GetData() const { return data_; }
 		uint32_t GetNumElements() const { return numElements_; }
 

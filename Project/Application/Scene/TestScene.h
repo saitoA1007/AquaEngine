@@ -10,6 +10,7 @@
 #include "Material.h"
 #include "RefBuffer.h"
 #include "IceMaterial.h"
+#include "Collider.h"
 
 #include "Application/Scene/Transition/Fade.h"
 
@@ -113,6 +114,9 @@ private: // シーン機能
 	GameEngine::Model* cylinderModel_;
 	GameEngine::WorldTransform cylinderWorld_;
 
-
 	GameEngine::Model* testModel_;
+
+	// 球の当たり判定
+	GameEngine::SphereCollider testCollider_;
+	Vector3 testPos_ = {0.0f,0.0f,-5.0f};
 };

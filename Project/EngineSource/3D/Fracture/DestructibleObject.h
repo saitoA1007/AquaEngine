@@ -1,7 +1,9 @@
 #pragma once
+#include <unordered_set>
 #include "IGameObject.h"
 #include "Collider.h"
 #include "Model.h"
+#include "WorldTransform.h"
 #include "FractureInstance.h"
 
 namespace GameEngine {
@@ -20,6 +22,11 @@ namespace GameEngine {
 		// 描画処理
 		void Draw() override;
 
+	public:
+
+		// ワールド行列
+		WorldTransform worldTransform_;
+
 	private:
 		// モデル
 		Model* model_ = nullptr;
@@ -27,8 +34,42 @@ namespace GameEngine {
 		// aabbの当たり判定
 		AABBCollider collider_;
 
-		// 破片
-		FractureInstance fractureInstance_;
+		// このオブジェクトが持つ破壊グループ名
+		std::string groupName_;
+		// chunkIdから素早く引くためのマップ（Initializeで構築）
+		std::unordered_map<uint32_t, const FractureChunkEntry*> chunksById_;
+
+		// 元の静的チャンク
+		FractureInstance intactInstance_;
+		bool hasIntact_ = false;
+
+		// 事前分割のまま切り離されて落ちる破片
+		FractureInstance macroDebrisInstance_;
+		bool hasMacroDebris_ = false;
+
+		// ランタイムカットされた破片
+		FractureInstance microDebrisInstance_;
+		bool hasMicroDebris_ = false;
+
+		// 既に切り離し済みのチャンクID
+		std::unordered_set<uint32_t> destroyedChunkIds_;
+
+		// チャンクごとの蓄積ダメージ
+		std::unordered_map<uint32_t, float> chunkDamage_;
+
+		// chunkIdがintactInstance_の何番目のインスタンスか
+		std::unordered_map<uint32_t, uint32_t> chunkIndexInIntact_;
+
+		// モデル全体のおおよその中心。ひびを入れるのに使用
+		Vector3 modelCenter_ = { 0.0f, 0.0f, 0.0f };
+
+		float kBreakThreshold_ = 3.0f;
+		// 閾値到達寸前の最大ズレ量
+		float kMaxCrackOffset_ = 0.04f;
+		// 閾値到達寸前の最大ランダム回転
+		float kMaxCrackRotate_ = 0.15f;
+		// 隣接チャンクへ波及させる強さ
+		float kNeighborCrackFactor_ = 0.35f;
 
 	private:
 
@@ -36,6 +77,26 @@ namespace GameEngine {
 		void OnCollisionEnter(const GameEngine::CollisionResult& result);
 
 		void ApplyDamage(const Vector3& impactPos, float damageRadius);
+
+		// 隣接グラフをフラッドフィルして、切り離すチャンク群を選ぶ
+		std::vector<uint32_t> SelectDetachedChunks(uint32_t seedChunkId, float damageRadius, const Vector3& impactPos) const;
+
+		// impactPosに一番近い（まだ壊れていない）チャンクを探す
+		std::optional<uint32_t> FindNearestChunk(const Vector3& impactPos) const;
+
+		// 破片に簡易的な落下運動を与える（本来は物理エンジンに置き換える）
+		void SimulateFallingDebris(FractureInstance& instance, float deltaTime);
+
+		// 破片の爆発
+		void ApplyExplosionImpulse(FractureInstance& instance,
+			const std::vector<uint32_t>& chunkIds, const Vector3& impactPos, float damageRadius);
+
+		void ApplyExplosionImpulseUniform(FractureInstance& instance,
+			const Vector3& impactPos, float strength);
+
+		void ApplyChipDamage(const Vector3& impactPos, float damageAmount);
+		void UpdateCrackVisual(uint32_t chunkId, float ratio);
+		void RebuildIntactIndexMap(const std::vector<uint32_t>& ids);
 	};
 }
 
