@@ -14,6 +14,10 @@ TestScene::TestScene() {
 
     // 決定ボタンコマンドを追加
 	inputCommand_->RegisterCommand("Decision", { {InputState::KeyTrigger, DIK_SPACE},{InputState::PadTrigger, XINPUT_GAMEPAD_X} });
+	inputCommand_->RegisterCommand("MoveUp", { {InputState::KeyPush, DIK_W },{InputState::PadLeftStick,0,{0.0f,1.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_UP } });
+	inputCommand_->RegisterCommand("MoveDown", { {InputState::KeyPush, DIK_S },{InputState::PadLeftStick,0,{0.0f,-1.0f},0.2f}, {InputState::PadPush, XINPUT_GAMEPAD_DPAD_DOWN} });
+	inputCommand_->RegisterCommand("MoveLeft", { {InputState::KeyPush, DIK_A },{InputState::PadLeftStick,0,{-1.0f,0.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_LEFT } });
+	inputCommand_->RegisterCommand("MoveRight", { {InputState::KeyPush, DIK_D },{InputState::PadLeftStick,0,{1.0f,0.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_RIGHT } });
 
 	// メインカメラの初期化
 	mainCamera_ = std::make_unique<Camera>();
@@ -93,6 +97,11 @@ TestScene::TestScene() {
 	// 破片のテスト
 	testModel_ = modelManager_->GetNameByModel("test.gltf");
 	gameObjectManager_->AddObject<DestructibleObject>(testModel_, static_cast<uint32_t>(CollisionTypeID::kPlayer), kCollisionAttributePlayer);
+
+	testCollider_.SetRadius(1.0f);
+	testCollider_.SetWorldPosition(testPos_);
+	testCollider_.SetCollisionAttribute(kCollisionAttributeEnemy);
+	testCollider_.SetCollisionMask(~kCollisionAttributeEnemy);
 }
 
 void TestScene::Initialize() {
@@ -108,6 +117,13 @@ void TestScene::Update() {
 
 	// アニメーションの更新処理
 	walkAnimator_->Update();
+
+	// 操作
+	if (inputCommand_->IsCommandActive("MoveUp")) { testPos_.z += 5.0f * FpsCounter::gameDeltaTime; }
+	if (inputCommand_->IsCommandActive("MoveDown")) { testPos_.z -= 5.0f * FpsCounter::gameDeltaTime; }
+	if (inputCommand_->IsCommandActive("MoveLeft")) { testPos_.x -= 5.0f * FpsCounter::gameDeltaTime; }
+	if (inputCommand_->IsCommandActive("MoveRight")) { testPos_.x += 5.0f * FpsCounter::gameDeltaTime; }
+	testCollider_.SetWorldPosition(testPos_);
 }
 
 void TestScene::DebugUpdate() {

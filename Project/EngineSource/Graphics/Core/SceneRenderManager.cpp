@@ -188,6 +188,10 @@ void SceneRenderManager::Execute3dRequest(const Draw3dRequest& request) {
         ModelRenderer::DrawFracture(request.model, *request.fractureInstance, fractureCommandSignature_, renderQueue_->GetLightResource());
         break;
 
+    case Draw3dType::RuntimeCutFragments:
+        ModelRenderer::DrawRuntimeCutFragments(*request.fractureInstance, fractureCommandSignature_, renderQueue_->GetLightResource(), request.material);
+        break;
+
     default:
         assert(false && "未対応のDraw3dTypeです");
         break;

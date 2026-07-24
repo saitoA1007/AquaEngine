@@ -194,7 +194,7 @@ void ModelRenderer::DrawParticleCS(const Model* model, const uint32_t& numInstan
 	}
 }
 
-void ModelRenderer::DrawFracture(const Model* model,FractureInstance& fractureInstance, ID3D12CommandSignature* sig, GpuResource* lightGroupResource, const GpuResource* material) {
+void ModelRenderer::DrawFracture(const Model* model, FractureInstance& fractureInstance, ID3D12CommandSignature* sig, GpuResource* lightGroupResource, const GpuResource* material) {
 
 	for (auto& [groupName, chunks] : model->GetFractureChunks()) {
 		PackedGeometryBuffer* buffer = model->GetFractureBuffers().at(groupName).get();
@@ -225,6 +225,25 @@ void ModelRenderer::DrawFracture(const Model* model,FractureInstance& fractureIn
 			0, nullptr, 0
 		);
 	}
+}
+
+void ModelRenderer::DrawRuntimeCutFragments(FractureInstance& fractureInstance, ID3D12CommandSignature* sig, GpuResource* lightGroupResource, const GpuResource* material) {
+
+	assert(fractureInstance.HasRuntimeGeometry() && "ランタイムカットで構築されたFractureInstanceではありません");
+
+	commandList_->IASetVertexBuffers(0, 1, &fractureInstance.GetRuntimeVertexBufferView());
+	commandList_->IASetIndexBuffer(&fractureInstance.GetRuntimeIndexBufferView());
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	commandList_->SetGraphicsRootConstantBufferView(0, material->GetGpuVirtualAddress());
+	commandList_->SetGraphicsRootDescriptorTable(1, fractureInstance.GetInstancingSrvGPU());
+	commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+	commandList_->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(4, lightGroupResource->GetGpuVirtualAddress());
+
+	commandList_->ExecuteIndirect(
+		sig, fractureInstance.GetNumInstance(),
+		fractureInstance.GetArgumentBuffer().GetResource(), 0, nullptr, 0);
 }
 
 void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTransform, GpuResource* lightGroupResource, const GpuResource* material) {

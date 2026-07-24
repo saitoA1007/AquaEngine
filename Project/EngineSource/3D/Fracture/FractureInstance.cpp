@@ -12,38 +12,36 @@ void FractureInstance::Initialize(const std::vector<uint32_t>& chunkIds, const P
 	numInstance_ = static_cast<uint32_t>(chunkIds.size());
 
 	// リソース作成
+	buffer_.Release();
 	buffer_.Create(numInstance_);
 	instancingData_ = buffer_.GetData();
 
 	// CPU側のトランスフォーム配列も同じサイズに確保
 	transformData_.resize(numInstance_);
 
+	argumentBuffer_.Release();
 	argumentBuffer_.Create(numInstance_);
 	argumentData_ = argumentBuffer_.GetData();
 
-	// 情報を書き込む
 	for (uint32_t index = 0; index < numInstance_; ++index) {
-		uint32_t chunkId = chunkIds[index];
-
 		// PackedGeometryBufferからこのチャンクの描画範囲を取得
+		uint32_t chunkId = chunkIds[index];
 		const GeometryRange& range = geometryBuffer.GetRange(chunkId);
 
-		// CPU側の初期トランスフォーム設定
+		// トランスフォームを初期化
 		transformData_[index].transform.scale = { 1.0f, 1.0f, 1.0f };
 		transformData_[index].transform.rotate = { 0.0f, 0.0f, 0.0f };
 		transformData_[index].transform.translate = { 0.0f, 0.0f, 0.0f };
-
-		// GPU側バッファの初期化
 		instancingData_[index].world = Matrix4x4::MakeIdentity();
 		instancingData_[index].worldInverseTranspose = Matrix4x4::MakeIdentity();
 
-		// PackedGeometryBufferから得た描画範囲をGPU用構造体に詰める
+		// PackedGeometryBufferから得た描画範囲を設定
 		instancingData_[index].vertexOffset = range.vertexOffset;
 		instancingData_[index].indexOffset = range.indexOffset;
 		instancingData_[index].indexCount = range.indexCount;
 		instancingData_[index].chunkId = chunkId;
 
-		// ExecuteIndirect 用のDrawコマンド引数を設定
+		// ExecuteIndirect用のDrawコマンド引数を設定
 		argumentData_[index].instanceIndex = index;
 		argumentData_[index].drawArguments.IndexCountPerInstance = range.indexCount; // 破片のインデックス数
 		argumentData_[index].drawArguments.InstanceCount = 1;                        // 1回につき1個描画
@@ -54,7 +52,7 @@ void FractureInstance::Initialize(const std::vector<uint32_t>& chunkIds, const P
 }
 
 void FractureInstance::Update() {
-	// 数によって更新を変える
+	// 更新
 	for (uint32_t i = 0; i < transformData_.size(); ++i) {
 		instancingData_[i].world = Math::MakeAffineMatrix(transformData_[i].transform.scale, transformData_[i].transform.rotate, transformData_[i].transform.translate);
 		instancingData_[i].worldInverseTranspose = Math::InverseTranspose(instancingData_[i].world);
@@ -64,16 +62,17 @@ void FractureInstance::Update() {
 void FractureInstance::InitializeFromRanges(const std::vector<GeometryRange>& ranges) {
 	AllocateBuffers(static_cast<uint32_t>(ranges.size()));
 	for (uint32_t index = 0; index < numInstance_; ++index) {
-		// ランタイム破片には元のchunkIdの概念がないのでindexで代用
+		// ランタイム破片には元のchunkIdがないのでindexを使用
 		WriteInstance(index, ranges[index], index);
 	}
 }
 
-void FractureInstance::ApplyRuntimeCut(const Fragment& source, const Vector3& impactPos, int maxDepth, RuntimeFractureBuffer& runtimeBuffer) {
+void FractureInstance::ApplyRuntimeCut(const Fragment& source, const Vector3& impactPos, int maxDepth) {
 	std::vector<Fragment> fragments;
 	RecursiveFracture(source.vertices, source.indices, impactPos, 0, maxDepth, fragments);
 
-	std::vector<GeometryRange> ranges = runtimeBuffer.Upload(fragments);
+	runtimeBuffer_ = std::make_unique<RuntimeFractureBuffer>();
+	std::vector<GeometryRange> ranges = runtimeBuffer_->Upload(fragments);
 	InitializeFromRanges(ranges);
 }
 
@@ -127,7 +126,7 @@ ClipResult FractureInstance::ClipMeshByPlane(const std::vector<VertexData>& vert
 			SignedDist(Vector3(v[1].position.x, v[1].position.y, v[1].position.z)),
 			SignedDist(Vector3(v[2].position.x, v[2].position.y, v[2].position.z)) };
 
-		// 3頂点が全部同じ側 → そのまま片方に追加
+		// 3頂点が全部同じ側であればそのまま片方に追加
 		if (d[0] >= 0 && d[1] >= 0 && d[2] >= 0) { 
 			AddTriangle(result.frontVerts, result.frontIndices, v);
 			continue; 
@@ -271,7 +270,7 @@ void FractureInstance::RecursiveFracture(const std::vector<VertexData>& verts, c
 
 	ClipResult clipped = ClipMeshByPlane(verts, indices, normal, dist);
 
-	// 分割失敗だと諦める
+	// 分割失敗だと飛ばす
 	if (clipped.frontIndices.empty() || clipped.backIndices.empty()) {
 		outFragments.push_back({ verts, indices });
 		return;

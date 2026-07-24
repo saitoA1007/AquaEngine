@@ -32,6 +32,15 @@ namespace GameEngine {
 			resource_->Map(0, nullptr, reinterpret_cast<void**>(&data_));
 		}
 
+		// 解放
+		void Release() {
+			if (data_) {
+				resource_->Unmap(0, nullptr);
+				data_ = nullptr;
+			}
+			resource_.Reset();
+		}
+
 		// データを取得する
 		T* GetData() const { return data_; }
 

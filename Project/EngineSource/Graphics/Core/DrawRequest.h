@@ -38,6 +38,7 @@ namespace GameEngine {
         Grid,           // デバックのグリッド描画用
         DebugLine,      // デバックのライン描画用
         Fracture,       // 破片の描画
+        RuntimeCutFragments, // 動的な破片
     };
 
     enum class Draw2dType {

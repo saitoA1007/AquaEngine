@@ -61,7 +61,7 @@ namespace GameEngine {
 		void InitializeFromRanges(const std::vector<GeometryRange>& ranges);
 
 		// 指定メッシュを衝撃点周りでランタイムカットし、その結果でこのインスタンスを構築する
-		void ApplyRuntimeCut(const Fragment& source, const Vector3& impactPos, int maxDepth, RuntimeFractureBuffer& runtimeBuffer);
+		void ApplyRuntimeCut(const Fragment& source, const Vector3& impactPos, int maxDepth);
 
 		const CD3DX12_GPU_DESCRIPTOR_HANDLE& GetInstancingSrvGPU() const { return buffer_.GetSrvGpuHandle(); }
 
@@ -77,6 +77,12 @@ namespace GameEngine {
 		StructuredBuffer<FractureForGPU>& GetBuffer() { return buffer_; }
 
 		ConstantBuffer<FractureIndirectCommand>& GetArgumentBuffer() { return argumentBuffer_; }
+
+		// ランタイムカットで構築された場合のみ有効
+		bool HasRuntimeGeometry() const { return runtimeBuffer_ != nullptr; }
+		const D3D12_VERTEX_BUFFER_VIEW& GetRuntimeVertexBufferView() const { return runtimeBuffer_->GetVertexBufferView(); }
+		const D3D12_INDEX_BUFFER_VIEW& GetRuntimeIndexBufferView() const { return runtimeBuffer_->GetIndexBufferView(); }
+
 	private:
 		// コピー禁止
 		FractureInstance(const FractureInstance&) = delete;
@@ -100,6 +106,9 @@ namespace GameEngine {
 
 		// これ未満の三角形数になった破片はそれ以上分割しない
 		size_t kMinTriangleCount = 12;
+
+		// ランタイム分割
+		std::unique_ptr<RuntimeFractureBuffer> runtimeBuffer_;
 
 	private:
 

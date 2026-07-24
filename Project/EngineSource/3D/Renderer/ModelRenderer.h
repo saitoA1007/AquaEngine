@@ -64,6 +64,7 @@ namespace GameEngine {
 
 		// 破片を描画
 		static void DrawFracture(const Model* model, FractureInstance& fractureInstance, ID3D12CommandSignature* sig, GpuResource* lightGroupResource, const GpuResource* material = nullptr);
+		static void DrawRuntimeCutFragments(FractureInstance& fractureInstance, ID3D12CommandSignature* sig, GpuResource* lightGroupResource, const GpuResource* material);
 
 		/// <summary>
 		/// グリッドを描画
