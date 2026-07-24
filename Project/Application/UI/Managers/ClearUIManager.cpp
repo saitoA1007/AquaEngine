@@ -108,6 +108,9 @@ void ClearUIManager::EnterAnimation() {
 	}
 
 	if (timer_ >= 1.0f) {
+		bgSprite_.color_.w = 1.0f;
+		frameSprite_.position_.x = 0.0f;
+		clearTextSprite_.position_.x = 640.0f;
 		isEnterAnimation_ = false;
 	}
 }

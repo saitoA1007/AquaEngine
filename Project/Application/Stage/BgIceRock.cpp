@@ -3,10 +3,6 @@ using namespace GameEngine;
 
 BgIceRock::BgIceRock(GameEngine::Model* model) : iceModelComponent_(model) {
 
-	// 氷の法線マップ
-	//iceMaterial_.materialData_->dissolveThreshold = 1.0f;
-	//iceMaterial_.materialData_->heightScale = 0.002f;
-
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>("BgIceRock");
 	debugParame_->RegisterWorld("world", iceModelComponent_.worldTransform_);

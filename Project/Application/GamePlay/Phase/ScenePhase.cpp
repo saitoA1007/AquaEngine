@@ -342,6 +342,8 @@ void ClearPhase::Enter() {
 	clearUIManager_->SetActive(true);
 	// 初期化
 	clearUIManager_->Initialize();
+	// アニメーション開始
+	clearUIManager_->StartEnterAnimation();
 
 	// プレイ時間を取得
 	clearUIManager_->SetTime(commonData_.playTime_);
