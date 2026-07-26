@@ -65,12 +65,23 @@
             3.0
         ],
         "SceneName": "Game",
+        "StateOutAnimation": {
+            "CycleHeight": 2.0,
+            "EndPosY": 1.0,
+            "FadeMaxTime": 2.0,
+            "InMaxTime": 4.0,
+            "StartPosY": 0.0,
+            "SwayPhase": 0.0,
+            "SwaySpeed": 0.0,
+            "SwayWeithX": 10.0,
+            "SwayWeithZ": 5.0
+        },
         "StatusWeight": {
-            "CrossMove": 0,
-            "IceFallAttack": 0,
-            "RotateMove": 0,
-            "RushAttack": 0,
-            "Wait": 170,
+            "CrossMove": 10,
+            "IceFallAttack": 20,
+            "RotateMove": 10,
+            "RushAttack": 40,
+            "Wait": 5,
             "WindAttack": 0
         },
         "Wait": {

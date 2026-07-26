@@ -35,7 +35,7 @@ private:
 // チュートリアル
 class TutorialPhase : public IScenePhase {
 public:
-    TutorialPhase(PhaseCommonData& commonData, CameraController* cameraController, BossEnemy* bossEnemy, PlayUIManager* playUIManager);
+    TutorialPhase(PhaseCommonData& commonData, CameraController* cameraController, Player* player, BossEnemy* bossEnemy, PlayUIManager* playUIManager);
     ~TutorialPhase() = default;
 
     void Enter() override;
@@ -47,6 +47,9 @@ public:
 private:
     // ボス
     BossEnemy* bossEnemy_ = nullptr;
+
+    // プレイヤー
+    Player* player_ = nullptr;
 
     // UI
     PlayUIManager* playUIManager_ = nullptr;

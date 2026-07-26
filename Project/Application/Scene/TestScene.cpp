@@ -46,7 +46,7 @@ TestScene::TestScene() {
 	terrainModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
 	uint32_t grassGH = textureManager_->GetHandleByName("grass.png");
 	terrainModel_->SetDefaultTextureHandle(grassGH);
-	terrainWorld_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,-2.0f,0.0f} });
+	terrainWorld_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,-4.0f,0.0f} });
 
 	uint32_t normalGH = textureManager_->GetHandleByName("testNormal.png");
 	terrainModel_->SetDefaultNormalTexture(normalGH);

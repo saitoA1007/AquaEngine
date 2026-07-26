@@ -66,6 +66,11 @@ public:
 	bool IsHitWall() const { return bounceAction_.IsHitWall(); }
 	void SetIsHitWall(bool isHitWall) { bounceAction_.SetIsHitWall(isHitWall); }
 
+	// 描画の有効を設定
+	void SetIsDraw(bool isDraw) {
+		isDraw_ = isDraw;
+	}
+
 private:
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;
@@ -85,9 +90,13 @@ private:
 	// アニメーション管理
 	std::unique_ptr<PlayerAnimator> animator_;
 
+	// 仮のプレイヤーのエフェクト管理システム
 	PlayerEffectManager* effectManager_ = nullptr;
 
-private:
+	// 表示フラグ
+	bool isDraw_ = true;
+
+private: 
 	// プレイヤー
 	PlayerCommonData commonData_;
 

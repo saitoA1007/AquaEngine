@@ -25,8 +25,8 @@
             ]
         },
         "Follow": {
-            "Distance": 38.0,
-            "Fov": 0.44999998807907104,
+            "Distance": 30.0,
+            "Fov": 0.5,
             "OffsetY": 1.0,
             "PositionLerpRate": 0.07000000029802322,
             "RotateDamping": 0.8799999952316284,

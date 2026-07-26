@@ -76,6 +76,8 @@ void Player::Initialize() {
 	// 位置を初期化
 	worldTransform_.transform_.translate = { 0.0f,2.0f,12.0f };
 
+	isDraw_ = true;
+
 	// 初期化
 	animator_->Initialize();
 }
@@ -125,6 +127,7 @@ void Player::Update() {
 }
 
 void Player::Draw() {
+	if (!isDraw_) { return; }
 
 	// モデル描画
 	renderQueue_->SubmitRaytracingModel(model_, worldTransform_);

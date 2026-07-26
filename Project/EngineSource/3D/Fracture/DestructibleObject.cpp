@@ -137,10 +137,11 @@ void DestructibleObject::ApplyDamage(const Vector3& impactPos, float damageRadiu
 		ApplyExplosionImpulse(macroDebrisInstance_, macroIds, impactPos, damageRadius);
 	}
 
-	// シードチャンクだけランタイムカット
+	// チャンクを取得
 	Fragment seedFragment = buffer->ExtractChunk(seedChunkId.value());
 	Log("seed tris=" + std::to_string(seedFragment.indices.size() / 3));
-	microDebrisInstance_.ApplyRuntimeCut(seedFragment, impactPos, 3);
+	// シードチャンクだけランタイムカット
+	microDebrisInstance_.ApplyRuntimeCut(seedFragment, impactPos, 8);
 	hasMicroDebris_ = true;
 
 	// シード由来の破片に爆発の初速を与える

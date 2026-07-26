@@ -1,3 +1,5 @@
+#define NOMINMAX
+#include <algorithm>
 #include "FractureInstance.h"
 #include "MyMath.h"
 #include "RandomGenerator.h"
@@ -67,9 +69,13 @@ void FractureInstance::InitializeFromRanges(const std::vector<GeometryRange>& ra
 	}
 }
 
-void FractureInstance::ApplyRuntimeCut(const Fragment& source, const Vector3& impactPos, int maxDepth) {
+void FractureInstance::ApplyRuntimeCut(const Fragment& source, const Vector3& impactPos, int numSites) {
+	// 元の三角形数に対してサイト数が多すぎると極端に薄い破片が量産されるので上限をかける
+	int maxReasonableSites = std::max(2, static_cast<int>((source.indices.size() / 3) / kMinTriangleCount));
+	int clampedSites = std::min(numSites, maxReasonableSites);
+
 	std::vector<Fragment> fragments;
-	RecursiveFracture(source.vertices, source.indices, impactPos, 0, maxDepth, fragments);
+	VoronoiFracture(source.vertices, source.indices, impactPos, clampedSites, fragments);
 
 	runtimeBuffer_ = std::make_unique<RuntimeFractureBuffer>();
 	std::vector<GeometryRange> ranges = runtimeBuffer_->Upload(fragments);
@@ -137,11 +143,11 @@ ClipResult FractureInstance::ClipMeshByPlane(const std::vector<VertexData>& vert
 			continue;
 		}
 
-		// 平面をまたぐ三角形からエッジとの交点を計算し、front/backに三角形分割して振り分け
+		// 平面をまたぐ三角形からエッジとの交点を計算し、front,backに三角形分割して振り分け
 		SplitStraddlingTriangle(v, d, planeNormal, planeDist, result, cutEdges);
 	}
 
-	// 切断エッジ群をつないで多角形化から三角形ファンでキャップし、front/back両方に追加
+	// 切断エッジ群をつないで多角形化から三角形ファンでキャップし、front,back両方に追加
 	CapCutFace(cutEdges, planeNormal, result);
 
 	return result;
@@ -253,31 +259,91 @@ void FractureInstance::CapCutFace(const std::vector<std::pair<VertexData, Vertex
 	}
 }
 
-void FractureInstance::RecursiveFracture(const std::vector<VertexData>& verts, const std::vector<uint32_t>& indices,
-	const Vector3& impactPos, int depth, int maxDepth,
-	std::vector<Fragment>& outFragments) {
+std::vector<Vector3> FractureInstance::GenerateVoronoiSites(const AABB& bounds, const Vector3& impactPos, int numSites) const {
+	std::vector<Vector3> sites;
+	sites.reserve(numSites);
 
-	// これ以上割らない
-	if (depth >= maxDepth || (indices.size() / 3) < kMinTriangleCount) {
-		outFragments.push_back({ verts, indices }); 
-		return;
+	Vector3 extent = bounds.max - bounds.min;
+	float maxRadius = Math::Length(extent) * 0.5f;
+
+	for (int i = 0; i < numSites; ++i) {
+		// tが0に近いほど衝撃点の近くに配置される
+		float t = RandomGenerator::Get(0.0f, 1.0f);
+		float radius = maxRadius * (t * t);
+
+		Vector3 dir = RandomGenerator::GetVector3(-1.0f, 1.0f);
+		dir.Normalize();
+
+		Vector3 pos = impactPos + dir * radius;
+
+		// バウンディングボックス外だとクリップが噛み合わずセルが消えやすいのでクランプ
+		pos.x = std::clamp(pos.x, bounds.min.x, bounds.max.x);
+		pos.y = std::clamp(pos.y, bounds.min.y, bounds.max.y);
+		pos.z = std::clamp(pos.z, bounds.min.z, bounds.max.z);
+
+		sites.push_back(pos);
 	}
+	return sites;
+}
 
-	// 衝撃点付近を通るランダムな平面を生成
-	Vector3 normal = RandomGenerator::GetVector3(-1.0f,1.0f);
-	normal.Normalize();
-	float dist = Math::Dot(normal, impactPos) + RandomGenerator::Get(-0.1f, 0.1f);
+void FractureInstance::VoronoiFracture(const std::vector<VertexData>& verts, const std::vector<uint32_t>& indices,
+	const Vector3& impactPos, int numSites, std::vector<Fragment>& outFragments) {
 
-	ClipResult clipped = ClipMeshByPlane(verts, indices, normal, dist);
-
-	// 分割失敗だと飛ばす
-	if (clipped.frontIndices.empty() || clipped.backIndices.empty()) {
+	if (numSites <= 1) {
 		outFragments.push_back({ verts, indices });
 		return;
 	}
 
-	RecursiveFracture(clipped.frontVerts, clipped.frontIndices, impactPos, depth + 1, maxDepth, outFragments);
-	RecursiveFracture(clipped.backVerts, clipped.backIndices, impactPos, depth + 1, maxDepth, outFragments);
+	AABB bounds = ComputeBounds(verts);
+	std::vector<Vector3> sites = GenerateVoronoiSites(bounds, impactPos, numSites);
+
+	for (size_t i = 0; i < sites.size(); ++i) {
+		std::vector<VertexData> cellVerts = verts;
+		std::vector<uint32_t> cellIndices = indices;
+
+		for (size_t j = 0; j < sites.size(); ++j) {
+			if (i == j) { continue; }
+
+			Vector3 normal = sites[j] - sites[i];
+			float len = Math::Length(normal);
+			// ほぼ同位置のサイトは飛ばす
+			if (len < 1e-5f) { continue; } 
+			normal = normal / len;
+
+			Vector3 midpoint = (sites[i] + sites[j]) * 0.5f;
+			float planeDist = Math::Dot(normal, midpoint);
+
+			ClipResult clipped = ClipMeshByPlane(cellVerts, cellIndices, normal, planeDist);
+			cellVerts = clipped.backVerts;
+			cellIndices = clipped.backIndices;
+
+			// 他のサイトに完全に削られた
+			if (cellIndices.empty()) {
+				break;
+			}
+		}
+
+		if (!cellIndices.empty()) {
+			outFragments.push_back({ std::move(cellVerts), std::move(cellIndices) });
+		}
+	}
+}
+
+AABB FractureInstance::ComputeBounds(const std::vector<VertexData>& verts) {
+	AABB aabb;
+	if (verts.empty()) { return aabb; }
+
+	aabb.min = Vector3(verts[0].position.x, verts[0].position.y, verts[0].position.z);
+	aabb.max = Vector3(verts[0].position.x, verts[0].position.y, verts[0].position.z);
+	for (const auto& v : verts) {
+		aabb.min.x = std::min(aabb.min.x, v.position.x);
+		aabb.min.y = std::min(aabb.min.y, v.position.y);
+		aabb.min.z = std::min(aabb.min.z, v.position.z);
+		aabb.max.x = std::max(aabb.max.x, v.position.x);
+		aabb.max.y = std::max(aabb.max.y, v.position.y);
+		aabb.max.z = std::max(aabb.max.z, v.position.z);
+	}
+	return aabb;
 }
 
 void FractureInstance::AddTriangle(std::vector<VertexData>& verts, std::vector<uint32_t>& indices, const VertexData v[3]) {
