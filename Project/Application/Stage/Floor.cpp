@@ -69,7 +69,7 @@ void Floor::Update() {
 	// 氷より少し下に地面を配置する
 	terrainModelComponent_.worldTransform_.transform_.scale = iceModelComponent_.worldTransform_.transform_.scale;
 	terrainModelComponent_.worldTransform_.transform_.translate = iceModelComponent_.worldTransform_.transform_.translate;
-	terrainModelComponent_.worldTransform_.transform_.translate.y -= 1.0f;
+	terrainModelComponent_.worldTransform_.transform_.translate.y -= 0.2f;
 
 	// 更新
 	iceModelComponent_.Update();

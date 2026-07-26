@@ -61,7 +61,7 @@ namespace GameEngine {
 		void InitializeFromRanges(const std::vector<GeometryRange>& ranges);
 
 		// 指定メッシュを衝撃点周りでランタイムカットし、その結果でこのインスタンスを構築する
-		void ApplyRuntimeCut(const Fragment& source, const Vector3& impactPos, int maxDepth);
+		void ApplyRuntimeCut(const Fragment& source, const Vector3& impactPos, int numSites);
 
 		const CD3DX12_GPU_DESCRIPTOR_HANDLE& GetInstancingSrvGPU() const { return buffer_.GetSrvGpuHandle(); }
 
@@ -129,10 +129,12 @@ namespace GameEngine {
 		void CapCutFace(const std::vector<std::pair<VertexData, VertexData>>& cutEdges,
 			const Vector3& planeNormal, ClipResult& result);
 
-		// 再帰分割
-		void RecursiveFracture(const std::vector<VertexData>& verts, const std::vector<uint32_t>& indices,
-			const Vector3& impactPos, int depth, int maxDepth,
-			std::vector<Fragment>& outFragments);
+		std::vector<Vector3> GenerateVoronoiSites(const AABB& bounds, const Vector3& impactPos, int numSites) const;
+
+		void VoronoiFracture(const std::vector<VertexData>& verts, const std::vector<uint32_t>& indices,
+			const Vector3& impactPos, int numSites, std::vector<Fragment>& outFragments);
+
+		AABB ComputeBounds(const std::vector<VertexData>& verts);
 
 		// 三角形追加
 		static void AddTriangle(std::vector<VertexData>& verts, std::vector<uint32_t>& indices, const VertexData v[3]);

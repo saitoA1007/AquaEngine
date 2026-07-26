@@ -13,6 +13,9 @@ void BossStateIn::Enter() {
 	stateCommonData_.worldTransform->transform_.translate = { 0.0f,0.0f,0.0f };
 	stateCommonData_.worldTransform->transform_.rotate = { 0.0f,3.2f,0.0f };
 
+	// アニメーション
+	stateCommonData_.animator->StartAnimation(BossAnimationType::kAppearance, "Appearance_Animation_Rotate");
+
 	// 初期化
 	isMove_ = true;
 	delayBreakEgg_ = true;
@@ -54,6 +57,9 @@ void BossStateIn::Update() {
 			isMove_ = false;
 			// 次フェーズへ向けてタイマーリセット
 			timer_ = 0.0f;
+
+			// アニメーション遷移
+			stateCommonData_.animator->StartAnimation(BossAnimationType::kMove, "基本移動");
 		}
 	} else {
 		// 待機タイマー

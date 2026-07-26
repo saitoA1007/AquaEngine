@@ -3,10 +3,15 @@ using namespace GameEngine;
 
 #include "Application/Player/Player.h"
 #include "Application/Player/PlayerEffectManager.h"
+
 #include "Application/Stage/StageManager.h"
+#include "Application/Stage/BgIceRock.h"
+
 #include "Application/Enemy/BossEnemy.h"
 #include "Application/Enemy/BossRangedAttackManager.h"
+
 #include "Application/GamePlay/GamePhaseManager.h"
+
 #include "Application/UI/Managers/TitleUIManager.h"
 #include "Application/UI/Managers/PlayUIManager.h"
 #include "Application/UI/Managers/GameOverUIManager.h"
@@ -59,6 +64,10 @@ GameScene::GameScene() {
 	wallModel->SetDefaultColor({1,1,1,0.9f});
 	wallModel->SetDefaultIOR(1.31f);
 	gameObjectManager_->AddObject<StageManager>(gameObjectManager_, floorModel, wallModel, textureManager_);
+
+	// 仮の背景の氷オブジェクト。後でオブジェクト設置エディターでマテリアルを変更出来るようにしておく。
+	auto* bgIceRockModel = modelManager_->GetNameByModel("BGIceRock.obj");
+	gameObjectManager_->AddObject<BgIceRock>(bgIceRockModel);
 
 	// タイトル中のUI
 	auto* titleUIManager = gameObjectManager_->AddObject<TitleUIManager>(textureManager_);

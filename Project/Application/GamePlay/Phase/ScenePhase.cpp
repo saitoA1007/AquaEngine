@@ -65,13 +65,16 @@ void TitlePhase::Exit() {
 // チュートリアル
 //=====================================================
 
-TutorialPhase::TutorialPhase(PhaseCommonData& commonData, CameraController* cameraController, BossEnemy* bossEnemy, PlayUIManager* playUIManager) : IScenePhase(commonData) {
+TutorialPhase::TutorialPhase(PhaseCommonData& commonData, CameraController* cameraController, Player* player, BossEnemy* bossEnemy, PlayUIManager* playUIManager) : IScenePhase(commonData) {
 
 	// カメラ管理を取得
 	cameraController_ = cameraController;
 
 	// ボスを取得
 	bossEnemy_ = bossEnemy;
+
+	// プレイヤーを取得
+	player_ = player;
 
 	// UIを取得
 	playUIManager_ = playUIManager;
@@ -101,6 +104,8 @@ void TutorialPhase::Update() {
 		cameraController_->SetChangeState(CameraState::kEnterMovie);
 		// 黒帯を表示させる
 		playUIManager_->SetBarActive(true);
+		// プレイヤーを表示しない
+		player_->SetIsDraw(false);
 	} else {
 		// 黒帯UIを表示
 		playUIManager_->SetBarActive(cameraController_->UseLetterBoxUI());
@@ -122,6 +127,8 @@ void TutorialPhase::Exit() {
 	if (commonData_.requestPhase != ScenePhase::kPause) {
 		playUIManager_->SetIsDrawGamePlayUI(true);
 		playUIManager_->SetIsDrawPlayGuide(true);
+		// プレイヤーを表示
+		player_->SetIsDraw(true);
 		// フォローカメラに変更
 		cameraController_->SetChangeState(CameraState::kFollow);
 	}
@@ -342,6 +349,8 @@ void ClearPhase::Enter() {
 	clearUIManager_->SetActive(true);
 	// 初期化
 	clearUIManager_->Initialize();
+	// アニメーション開始
+	clearUIManager_->StartEnterAnimation();
 
 	// プレイ時間を取得
 	clearUIManager_->SetTime(commonData_.playTime_);
