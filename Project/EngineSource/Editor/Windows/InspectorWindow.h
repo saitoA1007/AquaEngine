@@ -165,6 +165,54 @@ namespace GameEngine {
 			}
 		}
 
+		void operator()(ColliderShapeData& value) const {
+			if (ImGui::TreeNode(itemName.c_str())) {
+
+				// 形状選択
+				int typeIdx = static_cast<int>(value.type);
+				if (ImGui::Combo("Shape", &typeIdx, ShapeTypeNames, static_cast<int>(ShapeType::kMaxCount))) {
+					value.type = static_cast<ShapeType>(typeIdx);
+					isDirty = true;
+				}
+
+				// 形状ごとのパラメータ
+				switch (value.type) {
+				case ShapeType::kSphere:
+					if (ImGui::DragFloat("Radius", &value.radius, 0.01f, 0.0f, FLT_MAX)) {
+						isDirty = true;
+					}
+					break;
+
+				case ShapeType::kAABB:
+					if (ImGui::DragFloat3("BoxSize", &value.boxSize.x, 0.01f, 0.0f, FLT_MAX)) {
+						isDirty = true;
+					}
+					if (ImGui::DragFloat3("AnchorPoint", &value.anchorPoint.x, 0.01f, 0.0f, FLT_MAX)) {
+						isDirty = true;
+					}
+					break;
+
+				case ShapeType::kOBB:
+					if (ImGui::DragFloat3("BoxSize", &value.boxSize.x, 0.01f, 0.0f, FLT_MAX)) {
+						isDirty = true;
+					}
+					if (ImGui::DragFloat3("AnchorPoint", &value.anchorPoint.x, 0.01f, 0.0f, FLT_MAX)) {
+						isDirty = true;
+					}
+					if (ImGui::DragFloat3("Rotate", &value.rotate.x, 0.01f, 0.0f, FLT_MAX)) {
+						isDirty = true;
+					}
+					break;
+
+				case ShapeType::kSegment:
+					ImGui::TextDisabled("No parameters");
+					break;
+				}
+
+				ImGui::TreePop();
+			}
+		}
+
 		void operator()(bool& value) const {
 			if (ImGui::Checkbox(itemName.c_str(), &value)) { isDirty = true; }
 		}

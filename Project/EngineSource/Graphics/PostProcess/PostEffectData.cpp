@@ -10,7 +10,7 @@ ColorGrading::ColorGrading() {
     data->enableGrayscale = 0;
     data->enableSepia = 0;
     data->enableRandom = 0;
-    data->enableVignetting = 0;
+    data->enableVignetting = 1;
 
     data->vignettingIntensity = 16.0f;
     data->vignettingTime = 0.15f;
@@ -96,6 +96,21 @@ Bloom::Bloom() {
 }
 
 void Bloom::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
+    commandList->SetGraphicsRootDescriptorTable(0, srvManager->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+    commandList->SetGraphicsRootConstantBufferView(1, buffer_.GetGpuVirtualAddress());
+    commandList->DrawInstanced(3, 1, 0, 0);
+}
+
+Dissolve::Dissolve() {
+    // 作成
+    buffer_.Create();
+    // 標準偏差
+    buffer_.GetData()->intensity = 0.0f;
+
+    isActive_ = true;
+}
+
+void Dissolve::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
     commandList->SetGraphicsRootDescriptorTable(0, srvManager->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
     commandList->SetGraphicsRootConstantBufferView(1, buffer_.GetGpuVirtualAddress());
     commandList->DrawInstanced(3, 1, 0, 0);

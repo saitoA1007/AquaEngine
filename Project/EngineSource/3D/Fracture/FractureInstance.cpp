@@ -69,13 +69,24 @@ void FractureInstance::InitializeFromRanges(const std::vector<GeometryRange>& ra
 	}
 }
 
-void FractureInstance::ApplyRuntimeCut(const Fragment& source, const Vector3& impactPos, int numSites) {
-	// 元の三角形数に対してサイト数が多すぎると極端に薄い破片が量産されるので上限をかける
-	int maxReasonableSites = std::max(2, static_cast<int>((source.indices.size() / 3) / kMinTriangleCount));
+void FractureInstance::ApplyRuntimeCut(const Fragment& source, const Vector3& impactPos, float craterRadius, int numSites, int planeCount) {
+	std::vector<VertexData> carvedVerts = source.vertices;
+	std::vector<uint32_t> carvedIndices = source.indices;
+
+	// 衝撃点周りを、衝突形状に合わせて凹ませる
+	CarveImpactCrater(carvedVerts, carvedIndices, impactPos, craterRadius, planeCount);
+
+	// クレーターで全部消えてしまった場合は元のメッシュにフォールバック
+	if (carvedIndices.empty()) {
+		carvedVerts = source.vertices;
+		carvedIndices = source.indices;
+	}
+
+	int maxReasonableSites = std::max(2, static_cast<int>((carvedIndices.size() / 3) / kMinTriangleCount));
 	int clampedSites = std::min(numSites, maxReasonableSites);
 
 	std::vector<Fragment> fragments;
-	VoronoiFracture(source.vertices, source.indices, impactPos, clampedSites, fragments);
+	VoronoiFracture(carvedVerts, carvedIndices, impactPos, clampedSites, fragments);
 
 	runtimeBuffer_ = std::make_unique<RuntimeFractureBuffer>();
 	std::vector<GeometryRange> ranges = runtimeBuffer_->Upload(fragments);
@@ -344,6 +355,51 @@ AABB FractureInstance::ComputeBounds(const std::vector<VertexData>& verts) {
 		aabb.max.z = std::max(aabb.max.z, v.position.z);
 	}
 	return aabb;
+}
+
+std::vector<Vector3> FractureInstance::GenerateSpherePlaneNormals(int count) const {
+	std::vector<Vector3> normals;
+	normals.reserve(count);
+
+	if (count <= 1) {
+		normals.push_back(Vector3(0.0f, 1.0f, 0.0f));
+		return normals;
+	}
+
+	const float goldenAngle = 3.14159265f * (3.0f - std::sqrt(5.0f));
+	for (int i = 0; i < count; ++i) {
+		float y = 1.0f - (static_cast<float>(i) / static_cast<float>(count - 1)) * 2.0f;
+		float radiusAtY = std::sqrt(std::max(0.0f, 1.0f - y * y));
+		float theta = goldenAngle * static_cast<float>(i);
+
+		float x = std::cos(theta) * radiusAtY;
+		float z = std::sin(theta) * radiusAtY;
+		normals.push_back(Vector3(x, y, z));
+	}
+	return normals;
+}
+
+void FractureInstance::CarveImpactCrater(std::vector<VertexData>& verts, std::vector<uint32_t>& indices,
+	const Vector3& impactPos, float craterRadius, int planeCount) {
+
+	std::vector<Vector3> normals = GenerateSpherePlaneNormals(planeCount);
+
+	for (const Vector3& n : normals) {
+		// 球面上の接点を通り、外向き法線nを持つ平面
+		Vector3 planePoint = impactPos + n * craterRadius;
+		float planeDist = Math::Dot(n, planePoint);
+
+		ClipResult clipped = ClipMeshByPlane(verts, indices, n, planeDist);
+
+		// n方向を残す。ClipMeshByPlaneは切断面のキャップも自動で追加
+		verts = clipped.frontVerts;
+		indices = clipped.frontIndices;
+
+		// クレーターがメッシュ全体を覆ってしまった
+		if (indices.empty()) {
+			break;
+		}
+	}
 }
 
 void FractureInstance::AddTriangle(std::vector<VertexData>& verts, std::vector<uint32_t>& indices, const VertexData v[3]) {

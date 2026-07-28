@@ -153,4 +153,32 @@ namespace GameEngine {
     private:
         ConstantBuffer<BloomData> buffer_;
     };
+
+    // ディゾルブ
+    class Dissolve : public IPostEffect {
+        struct DissolveData {
+            uint32_t gameTextureHandle;
+            uint32_t noiseTextureHandle;
+            float intensity;
+            float pad;
+        };
+
+    public:
+        Dissolve();
+
+        void Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) override;
+
+        void SetPassIndex(const uint32_t& index) override {
+            buffer_.GetData()->gameTextureHandle = index;
+        }
+
+        void SetNoiseTextureIndex(uint32_t index) {
+            buffer_.GetData()->noiseTextureHandle = index;
+        }
+
+    private:
+        ConstantBuffer<DissolveData> buffer_;
+    };
+
+
 }

@@ -69,6 +69,11 @@ GameScene::GameScene() {
 	auto* bgIceRockModel = modelManager_->GetNameByModel("BGIceRock.obj");
 	gameObjectManager_->AddObject<BgIceRock>(bgIceRockModel);
 
+	// ステージに降っている雪を描画
+	auto* effectModel = modelManager_->GetNameByModel("plane.obj");
+	effectModel->SetDefaultIsEnableLight(false);
+	gameObjectManager_->AddObject<ParticleBehavior>("BgSnowParticle", 64, textureManager_, effectModel, &renderQueue_->GetMainCamera());
+
 	// タイトル中のUI
 	auto* titleUIManager = gameObjectManager_->AddObject<TitleUIManager>(textureManager_);
 	// プレイ中のUI

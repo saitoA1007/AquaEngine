@@ -144,6 +144,30 @@ void GameParamEditor::DeserializeGroupFromJson(Group& group, const json& node) {
 					shape.boxSize = { s[0], s[1], s[2] };
 				}
 				group.items[itemName].value = shape;
+			} else if (itItem->contains("_ColliderShapeType") && itItem->contains("_radius")) {
+
+				ColliderShapeData data;
+				std::string typeStr = itItem->at("_ColliderShapeType").get<std::string>();
+				for (int i = 0; i < static_cast<int>(ShapeType::kMaxCount); ++i) {
+					if (typeStr == ShapeTypeNames[i]) {
+						data.type = static_cast<ShapeType>(i);
+						break;
+					}
+				}
+				if (itItem->contains("_radius")) { data.radius = itItem->at("_radius").get<float>(); }
+				if (itItem->contains("_anchorPoint")) {
+					const auto& s = itItem->at("_anchorPoint");
+					data.anchorPoint = { s[0], s[1], s[2] };
+				}
+				if (itItem->contains("_boxSize")) {
+					const auto& s = itItem->at("_boxSize");
+					data.boxSize = { s[0], s[1], s[2] };
+				}
+				if (itItem->contains("_rotate")) {
+					const auto& s = itItem->at("_rotate");
+					data.boxSize = { s[0], s[1], s[2] };
+				}
+				group.items[itemName].value = data;
 			} else {
 				// それ以外のオブジェクトはサブグループとして再帰的に読み込む
 				DeserializeGroupFromJson(group.children[itemName], *itItem);

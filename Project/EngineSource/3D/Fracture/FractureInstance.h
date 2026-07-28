@@ -12,6 +12,10 @@ namespace GameEngine {
 	struct FractureChunkState {
 		Transform transform;
 		Vector3 velocity;
+
+		Vector3 crackVelocity;         // 位置ばねの速度
+		Vector3 crackAngularVelocity;  // 回転ばねの速度
+		Vector3 crackRestOffset;	   // ばねの収束目標位置
 	};
 
 	struct FractureForGPU {
@@ -61,7 +65,7 @@ namespace GameEngine {
 		void InitializeFromRanges(const std::vector<GeometryRange>& ranges);
 
 		// 指定メッシュを衝撃点周りでランタイムカットし、その結果でこのインスタンスを構築する
-		void ApplyRuntimeCut(const Fragment& source, const Vector3& impactPos, int numSites);
+		void ApplyRuntimeCut(const Fragment& source, const Vector3& impactPos, float craterRadius, int numSites,int planeCount);
 
 		const CD3DX12_GPU_DESCRIPTOR_HANDLE& GetInstancingSrvGPU() const { return buffer_.GetSrvGpuHandle(); }
 
@@ -135,6 +139,11 @@ namespace GameEngine {
 			const Vector3& impactPos, int numSites, std::vector<Fragment>& outFragments);
 
 		AABB ComputeBounds(const std::vector<VertexData>& verts);
+
+		std::vector<Vector3> GenerateSpherePlaneNormals(int count) const;
+
+		void CarveImpactCrater(std::vector<VertexData>& verts, std::vector<uint32_t>& indices,
+			const Vector3& impactPos, float craterRadius, int planeCount);
 
 		// 三角形追加
 		static void AddTriangle(std::vector<VertexData>& verts, std::vector<uint32_t>& indices, const VertexData v[3]);

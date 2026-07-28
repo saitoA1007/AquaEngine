@@ -13,7 +13,7 @@ DestructibleObject::DestructibleObject(Model* model, uint32_t colliderId, uint32
     collider_.SetCollisionAttribute(colliderAttribute);
     collider_.SetCollisionMask(~colliderAttribute);
 
-	collider_.SetSize(Vector3(2.0f,2.0f,2.0f));
+	collider_.SetSize(Vector3(2.5f,2.5f, 2.5f));
 	collider_.SetWorldPosition(worldTransform_.GetWorldPosition());
 	collider_.SetAnchorPoint(Vector3(0.5f,0.5f,0.5f));
 
@@ -70,12 +70,17 @@ void DestructibleObject::Update() {
 	worldTransform_.UpdateTransformMatrix();
 	collider_.SetWorldPosition(worldTransform_.GetWorldPosition());
 
+	SimulateCrackPhysics();
+
 	if (hasMacroDebris_) {
 		SimulateFallingDebris(macroDebrisInstance_, FpsCounter::gameDeltaTime);
 	}
 	if (hasMicroDebris_) {
 		SimulateFallingDebris(microDebrisInstance_, FpsCounter::gameDeltaTime);
 	}
+
+	// 更新
+	collider_.SetSize(colliderSize_);
 }
 
 void DestructibleObject::Draw() {
@@ -97,7 +102,7 @@ void DestructibleObject::Draw() {
 void DestructibleObject::OnCollisionEnter(const GameEngine::CollisionResult& result) {
     //ApplyDamage(result.contactPosition, 1.0f);
 	//result.penetrationDepth * 2.0f + 0.5f
-	ApplyChipDamage(result.contactPosition, 2.0f);
+	ApplyChipDamage(result.contactPosition, testDamageAmount_);
 }
 
 void DestructibleObject::ApplyDamage(const Vector3& impactPos, float damageRadius) {
@@ -140,8 +145,10 @@ void DestructibleObject::ApplyDamage(const Vector3& impactPos, float damageRadiu
 	// チャンクを取得
 	Fragment seedFragment = buffer->ExtractChunk(seedChunkId.value());
 	Log("seed tris=" + std::to_string(seedFragment.indices.size() / 3));
+	// 仮でダメージ半径に応じてクレーターの大きさも連動させる
+	//float craterRadius = damageRadius * 0.3f;
 	// シードチャンクだけランタイムカット
-	microDebrisInstance_.ApplyRuntimeCut(seedFragment, impactPos, 8);
+	microDebrisInstance_.ApplyRuntimeCut(seedFragment, impactPos, testCraterRadius_,8, testPlaneCount_);
 	hasMicroDebris_ = true;
 
 	// シード由来の破片に爆発の初速を与える
@@ -169,10 +176,11 @@ void DestructibleObject::ApplyDamage(const Vector3& impactPos, float damageRadiu
 		// 全チャンクが破壊された
 		hasIntact_ = false;
 	}
-
+	
 	// 破壊されたチャンクの蓄積情報は不要になるので削除
 	for (uint32_t id : detachedIds) {
 		chunkDamage_.erase(id);
+		crackActiveChunkIds_.erase(id);
 	}
 }
 
@@ -310,7 +318,7 @@ void DestructibleObject::ApplyChipDamage(const Vector3& impactPos, float damageA
 	accumulated += damageAmount;
 
 	float ratio = std::min(accumulated / kBreakThreshold_, 1.0f);
-	UpdateCrackVisual(chunkId, ratio);
+	UpdateCrackVisual(chunkId, ratio, damageAmount);
 
 	// 隣接チャンクにも弱めのひびを波及させる
 	if (kNeighborCrackFactor_ > 0.0f) {
@@ -318,7 +326,7 @@ void DestructibleObject::ApplyChipDamage(const Vector3& impactPos, float damageA
 		if (it != chunksById_.end()) {
 			for (uint32_t neighborId : it->second->info.neighborChunkIds) {
 				if (destroyedChunkIds_.count(neighborId)) continue;
-				UpdateCrackVisual(neighborId, ratio * kNeighborCrackFactor_);
+				UpdateCrackVisual(neighborId, ratio * kNeighborCrackFactor_, damageAmount * kNeighborCrackFactor_);
 			}
 		}
 	}
@@ -329,7 +337,7 @@ void DestructibleObject::ApplyChipDamage(const Vector3& impactPos, float damageA
 	}
 }
 
-void DestructibleObject::UpdateCrackVisual(uint32_t chunkId, float ratio) {
+void DestructibleObject::UpdateCrackVisual(uint32_t chunkId, float ratio, float damageDelta) {
 	auto indexIt = chunkIndexInIntact_.find(chunkId);
 	auto chunkIt = chunksById_.find(chunkId);
 	if (indexIt == chunkIndexInIntact_.end() || chunkIt == chunksById_.end()) {
@@ -347,13 +355,16 @@ void DestructibleObject::UpdateCrackVisual(uint32_t chunkId, float ratio) {
 	auto& transforms = intactInstance_.GetTransformDatas();
 	FractureChunkState& state = transforms[indexIt->second];
 
-	// 中心から外側へ押し出す
-	state.transform.translate = dir * (ratio * kMaxCrackOffset_);
+	// ダメージが蓄積するほど外側に押し出された位置になる
+	state.crackRestOffset = dir * (ratio * kMaxCrackOffset_);
 
-	// ダメージが大きいほど揺れが激しくなる、微小なランダム回転
-	state.transform.rotate.x = RandomGenerator::Get(-ratio, ratio) * kMaxCrackRotate_;
-	state.transform.rotate.y = RandomGenerator::Get(-ratio, ratio) * kMaxCrackRotate_;
-	state.transform.rotate.z = RandomGenerator::Get(-ratio, ratio) * kMaxCrackRotate_;
+	// 衝撃の瞬間速度インパルス
+	float impulse = kCrackImpulseStrength_ * damageDelta;
+	state.crackVelocity += dir * impulse;
+	state.crackAngularVelocity += RandomGenerator::GetVector3(-1.0f, 1.0f) * impulse * kMaxCrackRotate_;
+	
+	// このチャンクは以後、毎フレームのばねシミュレーション対象にする
+	crackActiveChunkIds_.insert(chunkId);
 
 	intactInstance_.Update();
 }
@@ -363,5 +374,54 @@ void DestructibleObject::RebuildIntactIndexMap(const std::vector<uint32_t>& ids)
 	for (uint32_t i = 0; i < ids.size(); ++i) {
 		chunkIndexInIntact_[ids[i]] = i;
 	}
+}
+
+void DestructibleObject::SimulateCrackPhysics() {
+	if (crackActiveChunkIds_.empty()) {
+		return; // 揺れているチャンクがなければ何もしない（軽量）
+	}
+
+	auto& transforms = intactInstance_.GetTransformDatas();
+	// これ未満なら収束したとみなす
+	constexpr float kSettleThreshold = 0.0005f; 
+
+	std::vector<uint32_t> settledIds;
+
+	for (uint32_t chunkId : crackActiveChunkIds_) {
+		auto indexIt = chunkIndexInIntact_.find(chunkId);
+		// 壊れて消えた等、もう対象にしない
+		if (indexIt == chunkIndexInIntact_.end()) {
+			settledIds.push_back(chunkId);
+			continue;
+		}
+
+		FractureChunkState& state = transforms[indexIt->second];
+
+		// 位置のばね
+		Vector3 displacement = state.transform.translate - state.crackRestOffset;
+		Vector3 accel = displacement * -kCrackSpringStiffness_ - state.crackVelocity * kCrackDamping_;
+		state.crackVelocity += accel * FpsCounter::gameDeltaTime;
+		state.transform.translate += state.crackVelocity * FpsCounter::gameDeltaTime;
+
+		// 回転のばね
+		Vector3 rotAccel = state.transform.rotate * -kCrackAngularSpringStiffness_ - state.crackAngularVelocity * kCrackAngularDamping_;
+		state.crackAngularVelocity += rotAccel * FpsCounter::gameDeltaTime;
+		state.transform.rotate += state.crackAngularVelocity * FpsCounter::gameDeltaTime;
+
+		// 十分収まったらアクティブリストから外す
+		bool settled = Math::Length(displacement) < kSettleThreshold
+			&& Math::Length(state.crackVelocity) < kSettleThreshold
+			&& Math::Length(state.transform.rotate) < kSettleThreshold
+			&& Math::Length(state.crackAngularVelocity) < kSettleThreshold;
+		if (settled) {
+			settledIds.push_back(chunkId);
+		}
+	}
+
+	for (uint32_t id : settledIds) {
+		crackActiveChunkIds_.erase(id);
+	}
+
+	intactInstance_.Update();
 }
 

@@ -9,6 +9,7 @@
 #include "Vector2.h"
 #include "Range.h"
 #include "ParticleData.h"
+#include "ColliderInfo.h"
 
 #include <json.hpp>
 #include "MyMath.h"
@@ -21,7 +22,7 @@ namespace GameEngine {
 		// 項目
 		struct Item {
 			std::variant<int32_t, uint32_t, float, Vector2, Vector3, Vector4, Range3, Range4, bool, std::string,
-				EmitterShape, TextureData> value;
+				EmitterShape, TextureData, ColliderShapeData> value;
 			int priority = INT_MAX; // 優先順位
 			bool isDirty = false; // ImGuiで値が変更されたか
 		};
@@ -320,6 +321,14 @@ namespace GameEngine {
 			void operator()(const TextureData& value) const {
 				// テクスチャの名前を保存
 				jsonData["_TextureName"] = value.name;
+			}
+
+			void operator()(const ColliderShapeData& data) const {
+				jsonData["_ColliderShapeType"] = EmitShapeTypeNames[static_cast<int>(data.type)];
+				jsonData["_radius"] = data.radius;
+				jsonData["_anchorPoint"] = { data.anchorPoint.x, data.anchorPoint.y, data.anchorPoint.z };
+				jsonData["_boxSize"] = { data.boxSize.x, data.boxSize.y, data.boxSize.z };
+				jsonData["_rotate"] = { data.rotate.x, data.rotate.y, data.rotate.z };
 			}
 
 			template<typename T>

@@ -3,9 +3,13 @@
 #include "IGameObject.h"
 #include "ModelComponent.h"
 #include "DebugParameter.h"
+#include "Collider.h"
 
 namespace GameEngine {
 
+	/// <summary>
+	/// マップ配置用の静的オブジェクト
+	/// </summary>
 	class StaticGameObject : public IGameObject {
 	public:
 		StaticGameObject(std::string name, std::string modelName, Model* model);
@@ -51,9 +55,21 @@ namespace GameEngine {
 		// パラメータ機能
 		std::unique_ptr<GameEngine::DebugParameter> debugParame_;
 
+		// 当たり判定
+		std::unique_ptr<Collider> collider_;
+
+		bool isActiveCollider_ = false;
+		bool makedCollider_ = false;
+		
+		ColliderShapeData shapeData_;
+		ShapeType currentShapeType_ = ShapeType::kSphere;
+
 		std::string name_ = "None";
 		// モデル名
 		std::string modelName_ = "None";
 
+	private:
+
+		void SetCollider();
 	};
 }
