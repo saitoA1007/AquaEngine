@@ -7,6 +7,7 @@ struct Material
 {
     uint textureHandle;
     float diff;
+    float2 pad;
 };
 ConstantBuffer<Material> gMaterial : register(b0);
 

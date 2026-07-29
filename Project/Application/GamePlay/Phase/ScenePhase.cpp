@@ -249,6 +249,8 @@ void PausePhase::Update() {
 			} else if (PauseUIManager::SelectType::kBackTitle == pauseUIManager_->GetType()) {
 				// タイトルへ戻る
 				commonData_.requestPhase = ScenePhase::kTitle;
+				// リセットする
+				commonData_.resetScene = true;
 			} else {
 
 				// 戻る場合はアニメーション

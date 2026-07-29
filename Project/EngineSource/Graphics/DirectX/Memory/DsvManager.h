@@ -47,7 +47,7 @@ namespace GameEngine {
         ID3D12Device* device_ = nullptr;
         Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap_;
 
-        uint32_t maxDsvCount_ = 10;
+        uint32_t maxDsvCount_ = 15;
         uint32_t descriptorSizeDSV_ = 0;
         uint32_t nextDsvIndex_ = 0;
 
