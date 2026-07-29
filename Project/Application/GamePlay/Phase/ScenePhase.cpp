@@ -357,8 +357,14 @@ void ClearPhase::Enter() {
 }
 
 void ClearPhase::Update() {
-	// リセットする
-	commonData_.resetScene = true;
+
+	// 決定
+	if (commonData_.inputCommand->IsCommandActive("Decision")) {
+		// リセットする
+		commonData_.resetScene = true;
+		// タイトルへ戻る
+		commonData_.requestPhase = ScenePhase::kTitle;
+	}
 }
 
 void ClearPhase::Exit() {

@@ -11,6 +11,7 @@
 #include "RefBuffer.h"
 #include "IceMaterial.h"
 #include "Collider.h"
+#include "DestructibleObject.h"
 
 #include "Application/Scene/Transition/Fade.h"
 
@@ -118,5 +119,7 @@ private: // シーン機能
 
 	// 球の当たり判定
 	GameEngine::SphereCollider testCollider_;
-	Vector3 testPos_ = {0.0f,0.0f,-5.0f};
+	Vector3 testPos_ = {0.0f,0.0f,-8.0f};
+
+	GameEngine::DestructibleObject* destructibleObject_ = nullptr;
 };

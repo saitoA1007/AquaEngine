@@ -1,0 +1,60 @@
+{
+    "BossEgg.obj_0": {
+        "Collider": {
+            "ColliderData": {
+                "_ColliderShapeType": "Sphere",
+                "_anchorPoint": [
+                    0.5,
+                    0.5,
+                    0.5
+                ],
+                "_boxSize": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "_radius": 1.0,
+                "_rotate": [
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            }
+        },
+        "IsActiveCollider": true,
+        "Material": {
+            "Color": [
+                0.6000000238418579,
+                0.6000000238418579,
+                0.6000000238418579,
+                1.0
+            ],
+            "Metalic": 0.009999999776482582,
+            "Roughness": 0.09072338044643402,
+            "SpecularColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "SceneName": "Test",
+        "WorldWorldTransform": {
+            "Rotate": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Scale": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Translate": [
+                0.0,
+                0.0,
+                0.0
+            ]
+        }
+    }
+}

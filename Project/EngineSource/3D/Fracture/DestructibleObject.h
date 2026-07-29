@@ -27,6 +27,11 @@ namespace GameEngine {
 		// ワールド行列
 		WorldTransform worldTransform_;
 
+		// 一時的なテスト用の項目
+		Vector3 colliderSize_ = { 2.5f,2.5f,2.5f };
+		float testDamageAmount_ = 2.0f;
+		float testCraterRadius_ = 2.0f;
+		int testPlaneCount_ = 8;
 	private:
 		// モデル
 		Model* model_ = nullptr;
@@ -71,6 +76,14 @@ namespace GameEngine {
 		// 隣接チャンクへ波及させる強さ
 		float kNeighborCrackFactor_ = 0.35f;
 
+		// ばね物理のパラメータ
+		float kCrackSpringStiffness_ = 400.0f;         // バネ定数
+		float kCrackDamping_ = 30.0f;                  // 減衰係数
+		float kCrackAngularSpringStiffness_ = 250.0f;
+		float kCrackAngularDamping_ = 15.0f;
+		float kCrackImpulseStrength_ = 1.8f;
+		// 現在バネが揺れているチャンクのID
+		std::unordered_set<uint32_t> crackActiveChunkIds_;
 	private:
 
 		// 当たり判定のコールバック関数
@@ -95,8 +108,10 @@ namespace GameEngine {
 			const Vector3& impactPos, float strength);
 
 		void ApplyChipDamage(const Vector3& impactPos, float damageAmount);
-		void UpdateCrackVisual(uint32_t chunkId, float ratio);
+		void UpdateCrackVisual(uint32_t chunkId, float ratio, float damageDelta);
 		void RebuildIntactIndexMap(const std::vector<uint32_t>& ids);
+
+		void SimulateCrackPhysics();
 	};
 }
 

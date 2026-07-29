@@ -151,7 +151,7 @@ void BossRushAttackAction::RushAttack() {
 	// 移動
 	commonData_.transform.translate = Lerp(startRushPos_, endRushPos_,timer_);
 	// 高さ
-	commonData_.transform.translate.y = Lerp(startRushPos_.y, 2.0f, timer_);
+	commonData_.transform.translate.y = Lerp(startRushPos_.y, 0.5f, timer_);
 
 	// 回転
 	Vector3 dir = endRushPos_ - startRushPos_;

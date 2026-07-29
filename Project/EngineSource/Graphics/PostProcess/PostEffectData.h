@@ -36,6 +36,10 @@ namespace GameEngine {
             buffer_.GetData()->textureHandle = index;
         }
 
+        void SetEnableGrayscale(bool isActive) {
+            buffer_.GetData()->enableGrayscale = isActive;
+        }
+
     private:
         ConstantBuffer<ColorGradingData> buffer_;
     };
@@ -153,4 +157,36 @@ namespace GameEngine {
     private:
         ConstantBuffer<BloomData> buffer_;
     };
+
+    // ディゾルブ
+    class Dissolve : public IPostEffect {
+        struct DissolveData {
+            uint32_t gameTextureHandle;
+            uint32_t noiseTextureHandle;
+            float threshold;
+            float pad;
+        };
+
+    public:
+        Dissolve();
+
+        void Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) override;
+
+        void SetPassIndex(const uint32_t& index) override {
+            buffer_.GetData()->gameTextureHandle = index;
+        }
+
+        void SetNoiseTextureIndex(uint32_t index) {
+            buffer_.GetData()->noiseTextureHandle = index;
+        }
+
+        void SetThreshold(float threshold) {
+            buffer_.GetData()->threshold = threshold;
+        }
+
+    private:
+        ConstantBuffer<DissolveData> buffer_;
+    };
+
+
 }

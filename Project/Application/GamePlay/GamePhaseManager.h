@@ -3,6 +3,7 @@
 #include <memory>
 #include "IGameObject.h"
 #include "IScenePhase.h"
+#include "PostProcess/PostEffectData.h"
 #include "Application/Utils/TimeController.h"
 
 // 前方宣言
@@ -22,7 +23,7 @@ class GamePhaseManager : public GameEngine::IGameObject {
 public:
 	GamePhaseManager(GameEngine::InputCommand* inputCommand, Player* player, BossEnemy* bossEnemy,
 		TitleUIManager* titleUIManager, PlayUIManager* playUIManager, GameOverUIManager* gameOverUIManager, ClearUIManager* clearUIManager,
-		PauseUIManager* pauseUIManager,CameraController* cameraController);
+		PauseUIManager* pauseUIManager,CameraController* cameraController, GameEngine::Dissolve* dissolve);
 	~GamePhaseManager() = default;
 
 	void Initialize() override;
@@ -34,6 +35,13 @@ private:
 
 	// 各フェーズ
 	std::unordered_map<ScenePhase, std::unique_ptr<IScenePhase>> phases_;
+
+	// シーン遷移に使用するポストエフェクトの変化
+	GameEngine::Dissolve* dissolve_ = nullptr;
+	float maxTime_ = 1.0f;
+	float timer_ = 0.0f;
+	bool isReset_ = false;
+	bool isResetActive_ = false;
 
 	// 共通データ
 	PhaseCommonData commonData_;

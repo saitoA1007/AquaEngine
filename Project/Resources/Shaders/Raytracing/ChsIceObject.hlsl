@@ -220,6 +220,14 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
         iceColor
     );
     
+    // 視線と法線の内積を取る
+    float rimNdotV = saturate(dot(worldNormal, viewDir));
+    float rimFactor = 1.0f - rimNdotV;
+    rimFactor = pow(rimFactor, 5.0f);
+    // リムライトの最終成分
+    float3 rimLight = float3(1.0f, 1.0f, 1.0f) * rimFactor * 0.5f;
+    payload.color += rimLight;
+    
     // バブルを描画
     float3 F0Ice = float3(0.02f, 0.02f, 0.02f);
     float NdotV = saturate(dot(worldNormal, viewDir));

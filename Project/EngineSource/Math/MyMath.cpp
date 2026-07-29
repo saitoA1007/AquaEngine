@@ -576,6 +576,28 @@ namespace GameEngine {
 			return scaleMatrix * billboardMatrix * translateMatrix;
 		}
 
+		Matrix4x4 MakeBillboardMatrix(const Vector3& scale, const Vector3& translate, float rotateZ, const Matrix4x4& cameraMatrix) {
+
+			// スケール行列
+			Matrix4x4 scaleMatrix = Math::MakeScaleMatrix(scale);
+
+			// パーティクル自体のローカル回転行列を作成
+			Matrix4x4 localRotateMatrix = Math::MakeRotateZMatrix(rotateZ);
+
+			// ビルボードの回転行列を作成
+			Matrix4x4 backToFrontMatrix = Math::MakeRotateYMatrix(0.0f);
+			Matrix4x4 billboardMatrix = Math::Multiply(backToFrontMatrix, cameraMatrix);
+			billboardMatrix.m[3][0] = 0.0f;
+			billboardMatrix.m[3][1] = 0.0f;
+			billboardMatrix.m[3][2] = 0.0f;
+
+			// 平行移動行列の作成
+			Matrix4x4 translateMatrix = Math::MakeTranslateMatrix(translate);
+
+			// 行列の更新
+			return scaleMatrix * localRotateMatrix * billboardMatrix * translateMatrix;
+		}
+
 		Matrix4x4 MakeDirectionalBillboardMatrix(const Vector3& scale, const Vector3& translate, const Matrix4x4& cameraMatrix, const Matrix4x4& viewMatrix, const Vector3& velocity) {
 			// 1. ビルボード行列（カメラの回転をコピーしてZ軸回転などをリセット）
 			Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(0.0f);

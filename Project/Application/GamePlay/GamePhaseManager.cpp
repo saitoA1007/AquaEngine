@@ -2,13 +2,18 @@
 #include "Application/Player/Player.h"
 #include "Application/Enemy/BossEnemy.h"
 #include "Application/UI/Managers/PlayUIManager.h"
-
+#include "FPSCounter.h"
+#include "EasingManager.h"
 // 各フェーズ
 #include "Phase/ScenePhase.h"
 
+using namespace GameEngine;
+
 GamePhaseManager::GamePhaseManager(GameEngine::InputCommand* inputCommand, Player* player, BossEnemy* bossEnemy,
 	TitleUIManager* titleUIManager, PlayUIManager* playUIManager, GameOverUIManager* gameOverUIManager, ClearUIManager* clearUIManager,
-	PauseUIManager* pauseUIManager,CameraController* cameraController) {
+	PauseUIManager* pauseUIManager,CameraController* cameraController, GameEngine::Dissolve* dissolve) {
+
+	dissolve_ = dissolve;
 
 	updateOrder_ = 0;
 
@@ -40,19 +45,62 @@ void GamePhaseManager::Update() {
 	timeController_.Update();
 
 	if (commonData_.requestPhase.has_value()) {
-		phases_[commonData_.currentPhase]->Exit();
+
 		// シーンの状態をリセット
 		if (commonData_.resetScene) {
-			// リセット
-			SceneReset();
+			isResetActive_ = true;
+		} else {
 			commonData_.resetScene = false;
+			phases_[commonData_.currentPhase]->Exit();
+			// 現在のフェーズを前のフェーズとして保存
+			commonData_.SetPrePhase();
+			// 現在のフェーズを変更
+			commonData_.currentPhase = commonData_.requestPhase.value();
+			commonData_.requestPhase = std::nullopt;
+			phases_[commonData_.currentPhase]->Enter();
 		}
-		// 現在のフェーズを前のフェーズとして保存
-		commonData_.SetPrePhase();
-		// 現在のフェーズを変更
-		commonData_.currentPhase = commonData_.requestPhase.value();
-		commonData_.requestPhase = std::nullopt;
-		phases_[commonData_.currentPhase]->Enter();
+
+		if (isReset_) {
+			commonData_.resetScene = false;
+			phases_[commonData_.currentPhase]->Exit();
+			// 現在のフェーズを前のフェーズとして保存
+			commonData_.SetPrePhase();
+			// 現在のフェーズを変更
+			commonData_.currentPhase = commonData_.requestPhase.value();
+			commonData_.requestPhase = std::nullopt;
+			phases_[commonData_.currentPhase]->Enter();
+		}
+	}
+
+	if (isResetActive_) {
+		timer_ += FpsCounter::deltaTime / maxTime_;
+
+		float t = 0.0f;
+		if (timer_ <= 0.5f) {
+			float localT = timer_ / 0.5f;
+			t = Lerp(0.0f, 1.0f, localT);
+		} else {
+			float localT = (timer_ - 0.5f) / 0.5f;
+			t = Lerp(1.0f, 0.0f, localT);
+		}
+
+		dissolve_->SetThreshold(t);
+
+		// 半分を超えたらリセット
+		if (timer_ >= 0.5f) {
+			if (!isReset_) {
+				// リセット
+				SceneReset();
+				isReset_ = true;
+			}
+		}
+
+		if (timer_ >= 1.0f) {
+			isReset_ = false;
+			isResetActive_ = false;
+			timer_ = 0.0f;
+			dissolve_->SetThreshold(0.0f);
+		}
 	}
 
 	// 更新処理

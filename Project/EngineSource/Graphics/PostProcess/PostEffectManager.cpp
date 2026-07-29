@@ -17,9 +17,11 @@ void PostEffectManager::Initialize(ID3D12GraphicsCommandList* commandList, SrvMa
     renderPassController_->AddPass("HighLumMaskPass");
     // ブルーム
     renderPassController_->AddPass("BloomPass");
+    // ディゾルブ
+    renderPassController_->AddPass("DissolvePass");
 
     // 実行順序を設定
-    RegisterPassOrder({"HighLumMaskPass", "GaussVerticalPass", "GaussHorizontalPass", "BloomPass", "ColorGradingPass"});
+    RegisterPassOrder({"HighLumMaskPass", "GaussVerticalPass", "GaussHorizontalPass", "BloomPass", "ColorGradingPass","DissolvePass"});
 
     // psoを登録
     RegisterPSO("ColorGrading", psoManager);
@@ -27,6 +29,7 @@ void PostEffectManager::Initialize(ID3D12GraphicsCommandList* commandList, SrvMa
     RegisterPSO("GaussVertical", psoManager);
     RegisterPSO("GaussHorizontal", psoManager);
     RegisterPSO("Bloom", psoManager);
+    RegisterPSO("Dissolve", psoManager);
 
     // エフェクトを追加
     AddPostEffect<ColorGrading>("ColorGradingPass", "ColorGrading");
@@ -35,6 +38,7 @@ void PostEffectManager::Initialize(ID3D12GraphicsCommandList* commandList, SrvMa
     AddPostEffect<GaussHorizontal>("GaussHorizontalPass", "GaussHorizontal");
     auto* bloom = AddPostEffect<Bloom>("BloomPass", "Bloom");
     bloom->SetGamePassIndex(renderPassController_->GetSrvIndex(renderPassController_->GetSceneFinalPass()));
+    AddPostEffect<Dissolve>("DissolvePass", "Dissolve");
 }
 
 void PostEffectManager::Execute() {
