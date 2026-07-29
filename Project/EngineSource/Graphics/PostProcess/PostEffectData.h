@@ -188,5 +188,25 @@ namespace GameEngine {
         ConstantBuffer<DissolveData> buffer_;
     };
 
+    // アウトライン
+    class OutLine : public IPostEffect {
+        struct OutLineData {
+            uint32_t textureHandle;
+            float sd; // 標準偏差
+            float padding[2];
+        };
+
+    public:
+        OutLine();
+
+        void Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) override;
+
+        void SetPassIndex(const uint32_t& index) override {
+            buffer_.GetData()->textureHandle = index;
+        }
+
+    private:
+        ConstantBuffer<OutLineData> buffer_;
+    };
 
 }

@@ -105,8 +105,8 @@ TestScene::TestScene() {
 	testCollider_.SetCollisionMask(~kCollisionAttributeEnemy);
 
 	// 色調補正
-	//auto* colorGrading = postEffectManager_->GetPostEffect<ColorGrading>("ColorGradingPass");
-	//colorGrading->SetEnableGrayscale(true);
+	auto* colorGrading = postEffectManager_->GetPostEffect<ColorGrading>("ColorGradingPass");
+	colorGrading->SetEnableGrayscale(true);
 }
 
 void TestScene::Initialize() {
