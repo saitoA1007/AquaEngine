@@ -1,6 +1,8 @@
 #include "GameScene.h"
 using namespace GameEngine;
 
+#include "PostProcess/PostEffectData.h"
+
 #include "Application/Player/Player.h"
 #include "Application/Player/PlayerEffectManager.h"
 
@@ -85,9 +87,13 @@ GameScene::GameScene() {
 	// ポーズのUI
 	auto* pauseUIManager = gameObjectManager_->AddObject<PauseUIManager>(textureManager_);
 
+	// 遷移する用のテクスチャを設定
+	Dissolve* dissolve = postEffectManager_->GetPostEffect<Dissolve>("DissolvePass");
+	dissolve->SetNoiseTextureIndex(textureManager_->GetHandleByName("noise0.png"));
+
 	// シーンフェーズを管理
 	gameObjectManager_->AddObject<GamePhaseManager>(inputCommand_, player, bossEnemy, titleUIManager, playUIManager, gameOverUIManager, clearUIManager,
-		pauseUIManager, cameraController_);
+		pauseUIManager, cameraController_, dissolve);
 }
 
 void GameScene::Initialize() {

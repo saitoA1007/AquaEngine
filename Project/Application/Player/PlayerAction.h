@@ -26,6 +26,9 @@ public:
 	// 最大Hp
 	int32_t GetMaxHp()const { return maxHp_; }
 
+	// 体力をリセット
+	void ResetHp() { currentHp_ = maxHp_; }
+
 private:
 
 	int32_t maxHp_ = 3;

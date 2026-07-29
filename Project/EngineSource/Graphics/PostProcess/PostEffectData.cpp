@@ -105,7 +105,7 @@ Dissolve::Dissolve() {
     // 作成
     buffer_.Create();
     // 標準偏差
-    buffer_.GetData()->intensity = 0.0f;
+    buffer_.GetData()->threshold = 0.0f;
 
     isActive_ = true;
 }

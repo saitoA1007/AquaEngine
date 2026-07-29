@@ -75,8 +75,12 @@ void Player::Initialize() {
 
 	// 位置を初期化
 	worldTransform_.transform_.translate = { 0.0f,2.0f,12.0f };
+	collider_.SetWorldPosition(worldTransform_.transform_.translate);
 
 	isDraw_ = true;
+
+	// 体力をリセット
+	playerStatus_.ResetHp();
 
 	// 初期化
 	animator_->Initialize();

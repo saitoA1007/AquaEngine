@@ -5,7 +5,6 @@
 #include "RandomGenerator.h"
 #include "FPSCounter.h"
 #include "Application/CollisionConfig.h"
-//#include "PostEffectData.h"
 using namespace GameEngine;
 
 TestScene::~TestScene() {}
@@ -105,8 +104,9 @@ TestScene::TestScene() {
 	testCollider_.SetCollisionAttribute(kCollisionAttributeEnemy);
 	testCollider_.SetCollisionMask(~kCollisionAttributeEnemy);
 
-	auto* dissolve = postEffectManager_->GetPostEffect<Dissolve>("DissolvePass");
-	dissolve->SetNoiseTextureIndex(textureManager_->GetHandleByName("noise0.png"));
+	// 色調補正
+	//auto* colorGrading = postEffectManager_->GetPostEffect<ColorGrading>("ColorGradingPass");
+	//colorGrading->SetEnableGrayscale(true);
 }
 
 void TestScene::Initialize() {
@@ -115,7 +115,11 @@ void TestScene::Initialize() {
 
 void TestScene::Update() {
 
-	if (inputCommand_->IsCommandActive("Decision")) { isFinished_ = true; }
+	if (inputCommand_->IsCommandActive("Decision")) { 
+		isFinished_ = true;
+		auto* colorGrading = postEffectManager_->GetPostEffect<ColorGrading>("ColorGradingPass");
+		colorGrading->SetEnableGrayscale(false);
+	}
 
 	// カメラの更新処理
 	mainCamera_->Update();

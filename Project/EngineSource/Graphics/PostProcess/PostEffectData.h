@@ -36,6 +36,10 @@ namespace GameEngine {
             buffer_.GetData()->textureHandle = index;
         }
 
+        void SetEnableGrayscale(bool isActive) {
+            buffer_.GetData()->enableGrayscale = isActive;
+        }
+
     private:
         ConstantBuffer<ColorGradingData> buffer_;
     };
@@ -159,7 +163,7 @@ namespace GameEngine {
         struct DissolveData {
             uint32_t gameTextureHandle;
             uint32_t noiseTextureHandle;
-            float intensity;
+            float threshold;
             float pad;
         };
 
@@ -174,6 +178,10 @@ namespace GameEngine {
 
         void SetNoiseTextureIndex(uint32_t index) {
             buffer_.GetData()->noiseTextureHandle = index;
+        }
+
+        void SetThreshold(float threshold) {
+            buffer_.GetData()->threshold = threshold;
         }
 
     private:

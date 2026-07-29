@@ -152,10 +152,10 @@ EnterMovieCameraState::EnterMovieCameraState(CameraController* controller, GameE
 
 void EnterMovieCameraState::Enter() {
 	phase_ = Phase::kMove;
+	timer_ = 0.0f;
 }
 
 void EnterMovieCameraState::Update(float dt60) {
-
 
 	Vector3 enemyPos = controller_->GetTargetWorld()->transform_.translate;
 	commonData_.idealTarget = enemyPos;

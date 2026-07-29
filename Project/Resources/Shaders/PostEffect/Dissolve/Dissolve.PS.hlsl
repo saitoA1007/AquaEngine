@@ -18,9 +18,14 @@ PixelShaderOutput main(VertexShaderOutput input)
     output.color = gTexture[gMaterial.textureHandle].Sample(gSampler, input.texcoord);
     
     float mask = gTexture[gMaterial.dissolveTextureHandle].Sample(gSampler, input.texcoord).r;
-    // edge
-    float edge = 1.0f - smoothstep(0.5f, 0.53f, mask);
-    output.color.rgb += edge * float3(1.0f, 0.4f, 0.3f);
+    
+    // エッジの幅
+    float edgeWidth = 0.03f;
+    
+    float edge = smoothstep(gMaterial.threshold, gMaterial.threshold + edgeWidth, mask)
+               * (1.0f - smoothstep(gMaterial.threshold + edgeWidth, gMaterial.threshold + edgeWidth * 2.0f, mask));
+    // エッジの加算
+    output.color.rgb += edge * float3(0.0f, 0.1f, 1.0f);
     if (mask < gMaterial.threshold)
     {
         // マスク部分は黒色
