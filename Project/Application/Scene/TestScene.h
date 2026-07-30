@@ -7,6 +7,7 @@
 #include "WorldTransform.h"
 #include "Animator.h"
 #include "ParticleBehavior.h"
+#include "ParticleBehaviorGPU.h"
 #include "Material.h"
 #include "RefBuffer.h"
 #include "IceMaterial.h"
@@ -119,7 +120,10 @@ private: // シーン機能
 
 	// 球の当たり判定
 	GameEngine::SphereCollider testCollider_;
-	Vector3 testPos_ = {0.0f,0.0f,-8.0f};
+	Vector3 testPos_ = {10.0f,0.0f,-8.0f};
+
+	// パーティクル
+	GameEngine::ParticleBehaviorGPU* gpuParticle_ = nullptr;
 
 	GameEngine::DestructibleObject* destructibleObject_ = nullptr;
 };

@@ -27,10 +27,10 @@ VertexShaderOutput main(VertexShaderInput input, uint instanceId : SV_InstanceID
     VertexShaderOutput output;
     ParticleCS particle = gParticles[instanceId];
     float4x4 worldMatrix = MakeTranslateMatrix(particle.translate); // worldMatrixを作る
-    //worldMatrix[0] *= particle.scale.x;
-    //worldMatrix[1] *= particle.scale.y;
-    //worldMatrix[2] *= particle.scale.z;
-    //worldMatrix[3].xyz = particle.translate;
+    worldMatrix[0] *= particle.scale.x;
+    worldMatrix[1] *= particle.scale.y;
+    worldMatrix[2] *= particle.scale.z;
+    worldMatrix[3].xyz = particle.translate;
     float4 worldPos = mul(input.position, worldMatrix);
     output.position = mul(worldPos, gPerView.viewProjection);
     output.texcoord = input.texcoord;

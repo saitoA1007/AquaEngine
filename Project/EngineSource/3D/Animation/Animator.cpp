@@ -275,3 +275,45 @@ void Animator::DebugDraw(DebugRenderer* debugRenderer, float sphereRadius, const
 		}
 	}
 }
+
+Vector3 Animator::GetJointWorldPosition(const std::string& jointName, const Matrix4x4& worldMatrix) const {
+	if (!skeleton_) {
+		return Vector3(0.0f,0.0f,0.0f);
+	}
+
+	auto it = skeleton_->jointMap.find(jointName);
+	if (it == skeleton_->jointMap.end()) {
+		return Vector3(0.0f, 0.0f, 0.0f);
+	}
+
+	const Joint& joint = skeleton_->joints[it->second];
+	Matrix4x4 world = joint.skeletonSpaceMatrix * worldMatrix;
+
+	return Vector3{ world.m[3][0], world.m[3][1], world.m[3][2] };
+}
+
+Vector3 Animator::GetNodeWorldPosition(const std::string& nodeName, const Matrix4x4& worldMatrix) const {
+	if (!model_) {
+		return Vector3(0.0f, 0.0f, 0.0f);
+	}
+
+	const Node* target = FindNode(model_->GetNodes(), nodeName);
+	if (!target) {
+		return Vector3(0.0f, 0.0f, 0.0f);
+	}
+
+	Matrix4x4 world = target->localMatrix * worldMatrix;
+	return Vector3{ world.m[3][0], world.m[3][1], world.m[3][2] };
+}
+
+const Node* Animator::FindNode(const Node& node, const std::string& name) {
+	if (node.name == name) {
+		return &node;
+	}
+	for (const auto& child : node.children) {
+		if (const Node* found = FindNode(child, name)) {
+			return found;
+		}
+	}
+	return nullptr;
+}

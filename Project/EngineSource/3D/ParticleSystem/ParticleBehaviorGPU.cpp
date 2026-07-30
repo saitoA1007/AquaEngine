@@ -54,7 +54,7 @@ ParticleBehaviorGPU::ParticleBehaviorGPU(const std::string& name, uint32_t maxNu
 	emitData->frequency = 0.5f;
 	emitData->frequencyTime = 0.0f;
 	emitData->translate = Vector3(0, 0, 0);
-	emitData->radius = 1.0f;
+	emitData->radius = 0.5f;
 	emitData->emit = 0;
 
 	// 時間を作成
@@ -79,6 +79,9 @@ void ParticleBehaviorGPU::Update() {
 	} else {
 		emitData->emit = 0;
 	}
+
+	// 発射位置を更新
+	emitData->translate = emitPos_;
 
 	// 時間
 	perFrame_.GetData()->deltaTime = FpsCounter::gameDeltaTime;
