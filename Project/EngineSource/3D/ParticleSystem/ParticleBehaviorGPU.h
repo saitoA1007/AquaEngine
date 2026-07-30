@@ -54,6 +54,10 @@ namespace GameEngine {
 		// 描画処理
 		void Draw() override;
 
+	public:
+
+		Vector3 emitPos_ = { 0.0f,0.0f,0.0f };
+
 	private:
 		static ID3D12GraphicsCommandList4* commandList_;
 		static ID3D12RootSignature* emitRootSignature_;

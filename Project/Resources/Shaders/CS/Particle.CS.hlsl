@@ -26,7 +26,7 @@ void main( uint3 DTid : SV_DispatchThreadID )
                 //gFreeList[particleIndex] = particleIndex;
                 
                     // カウント分パーティクルを射出する
-                gParticle[particleIndex].scale = generator.Generate3d();
+                gParticle[particleIndex].scale = float3(0.1f,0.1f,0.1f);
                 gParticle[particleIndex].translate = generator.Generate3d();
                 gParticle[particleIndex].color.rgb = generator.Generate3d();
                 gParticle[particleIndex].color.a = 1.0f;

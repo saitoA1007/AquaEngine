@@ -88,6 +88,16 @@ namespace GameEngine {
 		/// <param name="model"></param>
 		void SetModelData(Model* model);
 
+		/// <summary>
+		/// 指定したJointのワールド座標を取得
+		/// </summary>
+		Vector3 GetJointWorldPosition(const std::string& jointName, const Matrix4x4& worldMatrix) const;
+
+		/// <summary>
+		/// 指定したNodeのワールド座標を取得
+		/// </summary>
+		Vector3 GetNodeWorldPosition(const std::string& nodeName, const Matrix4x4& worldMatrix) const;
+
 	private:
 		static ID3D12GraphicsCommandList4* commandList_;
 		static ID3D12RootSignature* rootSignature_;
@@ -154,5 +164,7 @@ namespace GameEngine {
 
 		// コンピュートシェーダーを更新
 		void UpdateCompute();
+
+		static const Node* FindNode(const Node& node, const std::string& name);
 	};
 }

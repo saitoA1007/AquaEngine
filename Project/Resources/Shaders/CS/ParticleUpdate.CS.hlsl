@@ -15,7 +15,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
     {
         if (gParticle[particleIndex].color.a > 0.0f)
         {
-            gParticle[particleIndex].translate += gParticle[particleIndex].velocity;
+            gParticle[particleIndex].translate += gParticle[particleIndex].velocity * gPerFrame.deltaTime;
             gParticle[particleIndex].currentTime += gPerFrame.deltaTime;
 
             float alpha = 1.0f - (gParticle[particleIndex].currentTime / gParticle[particleIndex].lifeTime);

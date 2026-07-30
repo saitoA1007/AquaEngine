@@ -1,7 +1,6 @@
 #include "TestScene.h"
 #include "ImguiManager.h"
 #include "PostProcess/PostEffectData.h"
-#include "ParticleBehaviorGPU.h"
 #include "RandomGenerator.h"
 #include "FPSCounter.h"
 #include "Application/CollisionConfig.h"
@@ -22,7 +21,7 @@ TestScene::TestScene() {
 
 	// メインカメラの初期化
 	mainCamera_ = std::make_unique<Camera>();
-	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} }, 1280, 720);
+	mainCamera_->Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,1.0f,-15.0f} }, 1280, 720);
 	mainCamera_->Update();
 
 	// 背景画像を設定
@@ -33,7 +32,7 @@ TestScene::TestScene() {
 	model_ = modelManager_->GetNameByModel("walk.gltf");
 	model_->SetDefaultIsEnableLight(true);
 	model_->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
-	world_.Initialize({ {2.0f,2.0f,2.0f},{0.0f,0.0f,0.0f},{0.0f,-1.0f,0.0f} });
+	world_.Initialize({ {2.0f,2.0f,2.0f},{0.0f,0.0f,0.0f},{2.0f,-1.0f,0.0f} });
 
 	// アニメーションデータを取得する
 	walkAnimationData_ = animationManager_->GetNameByAnimations("Walk");
@@ -56,7 +55,7 @@ TestScene::TestScene() {
 	effectModel_ = modelManager_->GetNameByModel("plane.obj");
 	effectModel_->SetDefaultIsEnableLight(false);
 	//gameObjectManager_->AddObject<ParticleBehavior>("HitAfterEffect", 32, textureManager_, effectModel_, &renderQueue_->GetMainCamera());
-	//gameObjectManager_->AddObject<ParticleBehaviorGPU>("GpuParticle", 1024, effectModel_);
+	gpuParticle_ = gameObjectManager_->AddObject<ParticleBehaviorGPU>("GpuParticle", 1024, effectModel_);
 
 	// 高ポリゴン氷
 	iceHighModel_ = modelManager_->GetNameByModel("ice_highPolygon.gltf");
@@ -97,7 +96,7 @@ TestScene::TestScene() {
 
 	// 破片のテスト
 	testModel_ = modelManager_->GetNameByModel("test.gltf");
-	destructibleObject_ = gameObjectManager_->AddObject<DestructibleObject>(testModel_, static_cast<uint32_t>(CollisionTypeID::kPlayer), kCollisionAttributePlayer);
+	//destructibleObject_ = gameObjectManager_->AddObject<DestructibleObject>(testModel_, static_cast<uint32_t>(CollisionTypeID::kPlayer), kCollisionAttributePlayer);
 
 	testCollider_.SetRadius(1.0f);
 	testCollider_.SetWorldPosition(testPos_);
@@ -105,8 +104,8 @@ TestScene::TestScene() {
 	testCollider_.SetCollisionMask(~kCollisionAttributeEnemy);
 
 	// 色調補正
-	auto* colorGrading = postEffectManager_->GetPostEffect<ColorGrading>("ColorGradingPass");
-	colorGrading->SetEnableGrayscale(true);
+	//auto* colorGrading = postEffectManager_->GetPostEffect<ColorGrading>("ColorGradingPass");
+	//colorGrading->SetEnableGrayscale(true);
 }
 
 void TestScene::Initialize() {
@@ -124,8 +123,13 @@ void TestScene::Update() {
 	// カメラの更新処理
 	mainCamera_->Update();
 
+	world_.UpdateTransformMatrix();
+
 	// アニメーションの更新処理
-	walkAnimator_->Update();
+	walkAnimator_->ComputeUpdate();
+
+	// 右手の位置を取得
+	gpuParticle_->emitPos_ = walkAnimator_->GetJointWorldPosition("mixamorig:RightHand", world_.GetWorldMatrix());
 
 	// 操作
 	if (inputCommand_->IsCommandActive("MoveUp")) { testPos_.y += 5.0f * FpsCounter::gameDeltaTime; }
@@ -143,12 +147,12 @@ void TestScene::DebugUpdate() {
 #ifdef USE_IMGUI
 	auto* light = renderQueue_->GetLightManager();
 
-	ImGui::Begin("Fracture");
-	ImGui::DragFloat3("ColliderSize", &destructibleObject_->colliderSize_.x, 0.1f);
-	ImGui::DragFloat("DamageAmount", &destructibleObject_->testDamageAmount_, 0.1f, 0.0f);
-	ImGui::DragFloat("CraterRadius", &destructibleObject_->testCraterRadius_, 0.1f, 0.0f);
-	ImGui::DragInt("PlaneCount", &destructibleObject_->testPlaneCount_, 1, 0);
-	ImGui::End();
+	//ImGui::Begin("Fracture");
+	//ImGui::DragFloat3("ColliderSize", &destructibleObject_->colliderSize_.x, 0.1f);
+	//ImGui::DragFloat("DamageAmount", &destructibleObject_->testDamageAmount_, 0.1f, 0.0f);
+	//ImGui::DragFloat("CraterRadius", &destructibleObject_->testCraterRadius_, 0.1f, 0.0f);
+	//ImGui::DragInt("PlaneCount", &destructibleObject_->testPlaneCount_, 1, 0);
+	//ImGui::End();
 
 	ImGui::Begin("test");
 
@@ -209,7 +213,10 @@ void TestScene::Draw() {
 	renderQueue_->SubmitRaytracingModel(terrainModel_, terrainWorld_);
 
 	// アニメーションモデル
-	//renderQueue_->SubmitRaytracingModel(model_, world_);
+	renderQueue_->SubmitRaytracingModel(model_, world_);
+
+	// アニメーションのデバック描画
+	walkAnimator_->DebugDraw(debugRenderer_);
 	
 	// それぞれの氷を描画
 	//renderQueue_->SubmitRaytracingModel(iceHighModel_, iceHighWorld_, &iceRefBuffers_[0]);
