@@ -1,6 +1,7 @@
 #include"DXCommand.h"
 #include<cassert>
 #include"LogManager.h"
+#include"Debug/DebugName.h"
 
 using namespace GameEngine;
 
@@ -23,6 +24,11 @@ void DXCommand::Initialize(ID3D12Device* device) {
     hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator_.Get(), nullptr, IID_PPV_ARGS(&commandList_));
     // コマンドリストを生成がうまくいかなかったので起動できない
     assert(SUCCEEDED(hr));
+
+    // PIX上で識別できるように名前を付ける
+    SetDebugName(commandQueue_.Get(), "MainCommandQueue");
+    SetDebugName(commandAllocator_.Get(), "MainCommandAllocator");
+    SetDebugName(commandList_.Get(), "MainCommandList");
 
     LogManager::GetInstance().Log("End　Create CommandList");
 }

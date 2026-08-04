@@ -2,8 +2,10 @@
 #include <memory>
 #include <unordered_map>
 #include <string>
+#include <vector>
 #include "RenderPass.h"
 #include "RenderTextureManager.h"
+#include "Debug/PixMarker.h"
 
 namespace GameEngine {
 
@@ -19,7 +21,7 @@ namespace GameEngine {
 		void AddPass(const std::string& name, RenderTextureMode mode = RenderTextureMode::RtvAndDsv,uint32_t wid = 1280,uint32_t hei = 720,
 			Vector4 clearColor = { 0.2f,0.2f,0.2f,1.0f },DXGI_FORMAT colorFormat = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
 
-		// 描画前に呼び出す(参照する時に切り替えられていなければassertで引っ掛ける)
+		// 描画前に呼び出す
 		void PrePass(const std::string& name);
 		void PrePass(std::vector<std::string> names,const std::string dsvName = "");
 		void PostPass(const std::string& name);
@@ -49,6 +51,19 @@ namespace GameEngine {
 		uint32_t GetSrvIndex(const std::string& name);
 		uint32_t GetUavIndex(const std::string& name);
 		uint32_t GetDepthSrvIndex(const std::string& name);
+
+		/// <summary>
+		/// 開きっぱなしのPIXイベントを全て閉じる。コマンドリストをCloseする直前に必ず呼ぶこと。
+		/// </summary>
+		void CloseAllPixEvents();
+
+	private:
+
+		// PIXイベントを開いてスタックに積む
+		void BeginPixEvent(const std::string& name);
+		// 指定名のPIXイベントを閉じる
+		void EndPixEvent(const std::string& name);
+
 	private:
 		RenderPassController(const RenderPassController&) = delete;
 		RenderPassController& operator=(const RenderPassController&) = delete;
@@ -67,6 +82,9 @@ namespace GameEngine {
 		// 最終的に画面に出すためのパス
 		std::string presentPassName_ = "";
 		CD3DX12_GPU_DESCRIPTOR_HANDLE presentPassSrvHandle_;
+
+		// 現在開いているPIXイベント名のスタック
+		std::vector<std::string> openPixEvents_;
 
 		uint32_t width_ = 0;
 		uint32_t height_ = 0;

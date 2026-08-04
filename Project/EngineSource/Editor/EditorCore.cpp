@@ -23,6 +23,7 @@
 #include "Windows/InspectorWindow.h"
 #include "Windows/PerformanceWindow.h"
 #include "Windows/MaterialNodeWindow.h"
+#include "Windows/PixWindow.h"
 
 using namespace GameEngine;
 
@@ -48,6 +49,7 @@ void EditorCore::Initialize(TextureManager* textureManager, SceneChangeRequest* 
 	windowManager_->RegisterWindow(std::make_unique<ConsoleWindow>());
 	windowManager_->RegisterWindow(std::make_unique<PerformanceWindow>());
 	windowManager_->RegisterWindow(std::make_unique<MaterialNodeWindow>(psoManager));
+	windowManager_->RegisterWindow(std::make_unique<PixWindow>());
 
 	// レイアウトのデータを取得する
 	editorLayout_->LoadLayout(windowManager_->GetWindows());

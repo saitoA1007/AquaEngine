@@ -3,6 +3,8 @@
 #include "RtvManager.h"
 #include "DsvManager.h"
 #include "Vector4.h"
+#include "Debug/DebugName.h"
+#include <string>
 
 namespace GameEngine {
 
@@ -67,6 +69,12 @@ namespace GameEngine {
 
 		RenderTextureMode GetMode() const { return mode_; }
 		ColorResourceState GetColorState() const { return colorState_; }
+
+		/// <summary>
+		/// PIX、デバッグレイヤー上で識別できるように名前を設定する
+		/// </summary>
+		/// <param name="name">レンダーパス名</param>
+		void SetDebugNames(const std::string& name);
 	private:
 		RenderTexture(const RenderTexture&) = delete;
 		RenderTexture& operator=(const RenderTexture&) = delete;

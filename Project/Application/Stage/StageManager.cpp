@@ -11,7 +11,7 @@ StageManager::StageManager(GameEngine::GameObjectManager* objectManager, GameEng
 	// 地面用の画像を取得
 	uint32_t iceNormalGH = textureManager->GetHandleByName("stone_tiles_02_nor_gl_1k.png");
 	uint32_t iceHeightGH = textureManager->GetHandleByName("stone_tiles_02_disp_1k.png");
-	uint32_t terrainGH = textureManager->GetHandleByName("aerial_grass_rock_diff_1k.jpg");
+	uint32_t terrainGH = textureManager->GetHandleByName("iceGrass.png");
 	uint32_t terrainNormalGH = textureManager->GetHandleByName("aerial_grass_rock_nor_gl_1k.png");
 
 	// 床モデルを生成

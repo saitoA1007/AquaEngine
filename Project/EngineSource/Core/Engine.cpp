@@ -2,6 +2,7 @@
 #include "Application/Scene/Register/SetUpScenes.h"
 #include "CrashHandle.h"
 #include "LogManager.h"
+#include "Debug/PixCapture.h"
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
@@ -118,11 +119,15 @@ void Engine::PreUpdate() {
     core_->Update(); // FPS
     input_->Update(); // 入力処理
 
+    // F11でPIXのGPUキャプチャを取得する
+    if (input_->GetInput()->TriggerKey(DIK_F11)) {
+        PixCapture::GetInstance().RequestCapture(1);
+    }
+
     graphics_->GetImGuiManager()->BeginFrame();
 
     // ヒープを設定する
     graphics_->BeginFrame();
-
 #ifdef USE_IMGUI
     // デバック描画をリセット
     graphics_->GetDebugRenderer()->Clear();

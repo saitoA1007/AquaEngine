@@ -2,6 +2,7 @@
 #include"LogManager.h"
 #include"DescriptorHeap.h"
 #include"DescriptorHandle.h"
+#include"Debug/DebugName.h"
 using namespace GameEngine;
 
 void DXRenderTarget::Initialize(ID3D12Device* device, IDXGISwapChain4* swapChain) {
@@ -36,6 +37,12 @@ void DXRenderTarget::Initialize(ID3D12Device* device, IDXGISwapChain4* swapChain
     rtvHandles_[1] = GetCPUDescriptorHandle(rtvHeap_.Get(), descriptorSizeRTV_, 1);
     // 2つ目を作る
     device->CreateRenderTargetView(swapChainResources_[1].Get(), &rtvDesc_, rtvHandles_[1]);
+
+    // PIX上で識別できるように名前を付ける
+    SetDebugName(rtvHeap_.Get(), "RTVHeap");
+    SetDebugName(dsvHeap_.Get(), "DSVHeap");
+    SetDebugName(swapChainResources_[0].Get(), "BackBuffer", 0);
+    SetDebugName(swapChainResources_[1].Get(), "BackBuffer", 1);
 
     LogManager::GetInstance().Log("End　Create TargetView");
 }

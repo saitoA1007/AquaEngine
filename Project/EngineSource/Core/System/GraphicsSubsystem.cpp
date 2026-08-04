@@ -8,10 +8,16 @@
 #include "CoreSubsystem.h"
 #include "Animator.h"
 #include "ParticleBehaviorGPU.h"
+#include "Debug/PixCapture.h"
 using namespace GameEngine;
 
 void GraphicsSubsystem::Initialize() {
     auto* windowsApp = context_.core->GetWindowsApp();
+
+    // PIXのGPUキャプチャ機能を準備する。
+    // WinPixGpuCapturer.dll は ID3D12Device の生成より「前」にロードしないと効かないため、
+    // 必ずこの位置で呼ぶこと。
+    PixCapture::GetInstance().Initialize();
 
     // DirectXの機能を生成
     graphicsDevice_ = std::make_unique<GraphicsDevice>();
@@ -19,6 +25,15 @@ void GraphicsSubsystem::Initialize() {
         windowsApp->GetHwnd(),
         windowsApp->kWindowWidth,
         windowsApp->kWindowHeight);
+
+    // HUD表示の設定は、スワップチェーン生成後に行う。
+    // （生成前に呼ぶと左上のオーバーレイ設定が反映されない）
+    PixCapture::GetInstance().SetHudVisible(false);
+
+    // PIXSetTargetWindow を設定すると、そのHWNDのPresent以外ではキャプチャが
+    // 開始/終了されなくなる。HWNDが想定と違うとキャプチャが一切取れなくなるため、
+    // 既定では設定しない。複数ウィンドウで対象を絞りたい場合だけ有効化する。
+    //PixCapture::GetInstance().SetTargetWindow(windowsApp->GetHwnd());
 
     // dxcCompilerの初期化
     dxc_ = std::make_unique<DXC>();
