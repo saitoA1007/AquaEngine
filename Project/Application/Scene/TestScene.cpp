@@ -55,7 +55,7 @@ TestScene::TestScene() {
 	effectModel_ = modelManager_->GetNameByModel("plane.obj");
 	effectModel_->SetDefaultIsEnableLight(false);
 	//gameObjectManager_->AddObject<ParticleBehavior>("HitAfterEffect", 32, textureManager_, effectModel_, &renderQueue_->GetMainCamera());
-	gpuParticle_ = gameObjectManager_->AddObject<ParticleBehaviorGPU>("GpuParticle", 1024, effectModel_);
+	//gpuParticle_ = gameObjectManager_->AddObject<ParticleBehaviorGPU>("GpuParticle", 1024, effectModel_);
 
 	// 高ポリゴン氷
 	iceHighModel_ = modelManager_->GetNameByModel("ice_highPolygon.gltf");
@@ -96,7 +96,7 @@ TestScene::TestScene() {
 
 	// 破片のテスト
 	testModel_ = modelManager_->GetNameByModel("test.gltf");
-	//destructibleObject_ = gameObjectManager_->AddObject<DestructibleObject>(testModel_, static_cast<uint32_t>(CollisionTypeID::kPlayer), kCollisionAttributePlayer);
+	destructibleObject_ = gameObjectManager_->AddObject<DestructibleObject>(testModel_, static_cast<uint32_t>(CollisionTypeID::kPlayer), kCollisionAttributePlayer);
 
 	testCollider_.SetRadius(1.0f);
 	testCollider_.SetWorldPosition(testPos_);
@@ -129,7 +129,7 @@ void TestScene::Update() {
 	walkAnimator_->ComputeUpdate();
 
 	// 右手の位置を取得
-	gpuParticle_->emitPos_ = walkAnimator_->GetJointWorldPosition("mixamorig:RightHand", world_.GetWorldMatrix());
+	//gpuParticle_->emitPos_ = walkAnimator_->GetJointWorldPosition("mixamorig:RightHand", world_.GetWorldMatrix());
 
 	// 操作
 	if (inputCommand_->IsCommandActive("MoveUp")) { testPos_.y += 5.0f * FpsCounter::gameDeltaTime; }
@@ -213,10 +213,10 @@ void TestScene::Draw() {
 	renderQueue_->SubmitRaytracingModel(terrainModel_, terrainWorld_);
 
 	// アニメーションモデル
-	renderQueue_->SubmitRaytracingModel(model_, world_);
+	//renderQueue_->SubmitRaytracingModel(model_, world_);
 
 	// アニメーションのデバック描画
-	walkAnimator_->DebugDraw(debugRenderer_);
+	//walkAnimator_->DebugDraw(debugRenderer_);
 	
 	// それぞれの氷を描画
 	//renderQueue_->SubmitRaytracingModel(iceHighModel_, iceHighWorld_, &iceRefBuffers_[0]);

@@ -34,6 +34,9 @@ void RenderPassController::PrePass(const std::string& name) {
 		assert(false && errorStr.c_str());
 	}
 
+	// PIXイベント開始
+	BeginPixEvent(name);
+
 	// 描画前処理
 	render->second->PrePass();
 	render->second->SetRenderTarget();
@@ -52,6 +55,9 @@ void RenderPassController::PrePass(std::vector<std::string> names, const std::st
 			std::string errorStr = "Not found RenderPass : name[" + names[i] + "]";
 			assert(false && errorStr.c_str());
 		}
+
+		// PIXイベント開始
+		BeginPixEvent(names[i]);
 
 		// 描画前処理
 		render->second->PrePass();
@@ -88,6 +94,50 @@ void RenderPassController::PostPass(const std::string& name) {
 
 	// 描画後処理
 	render->second->PostPass();
+
+	// PIXイベント終了
+	EndPixEvent(name);
+}
+
+//==============================================================================
+// PIXイベント制御
+//==============================================================================
+
+void RenderPassController::BeginPixEvent(const std::string& name) {
+	// 同じパスが二重に開かれるのを防ぐ
+	for (const auto& openName : openPixEvents_) {
+		if (openName == name) { return; }
+	}
+
+	PixBeginEvent(commandList_, PixColor::Pass, name.c_str());
+	openPixEvents_.push_back(name);
+}
+
+void RenderPassController::EndPixEvent(const std::string& name) {
+	// スタック内から対象を探す
+	int32_t target = -1;
+	for (int32_t i = static_cast<int32_t>(openPixEvents_.size()) - 1; i >= 0; --i) {
+		if (openPixEvents_[i] == name) {
+			target = i;
+			break;
+		}
+	}
+
+	// 開かれていなければ何もしない
+	if (target < 0) { return; }
+
+	// PIXイベントはスタック構造なので、対象より上に積まれたものから順に閉じる
+	while (static_cast<int32_t>(openPixEvents_.size()) > target) {
+		PixEndEvent(commandList_);
+		openPixEvents_.pop_back();
+	}
+}
+
+void RenderPassController::CloseAllPixEvents() {
+	while (!openPixEvents_.empty()) {
+		PixEndEvent(commandList_);
+		openPixEvents_.pop_back();
+	}
 }
 
 void RenderPassController::SwitchToUAV(const std::string& name) {

@@ -566,6 +566,8 @@
     <ClCompile Include="EngineSource\3D\Fracture\FractureInstance.cpp" />
     <ClCompile Include="EngineSource\3D\Fracture\DestructibleObject.cpp" />
     <ClCompile Include="Application\Stage\BgIceRock.cpp" />
+    <ClCompile Include="EngineSource\Graphics\Debug\PixCapture.cpp" />
+    <ClCompile Include="EngineSource\Editor\Windows\PixWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1115,6 +1117,10 @@
     <ClInclude Include="EngineSource\Graphics\Buffers\RuntimeFractureBuffer.h" />
     <ClInclude Include="EngineSource\3D\Fracture\DestructibleObject.h" />
     <ClInclude Include="Application\Stage\BgIceRock.h" />
+    <ClInclude Include="EngineSource\Graphics\Debug\DebugName.h" />
+    <ClInclude Include="EngineSource\Graphics\Debug\PixCapture.h" />
+    <ClInclude Include="EngineSource\Graphics\Debug\PixMarker.h" />
+    <ClInclude Include="EngineSource\Editor\Windows\PixWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />
@@ -1151,6 +1157,7 @@
     <None Include="Resources\Shaders\NoiseUtils.hlsli" />
     <None Include="Resources\Shaders\RandomUtils.hlsli" />
     <None Include="Resources\Shaders\Fracture.hlsli" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />

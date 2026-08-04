@@ -11,6 +11,9 @@ void RenderTextureManager::Create(const std::string& name, uint32_t width, uint3
     auto renderTexture = std::make_unique<RenderTexture>();
     renderTexture->Create(width, height, mode, colorFormat, clearColor);
 
+    // PIX上でリソース名が読めるように名前を設定する
+    renderTexture->SetDebugNames(name);
+
     // 同名が既存ならデストラクタ経由で古いリソースが解放される
     renderTextures_[name] = std::move(renderTexture);
 }

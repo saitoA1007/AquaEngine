@@ -170,6 +170,11 @@ void RenderTexture::InsertUavBarrier(ID3D12GraphicsCommandList* commandList) {
 	commandList->ResourceBarrier(1, &barrier);
 }
 
+void RenderTexture::SetDebugNames(const std::string& name) {
+	SetDebugName(resource_.Get(), "RT_" + name);
+	SetDebugName(depthResource_.Get(), "Depth_" + name);
+}
+
 void RenderTexture::CreateColorTarget(uint32_t width, uint32_t height, DXGI_FORMAT format) {
 	// カラーリソース作成
 	D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
