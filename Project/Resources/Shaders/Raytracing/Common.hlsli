@@ -34,6 +34,10 @@ struct BufferRef
     
     uint indexHandle; // モデルのインデックス
     uint vertexHandle; // モデルの頂点
+    
+    uint vertexOffset;
+    uint indexOffset;
+    float2 pad;
 };
 
 // Global Root Signature

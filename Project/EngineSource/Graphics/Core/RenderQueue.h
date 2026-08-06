@@ -143,6 +143,9 @@ namespace GameEngine {
         // 破片の描画
         void SubmitFracture(const Model* model, FractureInstance& fractureInstance, const float& alpha = 1.0f, const GpuResource* material = nullptr, const std::string& passName = "DefaultPass");
 
+        // レイトレの破片を描画
+        void SubmitRaytracingFracture(Model* model, FractureInstance& fractureInstance, WorldTransform& worldTransform);
+
         void SubmitRuntimeCutFragments(FractureInstance& fractureInstance, const GpuResource* material, const float& alpha = 1.0f, const std::string& passName = "DefaultPass");
 
         // psoの名前を取得

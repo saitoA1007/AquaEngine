@@ -5,6 +5,8 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "VertexData.h"
+#include "BLAS.h"
+#include "RefBuffer.h"
 
 namespace GameEngine {
 
@@ -78,6 +80,53 @@ namespace GameEngine {
 		uint32_t GetVertexBufferSrvIndex() const { return vertexBuffer_.GetSrvIndex(); }
 		uint32_t GetIndexBufferSrvIndex() const { return indexBuffer_.GetSrvIndex(); }
 
+		/// <summary>
+		/// 全チャンク分のBLASを一括構築する
+		/// </summary>
+		void BuildBLAS(ID3D12GraphicsCommandList4* cmdList, uint32_t materialSrvIndex) {
+			if (blasBuilt_) { return; }
+
+			uint32_t vbSrv = GetVertexBufferSrvIndex();
+			uint32_t ibSrv = GetIndexBufferSrvIndex();
+
+			for (const auto& [chunkId, range] : rangesByChunkId_) {
+				D3D12_VERTEX_BUFFER_VIEW offsetVB = MakeOffsetVBV(GetVertexBufferView(), range.vertexOffset, range.vertexCount);
+				D3D12_INDEX_BUFFER_VIEW offsetIB = MakeOffsetIBV(GetIndexBufferView(), range.indexOffset, range.indexCount);
+
+				auto blas = std::make_unique<BLAS>();
+				blas->Create(cmdList, offsetVB, offsetIB, range.vertexCount, range.indexCount, false);
+				chunkBLAS_[chunkId] = std::move(blas);
+
+				// RefBufferはデストラクタでインデックスを解放するためムーブができない
+				RefBuffer& refBuffer = chunkRefBuffers_[chunkId];
+				refBuffer.Create();
+				refBuffer.SetModelData(vbSrv, ibSrv, range.vertexOffset, range.indexOffset);
+				refBuffer.SetBufferMaterial(static_cast<uint32_t>(BufferType::kDefalutMaterial), materialSrvIndex);
+			}
+
+			blasBuilt_ = true;
+		}
+
+		bool HasBLAS() const { return blasBuilt_; }
+
+		BLAS* GetChunkBLAS(uint32_t chunkId) const {
+			auto it = chunkBLAS_.find(chunkId);
+			return it != chunkBLAS_.end() ? it->second.get() : nullptr;
+		}
+
+		uint32_t GetChunkRefIndex(uint32_t chunkId) const {
+			auto it = chunkRefBuffers_.find(chunkId);
+			assert(it != chunkRefBuffers_.end() && "指定chunkIdのRefBufferが見つかりません");
+			return it->second.GetRefIndex();
+		}
+
+		// マテリアルを設定
+		void SetBufferMaterial(uint32_t materialSrvIndex) {
+			for (auto& [id, refBuffer] : chunkRefBuffers_) {
+				refBuffer.SetBufferMaterial(0, materialSrvIndex);
+			}
+		}
+
 	private:
 		VertexBuffer<VertexData> vertexBuffer_;
 		IndexBuffer indexBuffer_;
@@ -88,5 +137,26 @@ namespace GameEngine {
 		// ランタイムカット用のCPU側コピー
 		std::vector<VertexData> cpuVertices_;
 		std::vector<uint32_t> cpuIndices_;
+
+		std::unordered_map<uint32_t, std::unique_ptr<BLAS>> chunkBLAS_;
+		std::unordered_map<uint32_t, RefBuffer> chunkRefBuffers_;
+		bool blasBuilt_ = false;
+
+	private:
+
+		static D3D12_VERTEX_BUFFER_VIEW MakeOffsetVBV(const D3D12_VERTEX_BUFFER_VIEW& base, uint32_t vertexOffset, uint32_t vertexCount) {
+			D3D12_VERTEX_BUFFER_VIEW view = base;
+			view.BufferLocation = base.BufferLocation + static_cast<UINT64>(vertexOffset) * base.StrideInBytes;
+			view.SizeInBytes = vertexCount * base.StrideInBytes;
+			return view;
+		}
+
+		static D3D12_INDEX_BUFFER_VIEW MakeOffsetIBV(const D3D12_INDEX_BUFFER_VIEW& base, uint32_t indexOffset, uint32_t indexCount) {
+			uint32_t strideBytes = (base.Format == DXGI_FORMAT_R32_UINT) ? 4 : 2;
+			D3D12_INDEX_BUFFER_VIEW view = base;
+			view.BufferLocation = base.BufferLocation + static_cast<UINT64>(indexOffset) * strideBytes;
+			view.SizeInBytes = indexCount * strideBytes;
+			return view;
+		}
 	};
 }

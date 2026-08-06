@@ -52,7 +52,7 @@ struct IceMaterialData
 
 static const uint VERTEX_STRIDE = 52;
 
-VertexData GetHitVertex(MyAttribute attrib, uint vertexHandle, uint indexHandle)
+VertexData GetHitVertex(MyAttribute attrib, uint vertexHandle, uint indexHandle, uint vertexOffset, uint indexOffset)
 {
     uint start = PrimitiveIndex() * 3;
     
@@ -63,8 +63,8 @@ VertexData GetHitVertex(MyAttribute attrib, uint vertexHandle, uint indexHandle)
 
     for (int i = 0; i < 3; ++i)
     {
-        uint index = gBufferData[indexHandle].Load<uint>((start + i) * 4);
-        
+        uint localIndex = gBufferData[indexHandle].Load<uint>((start + i) * 4 + indexOffset * 4);
+        uint index = localIndex + vertexOffset;
         VertexData v = gBufferData[vertexHandle].Load<VertexData>(index * VERTEX_STRIDE);
         
         positions[i] = v.position.xyz;
@@ -98,7 +98,7 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
     IceMaterialData material = gBufferData[ref.MaterialIndex].Load<IceMaterialData>(0);
     
     // 頂点データを取得する
-    VertexData vtx = GetHitVertex(attrib, ref.vertexHandle, ref.indexHandle);
+    VertexData vtx = GetHitVertex(attrib, ref.vertexHandle, ref.indexHandle, ref.vertexOffset, ref.indexOffset);
     // uvをトランスフォーム
     float4 transformedUV = mul(float4(vtx.texcoord, 0.0f, 1.0f), material.uvTransform);
     vtx.tangent.xyz = normalize(vtx.tangent.xyz);

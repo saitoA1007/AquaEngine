@@ -5,6 +5,7 @@
 #include "Model.h"
 #include "WorldTransform.h"
 #include "FractureInstance.h"
+#include "IceMaterial.h"
 
 namespace GameEngine {
 
@@ -35,6 +36,9 @@ namespace GameEngine {
 	private:
 		// モデル
 		Model* model_ = nullptr;
+
+		// 氷のマテリアル
+		IceMaterial iceMaterial_;
 
 		// aabbの当たり判定
 		AABBCollider collider_;

@@ -87,6 +87,11 @@ namespace GameEngine {
 		const D3D12_VERTEX_BUFFER_VIEW& GetRuntimeVertexBufferView() const { return runtimeBuffer_->GetVertexBufferView(); }
 		const D3D12_INDEX_BUFFER_VIEW& GetRuntimeIndexBufferView() const { return runtimeBuffer_->GetIndexBufferView(); }
 
+		// レイトレのTLASインスタンス行列に使う、チャンク単体のワールド行列
+		const Matrix4x4& GetChunkWorldMatrix(uint32_t index) const { return instancingData_[index].world; }
+
+		uint32_t GetChunkId(uint32_t index) const { return instancingData_[index].chunkId; }
+
 	private:
 		// コピー禁止
 		FractureInstance(const FractureInstance&) = delete;

@@ -5,6 +5,7 @@
 #include "Model.h"
 #include "WorldTransform.h"
 #include "WorldTransforms.h"
+#include "FractureInstance.h"
 #include "DrawRequest.h"
 #include "MyMath.h"
 using namespace GameEngine;
@@ -357,6 +358,38 @@ void RenderQueue::SubmitFracture(const Model* model, FractureInstance& fractureI
     } else {
         // 半透明描画に登録
         translucentDrawQueueList_[passName].push_back(request);
+    }
+}
+
+void RenderQueue::SubmitRaytracingFracture(Model* model, FractureInstance& fractureInstance, WorldTransform& worldTransform) {
+
+    for (auto& [groupName, chunks] : model->GetFractureChunks()) {
+        PackedGeometryBuffer* buffer = model->GetFractureBuffers().at(groupName).get();
+
+        if (!buffer->HasBLAS()) { return; }
+
+        uint32_t numInstance = fractureInstance.GetNumInstance();
+        for (uint32_t i = 0; i < numInstance; ++i) {
+            uint32_t chunkId = fractureInstance.GetChunkId(i);
+
+            BLAS* blas = buffer->GetChunkBLAS(chunkId);
+            if (blas == nullptr) { continue; }
+
+            TLASInstanceData data;
+            // blasを登録
+            data.blas = blas;
+            // 使用するヒットグループを設定
+            data.hitGroupIndexOffset = 1;
+            // 使用するデータを設定
+            data.instanceID = buffer->GetChunkRefIndex(chunkId);
+            // 座標
+            Matrix4x4 finalMatrix = fractureInstance.GetChunkWorldMatrix(i) * worldTransform.GetWorldMatrix();
+            Matrix4x4 matrix = Math::Transpose(finalMatrix);
+            std::memcpy(&data.transform, &matrix, sizeof(float) * 12);
+
+            // データを登録
+            raytracingDrawQueueList_.push_back(std::move(data));
+        }
     }
 }
 

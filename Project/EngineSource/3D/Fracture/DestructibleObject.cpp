@@ -26,6 +26,12 @@ DestructibleObject::DestructibleObject(Model* model, uint32_t colliderId, uint32
     collider_.SetOnCollisionEnterCallback([this](const CollisionResult& result) {
         OnCollisionEnter(result);
     });
+
+	// 氷のマテリアルを設定する
+	for (auto& [groupName, chunks] : model->GetFractureChunks()) {
+		PackedGeometryBuffer* buffer = model->GetFractureBuffers().at(groupName).get();
+		buffer->SetBufferMaterial(iceMaterial_.GetMaterialSrvIndex());
+	}
 }
 
 void DestructibleObject::Initialize() {
@@ -85,18 +91,21 @@ void DestructibleObject::Update() {
 
 void DestructibleObject::Draw() {
 
-	if (hasIntact_) {
-		renderQueue_->SubmitFracture(model_, intactInstance_);
-	}
-	if (hasMacroDebris_) {
-		renderQueue_->SubmitFracture(model_, macroDebrisInstance_);
-	}
-	// ランタイムで分割された破片を描画
-	if (hasMicroDebris_) {
-		const auto& chunk = model_->GetFractureChunks().begin();
-		Material* drawMaterial = model_->GetMaterial(chunk->second[0].materialName);
-		renderQueue_->SubmitRuntimeCutFragments(microDebrisInstance_, &drawMaterial->GetMaterialBuffer());
-	}
+	//if (hasIntact_) {
+	//	renderQueue_->SubmitFracture(model_, intactInstance_);
+	//}
+	//if (hasMacroDebris_) {
+	//	renderQueue_->SubmitFracture(model_, macroDebrisInstance_);
+	//}
+	//// ランタイムで分割された破片を描画
+	//if (hasMicroDebris_) {
+	//	const auto& chunk = model_->GetFractureChunks().begin();
+	//	Material* drawMaterial = model_->GetMaterial(chunk->second[0].materialName);
+	//	renderQueue_->SubmitRuntimeCutFragments(microDebrisInstance_, &drawMaterial->GetMaterialBuffer());
+	//}
+
+	// レイトレによる破片描画
+	renderQueue_->SubmitRaytracingFracture(model_, intactInstance_, worldTransform_);
 }
 
 void DestructibleObject::OnCollisionEnter(const GameEngine::CollisionResult& result) {

@@ -43,9 +43,16 @@ namespace GameEngine {
 		}
 
 		// モデル情報を設定する
-		void SetModelData(const uint32_t& vertexHandle, const uint32_t& indexHandle) {
+		//void SetModelData(const uint32_t& vertexHandle, const uint32_t& indexHandle) {
+		//	refData_->indexHandle = indexHandle - bufferStartIndex_;
+		//	refData_->vertexHandle = vertexHandle - bufferStartIndex_;
+		//}
+
+		void SetModelData(const uint32_t& vertexHandle, const uint32_t& indexHandle, uint32_t vertexOffset = 0, uint32_t indexOffset = 0) {
 			refData_->indexHandle = indexHandle - bufferStartIndex_;
 			refData_->vertexHandle = vertexHandle - bufferStartIndex_;
+			refData_->vertexOffset = vertexOffset;
+			refData_->indexOffset = indexOffset;
 		}
 
 		// 使用するヒットグループを設定
