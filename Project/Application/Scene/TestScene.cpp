@@ -147,12 +147,8 @@ void TestScene::DebugUpdate() {
 #ifdef USE_IMGUI
 	auto* light = renderQueue_->GetLightManager();
 
-	//ImGui::Begin("Fracture");
-	//ImGui::DragFloat3("ColliderSize", &destructibleObject_->colliderSize_.x, 0.1f);
-	//ImGui::DragFloat("DamageAmount", &destructibleObject_->testDamageAmount_, 0.1f, 0.0f);
-	//ImGui::DragFloat("CraterRadius", &destructibleObject_->testCraterRadius_, 0.1f, 0.0f);
-	//ImGui::DragInt("PlaneCount", &destructibleObject_->testPlaneCount_, 1, 0);
-	//ImGui::End();
+	// 破壊オブジェクトのチューニング値は DestructibleObject 内で
+	// DebugParameter に登録されており、GameParamEditor から編集できる
 
 	ImGui::Begin("test");
 
