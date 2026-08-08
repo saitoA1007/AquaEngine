@@ -3,7 +3,8 @@
 #include "FPSCounter.h"
 using namespace GameEngine;
 
-DestructibleObject::DestructibleObject(Model* model, uint32_t colliderId, uint32_t colliderAttribute) {
+DestructibleObject::DestructibleObject(std::string name, Model* model, uint32_t colliderId, uint32_t colliderAttribute) {
+	name_ = name;
 	model_ = model;
 	colliderId_ = colliderId;
 	colliderAttribute_ = colliderAttribute;
@@ -34,16 +35,34 @@ void DestructibleObject::Initialize() {
 		buffer->SetBufferMaterial(iceMaterial_.GetMaterialSrvIndex());
 	}
 
-	// 破砕状態を初期化（全チャンク無傷）
+	// 破砕状態を初期化
 	damageController_.Initialize(model_);
 
+	std::string subGroup = "";
+
 	// パラメータ機能
-	debugParameter_ = std::make_unique<DebugParameter>("DestructibleObject");
+	debugParameter_ = std::make_unique<DebugParameter>(name_);
 	debugParameter_->Register("ColliderSize", colliderSize_);
 	debugParameter_->Register("TestDamageAmount", testDamageAmount_);
 	debugParameter_->Register("TestCraterRadius", testCraterRadius_);
 	debugParameter_->Register("TestPlaneCount", testPlaneCount_);
 	debugParameter_->Apply();
+
+	debugParameter_->Register("BreakThreshold", damageController_.kBreakThreshold_);
+	debugParameter_->Register("MaxCrackOffset", damageController_.kMaxCrackOffset_);
+	debugParameter_->Register("MaxCrackRotate", damageController_.kMaxCrackRotate_);
+	debugParameter_->Register("NeighborCrackFactor", damageController_.kNeighborCrackFactor_);
+	// バネ物理
+	subGroup = "Physics";
+	debugParameter_->Register("CrackSpringStiffness", damageController_.kCrackSpringStiffness_,0, subGroup);
+	debugParameter_->Register("CrackDamping", damageController_.kCrackDamping_, 0, subGroup);
+	debugParameter_->Register("CrackAngularSpringStiffness", damageController_.kCrackAngularSpringStiffness_, 0, subGroup);
+	debugParameter_->Register("CrackAngularDamping", damageController_.kCrackAngularDamping_, 0, subGroup);
+	debugParameter_->Register("CrackImpulseStrength", damageController_.kCrackImpulseStrength_, 0, subGroup);
+
+	debugParameter_->Register("DentInwardBiasRatio", damageController_.kDentInwardBiasRatio_);
+	debugParameter_->Register("MinDentRatio", damageController_.kMinDentRatio_);
+	debugParameter_->Register("MaxDentRadiusToChunkRatio", damageController_.kMaxDentRadiusToChunkRatio_);
 }
 
 void DestructibleObject::Update() {
@@ -66,21 +85,32 @@ void DestructibleObject::Draw() {
 	if (breakState.HasIntact()) {
 		renderQueue_->SubmitRaytracingFracture(model_, breakState.Intact(), worldTransform_);
 	}
-	if (breakState.HasMacroDebris()) {
-		renderQueue_->SubmitRaytracingFracture(model_, breakState.MacroDebris(), worldTransform_);
+	// マクロ破片は破壊イベントごとに積み上がったバッチ全てを描画する
+	for (auto& batch : breakState.MacroDebrisBatches()) {
+		renderQueue_->SubmitRaytracingFracture(model_, *batch, worldTransform_);
 	}
 
 	// ランタイムでカットされた破片はラスタライズで描画
-	if (breakState.HasMicroDebris()) {
+	if (breakState.HasMicroDebris() || breakState.HasDentedChunks()) {
 		const auto& fractureChunks = model_->GetFractureChunks();
 		if (!fractureChunks.empty()) {
 			const auto& chunks = fractureChunks.begin()->second;
 			Material* drawMaterial = model_->GetMaterial(chunks.front().materialName);
-			renderQueue_->SubmitRuntimeCutFragments(breakState.MicroDebris(), &drawMaterial->GetMaterialBuffer());
+
+			// 積み上がったマイクロ破片バッチ全てを描画する
+			for (auto& batch : breakState.MicroDebrisBatches()) {
+				renderQueue_->SubmitRuntimeCutFragments(*batch, &drawMaterial->GetMaterialBuffer());
+			}
+
+			// 付着したまま動的に凹んでいるチャンクを描画する
+			for (auto& [chunkId, instance] : breakState.DentedChunks()) {
+				renderQueue_->SubmitRuntimeCutFragments(*instance, &drawMaterial->GetMaterialBuffer());
+			}
 		}
 	}
 }
 
 void DestructibleObject::OnCollisionEnter(const GameEngine::CollisionResult& result) {
-	damageController_.ApplyChipDamage(result.contactPosition, testDamageAmount_, testCraterRadius_, testPlaneCount_);
+	damageController_.ApplyChipDamage(result.contactPosition, testDamageAmount_, testCraterRadius_, testPlaneCount_,
+		result.contactNormal, result.penetrationDepth);
 }

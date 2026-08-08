@@ -276,27 +276,48 @@ namespace {
 		return normals;
 	}
 
+	// srcのメッシュをdstの末尾に、インデックスをオフセットしながら結合する
+	void AppendMesh(std::vector<VertexData>& dstVerts, std::vector<uint32_t>& dstIndices,
+		const std::vector<VertexData>& srcVerts, const std::vector<uint32_t>& srcIndices) {
+		uint32_t base = static_cast<uint32_t>(dstVerts.size());
+		dstVerts.insert(dstVerts.end(), srcVerts.begin(), srcVerts.end());
+		dstIndices.reserve(dstIndices.size() + srcIndices.size());
+		for (uint32_t idx : srcIndices) {
+			dstIndices.push_back(idx + base);
+		}
+	}
+
+	// メッシュから球状の領域を取り除く
 	void CarveImpactCrater(std::vector<VertexData>& verts, std::vector<uint32_t>& indices,
 		const Vector3& impactPos, float craterRadius, int planeCount) {
 
 		std::vector<Vector3> normals = GenerateSpherePlaneNormals(planeCount);
 
+		std::vector<VertexData> survivorVerts;
+		std::vector<uint32_t> survivorIndices;
+
+		std::vector<VertexData> remainderVerts = verts;
+		std::vector<uint32_t> remainderIndices = indices;
+
 		for (const Vector3& n : normals) {
+			if (remainderIndices.empty()) { break; }
+
 			// 球面上の接点を通り、外向き法線nを持つ平面
 			Vector3 planePoint = impactPos + n * craterRadius;
 			float planeDist = Math::Dot(n, planePoint);
 
-			ClipResult clipped = ClipMeshByPlane(verts, indices, n, planeDist);
+			ClipResult clipped = ClipMeshByPlane(remainderVerts, remainderIndices, n, planeDist);
 
-			// n方向を残す。ClipMeshByPlaneは切断面のキャップも自動で追加
-			verts = clipped.frontVerts;
-			indices = clipped.frontIndices;
+			// 球の外側は確定で生き残る
+			AppendMesh(survivorVerts, survivorIndices, clipped.frontVerts, clipped.frontIndices);
 
-			// クレーターがメッシュ全体を覆ってしまった
-			if (indices.empty()) {
-				break;
-			}
+			// 球の内側にいるかもしれない部分だけを、次の平面でさらに絞り込む
+			remainderVerts = std::move(clipped.backVerts);
+			remainderIndices = std::move(clipped.backIndices);
 		}
+
+		verts = std::move(survivorVerts);
+		indices = std::move(survivorIndices);
 	}
 }
 

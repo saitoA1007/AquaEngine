@@ -96,7 +96,7 @@ TestScene::TestScene() {
 
 	// 破片のテスト
 	testModel_ = modelManager_->GetNameByModel("test.gltf");
-	destructibleObject_ = gameObjectManager_->AddObject<DestructibleObject>(testModel_, static_cast<uint32_t>(CollisionTypeID::kPlayer), kCollisionAttributePlayer);
+	destructibleObject_ = gameObjectManager_->AddObject<DestructibleObject>("TestDestructibleObj", testModel_, static_cast<uint32_t>(CollisionTypeID::kPlayer), kCollisionAttributePlayer);
 
 	testCollider_.SetRadius(1.0f);
 	testCollider_.SetWorldPosition(testPos_);
@@ -146,9 +146,6 @@ void TestScene::Update() {
 void TestScene::DebugUpdate() {
 #ifdef USE_IMGUI
 	auto* light = renderQueue_->GetLightManager();
-
-	// 破壊オブジェクトのチューニング値は DestructibleObject 内で
-	// DebugParameter に登録されており、GameParamEditor から編集できる
 
 	ImGui::Begin("test");
 

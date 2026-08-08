@@ -47,15 +47,16 @@ void FractureDamageController::Initialize(Model* model) {
 void FractureDamageController::Update(float deltaTime) {
 	SimulateCrackPhysics();
 
-	if (breakState_.HasMacroDebris()) {
-		SimulateFallingDebris(breakState_.MacroDebris(), deltaTime);
+	for (auto& batch : breakState_.MacroDebrisBatches()) {
+		SimulateFallingDebris(*batch, deltaTime);
 	}
-	if (breakState_.HasMicroDebris()) {
-		SimulateFallingDebris(breakState_.MicroDebris(), deltaTime);
+	for (auto& batch : breakState_.MicroDebrisBatches()) {
+		SimulateFallingDebris(*batch, deltaTime);
 	}
 }
 
-void FractureDamageController::ApplyChipDamage(const Vector3& impactPos, float damageAmount, float craterRadius, int craterPlaneCount) {
+void FractureDamageController::ApplyChipDamage(const Vector3& impactPos, float damageAmount, float craterRadius, int craterPlaneCount,
+	const Vector3& impactDirection, float penetrationDepth) {
 	if (chunksById_.empty()) {
 		return;
 	}
@@ -70,7 +71,22 @@ void FractureDamageController::ApplyChipDamage(const Vector3& impactPos, float d
 	accumulated += damageAmount;
 
 	float ratio = std::min(accumulated / kBreakThreshold_, 1.0f);
-	UpdateCrackVisual(chunkId, ratio, damageAmount);
+
+	if (accumulated >= kBreakThreshold_) {
+		chunkDamage_.erase(chunkId);
+		// 切り離すので、付着したまま凹んでいた表示があれば不要になる
+		breakState_.RemoveDentedChunk(chunkId);
+		ApplyDamage(impactPos, 1.0f, craterRadius, craterPlaneCount, impactDirection, penetrationDepth);
+		return;
+	}
+
+	// まだ切り離すほどではないので、付着させたまま動的に断面を凹ませる
+	CarveAttachedDent(chunkId, impactPos, ratio, craterRadius, craterPlaneCount, impactDirection, penetrationDepth);
+
+	// ひびの揺れエフェクトは、まだ凹んでおらずレイトレのIntact側に残っているチャンクにのみ適用する
+	if (!breakState_.HasDentedChunk(chunkId)) {
+		UpdateCrackVisual(chunkId, ratio, damageAmount);
+	}
 
 	// 隣接チャンクにも弱めのひびを波及させる
 	if (kNeighborCrackFactor_ > 0.0f) {
@@ -78,18 +94,84 @@ void FractureDamageController::ApplyChipDamage(const Vector3& impactPos, float d
 		if (it != chunksById_.end()) {
 			for (uint32_t neighborId : it->second->info.neighborChunkIds) {
 				if (destroyedChunkIds_.count(neighborId)) continue;
+				if (breakState_.HasDentedChunk(neighborId)) continue;
 				UpdateCrackVisual(neighborId, ratio * kNeighborCrackFactor_, damageAmount * kNeighborCrackFactor_);
 			}
 		}
 	}
+}
 
-	if (accumulated >= kBreakThreshold_) {
-		chunkDamage_.erase(chunkId);
-		ApplyDamage(impactPos, 1.0f, craterRadius, craterPlaneCount);
+void FractureDamageController::CarveAttachedDent(uint32_t chunkId, const Vector3& impactPos, float damageRatio,
+	float craterRadius, int craterPlaneCount, const Vector3& impactDirection, float penetrationDepth) {
+
+	auto chunkIt = chunksById_.find(chunkId);
+	if (chunkIt == chunksById_.end()) {
+		return;
+	}
+
+	PackedGeometryBuffer* buffer = model_->GetFractureBuffers().at(groupName_).get();
+	Fragment chunkFragment = buffer->ExtractChunk(chunkId);
+
+	// ダメージが浅いうちは小さく、蓄積するほど大きく凹ませる
+	float dentRadius = (craterRadius + penetrationDepth) * std::max(damageRatio, kMinDentRatio_);
+
+	// チャンク自身のAABBから半径の上限を求めてクランプする
+	Vector3 chunkExtent = chunkIt->second->info.aabb.max - chunkIt->second->info.aabb.min;
+	float chunkRadius = Math::Length(chunkExtent) * 0.5f;
+	if (chunkRadius > 1e-4f) {
+		dentRadius = std::min(dentRadius, chunkRadius * kMaxDentRadiusToChunkRatio_);
+	}
+
+	Vector3 dentCenter = ComputeDentCenter(impactPos, impactDirection, dentRadius);
+
+	Log("CarveAttachedDent chunkId=" + std::to_string(chunkId) + " ratio=" + std::to_string(damageRatio) +
+		" chunkRadius=" + std::to_string(chunkRadius) + " dentRadius=" + std::to_string(dentRadius) +
+		" srcTris=" + std::to_string(chunkFragment.indices.size() / 3));
+
+	bool wasAlreadyDented = breakState_.HasDentedChunk(chunkId);
+
+	// numSites=1を渡すことでボロノイ分割はせず、クレーターで削った1個の形状だけを得る
+	FractureInstance& dentedInstance = breakState_.GetOrCreateDentedChunk(chunkId);
+	dentedInstance.ApplyRuntimeCut(chunkFragment, dentCenter, dentRadius, 1, craterPlaneCount);
+	
+	// 初めて凹んだチャンクは、レイトレ描画用の無傷インスタンスから除外する
+	if (!wasAlreadyDented) {
+		RebuildIntactExcludingDented();
 	}
 }
 
-void FractureDamageController::ApplyDamage(const Vector3& impactPos, float damageRadius, float craterRadius, int craterPlaneCount) {
+Vector3 FractureDamageController::ComputeDentCenter(const Vector3& impactPos, const Vector3& impactDirection, float dentRadius) const {
+	Vector3 dentCenter = impactPos;
+	float dirLength = Math::Length(impactDirection);
+	if (dirLength > 1e-4f) {
+		Vector3 dir = impactDirection / dirLength;
+		// 衝突方向と逆側へ球の中心を押し込み、攻撃側の表面が開いた噛み跡のような形にする
+		dentCenter -= dir * (dentRadius * kDentInwardBiasRatio_);
+	}
+	return dentCenter;
+}
+
+void FractureDamageController::RebuildIntactExcludingDented() {
+	PackedGeometryBuffer* buffer = model_->GetFractureBuffers().at(groupName_).get();
+
+	std::vector<uint32_t> remainingIds;
+	for (const auto& [id, entry] : chunksById_) {
+		if (destroyedChunkIds_.count(id)) { continue; }
+		if (breakState_.HasDentedChunk(id)) { continue; }
+		remainingIds.push_back(id);
+	}
+
+	if (!remainingIds.empty()) {
+		breakState_.Intact().Initialize(remainingIds, *buffer);
+		RebuildIntactIndexMap(remainingIds);
+	} else {
+		breakState_.Intact().Clear();
+		chunkIndexInIntact_.clear();
+	}
+}
+
+void FractureDamageController::ApplyDamage(const Vector3& impactPos, float damageRadius, float craterRadius, int craterPlaneCount,
+	const Vector3& impactDirection, float penetrationDepth) {
 	// 破壊データがなければ飛ばす
 	if (chunksById_.empty()) {
 		return;
@@ -119,42 +201,41 @@ void FractureDamageController::ApplyDamage(const Vector3& impactPos, float damag
 		}
 	}
 	if (!macroIds.empty()) {
-		breakState_.MacroDebris().Initialize(macroIds, *buffer);
+		// 破壊イベントごとに新しいバッチとして追加する
+		FractureInstance& macroBatch = breakState_.AddMacroDebrisBatch();
+		macroBatch.Initialize(macroIds, *buffer);
 
 		// 各破片に、衝撃点からの距離に応じた爆発の初速を与える
-		ApplyExplosionImpulse(breakState_.MacroDebris(), macroIds, impactPos, damageRadius);
+		ApplyExplosionImpulse(macroBatch, macroIds, impactPos, damageRadius);
+
+		breakState_.TrimMacroDebrisBatches(kMaxDebrisBatchesPerType_);
 	}
 
 	// チャンクを取得
 	Fragment seedFragment = buffer->ExtractChunk(seedChunkId.value());
 	Log("seed tris=" + std::to_string(seedFragment.indices.size() / 3));
-	// シードチャンクだけランタイムカット
-	breakState_.MicroDebris().ApplyRuntimeCut(seedFragment, impactPos, craterRadius, 8, craterPlaneCount);
+
+	float dentRadius = craterRadius + penetrationDepth;
+	Vector3 dentCenter = ComputeDentCenter(impactPos, impactDirection, dentRadius);
+
+	// シードチャンクだけランタイムカット。破壊イベントごとに新しいバッチとして追加する
+	FractureInstance& microBatch = breakState_.AddMicroDebrisBatch();
+	microBatch.ApplyRuntimeCut(seedFragment, dentCenter, dentRadius, 8, craterPlaneCount);
 
 	// シード由来の破片に爆発の初速を与える
-	ApplyExplosionImpulseUniform(breakState_.MicroDebris(), impactPos, 8.0f);
+	ApplyExplosionImpulseUniform(microBatch, impactPos, 8.0f);
 
-	Log("microDebris numInstance = " + std::to_string(breakState_.MicroDebris().GetNumInstance()));
+	Log("microDebris numInstance = " + std::to_string(microBatch.GetNumInstance()));
+
+	breakState_.TrimMicroDebrisBatches(kMaxDebrisBatchesPerType_);
 
 	// 切り離したチャンクを記録し、無傷インスタンスを残っているチャンクだけで作り直す
 	for (uint32_t id : detachedIds) {
 		destroyedChunkIds_.insert(id);
+		breakState_.RemoveDentedChunk(id);
 	}
 
-	std::vector<uint32_t> remainingIds;
-	for (const auto& [chunkId, entry] : chunksById_) {
-		if (destroyedChunkIds_.find(chunkId) == destroyedChunkIds_.end()) {
-			remainingIds.push_back(chunkId);
-		}
-	}
-
-	if (!remainingIds.empty()) {
-		breakState_.Intact().Initialize(remainingIds, *buffer);
-		RebuildIntactIndexMap(remainingIds);
-	} else {
-		// 全チャンクが破壊された
-		breakState_.Intact().Clear();
-	}
+	RebuildIntactExcludingDented();
 
 	// 破壊されたチャンクの蓄積情報は不要になるので削除
 	for (uint32_t id : detachedIds) {

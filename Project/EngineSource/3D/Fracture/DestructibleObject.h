@@ -15,7 +15,7 @@ namespace GameEngine {
 	/// </summary>
 	class DestructibleObject : public IGameObject {
 	public:
-		DestructibleObject(Model* model, uint32_t colliderId, uint32_t colliderAttribute);
+		DestructibleObject(std::string name, Model* model, uint32_t colliderId, uint32_t colliderAttribute);
 		~DestructibleObject() = default;
 
 		// 初期化処理
@@ -33,6 +33,9 @@ namespace GameEngine {
 		WorldTransform worldTransform_;
 
 	private:
+		// 名前
+		std::string name_ = "noName";
+
 		// モデル
 		Model* model_ = nullptr;
 
