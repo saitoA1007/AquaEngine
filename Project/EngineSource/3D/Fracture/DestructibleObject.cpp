@@ -46,7 +46,6 @@ void DestructibleObject::Initialize() {
 	debugParameter_->Register("TestDamageAmount", testDamageAmount_);
 	debugParameter_->Register("TestCraterRadius", testCraterRadius_);
 	debugParameter_->Register("TestPlaneCount", testPlaneCount_);
-	debugParameter_->Apply();
 
 	debugParameter_->Register("BreakThreshold", damageController_.kBreakThreshold_);
 	debugParameter_->Register("MaxCrackOffset", damageController_.kMaxCrackOffset_);
@@ -63,6 +62,8 @@ void DestructibleObject::Initialize() {
 	debugParameter_->Register("DentInwardBiasRatio", damageController_.kDentInwardBiasRatio_);
 	debugParameter_->Register("MinDentRatio", damageController_.kMinDentRatio_);
 	debugParameter_->Register("MaxDentRadiusToChunkRatio", damageController_.kMaxDentRadiusToChunkRatio_);
+
+	debugParameter_->Apply();
 }
 
 void DestructibleObject::Update() {
@@ -99,12 +100,14 @@ void DestructibleObject::Draw() {
 
 			// 積み上がったマイクロ破片バッチ全てを描画する
 			for (auto& batch : breakState.MicroDebrisBatches()) {
-				renderQueue_->SubmitRuntimeCutFragments(*batch, &drawMaterial->GetMaterialBuffer());
+				//renderQueue_->SubmitRuntimeCutFragments(*batch, &drawMaterial->GetMaterialBuffer());
+				renderQueue_->SubmitRuntimeCutIceFragments(*batch, &iceMaterial_.GetMaterialBuffer());
 			}
 
 			// 付着したまま動的に凹んでいるチャンクを描画する
 			for (auto& [chunkId, instance] : breakState.DentedChunks()) {
-				renderQueue_->SubmitRuntimeCutFragments(*instance, &drawMaterial->GetMaterialBuffer());
+				//renderQueue_->SubmitRuntimeCutFragments(*instance, &drawMaterial->GetMaterialBuffer());
+				renderQueue_->SubmitRuntimeCutIceFragments(*instance, &iceMaterial_.GetMaterialBuffer());
 			}
 		}
 	}

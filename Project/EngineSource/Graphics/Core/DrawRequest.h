@@ -39,6 +39,7 @@ namespace GameEngine {
         DebugLine,      // デバックのライン描画用
         Fracture,       // 破片の描画
         RuntimeCutFragments, // 動的な破片
+        RuntimeCutIceFragments, // 氷の動的な破片
     };
 
     enum class Draw2dType {

@@ -74,9 +74,11 @@ void SceneRenderManager::Initialize(ID3D12GraphicsCommandList4* commandList, Srv
   
     // 破片描画用PSO
     RegisterPSO("Fracture3D", psoManager);
+    RegisterPSO("IceFracture3D", psoManager);
 
     // 破片描画用のコマンドルートシグネチャ
     fractureCommandSignature_ = psoManager->GetCommandSignature("DrawIndexedIndirect");
+    iceFractureCommandSignature_ = psoManager->GetCommandSignature("IceDrawIndexedIndirect");
 
     // bufferのsrvIndexのスタート位置を設定
     bufferStartSrvIndex_ = srvManager_->GetStartSrvIndex(SrvHeapType::Buffer);
@@ -190,6 +192,10 @@ void SceneRenderManager::Execute3dRequest(const Draw3dRequest& request) {
 
     case Draw3dType::RuntimeCutFragments:
         ModelRenderer::DrawRuntimeCutFragments(*request.fractureInstance, fractureCommandSignature_, renderQueue_->GetLightResource(), request.material);
+        break;
+
+    case Draw3dType::RuntimeCutIceFragments:
+        ModelRenderer::DrawRuntimeCutFragments(*request.fractureInstance, iceFractureCommandSignature_, renderQueue_->GetLightResource(), request.material);
         break;
 
     default:

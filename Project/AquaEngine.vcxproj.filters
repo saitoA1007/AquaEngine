@@ -1149,6 +1149,7 @@
     <FxCompile Include="Resources\Shaders\Fracture.VS.hlsl" />
     <FxCompile Include="Resources\Shaders\Fracture.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\ColorGrading.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\IceFracture.PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Externals\imgui\ProggyClean.ttf" />

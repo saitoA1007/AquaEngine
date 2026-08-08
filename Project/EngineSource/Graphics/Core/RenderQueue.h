@@ -148,6 +148,8 @@ namespace GameEngine {
 
         void SubmitRuntimeCutFragments(FractureInstance& fractureInstance, const GpuResource* material, const float& alpha = 1.0f, const std::string& passName = "DefaultPass");
 
+        void SubmitRuntimeCutIceFragments(FractureInstance& fractureInstance, const GpuResource* material, const float& alpha = 1.0f, const std::string& passName = "DefaultPass");
+
         // psoの名前を取得
         const char* Get3dPsoName(Draw3dType type);
         const char* Get2dPsoName(Draw2dType type);

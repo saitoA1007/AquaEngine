@@ -120,7 +120,7 @@ private: // シーン機能
 
 	// 球の当たり判定
 	GameEngine::SphereCollider testCollider_;
-	Vector3 testPos_ = {10.0f,0.0f,-8.0f};
+	Vector3 testPos_ = {0.0f,0.0f,-8.0f};
 
 	// パーティクル
 	GameEngine::ParticleBehaviorGPU* gpuParticle_ = nullptr;

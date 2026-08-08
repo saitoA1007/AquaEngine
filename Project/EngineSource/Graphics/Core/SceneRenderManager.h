@@ -38,6 +38,7 @@ namespace GameEngine {
 
 		// 破片の描画に使用するコマンドルートシグネチャ。後で配置の変更をする
 		ID3D12CommandSignature* fractureCommandSignature_ = nullptr;
+		ID3D12CommandSignature* iceFractureCommandSignature_ = nullptr;
 
 		// 描画パスの実行順
 		std::vector<std::string> passExecuteOrder_;
