@@ -96,7 +96,7 @@ TestScene::TestScene() {
 
 	// 破片のテスト
 	testModel_ = modelManager_->GetNameByModel("test.gltf");
-	destructibleObject_ = gameObjectManager_->AddObject<DestructibleObject>(testModel_, static_cast<uint32_t>(CollisionTypeID::kPlayer), kCollisionAttributePlayer);
+	destructibleObject_ = gameObjectManager_->AddObject<DestructibleObject>("TestDestructibleObj", testModel_, static_cast<uint32_t>(CollisionTypeID::kPlayer), kCollisionAttributePlayer);
 
 	testCollider_.SetRadius(1.0f);
 	testCollider_.SetWorldPosition(testPos_);
@@ -146,13 +146,6 @@ void TestScene::Update() {
 void TestScene::DebugUpdate() {
 #ifdef USE_IMGUI
 	auto* light = renderQueue_->GetLightManager();
-
-	//ImGui::Begin("Fracture");
-	//ImGui::DragFloat3("ColliderSize", &destructibleObject_->colliderSize_.x, 0.1f);
-	//ImGui::DragFloat("DamageAmount", &destructibleObject_->testDamageAmount_, 0.1f, 0.0f);
-	//ImGui::DragFloat("CraterRadius", &destructibleObject_->testCraterRadius_, 0.1f, 0.0f);
-	//ImGui::DragInt("PlaneCount", &destructibleObject_->testPlaneCount_, 1, 0);
-	//ImGui::End();
 
 	ImGui::Begin("test");
 

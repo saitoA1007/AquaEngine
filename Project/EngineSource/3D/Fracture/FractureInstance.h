@@ -24,20 +24,13 @@ namespace GameEngine {
 
 		uint32_t vertexOffset; // PackedGeometryBuffer内でのチャンクの頂点開始位置
 		uint32_t indexOffset; // PackedGeometryBuffer内でのチャンクのインデックス開始位置
-		uint32_t indexCount; // IndexCountPerInstance に相当
-		uint32_t chunkId; // シェーダー側で gParticle を引くためのID
+		uint32_t indexCount;
+		uint32_t chunkId; // シェーダー側でgParticleを引くためのID
 	};
 
 	struct FractureIndirectCommand {
 		uint32_t instanceIndex;
 		D3D12_DRAW_INDEXED_ARGUMENTS drawArguments;
-	};
-
-	struct ClipResult {
-		std::vector<VertexData> frontVerts;
-		std::vector<VertexData> backVerts;
-		std::vector<uint32_t> frontIndices;
-		std::vector<uint32_t> backIndices;
 	};
 
 	/// <summary>
@@ -61,7 +54,7 @@ namespace GameEngine {
 
 	public:
 
-		// GeometryRangeを直接渡して初期化（ランタイムカットの結果など、PackedGeometryBuffer以外の出所に使う）
+		// GeometryRangeを直接渡して初期化
 		void InitializeFromRanges(const std::vector<GeometryRange>& ranges);
 
 		// 指定メッシュを衝撃点周りでランタイムカットし、その結果でこのインスタンスを構築する
@@ -75,6 +68,12 @@ namespace GameEngine {
 		/// <returns></returns>
 		const uint32_t GetNumInstance() { return numInstance_; }
 
+		// 描画すべきインスタンスを1つ以上持っているか
+		bool HasInstances() const { return numInstance_ > 0; }
+
+		// インスタンスを空にする
+		void Clear() { numInstance_ = 0; }
+
 		// トランスフォーム
 		std::vector<FractureChunkState>& GetTransformDatas() { return transformData_; }
 
@@ -86,6 +85,11 @@ namespace GameEngine {
 		bool HasRuntimeGeometry() const { return runtimeBuffer_ != nullptr; }
 		const D3D12_VERTEX_BUFFER_VIEW& GetRuntimeVertexBufferView() const { return runtimeBuffer_->GetVertexBufferView(); }
 		const D3D12_INDEX_BUFFER_VIEW& GetRuntimeIndexBufferView() const { return runtimeBuffer_->GetIndexBufferView(); }
+
+		// レイトレのTLASインスタンス行列に使う、チャンク単体のワールド行列
+		const Matrix4x4& GetChunkWorldMatrix(uint32_t index) const { return instancingData_[index].world; }
+
+		uint32_t GetChunkId(uint32_t index) const { return instancingData_[index].chunkId; }
 
 	private:
 		// コピー禁止
@@ -118,35 +122,6 @@ namespace GameEngine {
 
 		void AllocateBuffers(uint32_t count);
 		void WriteInstance(uint32_t index, const GeometryRange& range, uint32_t chunkId);
-
-		// 平面によるメッシュクリッピング
-		ClipResult ClipMeshByPlane(const std::vector<VertexData>& verts,
-			const std::vector<uint32_t>& indices,
-			const Vector3& planeNormal, float planeDist);
-
-		// 平面をまたぐ三角形の分割
-		void SplitStraddlingTriangle(const VertexData v[3], const float d[3],
-			const Vector3& planeNormal, float planeDist,
-			ClipResult& result, std::vector<std::pair<VertexData, VertexData>>& cutEdges);
-
-		// 切断エッジを繋いでキャップ面を生成
-		void CapCutFace(const std::vector<std::pair<VertexData, VertexData>>& cutEdges,
-			const Vector3& planeNormal, ClipResult& result);
-
-		std::vector<Vector3> GenerateVoronoiSites(const AABB& bounds, const Vector3& impactPos, int numSites) const;
-
-		void VoronoiFracture(const std::vector<VertexData>& verts, const std::vector<uint32_t>& indices,
-			const Vector3& impactPos, int numSites, std::vector<Fragment>& outFragments);
-
-		AABB ComputeBounds(const std::vector<VertexData>& verts);
-
-		std::vector<Vector3> GenerateSpherePlaneNormals(int count) const;
-
-		void CarveImpactCrater(std::vector<VertexData>& verts, std::vector<uint32_t>& indices,
-			const Vector3& impactPos, float craterRadius, int planeCount);
-
-		// 三角形追加
-		static void AddTriangle(std::vector<VertexData>& verts, std::vector<uint32_t>& indices, const VertexData v[3]);
 	};
 }
 

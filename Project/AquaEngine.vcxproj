@@ -227,6 +227,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\3D\Renderer\ModelRenderer.cpp" />
     <ClCompile Include="EngineSource\3D\ParticleSystem\ParticleBehavior.cpp" />
     <ClCompile Include="EngineSource\3D\Fracture\FractureInstance.cpp" />
+    <ClCompile Include="EngineSource\3D\Fracture\RuntimeMeshFracturer.cpp" />
+    <ClCompile Include="EngineSource\3D\Fracture\FractureDamageController.cpp" />
     <ClCompile Include="EngineSource\Common\CreateBufferResource.cpp" />
     <ClCompile Include="EngineSource\Core\Engine.cpp" />
     <ClCompile Include="EngineSource\Core\StaticGameObject.cpp" />
@@ -482,6 +484,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\3D\Camera\Camera.h" />
     <ClInclude Include="EngineSource\3D\Camera\DebugCamera.h" />
     <ClInclude Include="EngineSource\3D\Fracture\DestructibleObject.h" />
+    <ClInclude Include="EngineSource\3D\Fracture\RuntimeMeshFracturer.h" />
+    <ClInclude Include="EngineSource\3D\Fracture\FractureBreakState.h" />
+    <ClInclude Include="EngineSource\3D\Fracture\FractureDamageController.h" />
     <ClInclude Include="EngineSource\3D\Light\DirectionalLight.h" />
     <ClInclude Include="EngineSource\3D\Light\LightManager.h" />
     <ClInclude Include="EngineSource\3D\Light\PointLight.h" />

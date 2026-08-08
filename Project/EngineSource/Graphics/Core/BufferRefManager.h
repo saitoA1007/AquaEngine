@@ -13,6 +13,10 @@ namespace GameEngine {
 
 		uint32_t indexHandle; // インデックス
 		uint32_t vertexHandle; // 頂点
+
+		uint32_t vertexOffset = 0;
+		uint32_t indexOffset = 0;
+		float pad[2];
 	};
 
 	// バッファタイプ
