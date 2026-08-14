@@ -122,6 +122,10 @@ private: // シーン機能
 	GameEngine::SphereCollider testCollider_;
 	Vector3 testPos_ = {0.0f,0.0f,-8.0f};
 
+	// 1つに集約していない破片モデルを描画
+	GameEngine::Model* noFractureModel_;
+	GameEngine::WorldTransform noFractureWorld_;
+
 	// パーティクル
 	GameEngine::ParticleBehaviorGPU* gpuParticle_ = nullptr;
 

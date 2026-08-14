@@ -8,9 +8,6 @@ DestructibleObject::DestructibleObject(std::string name, Model* model, uint32_t 
 	model_ = model;
 	colliderId_ = colliderId;
 	colliderAttribute_ = colliderAttribute;
-}
-
-void DestructibleObject::Initialize() {
 
 	// 当たり判定の設定
 	collider_.SetCollisionAttribute(colliderAttribute_);
@@ -37,6 +34,7 @@ void DestructibleObject::Initialize() {
 
 	// 破砕状態を初期化
 	damageController_.Initialize(model_);
+	damageController_.SetWorldMatrix(worldTransform_.GetWorldMatrix());
 
 	std::string subGroup = "";
 
@@ -53,7 +51,7 @@ void DestructibleObject::Initialize() {
 	debugParameter_->Register("NeighborCrackFactor", damageController_.kNeighborCrackFactor_);
 	// バネ物理
 	subGroup = "Physics";
-	debugParameter_->Register("CrackSpringStiffness", damageController_.kCrackSpringStiffness_,0, subGroup);
+	debugParameter_->Register("CrackSpringStiffness", damageController_.kCrackSpringStiffness_, 0, subGroup);
 	debugParameter_->Register("CrackDamping", damageController_.kCrackDamping_, 0, subGroup);
 	debugParameter_->Register("CrackAngularSpringStiffness", damageController_.kCrackAngularSpringStiffness_, 0, subGroup);
 	debugParameter_->Register("CrackAngularDamping", damageController_.kCrackAngularDamping_, 0, subGroup);
@@ -66,6 +64,10 @@ void DestructibleObject::Initialize() {
 	debugParameter_->Apply();
 }
 
+void DestructibleObject::Initialize() {
+
+}
+
 void DestructibleObject::Update() {
 
 	debugParameter_->ApplyIfDirty();
@@ -75,6 +77,8 @@ void DestructibleObject::Update() {
 	collider_.SetWorldPosition(worldTransform_.GetWorldPosition());
 	collider_.SetSize(colliderSize_);
 
+	// マイクロ破片・凹んだチャンクのラスタライズ描画で使うワールド行列を渡す
+	damageController_.SetWorldMatrix(worldTransform_.GetWorldMatrix());
 	damageController_.Update(FpsCounter::gameDeltaTime);
 }
 

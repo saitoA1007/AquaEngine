@@ -29,6 +29,9 @@ namespace GameEngine {
 
 	public:
 
+		// 静的な破片を元の位置へ戻し、無傷の状態へ復元するアニメーションを開始する
+		void Reassemble() { damageController_.BeginReassembly(); }
+
 		// ワールド行列
 		WorldTransform worldTransform_;
 
@@ -49,7 +52,7 @@ namespace GameEngine {
 		uint32_t colliderId_ = 0;
 		uint32_t colliderAttribute_ = 0;
 
-		// ダメージ判定・破砕伝播・爆発・ひび割れ物理
+		// ダメージ判定、破砕伝播、爆発、ひび割れ物理
 		FractureDamageController damageController_;
 
 		// パラメータ機能

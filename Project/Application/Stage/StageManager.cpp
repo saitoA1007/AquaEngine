@@ -4,9 +4,15 @@
 #include "TextureManager.h"
 using namespace GameEngine;
 
-StageManager::StageManager(GameEngine::GameObjectManager* objectManager, GameEngine::Model* floorModel, GameEngine::Model* wallModel, GameEngine::TextureManager* textureManager) {
+StageManager::StageManager(GameEngine::GameObjectManager* objectManager, GameEngine::ModelManager* modelManager, GameEngine::TextureManager* textureManager) {
 	objectManager_ = objectManager;
-	model_ = wallModel;
+
+	auto* floorModel = modelManager->GetNameByModel("planeXZ.obj");
+	auto* wallFractureModel = modelManager->GetNameByModel("wallFracture.gltf");
+	auto* wallModel = modelManager->GetNameByModel("wall.obj");
+	wallModel->SetDefaultIsEnableLight(true);
+	wallModel->SetDefaultColor({ 1,1,1,0.9f });
+	wallModel->SetDefaultIOR(1.31f);
 
 	// 地面用の画像を取得
 	uint32_t iceNormalGH = textureManager->GetHandleByName("stone_tiles_02_nor_gl_1k.png");
@@ -16,6 +22,10 @@ StageManager::StageManager(GameEngine::GameObjectManager* objectManager, GameEng
 
 	// 床モデルを生成
 	objectManager_->AddObject<Floor>(floorModel, iceNormalGH, iceHeightGH, terrainGH, terrainNormalGH);
+
+	// モデルを取得
+	wallModel_ = wallModel;
+	wallFractureModel_ = wallFractureModel;
 
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>("StageManager");
@@ -70,7 +80,7 @@ void StageManager::GenerateWalls() {
 		transform.rotate = Vector3(0.0f, rotateY, 0.0f);
 		transform.translate = tmpPos;
 
-		auto* wall = objectManager_->AddObject<Wall>(model_, debugParame_.get());
+		auto* wall = objectManager_->AddObject<Wall>(wallModel_, wallFractureModel_, debugParame_.get());
 		wall->SetParameter(transform);
 
 		walls_.push_back(wall);

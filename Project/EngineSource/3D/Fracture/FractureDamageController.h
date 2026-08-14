@@ -24,6 +24,12 @@ namespace GameEngine {
 		void ApplyChipDamage(const Vector3& impactPos, float damageAmount, float craterRadius, int craterPlaneCount,
 			const Vector3& impactDirection, float penetrationDepth);
 
+		// 静的な破片を元の位置へ戻し、無傷の状態へ戻すアニメーションを開始する。
+		void BeginReassembly();
+		bool IsReassembling() const { return isReassembling_; }
+
+		void SetWorldMatrix(const Matrix4x4& worldMatrix) { worldMatrix_ = worldMatrix; }
+
 		FractureBreakState& GetBreakState() { return breakState_; }
 		const FractureBreakState& GetBreakState() const { return breakState_; }
 
@@ -52,6 +58,14 @@ namespace GameEngine {
 
 		// 付着したまま凹ませる球の半径は、チャンク自身のAABB対角線半分に対してこの割合を超えないようクランプする。
 		float kMaxDentRadiusToChunkRatio_ = 0.6f;
+
+		// 元に戻る演出で使うバネ物理のパラメータ。
+		float kReassemblySpringStiffness_ = 8.0f;
+		float kReassemblyDamping_ = 6.0f;
+		float kReassemblyAngularSpringStiffness_ = 8.0f;
+		float kReassemblyAngularDamping_ = 6.0f;
+		// これ未満なら元の位置・回転へ収束したとみなす
+		float kReassemblySettleThreshold_ = 0.02f;
 
 	private:
 		// モデル
@@ -83,6 +97,12 @@ namespace GameEngine {
 		// 現在バネが揺れているチャンクのID
 		std::unordered_set<uint32_t> crackActiveChunkIds_;
 
+		// 元の姿へ戻るアニメーションを再生中か
+		bool isReassembling_ = false;
+
+		// 生成元オブジェクトの現在のワールド行列
+		Matrix4x4 worldMatrix_ = Matrix4x4::MakeIdentity();
+
 	private:
 		// チャンクを切り離して破片化する
 		void ApplyDamage(const Vector3& impactPos, float damageRadius, float craterRadius, int craterPlaneCount,
@@ -101,6 +121,9 @@ namespace GameEngine {
 		// 隣接グラフをフラッドフィルして、切り離すチャンク群を選ぶ
 		std::vector<uint32_t> SelectDetachedChunks(uint32_t seedChunkId, float damageRadius, const Vector3& impactPos) const;
 
+		// アンカーから隣接グラフを辿れず、支えを失ったチャンクを集めて崩落させる
+		void CollapseUnsupportedChunks();
+
 		// impactPosに一番近いまだ壊れていないチャンクを探す
 		std::optional<uint32_t> FindNearestChunk(const Vector3& impactPos) const;
 
@@ -114,9 +137,18 @@ namespace GameEngine {
 		void ApplyExplosionImpulseUniform(FractureInstance& instance,
 			const Vector3& impactPos, float strength);
 
+		// 崩落する破片に、爆発ではなく重力で崩れ落ちるような弱い初速を与える
+		void ApplyCollapseImpulse(FractureInstance& instance);
+
 		void UpdateCrackVisual(uint32_t chunkId, float ratio, float damageDelta);
 		void RebuildIntactIndexMap(const std::vector<uint32_t>& ids);
 
 		void SimulateCrackPhysics();
+
+		// 再構築中のマクロ破片を全て原点へバネで収束させ、全チャンクが収束済みなら無傷状態へ復元する
+		void UpdateReassembly(float deltaTime);
+
+		// instance内の全チャンクの位置、回転を原点へバネで収束させる。全チャンクが収束済みならtrueを返す
+		bool SimulateReassemblySpring(FractureInstance& instance, float deltaTime);
 	};
 }

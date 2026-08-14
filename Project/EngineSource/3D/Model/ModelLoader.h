@@ -96,6 +96,9 @@ namespace GameEngine {
         // 破片ノード同士がこの距離以内ならAABBが近接/重なっているとみなす
         static constexpr float kFractureAdjacencyThreshold_ = 0.01f;
 
+        // アンカー判定：グループの全高に対して、最下端からこの割合以内にあるチャンクを地面固定とみなす
+        static constexpr float kFractureAnchorHeightRatio_ = 0.1f;
+
     private:
 
         /// <summary>

@@ -3,6 +3,7 @@
 #include "ModelComponent.h"
 #include "Collider.h"
 #include "IceMaterial.h"
+#include "DestructibleObject.h"
 
 // 前方宣言
 namespace GameEngine {
@@ -11,7 +12,7 @@ namespace GameEngine {
 
 class Wall : public GameEngine::IGameObject {
 public:
-	Wall(GameEngine::Model* model, GameEngine::DebugParameter* parame);
+	Wall(GameEngine::Model* model, GameEngine::Model* fractureModel, GameEngine::DebugParameter* parame);
 	~Wall() = default;
 
 	// 初期化
@@ -60,6 +61,9 @@ private:
 
 	// 氷の状態
 	bool isBreakIce_ = false;
+
+	// 破片のモデル
+	GameEngine::DestructibleObject destructObject_;
 
 private:
 

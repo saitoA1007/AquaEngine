@@ -6,7 +6,8 @@
 #include "Application/Enemy/BossEnemy.h"
 using namespace GameEngine;
 
-Wall::Wall(GameEngine::Model* model, GameEngine::DebugParameter* parame) : modelComponent_(model), underWallModelComponent_(model) {
+Wall::Wall(GameEngine::Model* model, GameEngine::Model* fractureModel, GameEngine::DebugParameter* parame) : modelComponent_(model), underWallModelComponent_(model),
+	destructObject_("Wall", fractureModel, static_cast<uint32_t>(CollisionTypeID::kWall), kCollisionAttributeTerrain) {
 	// パラメーター機能を取得
 	parame_ = parame;
 
@@ -79,7 +80,11 @@ void Wall::Update() {
 		currentHp_ = maxHp_;
 	}
 
+	// モデルの更新処理
 	modelComponent_.Update();
+
+	// 破片の更新処理
+	destructObject_.Update();
 }
 
 void Wall::Draw() {
@@ -91,6 +96,9 @@ void Wall::Draw() {
 
 	// 壁を描画
 	modelComponent_.DrawRaytracing(renderQueue_);
+
+	// 破片を描画
+	destructObject_.Draw();
 }
 
 void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {

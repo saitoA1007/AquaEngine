@@ -1,4 +1,5 @@
 #include "GameScene.h"
+#include "ImguiManager.h"
 using namespace GameEngine;
 
 #include "PostProcess/PostEffectData.h"
@@ -24,7 +25,7 @@ GameScene::~GameScene() {
 }
 
 GameScene::GameScene() {
-	// 入力コマンド設定
+	// 入力コマンド設定s
 	InputRegisterCommand();
 
 	// 背景を設定
@@ -60,12 +61,7 @@ GameScene::GameScene() {
 	player->SetCamera(cameraController_);
 
 	// ステージ
-	auto* floorModel = modelManager_->GetNameByModel("planeXZ.obj");
-	auto* wallModel = modelManager_->GetNameByModel("wall.obj");
-	wallModel->SetDefaultIsEnableLight(true);
-	wallModel->SetDefaultColor({1,1,1,0.9f});
-	wallModel->SetDefaultIOR(1.31f);
-	gameObjectManager_->AddObject<StageManager>(gameObjectManager_, floorModel, wallModel, textureManager_);
+	gameObjectManager_->AddObject<StageManager>(gameObjectManager_, modelManager_, textureManager_);
 
 	// 仮の背景の氷オブジェクト。後でオブジェクト設置エディターでマテリアルを変更出来るようにしておく。
 	auto* bgIceRockModel = modelManager_->GetNameByModel("BGIceRock.obj");
@@ -107,6 +103,13 @@ void GameScene::Update() {
 	//mainCamera_->Update();
 
 	mainCamera_->SetCamera(cameraController_->GetCamera());
+
+	auto* light =  renderQueue_->GetLightManager();
+
+	ImGui::Begin("test");
+	ImGui::DragFloat("LightIntensity", &light->directionalLight_->directionalLightData_.intensity, 0.01f);
+	ImGui::ColorEdit3("LightIntensity", &light->directionalLight_->directionalLightData_.color.x);
+	ImGui::End();
 }
 
 void GameScene::Draw() {

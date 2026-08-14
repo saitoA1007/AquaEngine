@@ -18,6 +18,8 @@ TestScene::TestScene() {
 	inputCommand_->RegisterCommand("MoveRight", { {InputState::KeyPush, DIK_D },{InputState::PadLeftStick,0,{1.0f,0.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_RIGHT } });
 	inputCommand_->RegisterCommand("MoveForward", { {InputState::KeyPush, DIK_W },{InputState::PadLeftStick,0,{0.0f,1.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_UP } });
 	inputCommand_->RegisterCommand("MoveBack", { {InputState::KeyPush, DIK_S },{InputState::PadLeftStick,0,{0.0f,-1.0f},0.2f}, {InputState::PadPush, XINPUT_GAMEPAD_DPAD_DOWN} });
+	// 破壊オブジェクトを元の姿へ戻す（デバッグ用）
+	inputCommand_->RegisterCommand("Reassemble", { {InputState::KeyTrigger, DIK_R } });
 
 	// メインカメラの初期化
 	mainCamera_ = std::make_unique<Camera>();
@@ -98,6 +100,13 @@ TestScene::TestScene() {
 	testModel_ = modelManager_->GetNameByModel("test.gltf");
 	destructibleObject_ = gameObjectManager_->AddObject<DestructibleObject>("TestDestructibleObj", testModel_, static_cast<uint32_t>(CollisionTypeID::kPlayer), kCollisionAttributePlayer);
 
+	//destructibleObject_->worldTransform_.transform_.translate.y = 3.0f;
+
+	// 1つに集約していない破片
+	noFractureModel_ = modelManager_->GetNameByModel("NoCellTestFracture.gltf");
+	noFractureWorld_.transform_.translate.x = 3.0f;
+	noFractureWorld_.UpdateTransformMatrix();
+
 	testCollider_.SetRadius(1.0f);
 	testCollider_.SetWorldPosition(testPos_);
 	testCollider_.SetCollisionAttribute(kCollisionAttributeEnemy);
@@ -139,6 +148,11 @@ void TestScene::Update() {
 	if (inputCommand_->IsCommandActive("MoveLeft")) { testPos_.x -= 5.0f * FpsCounter::gameDeltaTime; }
 	if (inputCommand_->IsCommandActive("MoveRight")) { testPos_.x += 5.0f * FpsCounter::gameDeltaTime; }
 	testCollider_.SetWorldPosition(testPos_);
+
+	// 破壊オブジェクトを元の姿へ戻す（デバッグ用）
+	if (inputCommand_->IsCommandActive("Reassemble")) {
+		destructibleObject_->Reassemble();
+	}
 
 	DebugUpdate();
 }
@@ -204,6 +218,9 @@ void TestScene::Draw() {
 
 	// 地面を描画
 	renderQueue_->SubmitRaytracingModel(terrainModel_, terrainWorld_);
+
+	// 破片を1つに集約していない
+	renderQueue_->SubmitModel(noFractureModel_, noFractureWorld_);
 
 	// アニメーションモデル
 	//renderQueue_->SubmitRaytracingModel(model_, world_);

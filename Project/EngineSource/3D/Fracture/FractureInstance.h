@@ -74,6 +74,9 @@ namespace GameEngine {
 		// インスタンスを空にする
 		void Clear() { numInstance_ = 0; }
 
+		// ラスタライズ描画で使用する親行列
+		void SetParentWorldMatrix(const Matrix4x4& worldMatrix) { parentWorldMatrix_ = worldMatrix; }
+
 		// トランスフォーム
 		std::vector<FractureChunkState>& GetTransformDatas() { return transformData_; }
 
@@ -107,6 +110,9 @@ namespace GameEngine {
 		FractureForGPU* instancingData_ = nullptr;
 
 		std::vector<FractureChunkState> transformData_;
+
+		// SetParentWorldMatrixで設定される、生成元オブジェクトのワールド行列
+		Matrix4x4 parentWorldMatrix_ = Matrix4x4::MakeIdentity();
 
 		// ExecuteIndirect用の間接描画引数バッファ
 		ConstantBuffer<FractureIndirectCommand> argumentBuffer_;

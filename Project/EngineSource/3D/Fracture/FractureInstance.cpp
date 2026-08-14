@@ -56,7 +56,8 @@ void FractureInstance::Initialize(const std::vector<uint32_t>& chunkIds, const P
 void FractureInstance::Update() {
 	// 更新
 	for (uint32_t i = 0; i < transformData_.size(); ++i) {
-		instancingData_[i].world = Math::MakeAffineMatrix(transformData_[i].transform.scale, transformData_[i].transform.rotate, transformData_[i].transform.translate);
+		Matrix4x4 localMatrix = Math::MakeAffineMatrix(transformData_[i].transform.scale, transformData_[i].transform.rotate, transformData_[i].transform.translate);
+		instancingData_[i].world = localMatrix * parentWorldMatrix_;
 		instancingData_[i].worldInverseTranspose = Math::InverseTranspose(instancingData_[i].world);
 	}
 }

@@ -3,6 +3,7 @@
 #include "IGameObject.h"
 #include "Model.h"
 #include "GameObjectManager.h"
+#include "ModelManager.h"
 #include "Wall.h"
 #include "DebugParameter.h"
 
@@ -13,7 +14,7 @@ namespace GameEngine {
 
 class StageManager : public GameEngine::IGameObject {
 public:
-	StageManager(GameEngine::GameObjectManager* objectManager, GameEngine::Model* floorModel, GameEngine::Model* wallModel, GameEngine::TextureManager* textureManager);
+	StageManager(GameEngine::GameObjectManager* objectManager, GameEngine::ModelManager* modelManager, GameEngine::TextureManager* textureManager);
 	~StageManager() = default;
 
 	// 初期化処理
@@ -27,7 +28,8 @@ public:
 
 private:
 	GameEngine::GameObjectManager* objectManager_ = nullptr;
-	GameEngine::Model* model_ = nullptr;
+	GameEngine::Model* wallModel_ = nullptr;
+	GameEngine::Model* wallFractureModel_ = nullptr;
 
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;

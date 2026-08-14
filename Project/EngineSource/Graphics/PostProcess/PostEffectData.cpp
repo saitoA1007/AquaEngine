@@ -121,8 +121,6 @@ OutLine::OutLine() {
     buffer_.Create();
     // 標準偏差
     buffer_.GetData()->sd = 2.5f;
-
-    isActive_ = true;
 }
 
 void OutLine::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
