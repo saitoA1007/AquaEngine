@@ -42,7 +42,7 @@ private:
 	GameEngine::DebugParameter* parame_ = nullptr;
 
 	// モデル
-	GameEngine::ModelComponent modelComponent_;
+	//GameEngine::ModelComponent modelComponent_;
 
 	// 氷のマテリアル
 	GameEngine::IceMaterial iceMaterial_;

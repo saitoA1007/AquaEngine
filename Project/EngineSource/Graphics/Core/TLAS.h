@@ -20,9 +20,9 @@ namespace GameEngine {
 		~TLAS();
 
 		/// <summary>
-		/// 複数のインスタンス情報からTLASを構築する
+		/// 初期容量分のバッファを確保してTLASを初期化する
 		/// </summary>
-		void Create(ID3D12GraphicsCommandList4* cmdList, const uint32_t& maxInstanceNum);
+		void Create(ID3D12GraphicsCommandList4* cmdList, const uint32_t& initialCapacity);
 
 		// 更新
 		void Update(ID3D12GraphicsCommandList4* cmdList, const std::vector<TLASInstanceData>& instances);
@@ -30,12 +30,13 @@ namespace GameEngine {
 		// SRVインデックスの取得
 		uint32_t GetSrvIndex() const { return srvIndex_; }
 		const CD3DX12_GPU_DESCRIPTOR_HANDLE& GetSrvHandleGPU() const { return srvHandleGPU_; }
+	
 	private:
 		// コピー禁止
 		TLAS(const TLAS&) = delete;
 		TLAS& operator=(const TLAS&) = delete;
 
-		// 最大描画数
+		// 現在確保している容量
 		uint32_t maxInstanceCount_ = 0;
 
 		// インスタンス情報をGPUに送るためのバッファ
@@ -47,6 +48,9 @@ namespace GameEngine {
 		// ビルドの入力設定
 		D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_INPUTS inputs_{};
 
+		// 前フレームの有効インスタンス数
+		uint32_t previousInstanceCount_ = UINT32_MAX;
+
 		// SRVインデックス
 		uint32_t srvIndex_ = 0;
 		// CPUのシェーダリソースビューのハンドル
@@ -55,5 +59,16 @@ namespace GameEngine {
 		CD3DX12_GPU_DESCRIPTOR_HANDLE srvHandleGPU_;
 
 		bool isCreated_ = false;
+
+	private:
+
+		// 指定した容量でインスタンスバッファ、AS本体、スクラッチバッファを確保し直す
+		void AllocateBuffers(uint32_t capacity);
+
+		// SRVを作成し直す
+		void CreateSrv();
+
+		// 必要な数が現在の容量を超えていればバッファを拡張する
+		void EnsureCapacity(uint32_t requiredCount);
 	};
 }
