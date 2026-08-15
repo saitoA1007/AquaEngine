@@ -72,6 +72,9 @@ void Wall::Initialize() {
 
 void Wall::Update() {
 
+	// 破片の更新処理
+	destructObject_.Update();
+
 	if (!isBreakIce_) { return; }
 	respawnTimer_ += FpsCounter::gameDeltaTime / respawnTime_;
 
@@ -82,9 +85,6 @@ void Wall::Update() {
 		destructObject_.worldTransform_.transform_.scale.z = 1.5f;
 		currentHp_ = maxHp_;
 	}
-
-	// 破片の更新処理
-	destructObject_.Update();
 }
 
 void Wall::Draw() {
@@ -120,6 +120,7 @@ void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& 
 	// Hpを削る
 	if (player != nullptr) {
 
+		// 突進攻撃で壁にヒットした瞬間のみ（触れているだけでは反応しない）
 		if (player->IsHitWall()) {
 			player->SetIsHitWall(false);
 			Vector3 velocity = player->GetVelocity();
@@ -134,6 +135,9 @@ void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& 
 			} else {
 				currentHp_ -= 3;
 			}
+
+			// 攻撃を受けた位置に破片を飛び散らせる
+			destructObject_.OnCollisionEnter(result);
 		}
 	} else if (boss != nullptr) {
 
@@ -143,6 +147,9 @@ void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& 
 		if (battleState == BossBattleState::kRushAttack) {
 			// ボスの場合、固定ダメージ
 			currentHp_ -= 2;
+
+			// 攻撃を受けた位置に破片を飛び散らせる
+			destructObject_.OnCollisionEnter(result);
 		}
 	}
 
@@ -157,7 +164,4 @@ void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& 
 	//}
 
 	//destructObject_.worldTransform_.UpdateTransformMatrix();
-
-	// 破片の当たり判定
-	destructObject_.OnCollisionEnter(result);
 }

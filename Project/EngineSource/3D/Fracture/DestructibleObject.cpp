@@ -1,6 +1,7 @@
 #define NOMINMAX
 #include "DestructibleObject.h"
 #include "FPSCounter.h"
+#include "MyMath.h"
 using namespace GameEngine;
 
 DestructibleObject::DestructibleObject(std::string name, Model* model, uint32_t colliderId, uint32_t colliderAttribute) {
@@ -118,6 +119,11 @@ void DestructibleObject::Draw() {
 }
 
 void DestructibleObject::OnCollisionEnter(const GameEngine::CollisionResult& result) {
-	damageController_.ApplyChipDamage(result.contactPosition, testDamageAmount_, testCraterRadius_, testPlaneCount_,
-		result.contactNormal, result.penetrationDepth);
+	// ワールド座標で渡ってくる衝突情報をローカル座標へ変換してから渡す
+	Matrix4x4 inverseWorld = Math::InverseMatrix(worldTransform_.GetWorldMatrix());
+	Vector3 localImpactPos = Math::Transforms(result.contactPosition, inverseWorld);
+	Vector3 localImpactDirection = Math::TransformNormal(result.contactNormal, inverseWorld);
+
+	damageController_.ApplyChipDamage(localImpactPos, testDamageAmount_, testCraterRadius_, testPlaneCount_,
+		localImpactDirection, result.penetrationDepth);
 }
