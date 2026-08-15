@@ -225,7 +225,7 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
     float rimFactor = 1.0f - rimNdotV;
     rimFactor = pow(rimFactor, 5.0f);
     // リムライトの最終成分
-    float3 rimLight = float3(1.0f, 1.0f, 1.0f) * rimFactor * 0.5f;
+    float3 rimLight = float3(1.0f, 1.0f, 1.0f) * rimFactor * 0.5f * gDirectionalLight.intensity;
     payload.color += rimLight;
     
     // バブルを描画

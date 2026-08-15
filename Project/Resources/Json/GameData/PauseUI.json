@@ -217,6 +217,31 @@
                 80.0
             ]
         },
+        "PlayGuideSprite": {
+            "AnchorPoint": [
+                0.5,
+                0.5
+            ],
+            "Color": [
+                0.7876448035240173,
+                0.7876448035240173,
+                0.7876448035240173,
+                1.0
+            ],
+            "MeshSize": [
+                1.0,
+                1.0
+            ],
+            "Position": [
+                859.9000244140625,
+                250.0
+            ],
+            "Rotate": 0.0,
+            "Scale": [
+                800.0,
+                350.0
+            ]
+        },
         "RetryUI": {
             "BaseWorldWorldTransform": {
                 "Rotate": [

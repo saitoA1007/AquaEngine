@@ -7,7 +7,7 @@ PlayUIManager::PlayUIManager(GameEngine::TextureManager* textureManager) {
 	// テクスチャを朱徳
 	uint32_t playerHpGH = textureManager->GetHandleByName("PlayerHP.png");
 	uint32_t bossNameGH = textureManager->GetHandleByName("BossName.png");
-	uint32_t playGuideGH = textureManager->GetHandleByName("playerGuide.png");
+	uint32_t pauseGuideGH = textureManager->GetHandleByName("pauseGuide.png");
 	uint32_t tutorial0GH = textureManager->GetHandleByName("Tutorial_01.png");
 	uint32_t tutorial1GH = textureManager->GetHandleByName("Tutorial_02.png");
 	uint32_t tutorial2GH = textureManager->GetHandleByName("Tutorial_03.png");
@@ -37,7 +37,7 @@ PlayUIManager::PlayUIManager(GameEngine::TextureManager* textureManager) {
 
 	// テクスチャを設定
 	bossNameSprite_.textureHandle_ = bossNameGH;
-	playGuideSprite_.textureHandle_ = playGuideGH;
+	playGuideSprite_.textureHandle_ = pauseGuideGH;
 
 	// ボスUI
 	bossHpBarUI_ = std::make_unique<HpBarUI>("BossHpUI");
