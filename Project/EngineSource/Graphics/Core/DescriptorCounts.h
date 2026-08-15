@@ -19,10 +19,10 @@ namespace GameEngine {
 		TextureMaxCount = 256,
 		SystemMaxCount = 32,
 		AccessMaxCount = 2,
-		BufferMaxCount = 512,
+		BufferMaxCount = 4096,
 		OtherMaxCount = 1
 	};
 
 	// 最大のsrvインデックス
-	static inline const uint32_t kMaxSrvIndex_ = 4096; 
+	static inline const uint32_t kMaxSrvIndex_ = 8192;
 }

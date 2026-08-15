@@ -37,6 +37,9 @@ namespace GameEngine {
 			collider_.SetActive(isActive);
 		}
 
+		// 当たり判定のコールバック関数
+		void OnCollisionEnter(const GameEngine::CollisionResult& result);
+
 	public:
 
 		// ワールド行列
@@ -70,9 +73,5 @@ namespace GameEngine {
 		float testDamageAmount_ = 2.0f;
 		float testCraterRadius_ = 2.0f;
 		int testPlaneCount_ = 8;
-
-	private:
-		// 当たり判定のコールバック関数
-		void OnCollisionEnter(const GameEngine::CollisionResult& result);
 	};
 }

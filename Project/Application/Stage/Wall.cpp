@@ -146,15 +146,18 @@ void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& 
 		}
 	}
 
-	// hpによって形を帰る
-	if (currentHp_ == 2) {
-		destructObject_.worldTransform_.transform_.scale.z = 1.0f;
-	} else if (currentHp_ == 1) {
-		destructObject_.worldTransform_.transform_.scale.z = 0.5f;
-	}else if (currentHp_ <= 0) {
-		currentHp_ = 0;
-		isBreakIce_ = true;
-	}
+	//// hpによって形を帰る
+	//if (currentHp_ == 2) {
+	//	destructObject_.worldTransform_.transform_.scale.z = 1.0f;
+	//} else if (currentHp_ == 1) {
+	//	destructObject_.worldTransform_.transform_.scale.z = 0.5f;
+	//}else if (currentHp_ <= 0) {
+	//	currentHp_ = 0;
+	//	isBreakIce_ = true;
+	//}
 
-	destructObject_.worldTransform_.UpdateTransformMatrix();
+	//destructObject_.worldTransform_.UpdateTransformMatrix();
+
+	// 破片の当たり判定
+	destructObject_.OnCollisionEnter(result);
 }

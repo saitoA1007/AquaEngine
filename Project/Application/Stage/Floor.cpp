@@ -15,7 +15,7 @@ Floor::Floor(GameEngine::Model* model, uint32_t iceNormalGH, uint32_t iceHeightG
 	// 地面
 	terrainModelComponent_.materialData_->textureHandle = terrainGH;
 	terrainModelComponent_.materialData_->normalTextureHandle = terrainNormalGH;
-	terrainModelComponent_.materialData_->enableLighting = true;
+	terrainModelComponent_.materialData_->enableLighting = false;
 	terrainModelComponent_.materialData_->metallic = 0.01f;
 	terrainModelComponent_.materialData_->roughness = 0.9f;
 
