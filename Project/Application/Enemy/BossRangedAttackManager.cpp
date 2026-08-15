@@ -5,12 +5,13 @@
 #include "Application/Enemy/RangedAttack/WindAttack.h"
 using namespace GameEngine;
 
-BossRangedAttackManager::BossRangedAttackManager(GameEngine::GameObjectManager* objectManager, GameEngine::Model* iceFallModel) {
+BossRangedAttackManager::BossRangedAttackManager(GameEngine::GameObjectManager* objectManager, GameEngine::Model* iceFallModel, GameEngine::Model* iceFallFractureModel) {
 
 	objectManager_ = objectManager;
 
 	iceFallModel_ = iceFallModel;
 
+    iceFallFractureModel_ = iceFallFractureModel;
 }
 
 void BossRangedAttackManager::StartIceFall(float rangeRadius, float minDistance, int iceFallNum, int iceFallMaxNum, int maxIter) {
@@ -54,7 +55,7 @@ void BossRangedAttackManager::StartIceFall(float rangeRadius, float minDistance,
 
     // 求めた位置から氷を生成する
     for (size_t i = 0; i < points.size(); ++i) {
-        objectManager_->AddObject<IceFall>(iceFallModel_, Vector3(points[i].x, 0.0f, points[i].y), currentIceFallNum_);
+        objectManager_->AddObject<IceFall>(iceFallModel_, iceFallFractureModel_, Vector3(points[i].x, 0.0f, points[i].y), currentIceFallNum_);
     }
 }
 

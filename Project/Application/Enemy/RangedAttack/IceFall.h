@@ -4,10 +4,11 @@
 #include "DebugParameter.h"
 #include "IceMaterial.h"
 #include "Collider.h"
+#include "DestructibleObject.h"
 
 class IceFall : public GameEngine::IGameObject {
 public:
-	IceFall(GameEngine::Model* model, Vector3 pos, int32_t& iceFallCurrentNum);
+	IceFall(GameEngine::Model* model, GameEngine::Model* fractureModel, Vector3 pos, int32_t& iceFallCurrentNum);
 	~IceFall();
 
 	// 初期化
@@ -24,10 +25,13 @@ private:
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;
 
 	// モデル
-	GameEngine::ModelComponent modelComponent_;
+	//GameEngine::ModelComponent modelComponent_;
 
 	// 氷のマテリアル
 	GameEngine::IceMaterial iceMaterial_;
+
+	// 破片のオブジェクト
+	GameEngine::DestructibleObject destructibleObject_;
 
 	// 現在の氷柱の数
 	int32_t& iceFallCurrentNum_;

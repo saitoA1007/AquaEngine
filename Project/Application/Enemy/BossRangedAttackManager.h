@@ -5,7 +5,7 @@
 
 class BossRangedAttackManager : public GameEngine::IGameObject {
 public:
-	BossRangedAttackManager(GameEngine::GameObjectManager* objectManager, GameEngine::Model* iceFallModel);
+	BossRangedAttackManager(GameEngine::GameObjectManager* objectManager, GameEngine::Model* iceFallModel, GameEngine::Model* iceFallFractureModel);
 	~BossRangedAttackManager() = default;
 
 	// 初期化
@@ -41,6 +41,7 @@ private:
 	GameEngine::GameObjectManager* objectManager_ = nullptr;
 
 	GameEngine::Model* iceFallModel_ = nullptr;
+	GameEngine::Model* iceFallFractureModel_ = nullptr;
 
 	// 氷柱の現在の数
 	int32_t currentIceFallNum_ = 0;

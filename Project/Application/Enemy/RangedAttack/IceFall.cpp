@@ -4,14 +4,16 @@
 #include "EasingManager.h"
 using namespace GameEngine;
 
-IceFall::IceFall(GameEngine::Model* model, Vector3 pos, int32_t& iceFallCurrentNum) :
-	modelComponent_(model), iceFallCurrentNum_(iceFallCurrentNum) {
+IceFall::IceFall(GameEngine::Model* model, GameEngine::Model* fractureModel, Vector3 pos, int32_t& iceFallCurrentNum) :
+	iceFallCurrentNum_(iceFallCurrentNum),
+	destructibleObject_("IceFall", fractureModel, static_cast<uint32_t>(CollisionTypeID::kIceFall), kCollisionAttributeEnemy) {
 
 	// 現在数を増やす
 	iceFallCurrentNum_ += 1;
 
 	// 位置を設定
-	modelComponent_.worldTransform_.transform_.translate = pos;
+	//modelComponent_.worldTransform_.transform_.translate = pos;
+	destructibleObject_.worldTransform_.transform_.translate = pos;
 
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>("IceFall");
@@ -19,11 +21,11 @@ IceFall::IceFall(GameEngine::Model* model, Vector3 pos, int32_t& iceFallCurrentN
 	debugParame_->Register("InMaxTime", inMaxTime_);
 	debugParame_->Register("StartPosY", startPosY_);
 	debugParame_->Register("EndPosY", endPosY_);
-	debugParame_->Register("Scale", modelComponent_.worldTransform_.transform_.scale);
+	debugParame_->Register("Scale", destructibleObject_.worldTransform_.transform_.scale);
 	debugParame_->Apply();
 
 	// 当たり判定
-	collider_.SetWorldPosition(modelComponent_.worldTransform_.transform_.translate);
+	collider_.SetWorldPosition(destructibleObject_.worldTransform_.transform_.translate);
 	collider_.SetRadius(colliderRadius_);
 	collider_.SetCollisionAttribute(kCollisionAttributeEnemy);
 	collider_.SetCollisionMask(~kCollisionAttributeEnemy);
@@ -38,8 +40,8 @@ IceFall::IceFall(GameEngine::Model* model, Vector3 pos, int32_t& iceFallCurrentN
 	});
 
 	// 参照するマテリアルを変更
-	modelComponent_.SetBufferMaterial(0, iceMaterial_.GetMaterialSrvIndex());
-	modelComponent_.SetHitGroup(1);
+	//modelComponent_.SetBufferMaterial(0, iceMaterial_.GetMaterialSrvIndex());
+	//modelComponent_.SetHitGroup(1);
 }
 
 IceFall::~IceFall() {
@@ -48,9 +50,9 @@ IceFall::~IceFall() {
 }
 
 void IceFall::Initialize() {
-	collider_.SetWorldPosition(modelComponent_.worldTransform_.transform_.translate);
+	collider_.SetWorldPosition(destructibleObject_.worldTransform_.transform_.translate);
 	collider_.SetRadius(colliderRadius_);
-	modelComponent_.Update();
+	destructibleObject_.Update();
 }
 
 void IceFall::Update() {
@@ -58,14 +60,20 @@ void IceFall::Update() {
 
 	EnterMove();
 
-	modelComponent_.Update();
-	collider_.SetWorldPosition(modelComponent_.worldTransform_.transform_.translate);
+	//modelComponent_.Update();
+	collider_.SetWorldPosition(destructibleObject_.worldTransform_.transform_.translate);
 	collider_.SetRadius(colliderRadius_);
+
+	// 破片の更新処理
+	destructibleObject_.Update();
 }
 
 void IceFall::Draw() {
 	// 壁を描画
-	modelComponent_.DrawRaytracing(renderQueue_);
+	//modelComponent_.DrawRaytracing(renderQueue_);
+
+	// 破片の描画
+	destructibleObject_.Draw();
 }
 
 void IceFall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
@@ -77,10 +85,10 @@ void IceFall::EnterMove() {
 
 	timer_ += FpsCounter::gameDeltaTime / inMaxTime_;
 
-	modelComponent_.worldTransform_.transform_.translate.y = Lerp(startPosY_, endPosY_, EaseInOut(timer_));
+	destructibleObject_.worldTransform_.transform_.translate.y = Lerp(startPosY_, endPosY_, EaseInOut(timer_));
 
 	if (timer_ >= 1.0f) {
-		modelComponent_.worldTransform_.transform_.translate.y = endPosY_;
+		destructibleObject_.worldTransform_.transform_.translate.y = endPosY_;
 		isEnterMoveActive_ = false;
 	}
 }
