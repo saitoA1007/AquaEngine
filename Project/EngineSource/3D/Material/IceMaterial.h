@@ -47,7 +47,11 @@ namespace GameEngine {
 			float bubbleJitter; // 気泡位置のばらつき
 
 			float bubbleHighlight; // ハイライト強度
-			float padding1[3];
+			float rimIntensity; // リムライトの明るさ
+			float rimPower; // リムライトの力
+			float padding1;
+
+			Vector4 rimColor; // リムライトの色
 		};
 
 	public:

@@ -47,7 +47,11 @@ struct IceMaterialData
     float bubbleJitter;
     
     float bubbleHighlight;
-    float3 padding1;
+    float rimIntensity;
+    float rimPower;
+    float1 padding1;
+    
+    float4 rimColor;
 };
 
 static const uint VERTEX_STRIDE = 52;
@@ -223,9 +227,9 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
     // 視線と法線の内積を取る
     float rimNdotV = saturate(dot(worldNormal, viewDir));
     float rimFactor = 1.0f - rimNdotV;
-    rimFactor = pow(rimFactor, 5.0f);
+    rimFactor = pow(rimFactor, material.rimPower);
     // リムライトの最終成分
-    float3 rimLight = float3(1.0f, 1.0f, 1.0f) * rimFactor * 0.5f * gDirectionalLight.intensity;
+    float3 rimLight = material.rimColor.rgb * rimFactor * material.rimIntensity * gDirectionalLight.intensity;
     payload.color += rimLight;
     
     // バブルを描画
