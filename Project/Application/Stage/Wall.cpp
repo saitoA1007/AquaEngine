@@ -20,6 +20,9 @@ Wall::Wall(GameEngine::Model* model, GameEngine::Model* fractureModel, GameEngin
 
 	//modelComponent_.materialData_->color.w = 0.8f;
 
+	// 破片側の当たり判定を無効
+	destructObject_.SetIsColliderActive(false);
+
 	// 当たり判定
 	collider_.SetWorldPosition(destructObject_.worldTransform_.transform_.translate);
 	collider_.SetSize(colliderSize_);

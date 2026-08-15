@@ -32,6 +32,13 @@ namespace GameEngine {
 		// 静的な破片を元の位置へ戻し、無傷の状態へ復元するアニメーションを開始する
 		void Reassemble() { damageController_.BeginReassembly(); }
 
+		// 当たり判定の設定
+		void SetIsColliderActive(bool isActive) {
+			collider_.SetActive(isActive);
+		}
+
+	public:
+
 		// ワールド行列
 		WorldTransform worldTransform_;
 

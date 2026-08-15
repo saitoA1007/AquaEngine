@@ -18,7 +18,7 @@ TestScene::TestScene() {
 	inputCommand_->RegisterCommand("MoveRight", { {InputState::KeyPush, DIK_D },{InputState::PadLeftStick,0,{1.0f,0.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_RIGHT } });
 	inputCommand_->RegisterCommand("MoveForward", { {InputState::KeyPush, DIK_W },{InputState::PadLeftStick,0,{0.0f,1.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_UP } });
 	inputCommand_->RegisterCommand("MoveBack", { {InputState::KeyPush, DIK_S },{InputState::PadLeftStick,0,{0.0f,-1.0f},0.2f}, {InputState::PadPush, XINPUT_GAMEPAD_DPAD_DOWN} });
-	// 破壊オブジェクトを元の姿へ戻す（デバッグ用）
+	// 破壊オブジェクトを元の姿へ戻す
 	inputCommand_->RegisterCommand("Reassemble", { {InputState::KeyTrigger, DIK_R } });
 
 	// メインカメラの初期化
@@ -149,7 +149,7 @@ void TestScene::Update() {
 	if (inputCommand_->IsCommandActive("MoveRight")) { testPos_.x += 5.0f * FpsCounter::gameDeltaTime; }
 	testCollider_.SetWorldPosition(testPos_);
 
-	// 破壊オブジェクトを元の姿へ戻す（デバッグ用）
+	// 破壊オブジェクトを元の姿へ戻す
 	if (inputCommand_->IsCommandActive("Reassemble")) {
 		destructibleObject_->Reassemble();
 	}
