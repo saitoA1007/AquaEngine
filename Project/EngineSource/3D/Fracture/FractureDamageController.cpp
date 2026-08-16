@@ -166,7 +166,7 @@ void FractureDamageController::ApplyChipDamage(const Vector3& impactPos, float d
 		chunkDamage_.erase(chunkId);
 		// 切り離すので、付着したまま凹んでいた表示があれば不要になる
 		breakState_.RemoveDentedChunk(chunkId);
-		ApplyDamage(impactPos, 1.0f, craterRadius, craterPlaneCount, impactDirection, penetrationDepth);
+		ApplyDamage(impactPos, kBreakDetachRadius_, craterRadius, craterPlaneCount, impactDirection, penetrationDepth);
 		return;
 	}
 

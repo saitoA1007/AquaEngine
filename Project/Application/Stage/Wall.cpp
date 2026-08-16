@@ -17,8 +17,7 @@ Wall::Wall(GameEngine::Model* model, GameEngine::Model* fractureModel, GameEngin
 	parame_->Register("ColliderSize", colliderSize_, index++, subGroup);
 	parame_->Register("MaxHp", maxHp_, index++, subGroup);
 	parame_->Register("RespawnTime", respawnTime_, index++, subGroup);
-
-	//modelComponent_.materialData_->color.w = 0.8f;
+	parame_->Register("ReassembleDestroyedRatio", reassembleDestroyedRatio_, index++, subGroup);
 
 	// 破片側の当たり判定を無効
 	destructObject_.SetIsColliderActive(false);
@@ -38,10 +37,6 @@ Wall::Wall(GameEngine::Model* model, GameEngine::Model* fractureModel, GameEngin
 	collider_.SetOnCollisionCallback([this](const CollisionResult& result) {
 		this->OnCollisionEnter(result);
 	});
-
-	// 参照するマテリアルを変更
-	//modelComponent_.SetBufferMaterial(0, iceMaterial_.GetMaterialSrvIndex());
-	//modelComponent_.SetHitGroup(1);
 
 	underWallModelComponent_.SetBufferMaterial(0, iceMaterial_.GetMaterialSrvIndex());
 	underWallModelComponent_.SetHitGroup(1);
@@ -75,6 +70,15 @@ void Wall::Update() {
 	// 破片の更新処理
 	destructObject_.Update();
 
+	// 設定した破壊率を超えたら、壁を元に戻す
+	if (!destructObject_.IsReassembling()) {
+		if (destructObject_.GetDestroyedRatio() >= reassembleDestroyedRatio_) {
+			if (!isBreakIce_) {
+				isBreakIce_ = true;
+			}
+		}
+	}
+
 	if (!isBreakIce_) { return; }
 	respawnTimer_ += FpsCounter::gameDeltaTime / respawnTime_;
 
@@ -82,8 +86,11 @@ void Wall::Update() {
 	if (respawnTimer_ >= 1.0f) {
 		isBreakIce_ = false;
 		respawnTimer_ = 0.0f;
-		destructObject_.worldTransform_.transform_.scale.z = 1.5f;
+		//destructObject_.worldTransform_.transform_.scale.z = 1.5f;
 		currentHp_ = maxHp_;
+
+		// 破片を元に戻す
+		destructObject_.Reassemble();
 	}
 }
 
@@ -91,8 +98,6 @@ void Wall::Draw() {
 
 	// 下に存在する壁を設置する
 	underWallModelComponent_.DrawRaytracing(renderQueue_);
-
-	if (isBreakIce_) { return; }
 
 	// 壁を描画
 	//modelComponent_.DrawRaytracing(renderQueue_);
@@ -102,6 +107,8 @@ void Wall::Draw() {
 }
 
 void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
+
+	if (isBreakIce_) { return; }
 
 	bool isPlayer = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kPlayer));
 	bool isBoss = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kBoss));

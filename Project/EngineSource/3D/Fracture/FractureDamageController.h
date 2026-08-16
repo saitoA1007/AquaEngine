@@ -28,6 +28,12 @@ namespace GameEngine {
 		void BeginReassembly();
 		bool IsReassembling() const { return isReassembling_; }
 
+		// チャンクの破壊された割合を取得
+		float GetDestroyedRatio() const {
+			if (chunksById_.empty()) { return 0.0f; }
+			return static_cast<float>(destroyedChunkIds_.size()) / static_cast<float>(chunksById_.size());
+		}
+
 		void SetWorldMatrix(const Matrix4x4& worldMatrix) { worldMatrix_ = worldMatrix; }
 
 		FractureBreakState& GetBreakState() { return breakState_; }
@@ -36,6 +42,8 @@ namespace GameEngine {
 	public:
 
 		float kBreakThreshold_ = 3.0f;
+		// チャンクが完全破壊された時、命中点から半径このくらいの範囲にある隣接チャンクも巻き込んで切り離す
+		float kBreakDetachRadius_ = 3.0f;
 		// 閾値到達寸前の最大ズレ量
 		float kMaxCrackOffset_ = 0.04f;
 		// 閾値到達寸前の最大ランダム回転

@@ -1,5 +1,7 @@
 #include "CreateBufferResource.h"
 #include <cassert>
+#include <cstdlib>
+#include <Windows.h>
 
 Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(ID3D12Device5* device, size_t sizeInBytes,
 	D3D12_HEAP_TYPE heapType, D3D12_RESOURCE_STATES initialState, D3D12_RESOURCE_FLAGS flags) {
@@ -27,7 +29,12 @@ Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(ID3D12Device5* devic
 		initialState,
 		nullptr,
 		IID_PPV_ARGS(&resource));
-	assert(SUCCEEDED(hr));
+	if (FAILED(hr)) {
+		// Release版でも確実に検知できるように
+		OutputDebugStringA("[CreateBufferResource] CreateCommittedResource failed\n");
+		assert(false && "CreateCommittedResourceに失敗しました");
+		std::abort();
+	}
 	return resource;
 }
 
@@ -59,7 +66,12 @@ Microsoft::WRL::ComPtr<ID3D12Resource> CreateResource(ID3D12Device* device, cons
 		initialState,
 		clearValue,
 		IID_PPV_ARGS(&resource));
-	assert(SUCCEEDED(hr) && "リソースの作成に失敗しました");
+	if (FAILED(hr)) {
+		// Release版でも確実に検知できるように
+		OutputDebugStringA("[CreateResource] CreateCommittedResource failed\n");
+		assert(false && "リソースの作成に失敗しました");
+		std::abort();
+	}
 	return resource;
 }
 

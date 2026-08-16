@@ -234,6 +234,7 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 		// 氷柱を削除
 		if (commonData_.state == PlayerState::kAttackRush) {
 			iceFall->Destroy();
+			//iceFall->SetIsBreak(true);
 		}
 
 		bounceAction_.WallBounce(worldTransform_.transform_.translate, result.contactNormal * -1.0f, result.penetrationDepth, attackRushAction_.GetRushMaxSpeed());

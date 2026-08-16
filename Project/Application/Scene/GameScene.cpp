@@ -104,13 +104,14 @@ void GameScene::Update() {
 	//mainCamera_->Update();
 
 	mainCamera_->SetCamera(cameraController_->GetCamera());
-
+#ifdef USE_IMGUI
 	auto* light =  renderQueue_->GetLightManager();
 
 	ImGui::Begin("test");
 	ImGui::DragFloat("LightIntensity", &light->directionalLight_->directionalLightData_.intensity, 0.01f);
 	ImGui::ColorEdit3("LightIntensity", &light->directionalLight_->directionalLightData_.color.x);
 	ImGui::End();
+#endif
 }
 
 void GameScene::Draw() {

@@ -1,17 +1,5 @@
 {
     "Wall": {
-        "BreakThreshold": 3.0,
-        "ColliderSize": [
-            2.5,
-            2.5,
-            2.5
-        ],
-        "DentInwardBiasRatio": 0.5,
-        "MaxCrackOffset": 0.03999999910593033,
-        "MaxCrackRotate": 0.15000000596046448,
-        "MaxDentRadiusToChunkRatio": 0.6000000238418579,
-        "MinDentRatio": 0.15000000596046448,
-        "NeighborCrackFactor": 0.3499999940395355,
         "Physics": {
             "CrackAngularDamping": 15.0,
             "CrackAngularSpringStiffness": 250.0,
@@ -20,8 +8,23 @@
             "CrackSpringStiffness": 400.0
         },
         "SceneName": "Game",
-        "TestCraterRadius": 2.0,
-        "TestDamageAmount": 20.0,
-        "TestPlaneCount": 8
+        "State": {
+            "BreakDetachRadius": 15.0,
+            "BreakThreshold": 0.20000000298023224,
+            "ColliderSize": [
+                2.5,
+                2.5,
+                2.5
+            ],
+            "CraterRadius": 15.0,
+            "DamageAmount": 200.0,
+            "DentInwardBiasRatio": 0.5,
+            "MaxCrackOffset": 0.03999999910593033,
+            "MaxCrackRotate": 0.15000000596046448,
+            "MaxDentRadiusToChunkRatio": 0.6000000238418579,
+            "MinDentRatio": 0.15000000596046448,
+            "NeighborCrackFactor": 0.3499999940395355,
+            "PlaneCount": 8
+        }
     }
 }

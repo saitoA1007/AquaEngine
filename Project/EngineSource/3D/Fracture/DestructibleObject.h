@@ -32,6 +32,12 @@ namespace GameEngine {
 		// 静的な破片を元の位置へ戻し、無傷の状態へ復元するアニメーションを開始する
 		void Reassemble() { damageController_.BeginReassembly(); }
 
+		// 元に戻るアニメーションを再生中か
+		bool IsReassembling() const { return damageController_.IsReassembling(); }
+
+		// チャンクの破壊された割合
+		float GetDestroyedRatio() const { return damageController_.GetDestroyedRatio(); }
+
 		// 当たり判定の設定
 		void SetIsColliderActive(bool isActive) {
 			collider_.SetActive(isActive);
@@ -44,6 +50,16 @@ namespace GameEngine {
 
 		// ワールド行列
 		WorldTransform worldTransform_;
+
+		// 当たり判定のサイズ
+		Vector3 colliderSize_ = { 2.5f, 2.5f, 2.5f };
+
+		// 与えるダメージ
+		float damageAmount_ = 2.0f;
+		// ダメージを与える範囲
+		float craterRadius_ = 2.0f;
+		// 切る数
+		int planeCount_ = 8;
 
 	private:
 		// 名前
@@ -66,12 +82,6 @@ namespace GameEngine {
 		FractureDamageController damageController_;
 
 		// パラメータ機能
-		std::unique_ptr<DebugParameter> debugParameter_;
-
-		// 一時的なテスト用の項目
-		Vector3 colliderSize_ = { 2.5f, 2.5f, 2.5f };
-		float testDamageAmount_ = 2.0f;
-		float testCraterRadius_ = 2.0f;
-		int testPlaneCount_ = 8;
+		std::unique_ptr<DebugParameter> debugParameter_;		
 	};
 }

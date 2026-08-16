@@ -41,15 +41,21 @@ DestructibleObject::DestructibleObject(std::string name, Model* model, uint32_t 
 
 	// パラメータ機能
 	debugParameter_ = std::make_unique<DebugParameter>(name_);
-	debugParameter_->Register("ColliderSize", colliderSize_);
-	debugParameter_->Register("TestDamageAmount", testDamageAmount_);
-	debugParameter_->Register("TestCraterRadius", testCraterRadius_);
-	debugParameter_->Register("TestPlaneCount", testPlaneCount_);
+	subGroup = "State";
+	debugParameter_->Register("ColliderSize", colliderSize_, 0, subGroup);
+	debugParameter_->Register("DamageAmount", damageAmount_, 0, subGroup);
+	debugParameter_->Register("CraterRadius", craterRadius_, 0, subGroup);
+	debugParameter_->Register("PlaneCount", planeCount_, 0, subGroup);
 
-	debugParameter_->Register("BreakThreshold", damageController_.kBreakThreshold_);
-	debugParameter_->Register("MaxCrackOffset", damageController_.kMaxCrackOffset_);
-	debugParameter_->Register("MaxCrackRotate", damageController_.kMaxCrackRotate_);
-	debugParameter_->Register("NeighborCrackFactor", damageController_.kNeighborCrackFactor_);
+	debugParameter_->Register("BreakThreshold", damageController_.kBreakThreshold_, 0, subGroup);
+	debugParameter_->Register("BreakDetachRadius", damageController_.kBreakDetachRadius_, 0, subGroup);
+	debugParameter_->Register("MaxCrackOffset", damageController_.kMaxCrackOffset_, 0, subGroup);
+	debugParameter_->Register("MaxCrackRotate", damageController_.kMaxCrackRotate_, 0, subGroup);
+	debugParameter_->Register("NeighborCrackFactor", damageController_.kNeighborCrackFactor_, 0, subGroup);
+
+	debugParameter_->Register("DentInwardBiasRatio", damageController_.kDentInwardBiasRatio_, 0, subGroup);
+	debugParameter_->Register("MinDentRatio", damageController_.kMinDentRatio_, 0, subGroup);
+	debugParameter_->Register("MaxDentRadiusToChunkRatio", damageController_.kMaxDentRadiusToChunkRatio_, 0, subGroup);
 	// バネ物理
 	subGroup = "Physics";
 	debugParameter_->Register("CrackSpringStiffness", damageController_.kCrackSpringStiffness_, 0, subGroup);
@@ -58,15 +64,11 @@ DestructibleObject::DestructibleObject(std::string name, Model* model, uint32_t 
 	debugParameter_->Register("CrackAngularDamping", damageController_.kCrackAngularDamping_, 0, subGroup);
 	debugParameter_->Register("CrackImpulseStrength", damageController_.kCrackImpulseStrength_, 0, subGroup);
 
-	debugParameter_->Register("DentInwardBiasRatio", damageController_.kDentInwardBiasRatio_);
-	debugParameter_->Register("MinDentRatio", damageController_.kMinDentRatio_);
-	debugParameter_->Register("MaxDentRadiusToChunkRatio", damageController_.kMaxDentRadiusToChunkRatio_);
-
 	debugParameter_->Apply();
 }
 
 void DestructibleObject::Initialize() {
-
+	debugParameter_->Apply();
 }
 
 void DestructibleObject::Update() {
@@ -124,6 +126,6 @@ void DestructibleObject::OnCollisionEnter(const GameEngine::CollisionResult& res
 	Vector3 localImpactPos = Math::Transforms(result.contactPosition, inverseWorld);
 	Vector3 localImpactDirection = Math::TransformNormal(result.contactNormal, inverseWorld);
 
-	damageController_.ApplyChipDamage(localImpactPos, testDamageAmount_, testCraterRadius_, testPlaneCount_,
+	damageController_.ApplyChipDamage(localImpactPos, damageAmount_, craterRadius_, planeCount_,
 		localImpactDirection, result.penetrationDepth);
 }

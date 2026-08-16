@@ -220,7 +220,7 @@ void TestScene::Draw() {
 	renderQueue_->SubmitRaytracingModel(terrainModel_, terrainWorld_);
 
 	// 破片を1つに集約していない
-	renderQueue_->SubmitModel(noFractureModel_, noFractureWorld_);
+	//renderQueue_->SubmitModel(noFractureModel_, noFractureWorld_);
 
 	// アニメーションモデル
 	//renderQueue_->SubmitRaytracingModel(model_, world_);

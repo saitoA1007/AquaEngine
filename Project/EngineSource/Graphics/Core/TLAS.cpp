@@ -1,16 +1,26 @@
 #include "TLAS.h"
 #include <algorithm>
 #include "CreateBufferResource.h"
+#include "ResourceGarbageCollector.h"
 using namespace GameEngine;
 
 TLAS::~TLAS() {
     if (isCreated_) {
-        resource_.Reset();
-        instanceBuffer_.Reset();
+        // GPU側の実行が完了してから破棄させる
+        if (resource_) {
+            ResourceGarbageCollector::GetInstance().Add(resource_);
+        }
+        if (instanceBuffer_) {
+            instanceBuffer_->Unmap(0, nullptr);
+            ResourceGarbageCollector::GetInstance().Add(instanceBuffer_);
+        }
+        if (scratchBuffer_) {
+            ResourceGarbageCollector::GetInstance().Add(scratchBuffer_);
+        }
         if (srvManager_) {
             srvManager_->ReleaseIndex(srvIndex_);
         }
-    }  
+    }
 }
 
 void TLAS::Create(ID3D12GraphicsCommandList4* cmdList, const uint32_t& initialCapacity) {
@@ -29,9 +39,16 @@ void TLAS::AllocateBuffers(uint32_t capacity) {
     maxInstanceCount_ = capacity;
     uint64_t instanceBufferSize = sizeof(D3D12_RAYTRACING_INSTANCE_DESC) * maxInstanceCount_;
 
-    // 既存のインスタンスバッファがあればアンマップしてから作り直す
+    // GPU側の実行が完了してから破棄
     if (instanceBuffer_) {
         instanceBuffer_->Unmap(0, nullptr);
+        ResourceGarbageCollector::GetInstance().Add(instanceBuffer_);
+    }
+    if (resource_) {
+        ResourceGarbageCollector::GetInstance().Add(resource_);
+    }
+    if (scratchBuffer_) {
+        ResourceGarbageCollector::GetInstance().Add(scratchBuffer_);
     }
 
     // GPUに送るためのリソースを作成

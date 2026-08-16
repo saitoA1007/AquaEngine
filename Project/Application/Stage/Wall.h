@@ -37,6 +37,9 @@ private:
 	// 当たり判定の大きさ
 	Vector3 colliderSize_ = { 10.0f,100.0f,0.5f };
 
+	// 破壊された時に戻す割合
+	float reassembleDestroyedRatio_ = 0.4f;
+
 private:
 	// パラメーター機能
 	GameEngine::DebugParameter* parame_ = nullptr;

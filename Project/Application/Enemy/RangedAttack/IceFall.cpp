@@ -15,6 +15,9 @@ IceFall::IceFall(GameEngine::Model* model, GameEngine::Model* fractureModel, Vec
 	//modelComponent_.worldTransform_.transform_.translate = pos;
 	destructibleObject_.worldTransform_.transform_.translate = pos;
 
+	// 当たり判定を無効
+	destructibleObject_.SetIsColliderActive(false);
+
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>("IceFall");
 	debugParame_->Register("ColliderRadius", colliderRadius_);
@@ -66,6 +69,15 @@ void IceFall::Update() {
 
 	// 破片の更新処理
 	destructibleObject_.Update();
+
+	//if (isBreak_) {
+	//	timer_ += FpsCounter::gameDeltaTime / 2.0f;
+	//
+	//	// 削除する
+	//	if (timer_ >= 1.0f) {
+	//		Destroy();
+	//	}
+	//}
 }
 
 void IceFall::Draw() {
@@ -78,6 +90,10 @@ void IceFall::Draw() {
 
 void IceFall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
 
+	//destructibleObject_.damageAmount_ = 1000.0f;
+	//destructibleObject_.craterRadius_ = 100.0f;
+	//
+	//destructibleObject_.OnCollisionEnter(result);
 }
 
 void IceFall::EnterMove() {
@@ -90,5 +106,6 @@ void IceFall::EnterMove() {
 	if (timer_ >= 1.0f) {
 		destructibleObject_.worldTransform_.transform_.translate.y = endPosY_;
 		isEnterMoveActive_ = false;
+		timer_ = 0.0f;
 	}
 }

@@ -20,6 +20,13 @@ public:
 	// 描画処理
 	void Draw() override;
 
+public:
+
+	// 破壊
+	void SetIsBreak(bool isBreak) {
+		isBreak_ = isBreak;
+	}
+
 private:
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;
@@ -48,6 +55,8 @@ private:
 	float timer_ = 0.0f;
 
 	bool isEnterMoveActive_ = true;
+
+	bool isBreak_ = false;
 
 private:
 
