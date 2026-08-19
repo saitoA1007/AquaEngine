@@ -71,14 +71,14 @@ GameScene::GameScene() {
 	gameObjectManager_->AddObject<BgIceRock>(bgIceRockModel);
 
 	// ステージに降っている雪を描画
-	auto* effectModel = modelManager_->GetNameByModel("plane.obj");
-	effectModel->SetDefaultIsEnableLight(false);
-	gameObjectManager_->AddObject<ParticleBehavior>("BgSnowParticle", 64, textureManager_, effectModel, &renderQueue_->GetMainCamera());
+	auto* planeModel = modelManager_->GetNameByModel("plane.obj");
+	planeModel->SetDefaultIsEnableLight(false);
+	gameObjectManager_->AddObject<ParticleBehavior>("BgSnowParticle", 64, textureManager_, planeModel, &renderQueue_->GetMainCamera());
 
 	// タイトル中のUI
 	auto* titleUIManager = gameObjectManager_->AddObject<TitleUIManager>(textureManager_);
 	// プレイ中のUI
-	auto* playUIManager = gameObjectManager_->AddObject<PlayUIManager>(textureManager_);
+	auto* playUIManager = gameObjectManager_->AddObject<PlayUIManager>(textureManager_, planeModel);
 	// ゲームオーバーのUI
 	auto* gameOverUIManager = gameObjectManager_->AddObject<GameOverUIManager>(textureManager_);
 	// クリアのUI

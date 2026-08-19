@@ -570,6 +570,7 @@
     <ClCompile Include="Application\Stage\BgIceRock.cpp" />
     <ClCompile Include="EngineSource\Graphics\Debug\PixCapture.cpp" />
     <ClCompile Include="EngineSource\Editor\Windows\PixWindow.cpp" />
+    <ClCompile Include="Application\UI\Widgets\ArrowUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1126,6 +1127,7 @@
     <ClInclude Include="EngineSource\Graphics\Debug\PixCapture.h" />
     <ClInclude Include="EngineSource\Graphics\Debug\PixMarker.h" />
     <ClInclude Include="EngineSource\Editor\Windows\PixWindow.h" />
+    <ClInclude Include="Application\UI\Widgets\ArrowUI.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />
