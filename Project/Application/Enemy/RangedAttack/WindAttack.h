@@ -29,6 +29,8 @@ public:
 		maxTime_ = maxTime;
 		timer_ = 0.0f;
 		isActive_ = true;
+		// 当たり判定を有効化
+		collider_.SetActive(true);
 
 		// 風の演出を設定
 		if (windParticle_ != nullptr) {

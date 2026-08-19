@@ -67,6 +67,8 @@ void WindAttack::Update() {
 	if (timer_ >= 1.0f) {
 
 		isActive_ = false;
+		// 当たり判定を無効
+		collider_.SetActive(false);
 
 		// 攻撃終了に合わせてパーティクルの発生を止める
 		if (windParticle_ != nullptr) {

@@ -149,9 +149,16 @@ void BossRushAttackAction::RushAttack() {
 	timer_ += FpsCounter::gameDeltaTime / rushMaxTime_;
 
 	// 移動
-	commonData_.transform.translate = Lerp(startRushPos_, endRushPos_,timer_);
+	commonData_.transform.translate = Lerp(startRushPos_, endRushPos_,EaseOut(timer_));
+
 	// 高さ
-	commonData_.transform.translate.y = Lerp(startRushPos_.y, 0.5f, timer_);
+	if (timer_ <= 0.3f) {
+		float localT = timer_ / 0.3f;
+		commonData_.transform.translate.y = Lerp(startRushPos_.y, 0.0f, EaseOut(localT));
+	} else if (timer_ >= 0.7f) {
+		float localT = (timer_ - 0.7f) / 0.3f;
+		commonData_.transform.translate.y = Lerp(0.0f, endRushPos_.y, EaseIn(localT));
+	}
 
 	// 回転
 	Vector3 dir = endRushPos_ - startRushPos_;

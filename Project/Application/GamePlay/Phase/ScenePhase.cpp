@@ -98,6 +98,7 @@ void TutorialPhase::Enter() {
 void TutorialPhase::Update() {
 
 	if (bossEnemy_->IsBreakEgg()) {
+		playUIManager_->SetIsDrawArrowUI(false);
 		playUIManager_->SetIsDrawGamePlayUI(false);
 		playUIManager_->SetIsDrawTutorialGuide(false);
 		playUIManager_->SetIsDrawPlayGuide(false);
