@@ -82,7 +82,7 @@
             "RotateMove": 10,
             "RushAttack": 40,
             "Wait": 5,
-            "WindAttack": 0
+            "WindAttack": 30
         },
         "Wait": {
             "MaxTime": 2.5

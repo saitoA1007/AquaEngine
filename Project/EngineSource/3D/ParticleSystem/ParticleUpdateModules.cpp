@@ -104,16 +104,10 @@ void RotationByVelocityModule::Update(ParticleData& particleData, [[maybe_unused
 
 	// 速度がほぼ0のときは、直前の向きを維持す
 	if (lenSq > 0.0001f) {
-		Vector3 dir = vel.Normalize();
-
-		// 横方向の回転
-		float yaw = std::atan2f(dir.x, dir.z);
-		// 横軸方向の長さを求める
-		float vectorX = Math::Length(Vector3(dir.x, 0.0f, dir.z));
-		// 縦方向の回転
-		float pitch = std::atan2f(-dir.y, vectorX);
+		Vector3 euler = Math::DirectionToEuler(vel);
 
 		// パーティクルの回転に適用
-		particleData.transform.rotate = { pitch, yaw, particleData.transform.rotate.z };
+		particleData.transform.rotate.x = euler.x;
+		particleData.transform.rotate.y = euler.y;
 	}
 }

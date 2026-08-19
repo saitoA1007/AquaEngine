@@ -2,7 +2,6 @@
 #include <numbers>
 #include "RandomGenerator.h"
 #include "Application/Enemy/RangedAttack/IceFall.h"
-#include "Application/Enemy/RangedAttack/WindAttack.h"
 #include "ParticleBehavior.h"
 using namespace GameEngine;
 
@@ -16,8 +15,11 @@ BossRangedAttackManager::BossRangedAttackManager(GameEngine::GameObjectManager* 
     iceFallFractureModel_ = iceFallFractureModel;
 
 	// 風攻撃の軌跡パーティクルを生成
-	windParticle_ = objectManager_->AddObject<ParticleBehavior>("EnemyWindAttackParticle", 32, textureManager, windModel, camera);
-	windParticle_->SetIsLoop(false);
+	auto* windParticle = objectManager_->AddObject<ParticleBehavior>("EnemyWindAttackParticle", 128, textureManager, windModel, camera);
+	windParticle->SetIsLoop(false);
+
+    // 風エフェクトを生成
+    windAttack_ = objectManager_->AddObject<WindAttack>(iceFallModel_, windParticle);
 }
 
 void BossRangedAttackManager::StartIceFall(float rangeRadius, float minDistance, int iceFallNum, int iceFallMaxNum, int maxIter) {
@@ -66,6 +68,6 @@ void BossRangedAttackManager::StartIceFall(float rangeRadius, float minDistance,
 }
 
 void BossRangedAttackManager::StartWind(Vector3 pos, Vector3 startDir, Vector3 endDir, float maxTime) {
-    // 風を生成
-    objectManager_->AddObject<WindAttack>(iceFallModel_, pos, startDir, endDir, maxTime, windParticle_);
+    // 風の演出を開始
+    windAttack_->Start(pos, startDir, endDir, maxTime);
 }

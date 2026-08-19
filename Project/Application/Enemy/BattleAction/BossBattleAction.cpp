@@ -522,6 +522,7 @@ void WindAttackAction::Update() {
 			Vector3 endDir = endRotDir_;
 			endDir.y = windDirY_;
 			endDir.Normalize();
+			// 風の演出
 			commonData_.rangedAttackManager->StartWind(commonData_.transform.translate, startDir, endDir, mainMaxTime_);
 		}
 		break;

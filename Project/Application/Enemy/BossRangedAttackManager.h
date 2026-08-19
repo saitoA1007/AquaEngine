@@ -2,6 +2,7 @@
 #include "IGameObject.h"
 #include "GameObjectManager.h"
 #include "Model.h"
+#include "Application/Enemy/RangedAttack/WindAttack.h"
 
 namespace GameEngine {
 	class TextureManager;
@@ -53,6 +54,6 @@ private:
 	// 氷柱の現在の数
 	int32_t currentIceFallNum_ = 0;
 
-	// 風攻撃の軌跡を表すパーティクル
-	GameEngine::ParticleBehavior* windParticle_ = nullptr;
+	// 風の攻撃演出
+	WindAttack* windAttack_ = nullptr;
 };

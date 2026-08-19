@@ -28,13 +28,13 @@
                     1.0
                 ],
                 "Enable": true,
-                "MaxSpeed": 15.0,
-                "MinSpeed": 14.0,
+                "MaxSpeed": 80.0,
+                "MinSpeed": 65.0,
                 "SpreadAngle": 6.0
             },
             "IsBillBoard": false,
             "IsLoop": true,
-            "LifeTime": 1.0,
+            "LifeTime": 1.5,
             "RotateEmit": {
                 "Enable": true,
                 "RangeRotate": {
@@ -87,7 +87,7 @@
                 "Enable": false
             },
             "RotationByVelocity": {
-                "Enable": false
+                "Enable": true
             },
             "SizeOverLifeTime": {
                 "Enable": false
@@ -99,6 +99,6 @@
                 "Enable": false
             }
         },
-        "SceneName": "Test"
+        "SceneName": "Game"
     }
 }
