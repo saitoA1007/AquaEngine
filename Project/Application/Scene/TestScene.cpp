@@ -59,6 +59,9 @@ TestScene::TestScene() {
 	//gameObjectManager_->AddObject<ParticleBehavior>("HitAfterEffect", 32, textureManager_, effectModel_, &renderQueue_->GetMainCamera());
 	//gpuParticle_ = gameObjectManager_->AddObject<ParticleBehaviorGPU>("GpuParticle", 1024, effectModel_);
 
+	auto* windModel = modelManager_->GetNameByModel("wind.obj");
+	gameObjectManager_->AddObject<ParticleBehavior>("EnemyWindAttackParticle", 32, textureManager_, windModel, &renderQueue_->GetMainCamera());
+
 	// 高ポリゴン氷
 	iceHighModel_ = modelManager_->GetNameByModel("ice_highPolygon.gltf");
 	iceHighModel_->SetDefaultIsEnableLight(true);

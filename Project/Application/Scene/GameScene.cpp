@@ -49,7 +49,9 @@ GameScene::GameScene() {
 	// 敵の遠距離攻撃管理
 	auto* iceFallModel = modelManager_->GetNameByModel("iceFall.obj");
 	auto* iceFallFractureModel = modelManager_->GetNameByModel("iceFallFracture.gltf");
-	auto* bossRangedAttackManager = gameObjectManager_->AddObject<BossRangedAttackManager>(gameObjectManager_, iceFallModel, iceFallFractureModel);
+	auto* windModel = modelManager_->GetNameByModel("wind.obj");
+	auto* bossRangedAttackManager = gameObjectManager_->AddObject<BossRangedAttackManager>(gameObjectManager_, iceFallModel, iceFallFractureModel,
+		textureManager_, windModel, &renderQueue_->GetMainCamera());
 
 	// 敵
 	auto* enemyModel = modelManager_->GetNameByModel("BossBird.gltf");

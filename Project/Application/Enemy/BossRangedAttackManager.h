@@ -3,9 +3,16 @@
 #include "GameObjectManager.h"
 #include "Model.h"
 
+namespace GameEngine {
+	class TextureManager;
+	class Camera;
+	class ParticleBehavior;
+}
+
 class BossRangedAttackManager : public GameEngine::IGameObject {
 public:
-	BossRangedAttackManager(GameEngine::GameObjectManager* objectManager, GameEngine::Model* iceFallModel, GameEngine::Model* iceFallFractureModel);
+	BossRangedAttackManager(GameEngine::GameObjectManager* objectManager, GameEngine::Model* iceFallModel, GameEngine::Model* iceFallFractureModel,
+		GameEngine::TextureManager* textureManager, GameEngine::Model* windModel, GameEngine::Camera* camera);
 	~BossRangedAttackManager() = default;
 
 	// 初期化
@@ -45,4 +52,7 @@ private:
 
 	// 氷柱の現在の数
 	int32_t currentIceFallNum_ = 0;
+
+	// 風攻撃の軌跡を表すパーティクル
+	GameEngine::ParticleBehavior* windParticle_ = nullptr;
 };

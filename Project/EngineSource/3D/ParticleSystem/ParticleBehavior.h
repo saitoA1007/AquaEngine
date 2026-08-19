@@ -9,6 +9,7 @@
 #include "Camera.h"
 #include "WorldTransforms.h"
 #include "ParticleUpdateModules.h"
+#include "ParticleEmitModules.h"
 
 namespace GameEngine{
 
@@ -71,6 +72,13 @@ namespace GameEngine{
 
 		void SetIsLoop(bool isLoop) {
 			main_.isLoop = isLoop;
+		}
+
+		// パーティクルの移動方向を設定
+		void SetDirection(const Vector3& direction) {
+			if (auto* directionModule = modulesControl_->GetModule<DirectionEmitModule>("DirectionEmit")) {
+				directionModule->SetDirection(direction);
+			}
 		}
 
 		bool IsLoop() const { return main_.isLoop; }

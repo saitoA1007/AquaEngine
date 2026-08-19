@@ -3,14 +3,23 @@
 #include "FPSCounter.h"
 #include "EasingManager.h"
 #include "MyMath.h"
+#include "ParticleBehavior.h"
 using namespace GameEngine;
 
-WindAttack::WindAttack(GameEngine::Model* model, Vector3 pos, Vector3 startDir, Vector3 endDir, float maxTime) : modelComponent_(model) {
+WindAttack::WindAttack(GameEngine::Model* model, Vector3 pos, Vector3 startDir, Vector3 endDir, float maxTime, GameEngine::ParticleBehavior* windParticle) : modelComponent_(model) {
 
 	modelComponent_.worldTransform_.transform_.translate = pos;
 	startDir_ = startDir;
 	endDir_ = endDir;
 	maxTime_ = maxTime;
+	windParticle_ = windParticle;
+
+	// 風パーティクルを開始位置・方向に合わせて発生させる
+	if (windParticle_ != nullptr) {
+		windParticle_->SetEmitterPos(pos);
+		windParticle_->SetDirection(startDir_);
+		windParticle_->SetIsLoop(true);
+	}
 
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>("WindAttack");
@@ -55,8 +64,19 @@ void WindAttack::Update() {
 	// 方向から角度を取得
 	modelComponent_.worldTransform_.transform_.rotate = Math::DirectionToEuler(dir);
 
+	// 風パーティクルの位置と向きを追従させる
+	if (windParticle_ != nullptr) {
+		windParticle_->SetEmitterPos(modelComponent_.worldTransform_.transform_.translate);
+		windParticle_->SetDirection(dir);
+	}
+
 	if (timer_ >= 1.0f) {
 		isDead_ = true;
+
+		// 攻撃終了に合わせてパーティクルの発生を止める
+		if (windParticle_ != nullptr) {
+			windParticle_->SetIsLoop(false);
+		}
 	}
 
 	modelComponent_.Update();

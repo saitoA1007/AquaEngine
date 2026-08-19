@@ -4,9 +4,13 @@
 #include "DebugParameter.h"
 #include "Collider.h"
 
+namespace GameEngine {
+	class ParticleBehavior;
+}
+
 class WindAttack : public GameEngine::IGameObject {
 public:
-	WindAttack(GameEngine::Model* model, Vector3 pos, Vector3 startDir, Vector3 endDir, float maxTime);
+	WindAttack(GameEngine::Model* model, Vector3 pos, Vector3 startDir, Vector3 endDir, float maxTime, GameEngine::ParticleBehavior* windParticle);
 	~WindAttack() = default;
 
 	// 初期化
@@ -34,6 +38,9 @@ private:
 
 	Vector3 startDir_ = { 0.0f,0.0f,-1.0f };
 	Vector3 endDir_ = { 0.0f,0.0f,-1.0f };
+
+	// 風の軌跡を表すパーティクル
+	GameEngine::ParticleBehavior* windParticle_ = nullptr;
 
 private:
 

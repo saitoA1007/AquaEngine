@@ -100,20 +100,20 @@ void VortexModule::Update(ParticleData& particleData, float time) {
 
 void RotationByVelocityModule::Update(ParticleData& particleData, [[maybe_unused]] float time) {
 	Vector3 vel = particleData.velocity;
-	float lenSq = vel.x * vel.x + vel.y * vel.y + vel.z * vel.z;
+	float lenSq = vel.LengthSquared();
 
 	// 速度がほぼ0のときは、直前の向きを維持す
 	if (lenSq > 0.0001f) {
-		float len = std::sqrt(lenSq);
-		Vector3 dir = { vel.x / len, vel.y / len, vel.z / len };
+		Vector3 dir = vel.Normalize();
 
-		// 横方向の回転（Y軸まわりの回転: Yaw）
-		float yaw = std::atan2(dir.x, dir.z);
-
+		// 横方向の回転
+		float yaw = std::atan2f(dir.x, dir.z);
+		// 横軸方向の長さを求める
+		float vectorX = Math::Length(Vector3(dir.x, 0.0f, dir.z));
 		// 縦方向の回転
-		float pitch = -std::asin(dir.y);
+		float pitch = std::atan2f(-dir.y, vectorX);
 
 		// パーティクルの回転に適用
-		particleData.transform.rotate = { pitch, yaw, 0.0f };
+		particleData.transform.rotate = { pitch, yaw, particleData.transform.rotate.z };
 	}
 }

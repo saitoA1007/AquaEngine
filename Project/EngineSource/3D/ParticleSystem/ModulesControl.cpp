@@ -11,6 +11,7 @@ ModulesControl::ModulesControl(DebugParameter* param) {
     // モジュールを登録
     RegisterModule<TextureModule>(mainGroup, "TextureEmit");
     RegisterModule<VelocityEmitModule>(mainGroup, "VelocityEmit");
+    RegisterModule<DirectionEmitModule>(mainGroup, "DirectionEmit");
     RegisterModule<RotateEmitModule>(mainGroup, "RotateEmit");
     RegisterModule<ScaleEmitModule>(mainGroup, "ScaleEmit");
     RegisterModule<ShapeEmitModule>(mainGroup, "ShapeEmit");

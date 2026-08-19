@@ -58,8 +58,9 @@ void BossStateIn::Update() {
 			// 次フェーズへ向けてタイマーリセット
 			timer_ = 0.0f;
 
-			// アニメーション遷移
-			stateCommonData_.animator->StartAnimation(BossAnimationType::kMove, "基本移動");
+			// 叫びモージョンに以降
+			stateCommonData_.animator->StartAnimation(BossAnimationType::kScream, "Scream", maxWaitTime_, false);
+
 		}
 	} else {
 		// 待機タイマー
@@ -67,6 +68,9 @@ void BossStateIn::Update() {
 
 		if (timer_ >= 1.0f) {
 			stateCommonData_.bossStateRequest = BossState::kBattle;
+
+			// アニメーション遷移
+			stateCommonData_.animator->StartAnimation(BossAnimationType::kMove, "基本移動");
 		}
 	}
 }

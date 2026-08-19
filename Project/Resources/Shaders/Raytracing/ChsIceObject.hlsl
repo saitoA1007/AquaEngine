@@ -224,6 +224,16 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
         iceColor
     );
     
+    // 平行光源による鏡面ハイライト
+    float3 lightDir = normalize(-gDirectionalLight.direction);
+    if (gDirectionalLight.active)
+    {
+        float3 lightColor = gDirectionalLight.color.rgb * gDirectionalLight.intensity;
+        float3 iceSpecular = CalcSpecular(worldNormal, lightDir, viewDir,
+            lightColor, material.specularColor.rgb, material.shininess);
+        payload.color += iceSpecular;
+    }
+
     // 視線と法線の内積を取る
     float rimNdotV = saturate(dot(worldNormal, viewDir));
     float rimFactor = 1.0f - rimNdotV;
