@@ -92,9 +92,6 @@ void FractureInstance::AllocateBuffers(uint32_t count) {
 		return;
 	}
 
-	// StructuredBuffer::Createは作成済みだと何もせずに返るため、必ず解放してから作り直す。
-	// これを怠ると、numInstance_だけが新しい数に増えてバッファは古い小さいままになり、
-	// ExecuteIndirectが範囲外の引数を読んでGPUがハングする
 	buffer_.Release();
 	buffer_.Create(numInstance_);
 	instancingData_ = buffer_.GetData();

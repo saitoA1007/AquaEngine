@@ -45,7 +45,6 @@ namespace GameEngine {
 		}
 
 		// レイキャスト時のフィルタリング用マスクを設定
-		// 値はRayInstanceMask(TLAS.h)を使用する
 		void SetInstanceMask(uint32_t mask, uint32_t i = 0) {
 			refBuffers_[i].SetInstanceMask(mask);
 		}

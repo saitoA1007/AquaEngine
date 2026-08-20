@@ -43,7 +43,7 @@
             "MinDistance": 5.0,
             "RangeRadiusRatio": 0.800000011920929
         },
-        "MaxHp": 100,
+        "MaxHp": 65,
         "ResetAction": {
             "MoveSpeed": 20.0,
             "RotateSpeed": 6.0

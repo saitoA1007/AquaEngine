@@ -75,6 +75,12 @@ namespace GameEngine {
             }
         }
 
+        // デバックカメラのワールド行列を取得
+        Matrix4x4 GetDebugCameraWorldMatrix() const {
+            auto* perViewData = perViewData_.GetData();
+            return perViewData->billboardMatrix;
+        }
+
         const bool& GetUseDebugCamera() const { return useDebugCamera_; }
 
         // カメラリソースを取得
