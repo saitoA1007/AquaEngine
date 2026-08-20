@@ -59,6 +59,12 @@ namespace GameEngine {
 		// 前フレームの有効インスタンス数
 		uint32_t previousInstanceCount_ = UINT32_MAX;
 
+		// 連続でリフィットした回数
+		uint32_t consecutiveRefitCount_ = 0;
+
+		// リフィットを連続で許可する上限
+		uint32_t kMaxConsecutiveRefits_ = 4;
+
 		// SRVインデックス
 		uint32_t srvIndex_ = 0;
 		// CPUのシェーダリソースビューのハンドル

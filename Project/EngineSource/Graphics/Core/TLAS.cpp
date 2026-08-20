@@ -143,8 +143,9 @@ void TLAS::Update(ID3D12GraphicsCommandList4* cmdList, const std::vector<TLASIns
     // 有効数でビルドを構築
     inputs_.NumDescs = activeCount;
 
-    // 前フレームとインスタンス数が同じであればトポロジが変わっていないためPERFORM_UPDATEを行い、異なる場合はフルビルドを行う
-    bool canRefit = (activeCount == previousInstanceCount_);
+    // 前フレームとインスタンス数が同じであればトポロジが変わっていないためPERFORM_UPDATEを行い、異なる場合はフルビルドを行う。
+    // 一定回数で必ずフルビルドに戻す
+    bool canRefit = (activeCount == previousInstanceCount_) && (consecutiveRefitCount_ < kMaxConsecutiveRefits_);
 
     D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC buildDesc{};
     buildDesc.Inputs = inputs_;
@@ -152,6 +153,10 @@ void TLAS::Update(ID3D12GraphicsCommandList4* cmdList, const std::vector<TLASIns
         buildDesc.Inputs.Flags |= D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_PERFORM_UPDATE;
         // インプレース更新
         buildDesc.SourceAccelerationStructureData = resource_->GetGPUVirtualAddress();
+        ++consecutiveRefitCount_;
+    } else {
+        // フルビルドでBVHの質が戻るのでカウントをリセットする
+        consecutiveRefitCount_ = 0;
     }
     buildDesc.ScratchAccelerationStructureData = scratchBuffer_->GetGPUVirtualAddress();
     buildDesc.DestAccelerationStructureData = resource_->GetGPUVirtualAddress();

@@ -11,6 +11,8 @@ void DXDevice::Initialize() {
 #ifdef _DEBUG
 	// デバックレイヤーを生成
 	CreateDebugLayer();
+	// DREDを有効化する
+	EnableDRED();
 #endif
 
 	// ファクトリーを生成
@@ -101,6 +103,18 @@ void DXDevice::CreateDebugLayer() {
 	{
 		debugController->EnableDebugLayer();
 		debugController->SetEnableGPUBasedValidation(TRUE);
+	}
+}
+
+void DXDevice::EnableDRED() {
+	ComPtr<ID3D12DeviceRemovedExtendedDataSettings1> dredSettings;
+	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&dredSettings)))) {
+		// 実行したコマンドの履歴と、ページフォルト時のリソース情報を記録させる
+		dredSettings->SetAutoBreadcrumbsEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
+		dredSettings->SetPageFaultEnablement(D3D12_DRED_ENABLEMENT_FORCED_ON);
+		LogManager::GetInstance().Log("DRED enabled");
+	} else {
+		LogManager::GetInstance().Log("DRED is not available");
 	}
 }
 #endif

@@ -43,6 +43,11 @@ namespace GameEngine {
 		/// デバックレイヤーを作成
 		/// </summary>
 		void CreateDebugLayer();
+
+		/// <summary>
+		/// DREDを有効化する。
+		/// </summary>
+		void EnableDRED();
 #endif
 	};
 }

@@ -82,11 +82,26 @@ void FractureInstance::ApplyRuntimeCut(const Fragment& source, const Vector3& im
 void FractureInstance::AllocateBuffers(uint32_t count) {
 	numInstance_ = count;
 
+	// 破片が1つも残らなかった場合、0要素でバッファを作るとリソース生成に失敗するため何も持たない状態にする
+	if (numInstance_ == 0) {
+		buffer_.Release();
+		argumentBuffer_.Release();
+		instancingData_ = nullptr;
+		argumentData_ = nullptr;
+		transformData_.clear();
+		return;
+	}
+
+	// StructuredBuffer::Createは作成済みだと何もせずに返るため、必ず解放してから作り直す。
+	// これを怠ると、numInstance_だけが新しい数に増えてバッファは古い小さいままになり、
+	// ExecuteIndirectが範囲外の引数を読んでGPUがハングする
+	buffer_.Release();
 	buffer_.Create(numInstance_);
 	instancingData_ = buffer_.GetData();
 
 	transformData_.resize(numInstance_);
 
+	argumentBuffer_.Release();
 	argumentBuffer_.Create(numInstance_);
 	argumentData_ = argumentBuffer_.GetData();
 }
