@@ -285,6 +285,9 @@ float3 IceBSDF(float3 worldPos, float3 worldNormal, int recursive, float ior, fl
     float cosTheta = saturate(dot(-worldRayDir, N));
     float r0 = (1.0f - ior) / (1.0f + ior);
     r0 = r0 * r0;
+    // 氷のr0はior1.31で約1.8%ぐらいでほぼ反射は移りません。
+    // ですが、現在はいったんビジュアル面を重視して上限を上げています。
+    r0 = max(r0, 0.3f);
     float F = r0 + (1.0f - r0) * pow(1.0f - cosTheta, 5.0f);
     F = saturate(F);
 
