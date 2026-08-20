@@ -612,7 +612,7 @@ void ResetAction::Initialize() {
 	dir.Normalize();
 
 	// 最後の位置を求める
-	endPos_ = dir * commonData_.stageRadius;
+	endPos_ = dir * (commonData_.stageRadius * 0.8f);
 	endPos_.y = defaultPosY_;
 
 	// 現在の向いている方向を求める

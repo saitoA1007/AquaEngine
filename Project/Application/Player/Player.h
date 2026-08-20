@@ -71,6 +71,11 @@ public:
 		isDraw_ = isDraw;
 	}
 
+	// ヒットエフェクトを開始
+	void StartHitEffect(Vector3 pos) {
+		effectManager_->StartHitEffect(pos, playerAttackDownAction_.GetPowerLevel());
+	}
+
 private:
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;

@@ -174,6 +174,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Enemy\State\BossStateOut.cpp" />
     <ClCompile Include="Application\GamePlay\GamePhaseManager.cpp" />
     <ClCompile Include="Application\GamePlay\Phase\ScenePhase.cpp" />
+    <ClCompile Include="Application\Player\Effect\PlayerHitAttackEffect.cpp" />
     <ClCompile Include="Application\Player\Effect\ShockFloor.cpp" />
     <ClCompile Include="Application\Player\Effect\ShockWave.cpp" />
     <ClCompile Include="Application\Player\Player.cpp" />
@@ -452,6 +453,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\GamePlay\GamePhaseManager.h" />
     <ClInclude Include="Application\GamePlay\IScenePhase.h" />
     <ClInclude Include="Application\GamePlay\Phase\ScenePhase.h" />
+    <ClInclude Include="Application\Player\Effect\PlayerHitAttackEffect.h" />
     <ClInclude Include="Application\Player\Effect\ShockFloor.h" />
     <ClInclude Include="Application\Player\Effect\ShockWave.h" />
     <ClInclude Include="Application\Player\IPlayerAction.h" />

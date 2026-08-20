@@ -145,7 +145,7 @@ private:
     // 移動する時のY軸の基本位置
     float defaultPosY_ = 5.0f;
 
-    // ステージ半径のオフセット
+    // ステージ半径の割合
     float offsetStageRadius_ = 0.0f;
 
     // 最大の時間

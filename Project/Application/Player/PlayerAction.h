@@ -213,6 +213,20 @@ public:
 
 	float GetAttackDownPower() const { return attackDownPower_; }
 
+	// 攻撃のレベル
+	uint32_t GetPowerLevel() const {
+		float diff = attackDownPower_ - kAttackDownMinPower_;
+		float ratio = diff / kAttackDownMaxPower_;
+
+		uint32_t level = 1;
+		if (ratio > 0.4f && ratio <= 0.7f) {
+			level = 2;
+		} else if(ratio > 0.7f) {
+			level = 3;
+		}
+		return level;
+	}
+
 private:
 	// 入力機能
 	GameEngine::InputCommand* inputCommand_ = nullptr;

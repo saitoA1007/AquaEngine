@@ -2,7 +2,6 @@
 #include "FPSCounter.h"
 #include "EasingManager.h"
 #include "MyMath.h"
-//#include "RenderQueue.h"
 using namespace GameEngine;
 
 ArrowUI::ArrowUI(std::string name, uint32_t texture, GameEngine::Model* model) : modelComponent_(model) {
