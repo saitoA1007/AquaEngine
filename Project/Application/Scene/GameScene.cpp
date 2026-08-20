@@ -50,6 +50,7 @@ GameScene::GameScene() {
 	auto* iceFallModel = modelManager_->GetNameByModel("iceFall.obj");
 	auto* iceFallFractureModel = modelManager_->GetNameByModel("iceFallFracture.gltf");
 	auto* windModel = modelManager_->GetNameByModel("wind.obj");
+	windModel->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
 	auto* bossRangedAttackManager = gameObjectManager_->AddObject<BossRangedAttackManager>(gameObjectManager_, iceFallModel, iceFallFractureModel,
 		textureManager_, windModel, &renderQueue_->GetMainCamera());
 

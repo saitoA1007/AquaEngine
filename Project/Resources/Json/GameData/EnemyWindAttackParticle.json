@@ -54,12 +54,12 @@
                 "Enable": true,
                 "RangeScale": {
                     "_Max": [
-                        1.5,
+                        2.0,
                         0.0,
                         0.0
                     ],
                     "_Min": [
-                        0.5,
+                        1.0,
                         0.0,
                         0.0
                     ]
@@ -69,10 +69,13 @@
             "ShapeEmit": {
                 "Enable": false
             },
-            "SpawnCoolTime": 0.05000000074505806,
+            "SpawnCoolTime": 0.0,
             "SpawnMaxCount": 3,
             "TextureEmit": {
-                "Enable": false
+                "Enable": true,
+                "Texture": {
+                    "_TextureName": "WindNoise.png"
+                }
             },
             "VelocityEmit": {
                 "Enable": false

@@ -465,6 +465,7 @@ void PSOManager::DefaultLoadPSO() {
     RegisterPSO("Instancing3D", instancing3D, &instancingRootSigBuilder, &inputLayoutBuilder);
 
     // インスタンシング描画の加算合成用PSO
+    instancing3D.drawMode = DrawModel::None;
     instancing3D.blendMode = { BlendMode::kBlendModeAddAndSaveObjectAlpha };
     RegisterPSO("AdditiveInstancing3D", instancing3D, &instancingRootSigBuilder, &inputLayoutBuilder);
 

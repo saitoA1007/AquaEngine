@@ -32,19 +32,19 @@ public:
 		default:
 			scale = 5.0f;
 			// 蒼
-			modelComponent_.materialData_->color = Vector4(0.0f, 0.0f, 1.0f, 1.0f);
+			modelComponent_.materialData_->color = Vector4(0.0f, 0.0f, 1.0f, 0.7f);
 			break;
 
 		case 2:
 			scale = 10.0f;
 			// 黄
-			modelComponent_.materialData_->color = Vector4(1.0f, 1.0f, 0.0f, 1.0f);
+			modelComponent_.materialData_->color = Vector4(1.0f, 1.0f, 0.0f, 0.7f);
 			break;
 
 		case 3:
 			scale = 15.0f;
 			// 赤
-			modelComponent_.materialData_->color = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
+			modelComponent_.materialData_->color = Vector4(1.0f, 0.0f, 0.0f, 0.7f);
 			break;
 		}
 		modelComponent_.worldTransform_.transform_.scale = Vector3(scale, scale, 1.0f);

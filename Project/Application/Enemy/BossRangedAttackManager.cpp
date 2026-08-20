@@ -15,7 +15,7 @@ BossRangedAttackManager::BossRangedAttackManager(GameEngine::GameObjectManager* 
     iceFallFractureModel_ = iceFallFractureModel;
 
 	// 風攻撃の軌跡パーティクルを生成
-	auto* windParticle = objectManager_->AddObject<ParticleBehavior>("EnemyWindAttackParticle", 128, textureManager, windModel, camera);
+	auto* windParticle = objectManager_->AddObject<ParticleBehavior>("EnemyWindAttackParticle", 256, textureManager, windModel, camera);
 	windParticle->SetIsLoop(false);
 
     // 風エフェクトを生成
