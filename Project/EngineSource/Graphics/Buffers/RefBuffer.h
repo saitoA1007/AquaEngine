@@ -63,12 +63,23 @@ namespace GameEngine {
 		// 使用するヒットグループを取得
 		uint32_t GetUseHitGroupIndex() const { return useHitGroupIndex_; }
 
+		// レイキャスト時のフィルタリング用マスクを設定する
+		void SetInstanceMask(uint32_t mask) {
+			instanceMask_ = mask;
+		}
+
+		// レイキャスト時のフィルタリング用マスクを取得
+		uint32_t GetInstanceMask() const { return instanceMask_; }
+
 	private:
 		uint32_t refIndex_ = 0;
 		BufferRef* refData_ = nullptr;
 
 		// 使用するヒットグループ
 		uint32_t useHitGroupIndex_ = 0;
+
+		// レイキャスト時のフィルタリング用マスク
+		uint32_t instanceMask_ = 0x01;
 
 		bool isCreated_ = false;
 	};

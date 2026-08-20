@@ -6,12 +6,20 @@
 
 namespace GameEngine {
 
+	// レイのフィルタリングに使うインスタンスマスク
+	enum class RayInstanceMask {
+		kRayMaskOpaque = 0x01, // 不透明。影レイを完全に遮る
+		kRayMaskIce = 0x02, // 氷などの透過物。影レイを一部だけ遮る
+		kRayMaskAll = 0xFF, // 全てのインスタンス
+	};
+
 	// TLASに登録する1つ分のインスタンス情報
 	struct TLASInstanceData {
 		BLAS* blas = nullptr;             // BLAS
 		float transform[3][4];            // ワールド変換行列
 		uint32_t instanceID = 0;          // シェーダー側で取得できる任意のID
 		uint32_t hitGroupIndexOffset = 0; // hitGroupのどのレコードを使用するか
+		uint32_t instanceMask = static_cast<uint32_t>(RayInstanceMask::kRayMaskOpaque); // レイキャスト時のフィルタリング用マスク
 	};
 
 	class TLAS :public SrvResource {

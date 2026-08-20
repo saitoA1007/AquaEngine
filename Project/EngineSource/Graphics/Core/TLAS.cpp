@@ -137,7 +137,7 @@ void TLAS::Update(ID3D12GraphicsCommandList4* cmdList, const std::vector<TLASIns
         instanceDescs_[i].AccelerationStructure = instances[i].blas->GetGpuVirtualAddress();
 
         // レイキャスト時のフィルタリング
-        instanceDescs_[i].InstanceMask = 0xFF;
+        instanceDescs_[i].InstanceMask = instances[i].instanceMask;
     }
 
     // 有効数でビルドを構築

@@ -30,7 +30,7 @@ DestructibleObject::DestructibleObject(std::string name, Model* model, uint32_t 
 	// 氷のマテリアルを設定する
 	for (auto& [groupName, chunks] : model_->GetFractureChunks()) {
 		PackedGeometryBuffer* buffer = model_->GetFractureBuffers().at(groupName).get();
-		buffer->SetBufferMaterial(iceMaterial_.GetMaterialSrvIndex());
+		buffer->SetBufferMaterial(iceMaterial_.GetMaterialSrvIndex(), static_cast<uint32_t>(RayInstanceMask::kRayMaskIce));
 	}
 
 	// 破砕状態を初期化

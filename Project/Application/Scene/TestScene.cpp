@@ -93,6 +93,8 @@ TestScene::TestScene() {
 		iceRefBuffers_[i][0].Create();
 		iceRefBuffers_[i][0].SetBufferMaterial(0, iceMaterial_.GetMaterialSrvIndex());
 		iceRefBuffers_[i][0].SetHitGroupIndex(1);
+		// 影レイで不透明物と区別させる
+		iceRefBuffers_[i][0].SetInstanceMask(static_cast<uint32_t>(RayInstanceMask::kRayMaskIce));
 	}
 
 	// 円柱

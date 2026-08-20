@@ -309,6 +309,8 @@ void RenderQueue::SubmitRaytracingModel(Model* model, WorldTransform& worldTrans
 
             // 使用するヒットグループを設定
             data.hitGroupIndexOffset = refBuffer.GetUseHitGroupIndex();
+            // レイキャスト時のフィルタリング用マスクを設定
+            data.instanceMask = refBuffer.GetInstanceMask();
         } else {
             auto& customRef = (*customRefBuffer)[i];
 
@@ -327,6 +329,8 @@ void RenderQueue::SubmitRaytracingModel(Model* model, WorldTransform& worldTrans
 
             // 使用するヒットグループを設定
             data.hitGroupIndexOffset = customRef.GetUseHitGroupIndex();
+            // レイキャスト時のフィルタリング用マスクを設定
+            data.instanceMask = customRef.GetInstanceMask();
         }
 
         // 使用するデータを設定
@@ -380,6 +384,8 @@ void RenderQueue::SubmitRaytracingFracture(Model* model, FractureInstance& fract
             data.blas = blas;
             // 使用するヒットグループを設定
             data.hitGroupIndexOffset = 1;
+            // 氷のヒットグループを使うため、影レイでも氷として扱う
+            data.instanceMask = static_cast<uint32_t>(RayInstanceMask::kRayMaskIce);
             // 使用するデータを設定
             data.instanceID = buffer->GetChunkRefIndex(chunkId);
             // 座標

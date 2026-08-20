@@ -214,6 +214,10 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
         }
     }
     
+    float3 lightDir = normalize(-gDirectionalLight.direction);
+    // 影を取る
+    float shadowFactor = ComputeShadowFactor(worldPosition, lightDir);
+
     float3 iceColor = material.color.rgb * textureColor.rgb;
     payload.color = IceBSDF(
         worldPosition,
@@ -221,17 +225,20 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
         payload.recursive,
         material.ior,
         material.roughness,
-        iceColor
+        iceColor,
+        shadowFactor
     );
-    
-    // 平行光源による鏡面ハイライト
-    float3 lightDir = normalize(-gDirectionalLight.direction);
+
+    // 直射日光を失った分だけ透過、反射光をわずかに寒色へ寄せ、影の位置を判別できるようにする
+    payload.color *= lerp(ICE_SHADOW_TINT, float3(1.0f, 1.0f, 1.0f), shadowFactor);
+
+    // 平行光源による鏡面ハイライト。影の中では出ない
     if (gDirectionalLight.active)
     {
         float3 lightColor = gDirectionalLight.color.rgb * gDirectionalLight.intensity;
         float3 iceSpecular = CalcSpecular(worldNormal, lightDir, viewDir,
             lightColor, material.specularColor.rgb, material.shininess);
-        payload.color += iceSpecular;
+        payload.color += iceSpecular * shadowFactor;
     }
 
     // 視線と法線の内積を取る
@@ -240,20 +247,12 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
     rimFactor = pow(rimFactor, material.rimPower);
     // リムライトの最終成分
     float3 rimLight = material.rimColor.rgb * rimFactor * material.rimIntensity * gDirectionalLight.intensity;
-    payload.color += rimLight;
-    
-    // バブルを描画
+    payload.color += rimLight * shadowFactor;
+
+    // バブルを描画。気泡のハイライトは影の中では消える
     float3 F0Ice = float3(0.02f, 0.02f, 0.02f);
     float NdotV = saturate(dot(worldNormal, viewDir));
     float surfaceFresnel = F_Schlick(NdotV, F0Ice).x;
     float transmittance = 1.0f - surfaceFresnel;
-    payload.color += bubbleColor * transmittance;
-    
-   // 影判定を取得
-   //bool isInShadow = ShootShadowRay(worldPosition, lightDir);
-   //// 影の中であれば、影色を設定
-   //if (isInShadow)
-   //{
-   //    payload.color.xyz *= 0.5;
-   //}
+    payload.color += bubbleColor * transmittance * shadowFactor;
 }
