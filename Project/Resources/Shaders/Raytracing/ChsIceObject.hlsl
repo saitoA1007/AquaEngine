@@ -248,4 +248,12 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
     float surfaceFresnel = F_Schlick(NdotV, F0Ice).x;
     float transmittance = 1.0f - surfaceFresnel;
     payload.color += bubbleColor * transmittance;
+    
+    // 影判定を取得
+    bool isInShadow = ShootShadowRay(worldPosition, lightDir);
+    // 影の中であれば、影色を設定
+    if (isInShadow)
+    {
+        payload.color.xyz *= 0.5;
+    }
 }
