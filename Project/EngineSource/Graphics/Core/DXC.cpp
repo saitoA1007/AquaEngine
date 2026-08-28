@@ -41,11 +41,19 @@ Microsoft::WRL::ComPtr<IDxcBlob>  DXC::CompileShader(
 
 	std::vector<LPCWSTR> arguments = {
 		filePath.c_str(),  // コンパイル対象のhlslファイル名
-		L"-T", profile,  // ShaderProfileの設定 
-		L"-Zi", L"-Qembed_debug",  // デバック用に情報を埋め込む
-		L"-Od",  // 最適化を外しておく
-		L"-Zpr", // メモリアウトは行を優先
+		L"-T", profile,    // ShaderProfileの設定 
+		L"-Zpr",           // メモリアウトは行を優先
 	};
+
+#ifdef _DEBUG
+	// デバッグビルド時は最適化オフ、デバッグ情報を埋め込み
+	arguments.push_back(L"-Od");
+	arguments.push_back(L"-Zi");
+	arguments.push_back(L"-Qembed_debug");
+#else
+	// 最適化
+	arguments.push_back(L"-O3");
+#endif
 
 	// エントリーポイントが存在する場合設定
 	if (!entryPoint.empty()) {
