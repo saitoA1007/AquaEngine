@@ -72,7 +72,7 @@ namespace GameEngine {
 
 	private:
 
-		// パスの実行順を登録（Initialize時に呼ぶ）
+		// パスの実行順を登録
 		void RegisterPassOrder(const std::vector<std::string>& order) {
 			passExecuteOrder_ = order;
 		}
@@ -81,6 +81,17 @@ namespace GameEngine {
 		/// PSOManagerから名前を指定して動的に登録する。
 		/// </summary>
 		void RegisterPSO(const std::string& name, PSOManager* psoManager);
+
+		/// <summary>
+		/// 使用するPSOを登録する
+		/// </summary>
+		/// <param name="psoManager"></param>
+		void RegisterPSOs(PSOManager* psoManager);
+
+		/// <summary>
+		/// 使用するレンダーパスを作成する
+		/// </summary>
+		void CreateRenderPasses();
 
 		// 文字列キーでPSOをセット
 		void PreDraw(const std::string& psoName);
@@ -108,5 +119,10 @@ namespace GameEngine {
 		void CopyRaytracingDepth();
 
 		void Composite();
+
+		// ヘルパー
+
+		// 描画コマンドが無いパスをクリア
+		void ClearPassOnly(const std::string& passName);
 	};
 }

@@ -61,6 +61,10 @@ TestScene::TestScene() {
 	//gameObjectManager_->AddObject<ParticleBehavior>("HitAfterEffect", 32, textureManager_, effectModel_, &renderQueue_->GetMainCamera());
 	//gpuParticle_ = gameObjectManager_->AddObject<ParticleBehaviorGPU>("GpuParticle", 1024, effectModel_);
 
+	//auto* waModel = modelManager_->GetNameByModel("rushWave.obj");
+	//waModel->SetDefaultIsEnableLight(false);
+	//gameObjectManager_->AddObject<ParticleBehavior>("rushEffect", 32, textureManager_, waModel, &renderQueue_->GetMainCamera());
+
 	// 中ポリゴン氷
 	iceMiddleModel_ = modelManager_->GetNameByModel("ice_middlePolygon.gltf");
 	iceMiddleModel_->SetDefaultIsEnableLight(true);

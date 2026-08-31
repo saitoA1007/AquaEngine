@@ -17,64 +17,11 @@ void SceneRenderManager::Initialize(ID3D12GraphicsCommandList4* commandList, Srv
     bufferRefManager_ = bufferRefManager;
 	renderQueue_ = renderQueue;
 
-    // レイトレーシングで描画するパス
-    renderPassController_->AddPass("RaytracingPass", RenderTextureMode::RtvAndUav);
-    // レイトレーシング描画の深度情報を記録する。描画に使用しない
-    renderPassController_->AddPass("RaytracingPassDepth", RenderTextureMode::UavOnly, 1280, 720, { 0.0f,0.0f,0.0f,1.0f }, DXGI_FORMAT_R32_FLOAT);
-
-    // レイトレとラスタライズを合成する用のパス
-    renderPassController_->AddPass("LightingCompositePass");
-
-    // 影を描画するパス
-    renderPassController_->AddPass("ShadowPass", RenderTextureMode::DsvOnly, 2048, 2048);
-    // デフォルトで描画するパス
-    renderPassController_->AddPass("DefaultPass", RenderTextureMode::RtvAndDsv, 1280, 720, { 0.0f,0.0f,0.0f,0.0f });
-
-    // ラスタライズの最終描画
-    rasterizeFinalPassName_ = "DefaultPass";
-    // レイトレの最終描画
-    raytracingFinalPassName_ = "RaytracingPass";
-    // 最終的な描画先を設定
-    finalPassName_ = "LightingCompositePass";
-    renderPassController_->SetSceneFinalPass(finalPassName_);
-    renderPassController_->SetPresentPass(finalPassName_);
-
-    // WBOITに使用するパスを作成。半透明描画に使用
-    renderPassController_->AddPass("WBOITAccumulatePass", RenderTextureMode::RtvOnly, 1280, 720, { 0.0f,0.0f,0.0f,0.0f }, DXGI_FORMAT_R16G16B16A16_FLOAT);
-    renderPassController_->AddPass("WBOITResolvePass", RenderTextureMode::RtvOnly, 1280, 720, { 1.0f,1.0f,1.0f,1.0f }, DXGI_FORMAT_R8_UNORM);
-
-    renderPassController_->AddPass("CompositePass");
-
-    // 実行順序を設定
-    RegisterPassOrder({ "ShadowPass", "DefaultPass" });
+    // 描画パスと実行順を設定
+    CreateRenderPasses();
 
     // PSOを登録
-    RegisterPSO("Default3D", psoManager);
-    RegisterPSO("Additive3D", psoManager);
-    RegisterPSO("Instancing3D", psoManager);
-    RegisterPSO("AdditiveInstancing3D", psoManager);
-    RegisterPSO("Animation", psoManager);
-    RegisterPSO("Skybox", psoManager);
-    RegisterPSO("ShadowMap", psoManager);
-    RegisterPSO("Grid", psoManager);
-    RegisterPSO("Line", psoManager);
-
-    RegisterPSO("DefaultSprite", psoManager);
-    RegisterPSO("AdditiveSprite", psoManager);
-
-    RegisterPSO("wboit3D", psoManager);
-    RegisterPSO("wboitResolve", psoManager);
-
-    RegisterPSO("CSParticle3D", psoManager);
-
-    // レイトレとラスタライズの合成用
-    RegisterPSO("LightingComposite", psoManager);
-    // 深度コピー用
-    RegisterPSO("DepthCopy", psoManager);
-  
-    // 破片描画用PSO
-    RegisterPSO("Fracture3D", psoManager);
-    RegisterPSO("IceFracture3D", psoManager);
+    RegisterPSOs(psoManager);
 
     // 破片描画用のコマンドルートシグネチャ
     fractureCommandSignature_ = psoManager->GetCommandSignature("DrawIndexedIndirect");
@@ -110,6 +57,7 @@ void SceneRenderManager::Execute() {
     // レイトレとラスタライズの描画を合成する
     LightingComposite();
 
+    // 半透明の描画結果を合成する
     Composite();
 
     // 最終的に画面に出すためのパスの設定
@@ -119,6 +67,78 @@ void SceneRenderManager::Execute() {
 
 void SceneRenderManager::RegisterPSO(const std::string& name, PSOManager* psoManager) {
     psoList_[name] = psoManager->GetDrawPsoData(name);
+}
+
+void SceneRenderManager::RegisterPSOs(PSOManager* psoManager) {
+    const std::string kUsePsoNames[] = {
+        // 3D描画用
+        "Default3D",
+        "Additive3D",
+        "Instancing3D",
+        "AdditiveInstancing3D",
+        "Animation",
+        "Skybox",
+        "ShadowMap",
+        "Grid",
+        "Line",
+
+        // 2D描画用
+        "DefaultSprite",
+        "AdditiveSprite",
+
+        // 半透明描画用
+        "wboit3D",
+        "wboitResolve",
+
+        // GPUパーティクル用
+        "CSParticle3D",
+
+        // レイトレとラスタライズの合成用
+        "LightingComposite",
+        // 深度コピー用
+        "DepthCopy",
+
+        // 破片描画用
+        "Fracture3D",
+        "IceFracture3D",
+    };
+
+    for (const auto& psoName : kUsePsoNames) {
+        psoList_[psoName] = psoManager->GetDrawPsoData(psoName);
+    }
+}
+
+void SceneRenderManager::CreateRenderPasses() {
+    // レイトレーシングで描画するパス
+    renderPassController_->AddPass("RaytracingPass", RenderTextureMode::RtvAndUav);
+    // レイトレーシング描画の深度情報を記録する。描画に使用しない
+    renderPassController_->AddPass("RaytracingPassDepth", RenderTextureMode::UavOnly, 1280, 720, { 0.0f,0.0f,0.0f,1.0f }, DXGI_FORMAT_R32_FLOAT);
+
+    // レイトレとラスタライズを合成する用のパス
+    renderPassController_->AddPass("LightingCompositePass");
+
+    // 影を描画するパス
+    renderPassController_->AddPass("ShadowPass", RenderTextureMode::DsvOnly, 2048, 2048);
+    // デフォルトで描画するパス
+    renderPassController_->AddPass("DefaultPass", RenderTextureMode::RtvAndDsv, 1280, 720, { 0.0f,0.0f,0.0f,0.0f });
+
+    // ラスタライズの最終描画
+    rasterizeFinalPassName_ = "DefaultPass";
+    // レイトレの最終描画
+    raytracingFinalPassName_ = "RaytracingPass";
+    // 最終的な描画先を設定
+    finalPassName_ = "LightingCompositePass";
+    renderPassController_->SetSceneFinalPass(finalPassName_);
+    renderPassController_->SetPresentPass(finalPassName_);
+
+    // WBOITに使用するパスを作成。半透明描画に使用
+    renderPassController_->AddPass("WBOITAccumulatePass", RenderTextureMode::RtvOnly, 1280, 720, { 0.0f,0.0f,0.0f,0.0f }, DXGI_FORMAT_R16G16B16A16_FLOAT);
+    renderPassController_->AddPass("WBOITResolvePass", RenderTextureMode::RtvOnly, 1280, 720, { 1.0f,1.0f,1.0f,1.0f }, DXGI_FORMAT_R8_UNORM);
+
+    renderPassController_->AddPass("CompositePass");
+
+    // 実行順序を設定
+    RegisterPassOrder({ "ShadowPass", "DefaultPass" });
 }
 
 void SceneRenderManager::PreDraw(const std::string& psoName) {
@@ -457,4 +477,10 @@ void SceneRenderManager::Composite() {
     renderPassController_->PostPass("CompositePass");
 
     finalPassName_ = "CompositePass";
+}
+
+void SceneRenderManager::ClearPassOnly(const std::string& passName) {
+    renderPassController_->PrePass(passName);
+    renderPassController_->ClearRenderPass(passName);
+    renderPassController_->PostPass(passName);
 }
