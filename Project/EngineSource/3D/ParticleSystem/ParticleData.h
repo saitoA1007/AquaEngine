@@ -20,6 +20,7 @@ namespace GameEngine {
 
 		Vector3 startSize;
 		Vector3 startSpeed;
+		Vector3 rotateVelocity; // 回転速度
 
 		bool IsAlive() const { return 1.0f <= currentTime; }
 	};

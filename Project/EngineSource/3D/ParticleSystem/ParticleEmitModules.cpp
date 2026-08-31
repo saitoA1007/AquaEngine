@@ -91,6 +91,18 @@ void ScaleEmitModule::Create(ParticleData& particleData) {
 }
 
 //==================================================
+// 回転速度モジュール
+//==================================================
+
+void RotateVelocityEmitModule::Create(ParticleData& particleData) {
+	particleData.rotateVelocity = {
+		RandomGenerator::Get(velocityRange_.min.x, velocityRange_.max.x),
+		RandomGenerator::Get(velocityRange_.min.y, velocityRange_.max.y),
+		RandomGenerator::Get(velocityRange_.min.z, velocityRange_.max.z),
+	};
+}
+
+//==================================================
 // 発射形状モジュール
 //==================================================
 
