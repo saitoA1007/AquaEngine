@@ -1,0 +1,117 @@
+{
+    "BossRushEffect": {
+        "Emitter": {
+            "ColorEmit": {
+                "Enable": false
+            },
+            "Defalut": {
+                "EmittePos": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "Rotate": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "Scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "DirectionEmit": {
+                "Direction": [
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "Enable": true,
+                "MaxSpeed": -29.15999984741211,
+                "MinSpeed": -30.0,
+                "SpreadAngle": 0.0
+            },
+            "IsBillBoard": false,
+            "IsLoop": true,
+            "LifeTime": 0.20000000298023224,
+            "RotateEmit": {
+                "Enable": false
+            },
+            "RotateVelocityEmit": {
+                "Enable": true,
+                "RangeRotateVelocity": {
+                    "_Max": [
+                        0.0,
+                        0.0,
+                        40.0
+                    ],
+                    "_Min": [
+                        0.0,
+                        0.0,
+                        40.0
+                    ]
+                }
+            },
+            "ScaleEmit": {
+                "Enable": true,
+                "RangeScale": {
+                    "_Max": [
+                        0.9300000071525574,
+                        0.0,
+                        0.0
+                    ],
+                    "_Min": [
+                        0.9200000166893005,
+                        0.0,
+                        0.0
+                    ]
+                },
+                "SeparateAxes": false
+            },
+            "ShapeEmit": {
+                "Enable": false
+            },
+            "SpawnCoolTime": 0.05000000074505806,
+            "SpawnMaxCount": 2,
+            "TextureEmit": {
+                "Enable": true,
+                "Texture": {
+                    "_TextureName": "rushWave.png"
+                }
+            },
+            "VelocityEmit": {
+                "Enable": false
+            }
+        },
+        "Particle": {
+            "AlphaOverLifeTime": {
+                "Enable": true,
+                "EndAlpha": 0.20000000298023224
+            },
+            "Attraction": {
+                "Enable": false
+            },
+            "RotationByVelocity": {
+                "Enable": false
+            },
+            "SizeOverLifeTime": {
+                "Enable": true,
+                "EndSize": 8.0,
+                "SeparateAxes": false,
+                "SeparateAxesEndSize": [
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            },
+            "VelocityOverLifeTime": {
+                "Enable": false
+            },
+            "Vortex": {
+                "Enable": false
+            }
+        },
+        "SceneName": "Game"
+    }
+}

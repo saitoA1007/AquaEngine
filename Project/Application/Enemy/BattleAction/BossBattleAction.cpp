@@ -104,6 +104,9 @@ void BossRushAttackAction::RotateMove() {
 	dir.Normalize();
 	commonData_.transform.rotate.y = std::atan2f(dir.x, dir.z);
 
+	// 突進エフェクト
+	commonData_.rangedAttackManager->SetRush(commonData_.transform.translate + (dir * 4.0f), dir, true);
+
 	if (timer_ >= 1.0f) {
 		state_ = State::kRush;
 		timer_ = 0.0f;
@@ -141,6 +144,7 @@ void BossRushAttackAction::RotateMove() {
 		endRushPos_ = commonData_.transform.translate + targetDir * rushDistance;
 		endRushPos_.y = 2.0f;
 
+		// アニメーション
 		commonData_.animator->StartAnimation(BossAnimationType::kRush, "Rush_End", rushMaxTime_, false);
 	}
 }
@@ -166,9 +170,15 @@ void BossRushAttackAction::RushAttack() {
 	commonData_.transform.rotate.y = std::atan2f(dir.x, dir.z);
 	commonData_.transform.rotate.z = 0.0f;
 
+	// 突進エフェクト
+	commonData_.rangedAttackManager->SetRush(commonData_.transform.translate + (dir * 4.0f), dir, true);
+
 	if (timer_ >= 1.0f) {
 		isFinished_ = true;
 		commonData_.requestState = BossBattleState::kResetMove;
+
+		// 突進エフェクトの無効化
+		commonData_.rangedAttackManager->SetRush(commonData_.transform.translate, dir, false);
 	}
 }
 

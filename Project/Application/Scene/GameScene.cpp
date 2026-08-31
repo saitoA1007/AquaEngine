@@ -51,8 +51,10 @@ GameScene::GameScene() {
 	auto* iceFallFractureModel = modelManager_->GetNameByModel("iceFallFracture.gltf");
 	auto* windModel = modelManager_->GetNameByModel("wind.obj");
 	windModel->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
+	auto* rushModel = modelManager_->GetNameByModel("rushWave.obj");
+	rushModel->SetDefaultIsEnableLight(false);
 	auto* bossRangedAttackManager = gameObjectManager_->AddObject<BossRangedAttackManager>(gameObjectManager_, iceFallModel, iceFallFractureModel,
-		textureManager_, windModel, &renderQueue_->GetMainCamera());
+		textureManager_, windModel, rushModel, &renderQueue_->GetMainCamera());
 
 	// 敵
 	auto* enemyModel = modelManager_->GetNameByModel("BossBird.gltf");

@@ -13,17 +13,8 @@ namespace GameEngine {
 class BossRangedAttackManager : public GameEngine::IGameObject {
 public:
 	BossRangedAttackManager(GameEngine::GameObjectManager* objectManager, GameEngine::Model* iceFallModel, GameEngine::Model* iceFallFractureModel,
-		GameEngine::TextureManager* textureManager, GameEngine::Model* windModel, GameEngine::Camera* camera);
+		GameEngine::TextureManager* textureManager, GameEngine::Model* windModel, GameEngine::Model* rushModel, GameEngine::Camera* camera);
 	~BossRangedAttackManager() = default;
-
-	// 初期化
-	//void Initialize() override;
-	//
-	//// 更新処理
-	//void Update() override;
-	//
-	//// 描画処理
-	//void Draw() override;
 	
 public:
 
@@ -45,6 +36,13 @@ public:
 	/// <param name="endDir">最後の方向</param>
 	void StartWind(Vector3 pos, Vector3 startDir, Vector3 endDir, float maxTime);
 
+	/// <summary>
+	/// 突進攻撃
+	/// </summary>
+	/// <param name="pos"></param>
+	/// <param name="dir"></param>
+	void SetRush(Vector3 pos, Vector3 dir, bool isActive);
+
 private:
 	GameEngine::GameObjectManager* objectManager_ = nullptr;
 
@@ -56,4 +54,7 @@ private:
 
 	// 風の攻撃演出
 	WindAttack* windAttack_ = nullptr;
+
+	// 突進パーティクル
+	GameEngine::ParticleBehavior* rushParticle_ = nullptr;
 };
