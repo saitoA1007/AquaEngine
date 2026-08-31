@@ -16,6 +16,7 @@ ModulesControl::ModulesControl(DebugParameter* param) {
     RegisterModule<ScaleEmitModule>(mainGroup, "ScaleEmit");
     RegisterModule<ShapeEmitModule>(mainGroup, "ShapeEmit");
     RegisterModule<ColorEmitModule>(mainGroup, "ColorEmit");
+    RegisterModule<RotateVelocityEmitModule>(mainGroup, "RotateVelocityEmit");
 
     mainGroup = "Particle";
     RegisterModule<VelocityOverLifeTimeModule>(mainGroup, "VelocityOverLifeTime");

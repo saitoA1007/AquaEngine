@@ -108,6 +108,7 @@ ParticleData ParticleBehavior::MakeNewParticle() {
     tmpParticleData.startColor = tmpParticleData.color;
     tmpParticleData.startSize =  main_.scale;
     tmpParticleData.startSpeed = tmpParticleData.velocity;
+    tmpParticleData.rotateVelocity = { 0.0f,0.0f,0.0f };
     tmpParticleData.dir = { 0.0f,0.0f,0.0f };
 
     // 生存時間
@@ -169,6 +170,8 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
         particle.currentTime += FpsCounter::deltaTime / particle.lifeTime;
         // 速度を追加
         particle.transform.translate += particle.velocity * FpsCounter::deltaTime;
+        // 回転速度
+        particle.transform.rotate += particle.rotateVelocity * FpsCounter::deltaTime;
 
         // worldTransformsの更新
         if (main_.isBillBoard) {

@@ -140,6 +140,28 @@ namespace GameEngine {
 		bool separateAxes_ = false;
 	};
 
+	// 回転速度
+	class RotateVelocityEmitModule : public IParticleModule {
+	public:
+		~RotateVelocityEmitModule() = default;
+
+		void Register(DebugParameter* param) override {
+			int index = 1;
+			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
+			param->Register("RangeRotateVelocity", velocityRange_, index++, subGroup);
+		}
+
+		void Remove(DebugParameter* param) override {
+			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
+			param->RemoveItem("RangeRotateVelocity", subGroup);
+		}
+
+		void Create(ParticleData& particleData) override;
+
+	private:
+		Range3 velocityRange_;
+	};
+
 	// 発射形状
 	class ShapeEmitModule : public IParticleModule {
 	public:
