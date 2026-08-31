@@ -39,6 +39,7 @@ ParticleBehavior::ParticleBehavior(const std::string& name, uint32_t maxNum, Tex
     debugParame_->Register("EmittePos", main_.emitterPos, index++, subGroup);
     debugParame_->Register("Rotate", main_.rotate, index++, subGroup);
     debugParame_->Register("Scale", main_.scale, index++, subGroup);
+    debugParame_->Register("Color", main_.color, index++, subGroup);
 
     // 出現範囲を抑える
     if (maxNumInstance_ <= main_.spawnMaxCount) {
@@ -104,7 +105,7 @@ ParticleData ParticleBehavior::MakeNewParticle() {
     tmpParticleData.transform.scale = main_.scale;
     tmpParticleData.transform.rotate = main_.rotate;
     tmpParticleData.velocity = { 0.0f,0.0f,0.0f };
-    tmpParticleData.color = { 1.0f,1.0f,1.0f,1.0f };
+    tmpParticleData.color = main_.color;
     tmpParticleData.startColor = tmpParticleData.color;
     tmpParticleData.startSize =  main_.scale;
     tmpParticleData.startSpeed = tmpParticleData.velocity;

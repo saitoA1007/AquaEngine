@@ -13,6 +13,9 @@ PlayerEffectManager::PlayerEffectManager(GameEngine::GameObjectManager* objectMa
 	auto* planeXYmodel = modelManager->GetNameByModel("plane.obj");
 	planeXYmodel->SetDefaultIsEnableLight(false);
 
+	auto* waveModel = modelManager->GetNameByModel("rushWave.obj");
+	waveModel->SetDefaultIsEnableLight(false);
+
 	objectManager_ = objectManager;
 
 	shockModel_ = shockWaveModel;
@@ -31,6 +34,10 @@ PlayerEffectManager::PlayerEffectManager(GameEngine::GameObjectManager* objectMa
 	afterEffect_ = objectManager_->AddObject<ParticleBehavior>("HitAfterEffect", 32, textureManager, planeXYmodel, &renderQueue_->GetMainCamera());
 	afterEffect_->SetIsLoop(false);
 
+	// 着地エフェクト
+	landingEffect_ = objectManager_->AddObject<ParticleBehavior>("PlayerLandingEffect", 32, textureManager, waveModel, &renderQueue_->GetMainCamera());
+	landingEffect_->SetIsLoop(false);
+
 	// プレイヤーのヒットエフェクト
 	uint32_t hitEffectGH = textureManager->GetHandleByName("HitEffect.png");
 	playerHitAttackEffect_ = objectManager_->AddObject<PlayerHitAttackEffect>(hitEffectGH, planeXYmodel);
@@ -40,8 +47,9 @@ PlayerEffectManager::PlayerEffectManager(GameEngine::GameObjectManager* objectMa
 void PlayerEffectManager::Update() {
 
 	if (timer_ <= 1.0f) {
-		timer_ += FpsCounter::deltaTime / 0.2f;
+		timer_ += FpsCounter::deltaTime / 0.3f;
 		if (timer_ >= 1.0f) {
+			landingEffect_->SetIsLoop(false);
 			if (blastEffect_->IsLoop()) {
 				blastEffect_->SetIsLoop(false);
 			}
@@ -81,4 +89,10 @@ void PlayerEffectManager::StartShockWave(Vector3 pos) {
 
 void PlayerEffectManager::StartHitEffect(Vector3 pos, uint32_t level) {
 	playerHitAttackEffect_->Start(pos, level);
+}
+
+void PlayerEffectManager::StartLandingEffect(Vector3 pos) {
+	timer_ = 0.0f;
+	landingEffect_->SetEmitterPos(pos);
+	landingEffect_->SetIsLoop(true);
 }

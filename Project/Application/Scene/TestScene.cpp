@@ -64,7 +64,7 @@ TestScene::TestScene() {
 	// ボスのラッシュ演出
 	auto* waModel = modelManager_->GetNameByModel("rushWave.obj");
 	waModel->SetDefaultIsEnableLight(false);
-	gameObjectManager_->AddObject<ParticleBehavior>("BossRushEffect", 32, textureManager_, waModel, &renderQueue_->GetMainCamera());
+	gameObjectManager_->AddObject<ParticleBehavior>("PlayerLandingEffect", 32, textureManager_, waModel, &renderQueue_->GetMainCamera());
 
 	// 中ポリゴン氷
 	iceMiddleModel_ = modelManager_->GetNameByModel("ice_middlePolygon.gltf");
