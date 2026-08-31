@@ -2,15 +2,24 @@
 #include <numbers>
 #include "RandomGenerator.h"
 #include "Application/Enemy/RangedAttack/IceFall.h"
-#include "Application/Enemy/RangedAttack/WindAttack.h"
+#include "ParticleBehavior.h"
 using namespace GameEngine;
 
-BossRangedAttackManager::BossRangedAttackManager(GameEngine::GameObjectManager* objectManager, GameEngine::Model* iceFallModel) {
+BossRangedAttackManager::BossRangedAttackManager(GameEngine::GameObjectManager* objectManager, GameEngine::Model* iceFallModel, GameEngine::Model* iceFallFractureModel,
+	GameEngine::TextureManager* textureManager, GameEngine::Model* windModel, GameEngine::Camera* camera) {
 
 	objectManager_ = objectManager;
 
 	iceFallModel_ = iceFallModel;
 
+    iceFallFractureModel_ = iceFallFractureModel;
+
+	// 風攻撃の軌跡パーティクルを生成
+	auto* windParticle = objectManager_->AddObject<ParticleBehavior>("EnemyWindAttackParticle", 256, textureManager, windModel, camera);
+	windParticle->SetIsLoop(false);
+
+    // 風エフェクトを生成
+    windAttack_ = objectManager_->AddObject<WindAttack>(iceFallModel_, windParticle);
 }
 
 void BossRangedAttackManager::StartIceFall(float rangeRadius, float minDistance, int iceFallNum, int iceFallMaxNum, int maxIter) {
@@ -54,11 +63,11 @@ void BossRangedAttackManager::StartIceFall(float rangeRadius, float minDistance,
 
     // 求めた位置から氷を生成する
     for (size_t i = 0; i < points.size(); ++i) {
-        objectManager_->AddObject<IceFall>(iceFallModel_, Vector3(points[i].x, 0.0f, points[i].y), currentIceFallNum_);
+        objectManager_->AddObject<IceFall>(iceFallModel_, iceFallFractureModel_, Vector3(points[i].x, 0.0f, points[i].y), currentIceFallNum_);
     }
 }
 
 void BossRangedAttackManager::StartWind(Vector3 pos, Vector3 startDir, Vector3 endDir, float maxTime) {
-    // 風を生成
-    objectManager_->AddObject<WindAttack>(iceFallModel_, pos, startDir, endDir, maxTime);
+    // 風の演出を開始
+    windAttack_->Start(pos, startDir, endDir, maxTime);
 }

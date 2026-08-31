@@ -60,6 +60,14 @@ cbuffer LightGroup : register(b1)
     int isActiveEnvironment;
 };
 
+// レイのフィルタリングに使うインスタンスマスク
+#define RAY_MASK_OPAQUE 0x01 // 不透明。影レイを完全に遮る
+#define RAY_MASK_ICE    0x02 // 氷などの透過物。影レイを一部だけ遮る
+#define RAY_MASK_ALL    0xFF // 全てのインスタンス
+
+// 氷が落とす影の濃さ
+static const float ICE_SHADOW_DENSITY = 0.25f;
+
 inline float3 CalcBarycentrics(float2 barys)
 {
     return float3(
@@ -192,7 +200,8 @@ float3 TranslucentRefraction(float3 worldPosition, float3 worldNormal, int recur
 }
 
 // 影判定用のレイ
-bool ShootShadowRay(float3 origin, float3 direction)
+// rayMask : 遮蔽物として扱うインスタンスのマスク
+bool ShootShadowRay(float3 origin, float3 direction, uint rayMask = RAY_MASK_ALL)
 {
     RayDesc rayDesc;
     rayDesc.Origin = origin;
@@ -206,7 +215,6 @@ bool ShootShadowRay(float3 origin, float3 direction)
     RAY_FLAG flags = RAY_FLAG_NONE;
     //flags |= RAY_FLAG_FORCE_OPAQUE;
     flags |= RAY_FLAG_SKIP_CLOSEST_HIT_SHADER;
-    uint rayMask = 0xFF;
 
     TraceRay(
         gRtScene,
@@ -218,6 +226,24 @@ bool ShootShadowRay(float3 origin, float3 direction)
         rayDesc,
         payload);
     return payload.isHit;
+}
+
+// 遮蔽物の種類を区別して影の透過率を求める
+float ComputeShadowFactor(float3 origin, float3 direction)
+{
+    // 不透明な遮蔽物は光を完全に遮る
+    if (ShootShadowRay(origin, direction, RAY_MASK_OPAQUE))
+    {
+        return 0.0f;
+    }
+
+    // 氷は光を透過するため、薄い影にとどめる
+    if (ShootShadowRay(origin, direction, RAY_MASK_ICE))
+    {
+        return 1.0f - ICE_SHADOW_DENSITY;
+    }
+
+    return 1.0f;
 }
 
 float3 GlassBSDF(float3 worldPos, float3 worldNormal, int recursive, float ior, float roughness, float3 glassColor)
@@ -271,8 +297,12 @@ float3 GlassBSDF(float3 worldPos, float3 worldNormal, int recursive, float ior, 
 // 氷のBeer-Lambert則の吸収係数
 static const float3 ICE_ABSORPTION_COEFF = float3(0.80f, 0.25f, 0.04f);
 
+// 影の中の氷にかける色
+static const float3 ICE_SHADOW_TINT = float3(0.80f, 0.87f, 1.00f);
+
 // 氷のレンダリング
-float3 IceBSDF(float3 worldPos, float3 worldNormal, int recursive, float ior, float roughness, float3 iceColor)
+// shadowFactor : 影の中なら0、日向なら1。直接光由来の成分だけを遮るために使う
+float3 IceBSDF(float3 worldPos, float3 worldNormal, int recursive, float ior, float roughness, float3 iceColor, float shadowFactor)
 {
     float3 worldRayDir = normalize(WorldRayDirection());
 
@@ -285,6 +315,8 @@ float3 IceBSDF(float3 worldPos, float3 worldNormal, int recursive, float ior, fl
     float cosTheta = saturate(dot(-worldRayDir, N));
     float r0 = (1.0f - ior) / (1.0f + ior);
     r0 = r0 * r0;
+    // 氷のr0はior1.31で約1.8%ぐらいでほぼ反射は移りません。ですが、現在はいったんビジュアル面を重視して上限を上げています。
+    r0 = max(r0, 0.3f);
     float F = r0 + (1.0f - r0) * pow(1.0f - cosTheta, 5.0f);
     F = saturate(F);
 
@@ -325,15 +357,15 @@ float3 IceBSDF(float3 worldPos, float3 worldNormal, int recursive, float ior, fl
     // 反射レイ発射
     float3 reflectColor = Reflection(worldPos, N, recursive);
 
-    // 近似SSS
+    // 近似SSS。影の中では消える
     float3 sssContrib = float3(0.0f, 0.0f, 0.0f);
-    if (entering && roughness > 0.01f)
+    if (entering && roughness > 0.01f && shadowFactor > 0.0f)
     {
         float3 lightDir = normalize(-gDirectionalLight.direction);
         float3 lightColor = gDirectionalLight.color.rgb * gDirectionalLight.intensity;
         float scatterStr = roughness * 0.4f;
         sssContrib = IceFakeSSS(N, lightDir, worldRayDir, lightColor, scatterStr);
-        sssContrib *= (1.0f - F);
+        sssContrib *= (1.0f - F) * shadowFactor;
     }
 
     return lerp(refractColor, reflectColor, F) + sssContrib;

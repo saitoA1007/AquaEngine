@@ -2,15 +2,16 @@
 #include "TextureManager.h"
 using namespace GameEngine;
 
-PlayUIManager::PlayUIManager(GameEngine::TextureManager* textureManager) {
+PlayUIManager::PlayUIManager(GameEngine::TextureManager* textureManager, GameEngine::Model* planeModel) {
 
 	// テクスチャを朱徳
 	uint32_t playerHpGH = textureManager->GetHandleByName("PlayerHP.png");
 	uint32_t bossNameGH = textureManager->GetHandleByName("BossName.png");
-	uint32_t playGuideGH = textureManager->GetHandleByName("playerGuide.png");
+	uint32_t pauseGuideGH = textureManager->GetHandleByName("pauseGuide.png");
 	uint32_t tutorial0GH = textureManager->GetHandleByName("Tutorial_01.png");
 	uint32_t tutorial1GH = textureManager->GetHandleByName("Tutorial_02.png");
 	uint32_t tutorial2GH = textureManager->GetHandleByName("Tutorial_03.png");
+	uint32_t arrowGH = textureManager->GetHandleByName("arrow.png");
 
 	// チュートリアルの表示文字
 	tutorialTextSprites_.resize(3);
@@ -37,7 +38,7 @@ PlayUIManager::PlayUIManager(GameEngine::TextureManager* textureManager) {
 
 	// テクスチャを設定
 	bossNameSprite_.textureHandle_ = bossNameGH;
-	playGuideSprite_.textureHandle_ = playGuideGH;
+	playGuideSprite_.textureHandle_ = pauseGuideGH;
 
 	// ボスUI
 	bossHpBarUI_ = std::make_unique<HpBarUI>("BossHpUI");
@@ -47,12 +48,16 @@ PlayUIManager::PlayUIManager(GameEngine::TextureManager* textureManager) {
 
 	// 黒帯UI
 	letterBoxUI_ = std::make_unique<LetterboxUI>("LetterboxUI");
+
+	// 矢印
+	arrowUI_ = std::make_unique<ArrowUI>("ArrowUI", arrowGH, planeModel);
 }
 
 void PlayUIManager::Initialize() {
 	bossHpBarUI_->Initialize();
 	playerHpUI_->Initialize();
 	letterBoxUI_->Initialize();
+	arrowUI_->Initialize();
 
 	// 更新して適応させる
 	Update();
@@ -70,6 +75,7 @@ void PlayUIManager::Update() {
 	bossHpBarUI_->Update();
 	playerHpUI_->Update();
 	letterBoxUI_->Update();
+	arrowUI_->Update();
 
 	for (auto& sprite : tutorialTextSprites_) {
 		sprite.Update();
@@ -79,6 +85,11 @@ void PlayUIManager::Update() {
 void PlayUIManager::Draw() {
 	// 黒帯を描画
 	letterBoxUI_->Draw();
+
+	// 矢印
+	if (isDrawArrowUI_) {
+		arrowUI_->Draw();
+	}
 
 	if (isDrawGamePlayUI_) {
 		// ボスHpを描画

@@ -174,7 +174,7 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
         if (main_.isBillBoard) {
             // ビルボードを適応する
             if (isRotateVelocity) {
-                worldTransforms_->transformDatas_[currentNumInstance_].worldMatrix = Math::MakeDirectionalBillboardMatrix(particle.transform.scale, particle.transform.translate, cameraMatrix, camera_->GetViewMatrix(), particle.velocity);;
+                worldTransforms_->transformDatas_[currentNumInstance_].worldMatrix = Math::MakeDirectionalBillboardMatrix(particle.transform.scale, particle.transform.translate, cameraMatrix, camera_->GetViewMatrix(), particle.velocity, particle.transform.rotate.z);
             } else {
                 worldTransforms_->transformDatas_[currentNumInstance_].worldMatrix = Math::MakeBillboardMatrix(particle.transform.scale, particle.transform.translate, particle.transform.translate.z,cameraMatrix);
             }

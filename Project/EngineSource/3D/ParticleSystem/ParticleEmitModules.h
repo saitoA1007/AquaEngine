@@ -56,6 +56,43 @@ namespace GameEngine {
 		Range3 velocityRange_;
 	};
 
+	// 方向を指定した速度の生成
+	class DirectionEmitModule : public IParticleModule {
+	public:
+		~DirectionEmitModule() = default;
+
+		void Register(DebugParameter* param) override {
+			int index = 1;
+			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
+			param->Register("Direction", direction_, index++, subGroup);
+			param->Register("MinSpeed", minSpeed_, index++, subGroup);
+			param->Register("MaxSpeed", maxSpeed_, index++, subGroup);
+			param->Register("SpreadAngle", spreadAngle_, index++, subGroup);
+		}
+
+		void Remove(DebugParameter* param) override {
+			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
+			param->RemoveItem("Direction", subGroup);
+			param->RemoveItem("MinSpeed", subGroup);
+			param->RemoveItem("MaxSpeed", subGroup);
+			param->RemoveItem("SpreadAngle", subGroup);
+		}
+
+		void Create(ParticleData& particleData) override;
+
+		// 外部から基準方向を設定する
+		void SetDirection(const Vector3& direction) { direction_ = direction; }
+
+	private:
+		// 基準となる方向
+		Vector3 direction_ = { 0.0f, 0.0f, 1.0f };
+		// 速さの範囲
+		float minSpeed_ = 1.0f;
+		float maxSpeed_ = 1.0f;
+		// 基準方向からのばらつき角度
+		float spreadAngle_ = 0.0f;
+	};
+
 	// 回転の生成
 	class RotateEmitModule : public IParticleModule {
 	public:

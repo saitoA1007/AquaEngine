@@ -309,6 +309,8 @@ void RenderQueue::SubmitRaytracingModel(Model* model, WorldTransform& worldTrans
 
             // 使用するヒットグループを設定
             data.hitGroupIndexOffset = refBuffer.GetUseHitGroupIndex();
+            // レイキャスト時のフィルタリング用マスクを設定
+            data.instanceMask = refBuffer.GetInstanceMask();
         } else {
             auto& customRef = (*customRefBuffer)[i];
 
@@ -327,6 +329,8 @@ void RenderQueue::SubmitRaytracingModel(Model* model, WorldTransform& worldTrans
 
             // 使用するヒットグループを設定
             data.hitGroupIndexOffset = customRef.GetUseHitGroupIndex();
+            // レイキャスト時のフィルタリング用マスクを設定
+            data.instanceMask = customRef.GetInstanceMask();
         }
 
         // 使用するデータを設定
@@ -380,6 +384,8 @@ void RenderQueue::SubmitRaytracingFracture(Model* model, FractureInstance& fract
             data.blas = blas;
             // 使用するヒットグループを設定
             data.hitGroupIndexOffset = 1;
+            // 氷のヒットグループを使うため、影レイでも氷として扱う
+            data.instanceMask = static_cast<uint32_t>(RayInstanceMask::kRayMaskIce);
             // 使用するデータを設定
             data.instanceID = buffer->GetChunkRefIndex(chunkId);
             // 座標
@@ -411,6 +417,24 @@ void RenderQueue::SubmitRuntimeCutFragments(FractureInstance& fractureInstance, 
     }
 }
 
+void RenderQueue::SubmitRuntimeCutIceFragments(FractureInstance& fractureInstance, const GpuResource* material, const float& alpha, const std::string& passName) {
+    Draw3dRequest request;
+    request.layer = RenderLayer::Opaque;
+    // ブレンド設定
+    request.type = Draw3dType::RuntimeCutIceFragments;
+    request.passName = passName;
+    request.fractureInstance = &fractureInstance;
+    request.material = material;
+
+    if (alpha == 1.0f) {
+        // 不透明描画に登録
+        draw3dQueueList_[passName][request.layer][Get3dPsoName(request.type)].push_back(request);
+    } else {
+        // 半透明描画に登録
+        translucentDrawQueueList_[passName].push_back(request);
+    }
+}
+
 const char* RenderQueue::Get3dPsoName(Draw3dType type) {
     switch (type) {
     case Draw3dType::Default: { return "Default3D"; }
@@ -426,6 +450,7 @@ const char* RenderQueue::Get3dPsoName(Draw3dType type) {
     case Draw3dType::DebugLine: { return "Line"; }
     case Draw3dType::Fracture: { return "Fracture3D"; }
     case Draw3dType::RuntimeCutFragments: { return "Fracture3D"; }
+    case Draw3dType::RuntimeCutIceFragments: { return "IceFracture3D"; }
     default: { return "Default3D"; }
     }
 }

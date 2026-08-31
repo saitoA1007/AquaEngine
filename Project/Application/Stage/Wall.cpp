@@ -6,23 +6,26 @@
 #include "Application/Enemy/BossEnemy.h"
 using namespace GameEngine;
 
-Wall::Wall(GameEngine::Model* model, GameEngine::DebugParameter* parame) : modelComponent_(model), underWallModelComponent_(model) {
+Wall::Wall(GameEngine::Model* model, GameEngine::Model* fractureModel, GameEngine::DebugParameter* parame) : underWallModelComponent_(model),
+	destructObject_("Wall", fractureModel, static_cast<uint32_t>(CollisionTypeID::kWall), kCollisionAttributeTerrain) {
 	// パラメーター機能を取得
 	parame_ = parame;
 
 	std::string subGroup = "Wall";
 	int index = 0;
-	parame_->Register("ModelScale", modelComponent_.worldTransform_.transform_.scale, index++, subGroup);
+	parame_->Register("ModelScale", destructObject_.worldTransform_.transform_.scale, index++, subGroup);
 	parame_->Register("ColliderSize", colliderSize_, index++, subGroup);
 	parame_->Register("MaxHp", maxHp_, index++, subGroup);
 	parame_->Register("RespawnTime", respawnTime_, index++, subGroup);
+	parame_->Register("ReassembleDestroyedRatio", reassembleDestroyedRatio_, index++, subGroup);
 
-	modelComponent_.materialData_->color.w = 0.8f;
+	// 破片側の当たり判定を無効
+	destructObject_.SetIsColliderActive(false);
 
 	// 当たり判定
-	collider_.SetWorldPosition(modelComponent_.worldTransform_.transform_.translate);
+	collider_.SetWorldPosition(destructObject_.worldTransform_.transform_.translate);
 	collider_.SetSize(colliderSize_);
-	collider_.UpdateOrientationsFromRotate(modelComponent_.worldTransform_.transform_.rotate);
+	collider_.UpdateOrientationsFromRotate(destructObject_.worldTransform_.transform_.rotate);
 	collider_.SetCollisionAttribute(kCollisionAttributeTerrain);
 	collider_.SetCollisionMask(~kCollisionAttributeTerrain);
 	// データを登録
@@ -35,22 +38,18 @@ Wall::Wall(GameEngine::Model* model, GameEngine::DebugParameter* parame) : model
 		this->OnCollisionEnter(result);
 	});
 
-	// 参照するマテリアルを変更
-	modelComponent_.SetBufferMaterial(0, iceMaterial_.GetMaterialSrvIndex());
-	modelComponent_.SetHitGroup(1);
-
 	underWallModelComponent_.SetBufferMaterial(0, iceMaterial_.GetMaterialSrvIndex());
 	underWallModelComponent_.SetHitGroup(1);
 }
 
 void Wall::SetParameter(const Transform& transform) {
 	// 位置を取得
-	modelComponent_.worldTransform_.transform_.translate = transform.translate;
-	modelComponent_.worldTransform_.transform_.rotate = transform.rotate;
-	modelComponent_.worldTransform_.transform_.scale = { 2.0f,2.0f,1.5f };
+	destructObject_.worldTransform_.transform_.translate = transform.translate;
+	destructObject_.worldTransform_.transform_.rotate = transform.rotate;
+	destructObject_.worldTransform_.transform_.scale = { 2.0f,2.0f,1.5f };
 
 	// 下に存在する壁を設置する
-	underWallModelComponent_.worldTransform_.transform_ = modelComponent_.worldTransform_.transform_;
+	underWallModelComponent_.worldTransform_.transform_ = destructObject_.worldTransform_.transform_;
 	underWallModelComponent_.worldTransform_.transform_.translate.y = -2.0f;
 	underWallModelComponent_.worldTransform_.transform_.scale * 0.8f;
 
@@ -59,14 +58,26 @@ void Wall::SetParameter(const Transform& transform) {
 }
 
 void Wall::Initialize() {
-	collider_.SetWorldPosition(modelComponent_.worldTransform_.transform_.translate);
+	collider_.SetWorldPosition(destructObject_.worldTransform_.transform_.translate);
 	collider_.SetSize(colliderSize_);
-	collider_.UpdateOrientationsFromRotate(modelComponent_.worldTransform_.transform_.rotate);
-	modelComponent_.Update();
+	collider_.UpdateOrientationsFromRotate(destructObject_.worldTransform_.transform_.rotate);
+	destructObject_.Update();
 	underWallModelComponent_.Update();
 }
 
 void Wall::Update() {
+
+	// 破片の更新処理
+	destructObject_.Update();
+
+	// 設定した破壊率を超えたら、壁を元に戻す
+	if (!destructObject_.IsReassembling()) {
+		if (destructObject_.GetDestroyedRatio() >= reassembleDestroyedRatio_) {
+			if (!isBreakIce_) {
+				isBreakIce_ = true;
+			}
+		}
+	}
 
 	if (!isBreakIce_) { return; }
 	respawnTimer_ += FpsCounter::gameDeltaTime / respawnTime_;
@@ -75,11 +86,12 @@ void Wall::Update() {
 	if (respawnTimer_ >= 1.0f) {
 		isBreakIce_ = false;
 		respawnTimer_ = 0.0f;
-		modelComponent_.worldTransform_.transform_.scale.z = 1.5f;
+		//destructObject_.worldTransform_.transform_.scale.z = 1.5f;
 		currentHp_ = maxHp_;
-	}
 
-	modelComponent_.Update();
+		// 破片を元に戻す
+		destructObject_.Reassemble();
+	}
 }
 
 void Wall::Draw() {
@@ -87,13 +99,16 @@ void Wall::Draw() {
 	// 下に存在する壁を設置する
 	underWallModelComponent_.DrawRaytracing(renderQueue_);
 
-	if (isBreakIce_) { return; }
-
 	// 壁を描画
-	modelComponent_.DrawRaytracing(renderQueue_);
+	//modelComponent_.DrawRaytracing(renderQueue_);
+
+	// 破片を描画
+	destructObject_.Draw();
 }
 
 void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
+
+	if (isBreakIce_) { return; }
 
 	bool isPlayer = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kPlayer));
 	bool isBoss = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kBoss));
@@ -112,6 +127,7 @@ void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& 
 	// Hpを削る
 	if (player != nullptr) {
 
+		// 突進攻撃で壁にヒットした瞬間のみ（触れているだけでは反応しない）
 		if (player->IsHitWall()) {
 			player->SetIsHitWall(false);
 			Vector3 velocity = player->GetVelocity();
@@ -126,6 +142,9 @@ void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& 
 			} else {
 				currentHp_ -= 3;
 			}
+
+			// 攻撃を受けた位置に破片を飛び散らせる
+			destructObject_.OnCollisionEnter(result);
 		}
 	} else if (boss != nullptr) {
 
@@ -135,18 +154,21 @@ void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& 
 		if (battleState == BossBattleState::kRushAttack) {
 			// ボスの場合、固定ダメージ
 			currentHp_ -= 2;
+
+			// 攻撃を受けた位置に破片を飛び散らせる
+			destructObject_.OnCollisionEnter(result);
 		}
 	}
 
-	// hpによって形を帰る
-	if (currentHp_ == 2) {
-		modelComponent_.worldTransform_.transform_.scale.z = 1.0f;
-	} else if (currentHp_ == 1) {
-		modelComponent_.worldTransform_.transform_.scale.z = 0.5f;
-	}else if (currentHp_ <= 0) {
-		currentHp_ = 0;
-		isBreakIce_ = true;
-	}
+	//// hpによって形を帰る
+	//if (currentHp_ == 2) {
+	//	destructObject_.worldTransform_.transform_.scale.z = 1.0f;
+	//} else if (currentHp_ == 1) {
+	//	destructObject_.worldTransform_.transform_.scale.z = 0.5f;
+	//}else if (currentHp_ <= 0) {
+	//	currentHp_ = 0;
+	//	isBreakIce_ = true;
+	//}
 
-	modelComponent_.worldTransform_.UpdateTransformMatrix();
+	//destructObject_.worldTransform_.UpdateTransformMatrix();
 }

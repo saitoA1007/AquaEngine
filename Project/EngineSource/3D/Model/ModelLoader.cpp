@@ -662,6 +662,31 @@ void ModelLoader::BuildFractureAdjacency(ModelData& modelData, float threshold) 
 		};
 	}
 
+	// グループごとの高さレンジから、最下層のチャンクを地面に固定されたアンカーとしてマークする
+	// （事前分割チャンクの底面はギザギザなので、絶対値のしきい値ではなく全高に対する割合で判定する）
+	struct HeightRange {
+		float minY = FLT_MAX;
+		float maxY = -FLT_MAX;
+	};
+	std::unordered_map<std::string, HeightRange> heightRangeByGroup;
+	for (auto& meshData : modelData.meshes) {
+		if (!meshData.fractureInfo.has_value()) {
+			continue;
+		}
+		HeightRange& range = heightRangeByGroup[meshData.fractureInfo->groupName];
+		range.minY = std::min(range.minY, meshData.fractureInfo->aabb.min.y);
+		range.maxY = std::max(range.maxY, meshData.fractureInfo->aabb.max.y);
+	}
+	for (auto& meshData : modelData.meshes) {
+		if (!meshData.fractureInfo.has_value()) {
+			continue;
+		}
+		const HeightRange& range = heightRangeByGroup[meshData.fractureInfo->groupName];
+		float groupHeight = range.maxY - range.minY;
+		float anchorThreshold = range.minY + groupHeight * kFractureAnchorHeightRatio_;
+		meshData.fractureInfo->isAnchored = (meshData.fractureInfo->aabb.min.y <= anchorThreshold);
+	}
+
 	// AABBが近接、重なっているかどうかを判定するラムダ
 	auto isNearOrOverlapping = [threshold](const Vector3& minA, const Vector3& maxA, const Vector3& minB, const Vector3& maxB) {
 		return (minA.x - threshold <= maxB.x && maxA.x + threshold >= minB.x) &&

@@ -121,9 +121,10 @@ namespace GameEngine {
 		}
 
 		// マテリアルを設定
-		void SetBufferMaterial(uint32_t materialSrvIndex) {
+		void SetBufferMaterial(uint32_t materialSrvIndex, uint32_t mask) {
 			for (auto& [id, refBuffer] : chunkRefBuffers_) {
 				refBuffer.SetBufferMaterial(0, materialSrvIndex);
+				refBuffer.SetInstanceMask(mask);
 			}
 		}
 

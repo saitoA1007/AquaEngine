@@ -1,20 +1,8 @@
 {
-    "HitEffect": {
+    "EnemyWindAttackParticle": {
         "Emitter": {
             "ColorEmit": {
-                "Enable": true,
-                "MaxColor": [
-                    0.0,
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "MinColor": [
-                    0.0,
-                    0.8030886650085449,
-                    1.0,
-                    1.0
-                ]
+                "Enable": false
             },
             "Defalut": {
                 "EmittePos": [
@@ -33,22 +21,45 @@
                     1.0
                 ]
             },
-            "IsBillBoard": true,
+            "DirectionEmit": {
+                "Direction": [
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "Enable": true,
+                "MaxSpeed": 80.0,
+                "MinSpeed": 65.0,
+                "SpreadAngle": 6.0
+            },
+            "IsBillBoard": false,
             "IsLoop": true,
-            "LifeTime": 0.800000011920929,
+            "LifeTime": 1.5,
             "RotateEmit": {
-                "Enable": false
+                "Enable": true,
+                "RangeRotate": {
+                    "_Max": [
+                        0.0,
+                        0.0,
+                        6.400000095367432
+                    ],
+                    "_Min": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ]
+                }
             },
             "ScaleEmit": {
                 "Enable": true,
                 "RangeScale": {
                     "_Max": [
-                        0.800000011920929,
+                        2.0,
                         0.0,
                         0.0
                     ],
                     "_Min": [
-                        0.30000001192092896,
+                        1.0,
                         0.0,
                         0.0
                     ]
@@ -56,24 +67,14 @@
                 "SeparateAxes": false
             },
             "ShapeEmit": {
-                "Enable": true,
-                "Shape": {
-                    "_ShapeType": "Hemisphere",
-                    "_boxSize": [
-                        20.0,
-                        1.0,
-                        20.0
-                    ],
-                    "_emitFromShell": true,
-                    "_radius": 0.5
-                }
+                "Enable": false
             },
-            "SpawnCoolTime": 0.10000000149011612,
-            "SpawnMaxCount": 16,
+            "SpawnCoolTime": 0.0,
+            "SpawnMaxCount": 3,
             "TextureEmit": {
                 "Enable": true,
                 "Texture": {
-                    "_TextureName": "heightCircle.png"
+                    "_TextureName": "WindNoise.png"
                 }
             },
             "VelocityEmit": {
@@ -83,17 +84,10 @@
         "Particle": {
             "AlphaOverLifeTime": {
                 "Enable": true,
-                "EndAlpha": 0.0
+                "EndAlpha": 0.20000000298023224
             },
             "Attraction": {
-                "Damping": 1.0,
-                "Enable": true,
-                "Strength": -100.0,
-                "TargetPos": [
-                    0.0,
-                    0.0,
-                    0.0
-                ]
+                "Enable": false
             },
             "RotationByVelocity": {
                 "Enable": true
@@ -108,6 +102,6 @@
                 "Enable": false
             }
         },
-        "SceneName": "Test"
+        "SceneName": "Game"
     }
 }

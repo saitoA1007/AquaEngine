@@ -570,6 +570,10 @@
     <ClCompile Include="Application\Stage\BgIceRock.cpp" />
     <ClCompile Include="EngineSource\Graphics\Debug\PixCapture.cpp" />
     <ClCompile Include="EngineSource\Editor\Windows\PixWindow.cpp" />
+    <ClCompile Include="Application\UI\Widgets\ArrowUI.cpp" />
+    <ClCompile Include="Application\Player\Effect\PlayerHitAttackEffect.cpp" />
+    <ClCompile Include="Application\Demo\IceDemo.cpp" />
+    <ClCompile Include="Application\Demo\FructureDemo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1126,6 +1130,10 @@
     <ClInclude Include="EngineSource\Graphics\Debug\PixCapture.h" />
     <ClInclude Include="EngineSource\Graphics\Debug\PixMarker.h" />
     <ClInclude Include="EngineSource\Editor\Windows\PixWindow.h" />
+    <ClInclude Include="Application\UI\Widgets\ArrowUI.h" />
+    <ClInclude Include="Application\Player\Effect\PlayerHitAttackEffect.h" />
+    <ClInclude Include="Application\Demo\IceDemo.h" />
+    <ClInclude Include="Application\Demo\FructureDemo.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />
@@ -1149,6 +1157,7 @@
     <FxCompile Include="Resources\Shaders\Fracture.VS.hlsl" />
     <FxCompile Include="Resources\Shaders\Fracture.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\ColorGrading.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\IceFracture.PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Externals\imgui\ProggyClean.ttf" />

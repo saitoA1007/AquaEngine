@@ -145,11 +145,8 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     // 最終的な色を設定
     payload.color = directLight + indirectLight;
     
-    // 影判定を取得
-    bool isInShadow = ShootShadowRay(worldPosition, lightDir);
+    // 遮蔽物が不透明かをマスクで区別して影の濃さを取得する
+    float shadowFactor = ComputeShadowFactor(worldPosition, lightDir);
     // 影の中であれば、影色を設定
-    if (isInShadow)
-    {
-        payload.color.xyz *= 0.5;
-    }
+    payload.color.xyz *= lerp(0.5f, 1.0f, shadowFactor);
 }

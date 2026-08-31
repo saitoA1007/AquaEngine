@@ -92,11 +92,13 @@ void TutorialPhase::Enter() {
 	playUIManager_->SetIsDrawGamePlayUI(false);
 	playUIManager_->SetIsDrawTutorialGuide(true);
 	playUIManager_->SetIsDrawPlayGuide(true);
+	playUIManager_->SetIsDrawArrowUI(true);
 }
 
 void TutorialPhase::Update() {
 
 	if (bossEnemy_->IsBreakEgg()) {
+		playUIManager_->SetIsDrawArrowUI(false);
 		playUIManager_->SetIsDrawGamePlayUI(false);
 		playUIManager_->SetIsDrawTutorialGuide(false);
 		playUIManager_->SetIsDrawPlayGuide(false);
@@ -127,6 +129,7 @@ void TutorialPhase::Exit() {
 	if (commonData_.requestPhase != ScenePhase::kPause) {
 		playUIManager_->SetIsDrawGamePlayUI(true);
 		playUIManager_->SetIsDrawPlayGuide(true);
+		playUIManager_->SetIsDrawArrowUI(false);
 		// プレイヤーを表示
 		player_->SetIsDraw(true);
 		// フォローカメラに変更

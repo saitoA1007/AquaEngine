@@ -7,8 +7,7 @@
 namespace GameEngine {
 
 	/// <summary>
-	/// 無傷、事前分割のまま切り離された破片、ランタイムカットされた破片、
-	/// 付着したまま動的に凹んだチャンクの状態を保持する。
+	/// 無傷、事前分割のまま切り離された破片、ランタイムカットされた破片、付着したまま動的に凹んだチャンクの状態を保持する。
 	/// </summary>
 	class FractureBreakState {
 	public:
@@ -46,7 +45,7 @@ namespace GameEngine {
 			}
 		}
 
-		// 切り離されずに付着したまま、動的にカットされて凹んだチャンク（chunkIdごとに1つ）
+		// 切り離されずに付着したまま、動的にカットされて凹んだチャンク
 		FractureInstance& GetOrCreateDentedChunk(uint32_t chunkId) {
 			auto it = dentedChunks_.find(chunkId);
 			if (it == dentedChunks_.end()) {

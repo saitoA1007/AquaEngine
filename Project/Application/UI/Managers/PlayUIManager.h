@@ -2,6 +2,7 @@
 #include "IGameObject.h"
 #include "Application/UI/Widgets/HpBarUI.h"
 #include "Application/UI/Widgets/HpContainer.h"
+#include "Application/UI/Widgets/ArrowUI.h"
 #include "Application/UI/Effects/LetterboxUI.h"
 
 // 前方宣言
@@ -14,7 +15,7 @@ namespace GameEngine {
 /// </summary>
 class PlayUIManager : public GameEngine::IGameObject {
 public:
-	PlayUIManager(GameEngine::TextureManager* textureManager);
+	PlayUIManager(GameEngine::TextureManager* textureManager, GameEngine::Model* planeModel);
 	~PlayUIManager() = default;
 
 	// 初期化処理
@@ -63,6 +64,11 @@ public:
 		isDrawTutorialGuide_ = isDraw;
 	}
 
+	// 矢印の表示フラグ
+	void SetIsDrawArrowUI(bool isDraw) {
+		isDrawArrowUI_ = isDraw;
+	}
+
 private:
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;
@@ -71,6 +77,7 @@ private:
 	bool isDrawPlayGuide_ = true;
 	bool isDrawTutorialGuide_ = true;
 	bool isDrawGamePlayUI_ = true;
+	bool isDrawArrowUI_ = false;
 
 	// ボスのHpUI
 	std::unique_ptr<HpBarUI> bossHpBarUI_;
@@ -89,4 +96,7 @@ private:
 
 	// 黒帯表示
 	std::unique_ptr<LetterboxUI> letterBoxUI_;
+
+	// 矢印ui
+	std::unique_ptr<ArrowUI> arrowUI_;
 };

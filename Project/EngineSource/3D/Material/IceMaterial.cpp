@@ -49,6 +49,10 @@ IceMaterial::IceMaterial() {
 	materialData_->bubbleDensity = 0.03f;
 	materialData_->bubbleJitter = 0.4f;
 	materialData_->bubbleHighlight = 0.15f;
+
+	materialData_->rimColor = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+	materialData_->rimIntensity = 1.0f;
+	materialData_->rimPower = 5.0f;
 }
 
 IceMaterial::~IceMaterial() {

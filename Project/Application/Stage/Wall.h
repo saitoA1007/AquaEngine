@@ -3,6 +3,7 @@
 #include "ModelComponent.h"
 #include "Collider.h"
 #include "IceMaterial.h"
+#include "DestructibleObject.h"
 
 // 前方宣言
 namespace GameEngine {
@@ -11,7 +12,7 @@ namespace GameEngine {
 
 class Wall : public GameEngine::IGameObject {
 public:
-	Wall(GameEngine::Model* model, GameEngine::DebugParameter* parame);
+	Wall(GameEngine::Model* model, GameEngine::Model* fractureModel, GameEngine::DebugParameter* parame);
 	~Wall() = default;
 
 	// 初期化
@@ -36,12 +37,15 @@ private:
 	// 当たり判定の大きさ
 	Vector3 colliderSize_ = { 10.0f,100.0f,0.5f };
 
+	// 破壊された時に戻す割合
+	float reassembleDestroyedRatio_ = 0.4f;
+
 private:
 	// パラメーター機能
 	GameEngine::DebugParameter* parame_ = nullptr;
 
 	// モデル
-	GameEngine::ModelComponent modelComponent_;
+	//GameEngine::ModelComponent modelComponent_;
 
 	// 氷のマテリアル
 	GameEngine::IceMaterial iceMaterial_;
@@ -60,6 +64,9 @@ private:
 
 	// 氷の状態
 	bool isBreakIce_ = false;
+
+	// 破片のモデル
+	GameEngine::DestructibleObject destructObject_;
 
 private:
 

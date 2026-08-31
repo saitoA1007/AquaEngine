@@ -5,12 +5,16 @@
 #include "MyMath.h"
 using namespace GameEngine;
 
-WindAttack::WindAttack(GameEngine::Model* model, Vector3 pos, Vector3 startDir, Vector3 endDir, float maxTime) : modelComponent_(model) {
+WindAttack::WindAttack(GameEngine::Model* model, GameEngine::ParticleBehavior* windParticle) : modelComponent_(model) {
 
-	modelComponent_.worldTransform_.transform_.translate = pos;
-	startDir_ = startDir;
-	endDir_ = endDir;
-	maxTime_ = maxTime;
+	modelComponent_.worldTransform_.transform_.translate = Vector3(0.0f,-10.0f,0.0f);
+	windParticle_ = windParticle;
+
+	// 風パーティクルを開始位置・方向に合わせて発生させる
+	if (windParticle_ != nullptr) {
+		windParticle_->SetIsLoop(false);
+		windParticle_->SetEmitterPos(modelComponent_.worldTransform_.transform_.translate);
+	}
 
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>("WindAttack");
@@ -33,7 +37,6 @@ WindAttack::WindAttack(GameEngine::Model* model, Vector3 pos, Vector3 startDir, 
 	collider_.SetOnCollisionCallback([this](const CollisionResult& result) {
 		this->OnCollisionEnter(result);
 		});
-
 }
 
 void WindAttack::Initialize() {
@@ -55,8 +58,22 @@ void WindAttack::Update() {
 	// 方向から角度を取得
 	modelComponent_.worldTransform_.transform_.rotate = Math::DirectionToEuler(dir);
 
+	// 風パーティクルの位置と向きを追従させる
+	if (windParticle_ != nullptr) {
+		windParticle_->SetEmitterPos(modelComponent_.worldTransform_.transform_.translate);
+		windParticle_->SetDirection(dir);
+	}
+
 	if (timer_ >= 1.0f) {
-		isDead_ = true;
+
+		isActive_ = false;
+		// 当たり判定を無効
+		collider_.SetActive(false);
+
+		// 攻撃終了に合わせてパーティクルの発生を止める
+		if (windParticle_ != nullptr) {
+			windParticle_->SetIsLoop(false);
+		}
 	}
 
 	modelComponent_.Update();
@@ -66,8 +83,8 @@ void WindAttack::Update() {
 }
 
 void WindAttack::Draw() {
-	// 壁を描画
-	modelComponent_.DrawRaytracing(renderQueue_);
+	// 描画
+	//modelComponent_.DrawRaytracing(renderQueue_);
 }
 
 void WindAttack::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {

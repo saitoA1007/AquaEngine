@@ -465,6 +465,7 @@ void PSOManager::DefaultLoadPSO() {
     RegisterPSO("Instancing3D", instancing3D, &instancingRootSigBuilder, &inputLayoutBuilder);
 
     // インスタンシング描画の加算合成用PSO
+    instancing3D.drawMode = DrawModel::None;
     instancing3D.blendMode = { BlendMode::kBlendModeAddAndSaveObjectAlpha };
     RegisterPSO("AdditiveInstancing3D", instancing3D, &instancingRootSigBuilder, &inputLayoutBuilder);
 
@@ -698,6 +699,58 @@ void PSOManager::DefaultLoadPSO() {
         RegisterCommandSignature("DrawIndexedIndirect", indirectCommandSignature.Get());
     }
 
+    // 氷の破片描画用PSO
+    {
+        CreatePSOData fracture3D;
+        fracture3D.rootSigName = "IceFracture3D";
+        fracture3D.vsPath = L"Resources/Shaders/Fracture.VS.hlsl";
+        fracture3D.psPath = L"Resources/Shaders/IceFracture.PS.hlsl";
+        fracture3D.drawMode = DrawModel::None;
+        fracture3D.blendMode = { BlendMode::kBlendModeNormalAndSaveObjectAlpha };
+        fracture3D.isDepthEnable = true;
+        RootSignatureBuilder fractureRs;
+        fractureRs.Initialize(device_);
+        fractureRs.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_PIXEL);
+        fractureRs.AddSRVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX);
+        fractureRs.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 0, D3D12_SHADER_VISIBILITY_PIXEL);
+        fractureRs.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_ALL);
+        fractureRs.AddCBVParameter(2, D3D12_SHADER_VISIBILITY_PIXEL);
+        fractureRs.Add32BitConstantsParameter(1, 0, D3D12_SHADER_VISIBILITY_VERTEX);
+        fractureRs.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
+        fractureRs.CreateRootSignature();
+        RegisterPSO("IceFracture3D", fracture3D, &fractureRs, &inputLayoutBuilder);
+
+        // ----------------------------------------------------
+        // 一時的なテストのためここにExecuteIndirect用のコマンドシグネチャを作成
+        // ----------------------------------------------------
+        Microsoft::WRL::ComPtr<ID3D12CommandSignature> indirectCommandSignature;
+
+        // 破片描画
+        UINT kFractureInstanceIndexRootParam = 5;
+
+        D3D12_INDIRECT_ARGUMENT_DESC argumentDescs[2] = {};
+        argumentDescs[0].Type = D3D12_INDIRECT_ARGUMENT_TYPE_CONSTANT;
+        argumentDescs[0].Constant.RootParameterIndex = kFractureInstanceIndexRootParam;
+        argumentDescs[0].Constant.DestOffsetIn32BitValues = 0;
+        argumentDescs[0].Constant.Num32BitValuesToSet = 1;
+
+        argumentDescs[1].Type = D3D12_INDIRECT_ARGUMENT_TYPE_DRAW_INDEXED;
+
+        D3D12_COMMAND_SIGNATURE_DESC sigDesc = {};
+        sigDesc.ByteStride = sizeof(FractureIndirectCommand);
+        sigDesc.NumArgumentDescs = _countof(argumentDescs);
+        sigDesc.pArgumentDescs = argumentDescs;
+
+        HRESULT hr = device_->CreateCommandSignature(
+            &sigDesc,
+            fractureRs.GetRootSignature(),
+            IID_PPV_ARGS(&indirectCommandSignature));
+        assert(SUCCEEDED(hr));
+
+        // 登録
+        RegisterCommandSignature("IceDrawIndexedIndirect", indirectCommandSignature.Get());
+    }
+
     LogManager::GetInstance().Log("Default PSOs loaded");
 }
 
@@ -742,10 +795,6 @@ void PSOManager::DefaultLoadPostEffectPSO() {
     // ディゾルブ
     defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/Dissolve/Dissolve.PS.hlsl";
     RegisterPSO("Dissolve", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
-
-    // アウトライン
-    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/OutLine/OutLine.PS.hlsl";
-    RegisterPSO("OutLine", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 
     // ラスタライズとレイトレの描画を合成する
     defaultPostEffect.rootSigName = "LightingComposite";

@@ -30,6 +30,32 @@ PlayerEffectManager::PlayerEffectManager(GameEngine::GameObjectManager* objectMa
 
 	afterEffect_ = objectManager_->AddObject<ParticleBehavior>("HitAfterEffect", 32, textureManager, planeXYmodel, &renderQueue_->GetMainCamera());
 	afterEffect_->SetIsLoop(false);
+
+	// プレイヤーのヒットエフェクト
+	uint32_t hitEffectGH = textureManager->GetHandleByName("HitEffect.png");
+	playerHitAttackEffect_ = objectManager_->AddObject<PlayerHitAttackEffect>(hitEffectGH, planeXYmodel);
+	playerHitAttackEffect_->SetActive(false);
+}
+
+void PlayerEffectManager::Update() {
+
+	if (timer_ <= 1.0f) {
+		timer_ += FpsCounter::deltaTime / 0.2f;
+		if (timer_ >= 1.0f) {
+			if (blastEffect_->IsLoop()) {
+				blastEffect_->SetIsLoop(false);
+			}
+		}
+	}
+
+	if (afterTimer_ <= 1.0f) {
+		afterTimer_ += FpsCounter::deltaTime / 0.8f;
+		if (afterTimer_ >= 1.0f) {
+			if (afterEffect_->IsLoop()) {
+				afterEffect_->SetIsLoop(false);
+			}
+		}
+	}
 }
 
 void PlayerEffectManager::StartShockWave(Vector3 pos) {
@@ -52,23 +78,7 @@ void PlayerEffectManager::StartShockWave(Vector3 pos) {
 	afterTimer_ = 0.0f;
 }
 
-void PlayerEffectManager::Update() {
 
-	if (timer_ <= 1.0f) {
-		timer_ += FpsCounter::deltaTime / 0.2f;
-		if (timer_ >= 1.0f) {
-			if (blastEffect_->IsLoop()) {
-				blastEffect_->SetIsLoop(false);
-			}
-		}
-	}
-
-	if (afterTimer_ <= 1.0f) {
-		afterTimer_ += FpsCounter::deltaTime / 0.8f;
-		if (afterTimer_ >= 1.0f) {
-			if (afterEffect_->IsLoop()) {
-				afterEffect_->SetIsLoop(false);
-			}
-		}
-	}
+void PlayerEffectManager::StartHitEffect(Vector3 pos, uint32_t level) {
+	playerHitAttackEffect_->Start(pos, level);
 }

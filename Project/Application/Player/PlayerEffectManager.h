@@ -4,6 +4,7 @@
 #include "ParticleBehavior.h"
 #include "ModelManager.h"
 #include "TextureManager.h"
+#include "Effect/PlayerHitAttackEffect.h"
 
 class PlayerEffectManager : public GameEngine::IGameObject {
 public:
@@ -15,11 +16,16 @@ public:
 	//
 	//// 更新処理
 	void Update() override;
+
 	//
 	//// 描画処理
 	//void Draw() override;
 
+public:
+
 	void StartShockWave(Vector3 pos);
+
+	void StartHitEffect(Vector3 pos, uint32_t level);
 
 	//void StartDown();
 	//void EndDown();
@@ -45,4 +51,6 @@ private:
 	float timer_ = 0.0f;
 	float afterTimer_ = 0.0f;
 
+	// ヒット演出
+	PlayerHitAttackEffect* playerHitAttackEffect_ = nullptr;
 };

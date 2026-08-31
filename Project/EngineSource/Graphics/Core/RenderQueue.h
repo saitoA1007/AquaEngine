@@ -75,6 +75,12 @@ namespace GameEngine {
             }
         }
 
+        // デバックカメラのワールド行列を取得
+        Matrix4x4 GetDebugCameraWorldMatrix() const {
+            auto* perViewData = perViewData_.GetData();
+            return perViewData->billboardMatrix;
+        }
+
         const bool& GetUseDebugCamera() const { return useDebugCamera_; }
 
         // カメラリソースを取得
@@ -147,6 +153,8 @@ namespace GameEngine {
         void SubmitRaytracingFracture(Model* model, FractureInstance& fractureInstance, WorldTransform& worldTransform);
 
         void SubmitRuntimeCutFragments(FractureInstance& fractureInstance, const GpuResource* material, const float& alpha = 1.0f, const std::string& passName = "DefaultPass");
+
+        void SubmitRuntimeCutIceFragments(FractureInstance& fractureInstance, const GpuResource* material, const float& alpha = 1.0f, const std::string& passName = "DefaultPass");
 
         // psoの名前を取得
         const char* Get3dPsoName(Draw3dType type);

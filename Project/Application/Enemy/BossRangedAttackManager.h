@@ -2,10 +2,18 @@
 #include "IGameObject.h"
 #include "GameObjectManager.h"
 #include "Model.h"
+#include "Application/Enemy/RangedAttack/WindAttack.h"
+
+namespace GameEngine {
+	class TextureManager;
+	class Camera;
+	class ParticleBehavior;
+}
 
 class BossRangedAttackManager : public GameEngine::IGameObject {
 public:
-	BossRangedAttackManager(GameEngine::GameObjectManager* objectManager, GameEngine::Model* iceFallModel);
+	BossRangedAttackManager(GameEngine::GameObjectManager* objectManager, GameEngine::Model* iceFallModel, GameEngine::Model* iceFallFractureModel,
+		GameEngine::TextureManager* textureManager, GameEngine::Model* windModel, GameEngine::Camera* camera);
 	~BossRangedAttackManager() = default;
 
 	// 初期化
@@ -41,7 +49,11 @@ private:
 	GameEngine::GameObjectManager* objectManager_ = nullptr;
 
 	GameEngine::Model* iceFallModel_ = nullptr;
+	GameEngine::Model* iceFallFractureModel_ = nullptr;
 
 	// 氷柱の現在の数
 	int32_t currentIceFallNum_ = 0;
+
+	// 風の攻撃演出
+	WindAttack* windAttack_ = nullptr;
 };

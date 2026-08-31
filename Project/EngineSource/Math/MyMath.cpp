@@ -598,7 +598,7 @@ namespace GameEngine {
 			return scaleMatrix * localRotateMatrix * billboardMatrix * translateMatrix;
 		}
 
-		Matrix4x4 MakeDirectionalBillboardMatrix(const Vector3& scale, const Vector3& translate, const Matrix4x4& cameraMatrix, const Matrix4x4& viewMatrix, const Vector3& velocity) {
+		Matrix4x4 MakeDirectionalBillboardMatrix(const Vector3& scale, const Vector3& translate, const Matrix4x4& cameraMatrix, const Matrix4x4& viewMatrix, const Vector3& velocity, float rotateZ) {
 			// 1. ビルボード行列（カメラの回転をコピーしてZ軸回転などをリセット）
 			Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(0.0f);
 			Matrix4x4 billboardMatrix = Multiply(backToFrontMatrix, cameraMatrix);
@@ -631,10 +631,13 @@ namespace GameEngine {
 				rotateMatrix.m[1][1] = cosTheta;
 			}
 
+			// 最初に設定されたZ回転を維持するためのローカル回転
+			Matrix4x4 localRotateMatrix = MakeRotateZMatrix(rotateZ);
+
 			Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
 			Matrix4x4 translateMatrix = MakeTranslateMatrix(translate);
 
-			return scaleMatrix * rotateMatrix * billboardMatrix * translateMatrix;
+			return scaleMatrix * localRotateMatrix * rotateMatrix * billboardMatrix * translateMatrix;
 		}
 
 		Matrix4x4 LookAt(const Vector3& eye, const Vector3& center, const Vector3& up) {

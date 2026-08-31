@@ -15,7 +15,7 @@ Floor::Floor(GameEngine::Model* model, uint32_t iceNormalGH, uint32_t iceHeightG
 	// 地面
 	terrainModelComponent_.materialData_->textureHandle = terrainGH;
 	terrainModelComponent_.materialData_->normalTextureHandle = terrainNormalGH;
-	terrainModelComponent_.materialData_->enableLighting = true;
+	terrainModelComponent_.materialData_->enableLighting = false;
 	terrainModelComponent_.materialData_->metallic = 0.01f;
 	terrainModelComponent_.materialData_->roughness = 0.9f;
 
@@ -31,6 +31,10 @@ Floor::Floor(GameEngine::Model* model, uint32_t iceNormalGH, uint32_t iceHeightG
 	debugParame_->Register("bubbleDensity", iceMaterial_.materialData_->bubbleDensity, index++,subGroup);
 	debugParame_->Register("bubbleJitter", iceMaterial_.materialData_->bubbleJitter, index++,subGroup);
 	debugParame_->Register("bubbleHighlight", iceMaterial_.materialData_->bubbleHighlight, index++,subGroup);
+
+	debugParame_->Register("rimColor", iceMaterial_.materialData_->rimColor, index++,subGroup);
+	debugParame_->Register("rimIntensity", iceMaterial_.materialData_->rimIntensity, index++,subGroup);
+	debugParame_->Register("rimPower", iceMaterial_.materialData_->rimPower, index++,subGroup);
 	debugParame_->Apply();
 
 	// 当たり判定

@@ -87,9 +87,7 @@ private: // シーン機能
 
 	// 氷で共通のマテリアル
 	GameEngine::IceMaterial iceMaterial_;
-	// レイトレーシングで氷マテリアルを参照する用
-	std::vector<GameEngine::RefBuffer> iceRefBuffers_[4];
-
+	
 	Vector4 color_ = {1.0f,1.0f,1.0f,1.0f};
 	float roughness_ = 0.5f;
 	// 屈折
@@ -99,31 +97,16 @@ private: // シーン機能
 	GameEngine::Model* terrainModel_;
 	GameEngine::WorldTransform terrainWorld_;
 
-	// 高ポリゴン氷
-	GameEngine::Model* iceHighModel_;
-	GameEngine::WorldTransform iceHighWorld_;
 	// 中ポリゴン氷
 	GameEngine::Model* iceMiddleModel_;
 	GameEngine::WorldTransform iceMiddleWorld_;
-	// 小ポリゴン氷
-	GameEngine::Model* iceLowModel_;
-	GameEngine::WorldTransform iceLowWorld_;
 	// キューブ
 	GameEngine::Model* iceCubeModel_;
 	GameEngine::WorldTransform iceCubeWorld_;
 
-	// 円柱
-	GameEngine::Model* cylinderModel_;
-	GameEngine::WorldTransform cylinderWorld_;
-
 	GameEngine::Model* testModel_;
 
-	// 球の当たり判定
-	GameEngine::SphereCollider testCollider_;
-	Vector3 testPos_ = {10.0f,0.0f,-8.0f};
-
-	// パーティクル
-	GameEngine::ParticleBehaviorGPU* gpuParticle_ = nullptr;
-
-	GameEngine::DestructibleObject* destructibleObject_ = nullptr;
+	// 1つに集約していない破片モデルを描画
+	GameEngine::Model* noFractureModel_;
+	GameEngine::WorldTransform noFractureWorld_;
 };

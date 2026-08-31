@@ -28,7 +28,10 @@ void CollisionManager::CheckAllCollisions() {
 		// コライダーAを取得
 		Collider* colliderA = *itrA;
 
-		// イテレーターBはイテレータAの次の要素から回す(重複判定を回避)
+		// 無効なコライダーはスキップする
+		if (!colliderA->IsActive()) { continue; }
+
+		// イテレーターBはイテレータAの次の要素から回す
 		std::list<Collider*>::iterator itrB = itrA;
 		itrB++;
 
@@ -94,6 +97,8 @@ void CollisionManager::DebugDraw(DebugRenderer* debugRenderer) {
 #ifdef USE_IMGUI
 	if (colliders_.empty() || !debugRenderer->IsEnabled()) { return; }
 	for (auto collider : colliders_) {
+		// 無効なコライダーは描画しない
+		if (!collider->IsActive()) { continue; }
 		CollisionData type = collider->GetCollisionData();
 
 		switch (type.shapeType)
@@ -131,6 +136,10 @@ void CollisionManager::DebugDraw(DebugRenderer* debugRenderer) {
 }
 
 bool CollisionManager::IsActiveCollision(Collider* a, Collider* b) {
+	// どちらかが無効なら衝突しない
+	if (!a->IsActive() || !b->IsActive()) {
+		return false;
+	}
 	return (a->GetCollisionAttribute() & b->GetCollisionMask()) != 0 && (b->GetCollisionAttribute() & a->GetCollisionMask()) != 0;
 }
 

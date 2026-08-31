@@ -75,6 +75,9 @@ private:
 	// 隠れるフレーム部分
 	GameEngine::Sprite frameSprite_;
 
+	// 操作説明
+	GameEngine::Sprite playGuideSprite_;
+
 	// 戻る
 	std::unique_ptr<DimmerUI> backUI_;
 

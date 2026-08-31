@@ -4,10 +4,11 @@
 #include "DebugParameter.h"
 #include "IceMaterial.h"
 #include "Collider.h"
+#include "DestructibleObject.h"
 
 class IceFall : public GameEngine::IGameObject {
 public:
-	IceFall(GameEngine::Model* model, Vector3 pos, int32_t& iceFallCurrentNum);
+	IceFall(GameEngine::Model* model, GameEngine::Model* fractureModel, Vector3 pos, int32_t& iceFallCurrentNum);
 	~IceFall();
 
 	// 初期化
@@ -19,15 +20,25 @@ public:
 	// 描画処理
 	void Draw() override;
 
+public:
+
+	// 破壊
+	void SetIsBreak(bool isBreak) {
+		isBreak_ = isBreak;
+	}
+
 private:
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;
 
 	// モデル
-	GameEngine::ModelComponent modelComponent_;
+	//GameEngine::ModelComponent modelComponent_;
 
 	// 氷のマテリアル
 	GameEngine::IceMaterial iceMaterial_;
+
+	// 破片のオブジェクト
+	GameEngine::DestructibleObject destructibleObject_;
 
 	// 現在の氷柱の数
 	int32_t& iceFallCurrentNum_;
@@ -44,6 +55,8 @@ private:
 	float timer_ = 0.0f;
 
 	bool isEnterMoveActive_ = true;
+
+	bool isBreak_ = false;
 
 private:
 

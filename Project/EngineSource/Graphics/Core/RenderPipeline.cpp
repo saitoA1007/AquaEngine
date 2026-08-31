@@ -105,6 +105,9 @@ void RenderPipeline::EndFrame(ImGuiManager* imGuiManager) {
     // GPUとOSに画面の交換を行うように通知する
     graphicsDevice_->Present();
 
+    // TDRはこのタイミングで表面化するため、GPU待ちに入る前に状態を確認してDREDのログを残す
+    graphicsDevice_->CheckDeviceStatus();
+
     // Presentが終わったフレームを1枚としてカウントし、必要ならキャプチャを確定させる
     PixCapture::GetInstance().EndFrame();
 

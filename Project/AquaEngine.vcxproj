@@ -163,6 +163,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Camera\CameraController.cpp" />
     <ClCompile Include="Application\Camera\State\CameraState.cpp" />
     <ClCompile Include="Application\ColorEditor.cpp" />
+    <ClCompile Include="Application\Demo\FructureDemo.cpp" />
+    <ClCompile Include="Application\Demo\IceDemo.cpp" />
     <ClCompile Include="Application\Enemy\BattleAction\BossBattleAction.cpp" />
     <ClCompile Include="Application\Enemy\BossAnimator.cpp" />
     <ClCompile Include="Application\Enemy\BossEnemy.cpp" />
@@ -174,6 +176,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Enemy\State\BossStateOut.cpp" />
     <ClCompile Include="Application\GamePlay\GamePhaseManager.cpp" />
     <ClCompile Include="Application\GamePlay\Phase\ScenePhase.cpp" />
+    <ClCompile Include="Application\Player\Effect\PlayerHitAttackEffect.cpp" />
     <ClCompile Include="Application\Player\Effect\ShockFloor.cpp" />
     <ClCompile Include="Application\Player\Effect\ShockWave.cpp" />
     <ClCompile Include="Application\Player\Player.cpp" />
@@ -190,6 +193,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\UI\Effects\DimmerUI.cpp" />
     <ClCompile Include="Application\UI\Managers\ClearUIManager.cpp" />
     <ClCompile Include="Application\UI\Managers\GameOverUIManager.cpp" />
+    <ClCompile Include="Application\UI\Widgets\ArrowUI.cpp" />
     <ClCompile Include="Application\UI\Widgets\HpBarUI.cpp" />
     <ClCompile Include="Application\UI\Widgets\HpContainer.cpp" />
     <ClCompile Include="Application\UI\Effects\LetterboxUI.cpp" />
@@ -437,6 +441,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Camera\ICameraState.h" />
     <ClInclude Include="Application\Camera\State\CameraState.h" />
     <ClInclude Include="Application\ColorEditor.h" />
+    <ClInclude Include="Application\Demo\FructureDemo.h" />
+    <ClInclude Include="Application\Demo\IceDemo.h" />
     <ClInclude Include="Application\Enemy\BattleAction\BossBattleAction.h" />
     <ClInclude Include="Application\Enemy\BattleAction\IBossBattleAction.h" />
     <ClInclude Include="Application\Enemy\BossAnimator.h" />
@@ -451,6 +457,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\GamePlay\GamePhaseManager.h" />
     <ClInclude Include="Application\GamePlay\IScenePhase.h" />
     <ClInclude Include="Application\GamePlay\Phase\ScenePhase.h" />
+    <ClInclude Include="Application\Player\Effect\PlayerHitAttackEffect.h" />
     <ClInclude Include="Application\Player\Effect\ShockFloor.h" />
     <ClInclude Include="Application\Player\Effect\ShockWave.h" />
     <ClInclude Include="Application\Player\IPlayerAction.h" />
@@ -469,6 +476,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\UI\Effects\DimmerUI.h" />
     <ClInclude Include="Application\UI\Managers\ClearUIManager.h" />
     <ClInclude Include="Application\UI\Managers\GameOverUIManager.h" />
+    <ClInclude Include="Application\UI\Widgets\ArrowUI.h" />
     <ClInclude Include="Application\UI\Widgets\HpBarUI.h" />
     <ClInclude Include="Application\UI\Widgets\HpContainer.h" />
     <ClInclude Include="Application\UI\Effects\LetterboxUI.h" />
@@ -889,6 +897,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Development|x64'">6.6</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.6</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.6</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\IceFracture.PS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Resources\Shaders\Raytracing\Miss.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Library</ShaderType>

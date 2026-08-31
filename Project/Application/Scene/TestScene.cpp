@@ -4,6 +4,8 @@
 #include "RandomGenerator.h"
 #include "FPSCounter.h"
 #include "Application/CollisionConfig.h"
+#include "Application/Demo/IceDemo.h"
+#include "Application/Demo/FructureDemo.h"
 using namespace GameEngine;
 
 TestScene::~TestScene() {}
@@ -18,6 +20,8 @@ TestScene::TestScene() {
 	inputCommand_->RegisterCommand("MoveRight", { {InputState::KeyPush, DIK_D },{InputState::PadLeftStick,0,{1.0f,0.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_RIGHT } });
 	inputCommand_->RegisterCommand("MoveForward", { {InputState::KeyPush, DIK_W },{InputState::PadLeftStick,0,{0.0f,1.0f},0.2f}, { InputState::PadPush, XINPUT_GAMEPAD_DPAD_UP } });
 	inputCommand_->RegisterCommand("MoveBack", { {InputState::KeyPush, DIK_S },{InputState::PadLeftStick,0,{0.0f,-1.0f},0.2f}, {InputState::PadPush, XINPUT_GAMEPAD_DPAD_DOWN} });
+	// 破壊オブジェクトを元の姿へ戻す
+	inputCommand_->RegisterCommand("Reassemble", { {InputState::KeyTrigger, DIK_R } });
 
 	// メインカメラの初期化
 	mainCamera_ = std::make_unique<Camera>();
@@ -57,24 +61,17 @@ TestScene::TestScene() {
 	//gameObjectManager_->AddObject<ParticleBehavior>("HitAfterEffect", 32, textureManager_, effectModel_, &renderQueue_->GetMainCamera());
 	//gpuParticle_ = gameObjectManager_->AddObject<ParticleBehaviorGPU>("GpuParticle", 1024, effectModel_);
 
-	// 高ポリゴン氷
-	iceHighModel_ = modelManager_->GetNameByModel("ice_highPolygon.gltf");
-	iceHighModel_->SetDefaultIsEnableLight(true);
-	iceHighModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,0.9f });
-	iceHighModel_->SetDefaultIOR(1.309f);
-	iceHighWorld_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{-4.0f,2.0f,0.0f} });
+	//auto* waModel = modelManager_->GetNameByModel("rushWave.obj");
+	//waModel->SetDefaultIsEnableLight(false);
+	//gameObjectManager_->AddObject<ParticleBehavior>("rushEffect", 32, textureManager_, waModel, &renderQueue_->GetMainCamera());
+
 	// 中ポリゴン氷
 	iceMiddleModel_ = modelManager_->GetNameByModel("ice_middlePolygon.gltf");
 	iceMiddleModel_->SetDefaultIsEnableLight(true);
 	iceMiddleModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,0.9f });
 	iceMiddleModel_->SetDefaultIOR(1.309f);
 	iceMiddleWorld_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,2.0f,0.0f} });
-	// 小ポリゴン氷
-	iceLowModel_ = modelManager_->GetNameByModel("ice_lowPolygon.gltf");
-	iceLowModel_->SetDefaultIsEnableLight(true);
-	iceLowModel_->SetDefaultColor({ 1.0f,1.0f,1.0f,0.9f });
-	iceLowModel_->SetDefaultIOR(1.309f);
-	iceLowWorld_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{4.0f,2.0f,0.0f} });
+
 	// キューブ氷
 	iceCubeModel_ = modelManager_->GetNameByModel("cube.obj");
 	iceCubeModel_->SetDefaultIsEnableLight(true);
@@ -82,30 +79,22 @@ TestScene::TestScene() {
 	iceCubeModel_->SetDefaultIOR(1.309f);
 	iceCubeWorld_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{8.0f,2.0f,0.0f} });
 
-	// 氷用マテリアルを作成
-	for (size_t i = 0; i < 4; ++i) {
-		iceRefBuffers_[i].resize(1);
-		iceRefBuffers_[i][0].Create();
-		iceRefBuffers_[i][0].SetBufferMaterial(0, iceMaterial_.GetMaterialSrvIndex());
-		iceRefBuffers_[i][0].SetHitGroupIndex(1);
-	}
-
-	// 円柱
-	cylinderModel_ = modelManager_->GetNameByModel("Cylinder");
-	cylinderWorld_.Initialize({{1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,3.0f}});
-
 	// 破片のテスト
 	testModel_ = modelManager_->GetNameByModel("test.gltf");
-	destructibleObject_ = gameObjectManager_->AddObject<DestructibleObject>("TestDestructibleObj", testModel_, static_cast<uint32_t>(CollisionTypeID::kPlayer), kCollisionAttributePlayer);
 
-	testCollider_.SetRadius(1.0f);
-	testCollider_.SetWorldPosition(testPos_);
-	testCollider_.SetCollisionAttribute(kCollisionAttributeEnemy);
-	testCollider_.SetCollisionMask(~kCollisionAttributeEnemy);
+	// 1つに集約していない破片
+	noFractureModel_ = modelManager_->GetNameByModel("NoCellTestFracture.gltf");
+	noFractureWorld_.transform_.translate.x = 3.0f;
+	noFractureWorld_.UpdateTransformMatrix();
 
 	// 色調補正
 	//auto* colorGrading = postEffectManager_->GetPostEffect<ColorGrading>("ColorGradingPass");
 	//colorGrading->SetEnableGrayscale(true);
+
+	// 氷のデモ
+	gameObjectManager_->AddObject<IceDemo>("IceDemo", iceMiddleModel_);
+	// 破片のデモ
+	gameObjectManager_->AddObject<FructureDemo>("FructureDemo", inputCommand_, testModel_);
 }
 
 void TestScene::Initialize() {
@@ -115,9 +104,9 @@ void TestScene::Initialize() {
 void TestScene::Update() {
 
 	if (inputCommand_->IsCommandActive("Decision")) { 
-		isFinished_ = true;
-		auto* colorGrading = postEffectManager_->GetPostEffect<ColorGrading>("ColorGradingPass");
-		colorGrading->SetEnableGrayscale(false);
+		//isFinished_ = true;
+		//auto* colorGrading = postEffectManager_->GetPostEffect<ColorGrading>("ColorGradingPass");
+		//colorGrading->SetEnableGrayscale(false);
 	}
 
 	// カメラの更新処理
@@ -127,18 +116,6 @@ void TestScene::Update() {
 
 	// アニメーションの更新処理
 	walkAnimator_->ComputeUpdate();
-
-	// 右手の位置を取得
-	//gpuParticle_->emitPos_ = walkAnimator_->GetJointWorldPosition("mixamorig:RightHand", world_.GetWorldMatrix());
-
-	// 操作
-	if (inputCommand_->IsCommandActive("MoveUp")) { testPos_.y += 5.0f * FpsCounter::gameDeltaTime; }
-	if (inputCommand_->IsCommandActive("MoveDown")) { testPos_.y -= 5.0f * FpsCounter::gameDeltaTime; }
-	if (inputCommand_->IsCommandActive("MoveForward")) { testPos_.z += 5.0f * FpsCounter::gameDeltaTime; }
-	if (inputCommand_->IsCommandActive("MoveBack")) { testPos_.z -= 5.0f * FpsCounter::gameDeltaTime; }
-	if (inputCommand_->IsCommandActive("MoveLeft")) { testPos_.x -= 5.0f * FpsCounter::gameDeltaTime; }
-	if (inputCommand_->IsCommandActive("MoveRight")) { testPos_.x += 5.0f * FpsCounter::gameDeltaTime; }
-	testCollider_.SetWorldPosition(testPos_);
 
 	DebugUpdate();
 }
@@ -157,10 +134,6 @@ void TestScene::DebugUpdate() {
 	ImGui::DragFloat("lightIntensity", &intensity_, 0.1f);
 	ImGui::ColorEdit4("lightColor", &lightColor_.x);
 
-	ImGui::DragFloat3("IceHighPos", &iceHighWorld_.transform_.translate.x, 0.1f);
-	ImGui::DragFloat3("IceHighScale", &iceHighWorld_.transform_.scale.x, 0.1f);
-	iceHighWorld_.UpdateTransformMatrix();
-
 	dir_.Normalize();
 
 	light->SetDirectionalDirction(dir_);
@@ -171,29 +144,29 @@ void TestScene::DebugUpdate() {
 	ImGui::End();
 
 
-	ImGui::Begin("IceMaterial");
-	ImGui::ColorEdit4("IceColor", &iceMaterial_.materialData_->color.x);
-	ImGui::DragFloat("IceRoughness", &iceMaterial_.materialData_->roughness, 0.01f, 0.0f, 1.0f);
-	ImGui::DragFloat("IceIor", &iceMaterial_.materialData_->ior, 0.01f);
-
-	ImGui::Separator();
-
-	ImGui::DragFloat("IceChipScale", &iceMaterial_.materialData_->chipScale, 0.01f);
-	ImGui::DragFloat("IceChipStrength", &iceMaterial_.materialData_->chipStrength, 0.01f, 0.0f, 1.0f);
-	ImGui::DragFloat("IceEdgeWidth", &iceMaterial_.materialData_->edgeWidth, 0.01f);
-	ImGui::DragFloat("IceEdgeStrength", &iceMaterial_.materialData_->edgeStrength, 0.01f, 0.0f, 1.0f);
-	ImGui::DragFloat("IceMicroScale", &iceMaterial_.materialData_->microScale, 0.01f);
-	ImGui::DragFloat("IceMicroStrength", &iceMaterial_.materialData_->microStrength, 0.01f);
-	ImGui::DragFloat("IceDissolveThreshold", &iceMaterial_.materialData_->dissolveThreshold, 0.01f,0.0f,1.0f);
-
-	ImGui::Separator();
-
-	ImGui::DragFloat("bubbleScale", &iceMaterial_.materialData_->bubbleScale, 0.01f, 0.0f, 1.0f);
-	ImGui::DragFloat("bubbleMaxDepth", &iceMaterial_.materialData_->bubbleMaxDepth, 0.01f, 0.0f,10.0f);
-	ImGui::DragFloat("bubbleDensity", &iceMaterial_.materialData_->bubbleDensity, 0.01f, 0.0f, 1.0f);
-	ImGui::DragFloat("bubbleJitter", &iceMaterial_.materialData_->bubbleJitter, 0.01f, 0.0f, 1.0f);
-	ImGui::DragFloat("bubbleHighlight", &iceMaterial_.materialData_->bubbleHighlight, 0.01f, 0.0f, 1.0f);
-	ImGui::End();
+	//ImGui::Begin("IceMaterial");
+	//ImGui::ColorEdit4("IceColor", &iceMaterial_.materialData_->color.x);
+	//ImGui::DragFloat("IceRoughness", &iceMaterial_.materialData_->roughness, 0.01f, 0.0f, 1.0f);
+	//ImGui::DragFloat("IceIor", &iceMaterial_.materialData_->ior, 0.01f);
+	//
+	//ImGui::Separator();
+	//
+	//ImGui::DragFloat("IceChipScale", &iceMaterial_.materialData_->chipScale, 0.01f);
+	//ImGui::DragFloat("IceChipStrength", &iceMaterial_.materialData_->chipStrength, 0.01f, 0.0f, 1.0f);
+	//ImGui::DragFloat("IceEdgeWidth", &iceMaterial_.materialData_->edgeWidth, 0.01f);
+	//ImGui::DragFloat("IceEdgeStrength", &iceMaterial_.materialData_->edgeStrength, 0.01f, 0.0f, 1.0f);
+	//ImGui::DragFloat("IceMicroScale", &iceMaterial_.materialData_->microScale, 0.01f);
+	//ImGui::DragFloat("IceMicroStrength", &iceMaterial_.materialData_->microStrength, 0.01f);
+	//ImGui::DragFloat("IceDissolveThreshold", &iceMaterial_.materialData_->dissolveThreshold, 0.01f,0.0f,1.0f);
+	//
+	//ImGui::Separator();
+	//
+	//ImGui::DragFloat("bubbleScale", &iceMaterial_.materialData_->bubbleScale, 0.01f, 0.0f, 1.0f);
+	//ImGui::DragFloat("bubbleMaxDepth", &iceMaterial_.materialData_->bubbleMaxDepth, 0.01f, 0.0f,10.0f);
+	//ImGui::DragFloat("bubbleDensity", &iceMaterial_.materialData_->bubbleDensity, 0.01f, 0.0f, 1.0f);
+	//ImGui::DragFloat("bubbleJitter", &iceMaterial_.materialData_->bubbleJitter, 0.01f, 0.0f, 1.0f);
+	//ImGui::DragFloat("bubbleHighlight", &iceMaterial_.materialData_->bubbleHighlight, 0.01f, 0.0f, 1.0f);
+	//ImGui::End();
 #endif
 }
 
@@ -205,18 +178,9 @@ void TestScene::Draw() {
 	// 地面を描画
 	renderQueue_->SubmitRaytracingModel(terrainModel_, terrainWorld_);
 
+	// 破片を1つに集約していない
+	//renderQueue_->SubmitModel(noFractureModel_, noFractureWorld_);
+
 	// アニメーションモデル
 	//renderQueue_->SubmitRaytracingModel(model_, world_);
-
-	// アニメーションのデバック描画
-	//walkAnimator_->DebugDraw(debugRenderer_);
-	
-	// それぞれの氷を描画
-	//renderQueue_->SubmitRaytracingModel(iceHighModel_, iceHighWorld_, &iceRefBuffers_[0]);
-	//renderQueue_->SubmitRaytracingModel(iceMiddleModel_, iceMiddleWorld_, &iceRefBuffers_[1]);
-	//renderQueue_->SubmitRaytracingModel(iceLowModel_, iceLowWorld_, &iceRefBuffers_[2]);
-	//renderQueue_->SubmitRaytracingModel(iceCubeModel_, iceCubeWorld_, &iceRefBuffers_[3]);
-
-	// 円柱を描画
-	//renderQueue_->SubmitRaytracingModel(cylinderModel_, cylinderWorld_);
 }

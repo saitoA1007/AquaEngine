@@ -45,19 +45,109 @@ void FractureDamageController::Initialize(Model* model) {
 }
 
 void FractureDamageController::Update(float deltaTime) {
+	if (isReassembling_) {
+		// 再構築中は通常の落下・ひび揺れシミュレーションは行わない
+		UpdateReassembly(deltaTime);
+		return;
+	}
+
 	SimulateCrackPhysics();
 
+	// マクロ破片・Intact()はレイトレ提出時にworldTransformを掛けるので、ここでは何もしない
 	for (auto& batch : breakState_.MacroDebrisBatches()) {
 		SimulateFallingDebris(*batch, deltaTime);
 	}
+	// マイクロ破片はラスタライズ描画のため、生成元オブジェクトのワールド行列を毎フレーム反映する
 	for (auto& batch : breakState_.MicroDebrisBatches()) {
+		batch->SetParentWorldMatrix(worldMatrix_);
 		SimulateFallingDebris(*batch, deltaTime);
 	}
+	// 凹んだチャンクは物理を掛けないため、ワールド行列の更新だけ行う
+	for (auto& [chunkId, instance] : breakState_.DentedChunks()) {
+		instance->SetParentWorldMatrix(worldMatrix_);
+		instance->Update();
+	}
+}
+
+void FractureDamageController::BeginReassembly() {
+	// 何も壊れていなければ何もしない
+	if (destroyedChunkIds_.empty() && !breakState_.HasDentedChunks()
+		&& !breakState_.HasMacroDebris() && !breakState_.HasMicroDebris()) {
+		return;
+	}
+
+	breakState_.MicroDebrisBatches().clear();
+
+	isReassembling_ = true;
+}
+
+void FractureDamageController::UpdateReassembly(float deltaTime) {
+	bool allSettled = true;
+	for (auto& batch : breakState_.MacroDebrisBatches()) {
+		if (!SimulateReassemblySpring(*batch, deltaTime)) {
+			allSettled = false;
+		}
+	}
+
+	// まだ元の位置へ戻りきっていない破片がある間はここで終わる
+	if (!allSettled) {
+		return;
+	}
+
+	// 全てのマクロ破片が元の位置、回転へ収束したので、まとめて無傷状態へ復元する
+	destroyedChunkIds_.clear();
+	chunkDamage_.clear();
+	crackActiveChunkIds_.clear();
+	breakState_.DentedChunks().clear();
+	breakState_.MacroDebrisBatches().clear();
+
+	// destroyedChunkIds_、凹みが両方とも空になったので、全チャンクで無傷インスタンスが作り直される
+	RebuildIntactExcludingDented();
+
+	isReassembling_ = false;
+}
+
+bool FractureDamageController::SimulateReassemblySpring(FractureInstance& instance, float deltaTime) {
+	bool allSettled = true;
+	auto& transforms = instance.GetTransformDatas();
+
+	for (auto& state : transforms) {
+		// 目標からのズレは、現在の位置、回転そのもの
+		Vector3 displacement = state.transform.translate;
+		Vector3 accel = displacement * -kReassemblySpringStiffness_ - state.crackVelocity * kReassemblyDamping_;
+		state.crackVelocity += accel * deltaTime;
+		state.transform.translate += state.crackVelocity * deltaTime;
+
+		Vector3 rotAccel = state.transform.rotate * -kReassemblyAngularSpringStiffness_ - state.crackAngularVelocity * kReassemblyAngularDamping_;
+		state.crackAngularVelocity += rotAccel * deltaTime;
+		state.transform.rotate += state.crackAngularVelocity * deltaTime;
+
+		bool settled = Math::Length(displacement) < kReassemblySettleThreshold_
+			&& Math::Length(state.crackVelocity) < kReassemblySettleThreshold_
+			&& Math::Length(state.transform.rotate) < kReassemblySettleThreshold_
+			&& Math::Length(state.crackAngularVelocity) < kReassemblySettleThreshold_;
+		if (settled) {
+			// 収束済みなら完全に原点へスナップして、揺れ戻りを防ぐ
+			state.transform.translate = { 0.0f, 0.0f, 0.0f };
+			state.transform.rotate = { 0.0f, 0.0f, 0.0f };
+			state.crackVelocity = { 0.0f, 0.0f, 0.0f };
+			state.crackAngularVelocity = { 0.0f, 0.0f, 0.0f };
+		} else {
+			allSettled = false;
+		}
+	}
+
+	instance.Update();
+	return allSettled;
 }
 
 void FractureDamageController::ApplyChipDamage(const Vector3& impactPos, float damageAmount, float craterRadius, int craterPlaneCount,
 	const Vector3& impactDirection, float penetrationDepth) {
 	if (chunksById_.empty()) {
+		return;
+	}
+	// 再構築中はダメージを受け付けない
+	if (isReassembling_) {
 		return;
 	}
 
@@ -76,7 +166,7 @@ void FractureDamageController::ApplyChipDamage(const Vector3& impactPos, float d
 		chunkDamage_.erase(chunkId);
 		// 切り離すので、付着したまま凹んでいた表示があれば不要になる
 		breakState_.RemoveDentedChunk(chunkId);
-		ApplyDamage(impactPos, 1.0f, craterRadius, craterPlaneCount, impactDirection, penetrationDepth);
+		ApplyDamage(impactPos, kBreakDetachRadius_, craterRadius, craterPlaneCount, impactDirection, penetrationDepth);
 		return;
 	}
 
@@ -133,7 +223,10 @@ void FractureDamageController::CarveAttachedDent(uint32_t chunkId, const Vector3
 	// numSites=1を渡すことでボロノイ分割はせず、クレーターで削った1個の形状だけを得る
 	FractureInstance& dentedInstance = breakState_.GetOrCreateDentedChunk(chunkId);
 	dentedInstance.ApplyRuntimeCut(chunkFragment, dentCenter, dentRadius, 1, craterPlaneCount);
-	
+	// ラスタライズ描画のため、生成直後にワールド行列を反映しておく（次のUpdate()まで原点に見えてしまうのを防ぐ）
+	dentedInstance.SetParentWorldMatrix(worldMatrix_);
+	dentedInstance.Update();
+
 	// 初めて凹んだチャンクは、レイトレ描画用の無傷インスタンスから除外する
 	if (!wasAlreadyDented) {
 		RebuildIntactExcludingDented();
@@ -221,6 +314,9 @@ void FractureDamageController::ApplyDamage(const Vector3& impactPos, float damag
 	// シードチャンクだけランタイムカット。破壊イベントごとに新しいバッチとして追加する
 	FractureInstance& microBatch = breakState_.AddMicroDebrisBatch();
 	microBatch.ApplyRuntimeCut(seedFragment, dentCenter, dentRadius, 8, craterPlaneCount);
+	// ラスタライズ描画のため、生成直後にワールド行列を反映しておく（次のUpdate()まで原点に見えてしまうのを防ぐ）
+	microBatch.SetParentWorldMatrix(worldMatrix_);
+	microBatch.Update();
 
 	// シード由来の破片に爆発の初速を与える
 	ApplyExplosionImpulseUniform(microBatch, impactPos, 8.0f);
@@ -229,16 +325,87 @@ void FractureDamageController::ApplyDamage(const Vector3& impactPos, float damag
 
 	breakState_.TrimMicroDebrisBatches(kMaxDebrisBatchesPerType_);
 
-	// 切り離したチャンクを記録し、無傷インスタンスを残っているチャンクだけで作り直す
+	// 切り離したチャンクを記録する
 	for (uint32_t id : detachedIds) {
 		destroyedChunkIds_.insert(id);
 		breakState_.RemoveDentedChunk(id);
 	}
 
-	RebuildIntactExcludingDented();
-
 	// 破壊されたチャンクの蓄積情報は不要になるので削除
 	for (uint32_t id : detachedIds) {
+		chunkDamage_.erase(id);
+		crackActiveChunkIds_.erase(id);
+	}
+
+	// 直接の破壊でアンカーへの経路が絶たれ、支えを失ったチャンクがあれば併せて崩落させる
+	CollapseUnsupportedChunks();
+
+	// 直接破壊分・崩落分の両方を反映して、無傷インスタンスを1回だけ作り直す
+	RebuildIntactExcludingDented();
+}
+
+void FractureDamageController::CollapseUnsupportedChunks() {
+	// アンカーかつ未破壊のチャンクを起点に、隣接グラフ上で到達できる範囲を求める
+	std::unordered_set<uint32_t> reachable;
+	std::queue<uint32_t> queue;
+	bool hasAnyAnchor = false;
+
+	for (const auto& [id, entry] : chunksById_) {
+		if (destroyedChunkIds_.count(id)) { continue; }
+		if (!entry->info.isAnchored) { continue; }
+		hasAnyAnchor = true;
+		if (reachable.insert(id).second) {
+			queue.push(id);
+		}
+	}
+
+	// アンカーが1つもなければ、崩落判定自体をスキップする
+	if (!hasAnyAnchor) {
+		return;
+	}
+
+	while (!queue.empty()) {
+		uint32_t id = queue.front();
+		queue.pop();
+
+		auto it = chunksById_.find(id);
+		if (it == chunksById_.end()) {
+			continue;
+		}
+
+		for (uint32_t neighborId : it->second->info.neighborChunkIds) {
+			if (destroyedChunkIds_.count(neighborId)) { continue; }
+			if (chunksById_.find(neighborId) == chunksById_.end()) { continue; }
+			if (reachable.insert(neighborId).second) {
+				queue.push(neighborId);
+			}
+		}
+	}
+
+	// アンカーから到達できない、まだ破壊されていないチャンク
+	std::vector<uint32_t> unsupportedIds;
+	for (const auto& [id, entry] : chunksById_) {
+		if (destroyedChunkIds_.count(id)) { continue; }
+		if (reachable.count(id)) { continue; }
+		unsupportedIds.push_back(id);
+	}
+	if (unsupportedIds.empty()) {
+		return;
+	}
+
+	Log("CollapseUnsupportedChunks count=" + std::to_string(unsupportedIds.size()));
+
+	PackedGeometryBuffer* buffer = model_->GetFractureBuffers().at(groupName_).get();
+
+	// 崩落するチャンクも、事前分割のまま切り離すマクロ破片と同じ扱いで新しいバッチにする
+	FractureInstance& collapseBatch = breakState_.AddMacroDebrisBatch();
+	collapseBatch.Initialize(unsupportedIds, *buffer);
+	ApplyCollapseImpulse(collapseBatch);
+	breakState_.TrimMacroDebrisBatches(kMaxDebrisBatchesPerType_);
+
+	for (uint32_t id : unsupportedIds) {
+		destroyedChunkIds_.insert(id);
+		breakState_.RemoveDentedChunk(id);
 		chunkDamage_.erase(id);
 		crackActiveChunkIds_.erase(id);
 	}
@@ -360,6 +527,14 @@ void FractureDamageController::ApplyExplosionImpulseUniform(FractureInstance& in
 		Vector3 randomDir = RandomGenerator::GetVector3(-1.0f, 1.0f);
 		randomDir.Normalize();
 		state.velocity = randomDir * strength + Vector3(0.0f, strength * 0.3f, 0.0f);
+	}
+}
+
+void FractureDamageController::ApplyCollapseImpulse(FractureInstance& instance) {
+	auto& transforms = instance.GetTransformDatas();
+	for (auto& state : transforms) {
+		state.velocity = RandomGenerator::GetVector3(-0.3f, 0.3f);
+		state.velocity.y = std::min(state.velocity.y, 0.0f); // 上向きには飛ばさない
 	}
 }
 

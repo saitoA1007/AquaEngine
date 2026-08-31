@@ -44,6 +44,11 @@ namespace GameEngine {
 			refBuffers_[i].SetHitGroupIndex(hitGroupIndex);
 		}
 
+		// レイキャスト時のフィルタリング用マスクを設定
+		void SetInstanceMask(uint32_t mask, uint32_t i = 0) {
+			refBuffers_[i].SetInstanceMask(mask);
+		}
+
 	public:
 
 		// モデルが持つワールド行列

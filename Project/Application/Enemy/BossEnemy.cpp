@@ -168,6 +168,8 @@ void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRes
 			if (player->GetCurrentState() == PlayerState::kAttackDown) {
 				float damage = player->GetDamage();
 				stateCommonData_.hp_ -= static_cast<int32_t>(damage);
+				// ヒット時の演出
+				player->StartHitEffect(stateCommonData_.worldTransform->transform_.translate + Vector3(0.0f,10.0f,0.0f));
 			}
 		}
 	}

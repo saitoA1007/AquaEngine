@@ -37,7 +37,7 @@ void WorldTransforms::Initialize(const uint32_t& kNumInstance, const Transform& 
 void WorldTransforms::UpdateTransformMatrix(const uint32_t& numInstance) {
 	// 数によって更新を変える
 	for (uint32_t i = 0; i < numInstance; ++i) {
-		transformDatas_[i].worldMatrix = Math::MakeAffineMatrix(transformDatas_[i].transform.scale, transformDatas_[i].transform.rotate, transformDatas_[i].transform.translate);
+		transformDatas_[i].worldMatrix = Math::MakeWorldMatrixFromEulerRotation(transformDatas_[i].transform.translate, transformDatas_[i].transform.rotate, transformDatas_[i].transform.scale);
 	}
 }
 
