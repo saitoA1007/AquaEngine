@@ -15,6 +15,8 @@ namespace GameEngine {
 		Vector3 emitterPos = {0.0f,0.0f,0.0f}; // 発生位置
 		Vector3 rotate = { 0.0f,0.0f,0.0f };
 		Vector3 scale = { 1.0f,1.0f,1.0f };
+
+		Vector4 color = { 1.0f,1.0f,1.0f,1.0f }; // 色
 	};
 
 	// パーティクルの拡張機能の基底クラス

@@ -6,7 +6,7 @@
 using namespace GameEngine;
 
 BossRangedAttackManager::BossRangedAttackManager(GameEngine::GameObjectManager* objectManager, GameEngine::Model* iceFallModel, GameEngine::Model* iceFallFractureModel,
-	GameEngine::TextureManager* textureManager, GameEngine::Model* windModel, GameEngine::Camera* camera) {
+	GameEngine::TextureManager* textureManager, GameEngine::Model* windModel, GameEngine::Model* rushModel, GameEngine::Camera* camera) {
 
 	objectManager_ = objectManager;
 
@@ -17,6 +17,10 @@ BossRangedAttackManager::BossRangedAttackManager(GameEngine::GameObjectManager* 
 	// 風攻撃の軌跡パーティクルを生成
 	auto* windParticle = objectManager_->AddObject<ParticleBehavior>("EnemyWindAttackParticle", 256, textureManager, windModel, camera);
 	windParticle->SetIsLoop(false);
+
+    // 突進パーティクルを生成
+    rushParticle_ = objectManager_->AddObject<ParticleBehavior>("BossRushEffect", 32, textureManager, rushModel, camera);
+    rushParticle_->SetIsLoop(false);
 
     // 風エフェクトを生成
     windAttack_ = objectManager_->AddObject<WindAttack>(iceFallModel_, windParticle);
@@ -70,4 +74,10 @@ void BossRangedAttackManager::StartIceFall(float rangeRadius, float minDistance,
 void BossRangedAttackManager::StartWind(Vector3 pos, Vector3 startDir, Vector3 endDir, float maxTime) {
     // 風の演出を開始
     windAttack_->Start(pos, startDir, endDir, maxTime);
+}
+
+void BossRangedAttackManager::SetRush(Vector3 pos, Vector3 dir, bool isActive) {
+    rushParticle_->SetIsLoop(isActive);
+    rushParticle_->SetEmitterPos(pos);
+    rushParticle_->SetDirection(dir);
 }

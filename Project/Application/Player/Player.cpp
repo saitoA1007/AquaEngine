@@ -208,6 +208,9 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 				// 地面破壊スタート
 				commonData_.effectManager_->StartShockWave(Vector3(worldTransform_.transform_.translate.x, 1.0f, worldTransform_.transform_.translate.z));
 
+				// 着地エフェクトを開始
+				effectManager_->StartLandingEffect(Vector3(worldTransform_.transform_.translate.x, 0.0f, worldTransform_.transform_.translate.z));
+
 				commonData_.state = PlayerState::kStiffness;
 				commonData_.animator_->StartAnimation(PlayerAnimationType::kWalk, "歩き");
 				Log("Player End attackDown");

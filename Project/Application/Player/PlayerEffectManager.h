@@ -25,7 +25,11 @@ public:
 
 	void StartShockWave(Vector3 pos);
 
+	// ヒットエフェクト
 	void StartHitEffect(Vector3 pos, uint32_t level);
+
+	// 着地エフェクト
+	void StartLandingEffect(Vector3 pos);
 
 	//void StartDown();
 	//void EndDown();
@@ -48,9 +52,12 @@ private:
 	GameEngine::ParticleBehavior* blastEffect_;
 	GameEngine::ParticleBehavior* afterEffect_;
 
-	float timer_ = 0.0f;
-	float afterTimer_ = 0.0f;
+	float timer_ = 1.0f;
+	float afterTimer_ = 1.0f;
 
 	// ヒット演出
 	PlayerHitAttackEffect* playerHitAttackEffect_ = nullptr;
+
+	// 着地パーティクル
+	GameEngine::ParticleBehavior* landingEffect_ = nullptr;
 };
