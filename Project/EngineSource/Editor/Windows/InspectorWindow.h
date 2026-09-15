@@ -214,6 +214,15 @@ namespace GameEngine {
 			}
 		}
 
+		void operator()(EaseType& value) const {
+			// 種類を選択
+			int typeIdx = static_cast<int>(value);
+			if (ImGui::Combo("EaseType", &typeIdx, EaseTypeNames, static_cast<int>(EaseType::kMaxCount))) {
+				value = static_cast<EaseType>(typeIdx);
+				isDirty = true;
+			}
+		}
+
 		void operator()(bool& value) const {
 			if (ImGui::Checkbox(itemName.c_str(), &value)) { isDirty = true; }
 		}

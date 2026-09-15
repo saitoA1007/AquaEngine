@@ -168,6 +168,17 @@ void GameParamEditor::DeserializeGroupFromJson(Group& group, const json& node) {
 					data.boxSize = { s[0], s[1], s[2] };
 				}
 				group.items[itemName].value = data;
+
+			} else if (itItem->contains("_EaseType")) {
+				EaseType data;
+				std::string typeStr = itItem->at("_EaseType").get<std::string>();
+				for (int i = 0; i < static_cast<int>(EaseType::kMaxCount); ++i) {
+					if (typeStr == EaseTypeNames[i]) {
+						data = static_cast<EaseType>(i);
+						break;
+					}
+				}
+				group.items[itemName].value = data;
 			} else {
 				// それ以外のオブジェクトはサブグループとして再帰的に読み込む
 				DeserializeGroupFromJson(group.children[itemName], *itItem);
