@@ -178,6 +178,10 @@ namespace GameEngine {
 
 		void Create(ParticleData& particleData) override;
 
+		void SetRadius(float radius) {
+			emitterShape_.radius = radius;
+		}
+
 	private:
 		// 形状
 		EmitterShape emitterShape_;

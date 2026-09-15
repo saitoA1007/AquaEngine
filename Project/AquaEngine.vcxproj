@@ -217,8 +217,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\3D\Animation\Animator.cpp" />
     <ClCompile Include="EngineSource\3D\Material\IceMaterial.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ModelComponent.cpp" />
-    <ClCompile Include="EngineSource\3D\ParticleSystem\ModulesControl.cpp" />
     <ClCompile Include="EngineSource\3D\Model\Skeleton.cpp" />
+    <ClCompile Include="EngineSource\3D\ParticleSystem\ModulesControl.cpp" />
+    <ClCompile Include="EngineSource\3D\ParticleSystem\ParticleBehavior.cpp" />
     <ClCompile Include="EngineSource\3D\ParticleSystem\ParticleBehaviorGPU.cpp" />
     <ClCompile Include="EngineSource\3D\ParticleSystem\ParticleEmitModules.cpp" />
     <ClCompile Include="EngineSource\3D\ParticleSystem\ParticleUpdateModules.cpp" />
@@ -229,7 +230,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\3D\Model\ModelLoader.cpp" />
     <ClCompile Include="EngineSource\3D\Model\ModelManager.cpp" />
     <ClCompile Include="EngineSource\3D\Renderer\ModelRenderer.cpp" />
-    <ClCompile Include="EngineSource\3D\ParticleSystem\ParticleBehavior.cpp" />
     <ClCompile Include="EngineSource\3D\Fracture\FractureInstance.cpp" />
     <ClCompile Include="EngineSource\3D\Fracture\RuntimeMeshFracturer.cpp" />
     <ClCompile Include="EngineSource\3D\Fracture\FractureDamageController.cpp" />
@@ -505,11 +505,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\3D\Material\IceMaterial.h" />
     <ClInclude Include="EngineSource\3D\Fracture\FractureData.h" />
     <ClInclude Include="EngineSource\3D\Model\ModelComponent.h" />
+    <ClInclude Include="EngineSource\3D\Model\Skeleton.h" />
     <ClInclude Include="EngineSource\3D\ParticleSystem\ModulesControl.h" />
+    <ClInclude Include="EngineSource\3D\ParticleSystem\ParticleBehavior.h" />
     <ClInclude Include="EngineSource\3D\ParticleSystem\ParticleBehaviorGPU.h" />
+    <ClInclude Include="EngineSource\3D\ParticleSystem\ParticleData.h" />
     <ClInclude Include="EngineSource\3D\ParticleSystem\ParticleEmitModules.h" />
     <ClInclude Include="EngineSource\3D\ParticleSystem\ParticleModules.h" />
-    <ClInclude Include="EngineSource\3D\Model\Skeleton.h" />
     <ClInclude Include="EngineSource\3D\ParticleSystem\ParticleUpdateModules.h" />
     <ClInclude Include="EngineSource\3D\Renderer\DebugRenderer.h" />
     <ClInclude Include="EngineSource\3D\Material\Material.h" />
@@ -560,8 +562,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Graphics\Core\TLAS.h" />
     <ClInclude Include="EngineSource\Graphics\Core\DrawRequest.h" />
     <ClInclude Include="EngineSource\3D\Renderer\ModelRenderer.h" />
-    <ClInclude Include="EngineSource\3D\ParticleSystem\ParticleBehavior.h" />
-    <ClInclude Include="EngineSource\3D\ParticleSystem\ParticleData.h" />
     <ClInclude Include="EngineSource\3D\Model\VertexData.h" />
     <ClInclude Include="EngineSource\Graphics\Core\RenderQueue.h" />
     <ClInclude Include="EngineSource\3D\Transform\WorldTransform.h" />

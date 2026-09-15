@@ -56,6 +56,11 @@ void DirectionEmitModule::Create(ParticleData& particleData) {
 		baseDir = Math::RotateVector(baseDir, tilt);
 	}
 
+	// レンジ対策
+	if (maxSpeed_ < minSpeed_) {
+		std::swap(minSpeed_, maxSpeed_);
+	}
+
 	float speed = RandomGenerator::Get(minSpeed_, maxSpeed_);
 	particleData.velocity = baseDir * speed;
 }
@@ -178,11 +183,31 @@ void ShapeEmitModule::Create(ParticleData& particleData) {
 //==================================================
 
 void ColorEmitModule::Create(ParticleData& particleData) {
-	particleData.color = {
-		RandomGenerator::Get(minColor_.x, maxColor_.x),
-		RandomGenerator::Get(minColor_.y, maxColor_.y),
-		RandomGenerator::Get(minColor_.z, maxColor_.z),
+
+	Vector3 minHsv = Math::RGBtoHSV({ minColor_.x, minColor_.y, minColor_.z });
+	Vector3 maxHsv = Math::RGBtoHSV({ maxColor_.x, maxColor_.y, maxColor_.z });
+
+	if (maxHsv.x < minHsv.x) {
+		std::swap(minHsv.x, maxHsv.x);
+	}
+	if (maxHsv.y < minHsv.y) {
+		std::swap(minHsv.y, maxHsv.y);
+	}
+	if (maxHsv.z < minHsv.z) {
+		std::swap(minHsv.z, maxHsv.z);
+	}
+
+	Vector4 hsv = {
+		RandomGenerator::Get(minHsv.x, maxHsv.x),
+		RandomGenerator::Get(minHsv.y, maxHsv.y),
+		RandomGenerator::Get(minHsv.z, maxHsv.z),
 		RandomGenerator::Get(minColor_.w, maxColor_.w)
+	};
+	
+	Vector3 rgb = Math::HSVtoRGB(hsv.x, std::clamp(hsv.y, 0.0f, 1.0f), std::clamp(hsv.z, 0.0f, 1.0f));
+
+	particleData.color = {
+		rgb.x,rgb.y,rgb.z,hsv.w
 	};
 	particleData.startColor = particleData.color;
 }
@@ -200,6 +225,5 @@ void LifeTimeEmitModule::Create(ParticleData& particleData) {
 	}
 
 	// 経過時間の割合を求める時に0除算しないよう、下限を設ける
-	constexpr float kMinLifeTime = 0.01f;
-	particleData.lifeTime = (std::max)(RandomGenerator::Get(minLifeTime, maxLifeTime), kMinLifeTime);
+	particleData.lifeTime = (std::max)(RandomGenerator::Get(minLifeTime, maxLifeTime), 0.01f);
 }

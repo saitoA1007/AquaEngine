@@ -1,5 +1,6 @@
 #pragma once
 #include "ParticleModules.h"
+#include "EasingManager.h"
 
 namespace GameEngine {
 
@@ -11,11 +12,13 @@ namespace GameEngine {
 		void Register(DebugParameter* param) override {
 			int index = 1;
 			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
+			param->Register("EaseType", easeType_, index++, subGroup);
 			param->Register("EndVelocity", endVelocity_, index++, subGroup);
 		}
 
 		void Remove(DebugParameter* param) override {
 			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
+			param->RemoveItem("EaseType", subGroup);
 			param->RemoveItem("EndVelocity", subGroup);
 		}
 
@@ -23,6 +26,7 @@ namespace GameEngine {
 
 	private:
 		Vector3 endVelocity_;
+		EaseType easeType_ = EaseType::kLinear;
 	};
 
 	// サイズを変化させる
@@ -33,6 +37,7 @@ namespace GameEngine {
 		void Register(DebugParameter* param) override {
 			int index = 1;
 			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
+			param->Register("EaseType", easeType_, index++, subGroup);
 			param->Register("SeparateAxesEndSize", separateAxesEndSize_, index++, subGroup);
 			param->Register("EndSize", endSize_, index++, subGroup);
 			param->Register("SeparateAxes", separateAxes_, index++, subGroup);
@@ -40,6 +45,7 @@ namespace GameEngine {
 
 		void Remove(DebugParameter* param) override {
 			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
+			param->RemoveItem("EaseType", subGroup);
 			param->RemoveItem("SeparateAxesEndSize", subGroup);
 			param->RemoveItem("EndSize", subGroup);
 			param->RemoveItem("SeparateAxes", subGroup);
@@ -47,11 +53,16 @@ namespace GameEngine {
 
 		void Update(ParticleData& particleData, [[maybe_unused]] float time) override;
 
+		void SetEndScale(float scale) {
+			endSize_ = scale;
+		}
+
 	private:
 		float endSize_ = 0.0f;
 		Vector3 separateAxesEndSize_ = {};
 		// 各軸制御
 		bool separateAxes_ = false;
+		EaseType easeType_ = EaseType::kLinear;
 	};
 
 	// 透明度補間
@@ -62,11 +73,13 @@ namespace GameEngine {
 		void Register(DebugParameter* param) override {
 			int index = 1;
 			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
+			param->Register("EaseType", easeType_, index++, subGroup);
 			param->Register("EndAlpha", endAlpha_, index++, subGroup);
 		}
 
 		void Remove(DebugParameter* param) override {
 			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
+			param->RemoveItem("EaseType", subGroup);
 			param->RemoveItem("EndAlpha", subGroup);
 		}
 
@@ -74,6 +87,40 @@ namespace GameEngine {
 
 	private:
 		float endAlpha_ = 0.0f;
+		EaseType easeType_ = EaseType::kLinear;
+	};
+
+	// 色変化
+	class ColorOverLifeTimeModule : public IParticleModule {
+	public:
+		~ColorOverLifeTimeModule() = default;
+
+		void Register(DebugParameter* param) override {
+			int index = 1;
+			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
+			param->Register("EndColor", endRGB_, index++, subGroup);
+			param->Register("EaseType", easeType_, index++, subGroup);
+		}
+
+		void Remove(DebugParameter* param) override {
+			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
+			param->RemoveItem("EndColor", subGroup);
+			param->RemoveItem("EaseType", subGroup);
+		}
+
+		void Create(ParticleData& particleData) override;
+		void Update(ParticleData& particleData, [[maybe_unused]] float time) override;
+
+		// 外部から色を設定する
+		void SetHSV(const Vector3& endRGB) {
+			endRGB_ = { endRGB.x,endRGB.y,endRGB.z };
+		}
+
+	private:
+		// 色相、彩度、明度
+		Vector3 startHSV_ = {};
+		Vector4 endRGB_ = { 1.0f, 1.0f, 1.0f,1.0f };
+		EaseType easeType_ = EaseType::kLinear;
 	};
 
 	// 引力モジュール
