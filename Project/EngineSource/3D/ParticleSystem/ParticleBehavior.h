@@ -81,6 +81,13 @@ namespace GameEngine{
 			}
 		}
 
+		// パーティクルの生存時間を設定
+		void SetLifeTime(float minLifeTime, float maxLifeTime) {
+			if (auto* lifeTimeModule = modulesControl_->GetModule<LifeTimeEmitModule>("LifeTimeEmit")) {
+				lifeTimeModule->SetLifeTime(minLifeTime, maxLifeTime);
+			}
+		}
+
 		bool IsLoop() const { return main_.isLoop; }
 
 	private:

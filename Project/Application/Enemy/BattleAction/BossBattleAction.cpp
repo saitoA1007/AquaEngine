@@ -153,15 +153,15 @@ void BossRushAttackAction::RushAttack() {
 	timer_ += FpsCounter::gameDeltaTime / rushMaxTime_;
 
 	// 移動
-	commonData_.transform.translate = Lerp(startRushPos_, endRushPos_,EaseOut(timer_));
+	commonData_.transform.translate = Lerp(startRushPos_, endRushPos_,timer_,EaseType::kEaseOutQuad);
 
 	// 高さ
 	if (timer_ <= 0.3f) {
 		float localT = timer_ / 0.3f;
-		commonData_.transform.translate.y = Lerp(startRushPos_.y, 0.0f, EaseOut(localT));
+		commonData_.transform.translate.y = Lerp(startRushPos_.y, 0.0f, localT,EaseType::kEaseOutQuad);
 	} else if (timer_ >= 0.7f) {
 		float localT = (timer_ - 0.7f) / 0.3f;
-		commonData_.transform.translate.y = Lerp(0.0f, endRushPos_.y, EaseIn(localT));
+		commonData_.transform.translate.y = Lerp(0.0f, endRushPos_.y, localT,EaseType::kEaseInQuad);
 	}
 
 	// 回転
@@ -264,14 +264,14 @@ void BossCrossMoveAction::Update() {
 	float localTimer = std::fmodf(totalCycle, 1.0f);
 	if (localTimer <= 0.5f) {
 		float t = localTimer / 0.5f;
-		posY = Lerp(0.0f, maxMoveHeight_, EaseInOut(t));
+		posY = Lerp(0.0f, maxMoveHeight_, t, EaseType::kEaseInOutQuad);
 	} else {
 		float t = (localTimer - 0.5f) / 0.5f;
-		posY = Lerp(maxMoveHeight_, 0.0f, EaseInOut(t));
+		posY = Lerp(maxMoveHeight_, 0.0f, t, EaseType::kEaseInOutQuad);
 	}
 
 	// 移動
-	Vector3 pos = Lerp(startPos_, endPos_, EaseInOut(timer_));
+	Vector3 pos = Lerp(startPos_, endPos_, timer_, EaseType::kEaseInOutQuad);
 	commonData_.transform.translate = pos;
 	commonData_.transform.translate.y = defaultPosY_;
 	commonData_.transform.translate.y += posY;
@@ -283,14 +283,14 @@ void BossCrossMoveAction::Update() {
 	if (timer_ <= 0.2f) {
 		float localT = timer_ / 0.2f;
 		// 回転
-		dir = Slerp(startCurrentRotDir_, endRotDir_, EaseIn(localT));
+		dir = Slerp(startCurrentRotDir_, endRotDir_, localT, EaseType::kEaseInQuad);
 		// Y軸周りの角度
 		commonData_.transform.rotate.y = std::atan2f(dir.x, dir.z);
 	} else if (timer_ >= 0.8f) {
 
 		float localT = (timer_ - 0.8f) / 0.2f;
 		// 回転
-		dir = Slerp(endRotDir_, finalRotDir_, EaseOut(localT));
+		dir = Slerp(endRotDir_, finalRotDir_, localT, EaseType::kEaseOutQuad);
 		// Y軸周りの角度
 		commonData_.transform.rotate.y = std::atan2f(dir.x, dir.z);
 	}
@@ -384,10 +384,10 @@ void RotateMoveAction::Update() {
 
 	if (localTimer <= 0.5f) {
 		float t = localTimer / 0.5f;
-		posY = Lerp(0.0f, maxMoveHeight_, EaseInOut(t));
+		posY = Lerp(0.0f, maxMoveHeight_, t, EaseType::kEaseInOutQuad);
 	} else {
 		float t = (localTimer - 0.5f) / 0.5f;
-		posY = Lerp(maxMoveHeight_, 0.0f, EaseInOut(t));
+		posY = Lerp(maxMoveHeight_, 0.0f, t, EaseType::kEaseInOutQuad);
 	}
 
 	// 回転移動
@@ -402,7 +402,7 @@ void RotateMoveAction::Update() {
 		float localT = timer_ / 0.2f;
 
 		// 回転
-		dir = Slerp(startCurrentRotDir_, endRotDir_, EaseIn(localT));
+		dir = Slerp(startCurrentRotDir_, endRotDir_, localT, EaseType::kEaseInQuad);
 		// Y軸周りの角度
 		commonData_.transform.rotate.y = std::atan2f(dir.x, dir.z);
 
@@ -417,7 +417,7 @@ void RotateMoveAction::Update() {
 	} else {
 		float localT = (timer_ - 0.8f) / 0.2f;
 		// 回転
-		dir = Slerp(startCurrentRotDir_, finalRotDir_, EaseOut(localT));
+		dir = Slerp(startCurrentRotDir_, finalRotDir_, localT, EaseType::kEaseOutQuad);
 		// Y軸周りの角度
 		commonData_.transform.rotate.y = std::atan2f(dir.x, dir.z);
 	}
@@ -682,7 +682,7 @@ void ResetAction::Update() {
 		timer_ += FpsCounter::gameDeltaTime / moveMaxTime_;
 
 		// 移動
-		commonData_.transform.translate = Lerp(startPos_, endPos_, EaseInOut(timer_));
+		commonData_.transform.translate = Lerp(startPos_, endPos_, timer_, EaseType::kEaseInOutQuad);
 
 		if (timer_ >= 1.0f) {
 			timer_ = 0.0f;

@@ -101,7 +101,7 @@ void IceFall::EnterMove() {
 
 	timer_ += FpsCounter::gameDeltaTime / inMaxTime_;
 
-	destructibleObject_.worldTransform_.transform_.translate.y = Lerp(startPosY_, endPosY_, EaseInOut(timer_));
+	destructibleObject_.worldTransform_.transform_.translate.y = Lerp(startPosY_, endPosY_, timer_, EaseType::kEaseInOutQuad);
 
 	if (timer_ >= 1.0f) {
 		destructibleObject_.worldTransform_.transform_.translate.y = endPosY_;

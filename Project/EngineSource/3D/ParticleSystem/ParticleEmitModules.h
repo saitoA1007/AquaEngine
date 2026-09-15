@@ -207,4 +207,36 @@ namespace GameEngine {
 		Vector4 minColor_ = { 1.0f, 1.0f, 1.0f, 1.0f };
 		Vector4 maxColor_ = { 1.0f, 1.0f, 1.0f, 1.0f };
 	};
+
+	// 生存時間の生成
+	class LifeTimeEmitModule : public IParticleModule {
+	public:
+		~LifeTimeEmitModule() = default;
+
+		void Register(DebugParameter* param) override {
+			int index = 1;
+			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
+			param->Register("MinLifeTime", minLifeTime_, index++, subGroup);
+			param->Register("MaxLifeTime", maxLifeTime_, index++, subGroup);
+		}
+
+		void Remove(DebugParameter* param) override {
+			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
+			param->RemoveItem("MinLifeTime", subGroup);
+			param->RemoveItem("MaxLifeTime", subGroup);
+		}
+
+		void Create(ParticleData& particleData) override;
+
+		// 外部から生存時間の範囲を設定する
+		void SetLifeTime(float minLifeTime, float maxLifeTime) {
+			minLifeTime_ = minLifeTime;
+			maxLifeTime_ = maxLifeTime;
+		}
+
+	private:
+		// 生存時間の範囲
+		float minLifeTime_ = 1.0f;
+		float maxLifeTime_ = 1.0f;
+	};
 }

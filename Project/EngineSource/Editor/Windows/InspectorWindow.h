@@ -115,6 +115,7 @@ namespace GameEngine {
 
 				case EmitShapeType::Sphere:
 				case EmitShapeType::Hemisphere:
+				case EmitShapeType::Circle:
 					if (ImGui::DragFloat("Radius", &value.radius, 0.01f, 0.0f, FLT_MAX))
 						isDirty = true;
 					if (ImGui::Checkbox("EmitFromShell", &value.emitFromShell))

@@ -95,9 +95,9 @@ void ClearUIManager::EnterAnimation() {
 	} else if(timer_ <= 0.6f) {
 		float localT = (timer_ - 0.2f) / 0.4f;
 		// フレームの移動
-		frameSprite_.position_.x = Lerp(1280.0f,0.0f,EaseOut(localT));
+		frameSprite_.position_.x = Lerp(1280.0f,0.0f,localT, EaseType::kEaseOutQuad);
 		// クリア文字の移動
-		clearTextSprite_.position_.x = Lerp(1500.0f, 640.0f, EaseIn(localT));
+		clearTextSprite_.position_.x = Lerp(1500.0f, 640.0f, localT, EaseType::kEaseInQuad);
 
 	} else {
 		float localT = (timer_ - 0.6f) / 0.4f;

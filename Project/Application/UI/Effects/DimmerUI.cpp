@@ -38,10 +38,10 @@ void DimmerUI::Update() {
 
 		if (timer_ <= 0.5f) {
 			float localT = timer_ / 0.5f;
-			world_.transform_.scale = Lerp(startScale_, endScale_, EaseInOut(localT));
+			world_.transform_.scale = Lerp(startScale_, endScale_, localT, EaseType::kEaseInOutQuad);
 		} else {
 			float localT = (timer_ - 0.5f) / 0.5f;
-			world_.transform_.scale = Lerp(endScale_, startScale_, EaseInOut(localT));
+			world_.transform_.scale = Lerp(endScale_, startScale_, localT, EaseType::kEaseInOutQuad);
 		}
 
 		if (timer_ >= 1.0f) {

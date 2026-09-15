@@ -43,7 +43,7 @@ void BossStateOut::Update() {
 
 		Vector3 basePos;
 		basePos.x = 0.0f;
-		basePos.y = Lerp(startPosY_, endPosY_, EaseInOut(timer_));
+		basePos.y = Lerp(startPosY_, endPosY_, timer_, EaseType::kEaseInOutQuad);
 		basePos.z = 0.0f;
 
 		// 縦移動
@@ -53,10 +53,10 @@ void BossStateOut::Update() {
 
 		if (localTimer <= 0.5f) {
 			float t = localTimer / 0.5f;
-			posY = Lerp(0.0f, cycleHeight_, EaseInOut(t));
+			posY = Lerp(0.0f, cycleHeight_, t, EaseType::kEaseInOutQuad);
 		} else {
 			float t = (localTimer - 0.5f) / 0.5f;
-			posY = Lerp(cycleHeight_, 0.0f, EaseInOut(t));
+			posY = Lerp(cycleHeight_, 0.0f, t, EaseType::kEaseInOutQuad);
 		}
 
 		basePos.y += posY;

@@ -42,16 +42,17 @@ namespace GameEngine {
 		Sphere,      // 球
 		Hemisphere,  // 半球
 		Box,         // 直方体
+		Circle,      // 円(XZ平面)
 	};
 	inline constexpr const char* EmitShapeTypeNames[] = {
-		"Point", "Sphere", "Hemisphere", "Box"
+		"Point", "Sphere", "Hemisphere", "Box", "Circle"
 	};
-	inline constexpr int kEmitShapeTypeCount = 4;
+	inline constexpr int kEmitShapeTypeCount = 5;
 
 	struct EmitterShape {
 		EmitShapeType type = EmitShapeType::Point;
 
-		// Sphere、Hemisphere
+		// Sphere、Hemisphere、Circle
 		float radius = 1.0f;
 		bool  emitFromShell = false; // 表面からのみ発射
 

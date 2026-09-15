@@ -2,6 +2,7 @@
 #include "TextureManager.h"
 #include "RandomGenerator.h"
 #include "MyMath.h"
+#include <algorithm>
 #include <numbers>
 using namespace GameEngine;
 
@@ -155,6 +156,20 @@ void ShapeEmitModule::Create(ParticleData& particleData) {
 		particleData.transform.translate = RandomGenerator::GetVector3(centerPos - half, centerPos + half);
 		break;
 	}
+
+	case EmitShapeType::Circle: {
+		// XZ平面上の角度をランダムに決める
+		float angle = RandomGenerator::Get(0.0f, 2.0f * std::numbers::pi_v<float>);
+
+		float radius = emitterShape_.radius;
+		if (!emitterShape_.emitFromShell) {
+			// 内部に均等に散らすため、平方根を取ってから半径を掛ける
+			radius *= std::sqrt(RandomGenerator::Get(0.0f, 1.0f));
+		}
+
+		particleData.transform.translate = centerPos + Vector3(std::cos(angle) * radius, 0.0f, std::sin(angle) * radius);
+		break;
+	}
 	}
 }
 
@@ -170,4 +185,21 @@ void ColorEmitModule::Create(ParticleData& particleData) {
 		RandomGenerator::Get(minColor_.w, maxColor_.w)
 	};
 	particleData.startColor = particleData.color;
+}
+
+//==================================================
+// 生存時間モジュール
+//==================================================
+
+void LifeTimeEmitModule::Create(ParticleData& particleData) {
+	// 最小値と最大値が逆に設定されていても動くようにする
+	float minLifeTime = minLifeTime_;
+	float maxLifeTime = maxLifeTime_;
+	if (maxLifeTime < minLifeTime) {
+		std::swap(minLifeTime, maxLifeTime);
+	}
+
+	// 経過時間の割合を求める時に0除算しないよう、下限を設ける
+	constexpr float kMinLifeTime = 0.01f;
+	particleData.lifeTime = (std::max)(RandomGenerator::Get(minLifeTime, maxLifeTime), kMinLifeTime);
 }
