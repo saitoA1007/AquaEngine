@@ -54,7 +54,7 @@ GameScene::GameScene() {
 	auto* rushModel = modelManager_->GetNameByModel("rushWave.obj");
 	rushModel->SetDefaultIsEnableLight(false);
 	auto* bossRangedAttackManager = gameObjectManager_->AddObject<BossRangedAttackManager>(gameObjectManager_, iceFallModel, iceFallFractureModel,
-		textureManager_, windModel, rushModel, &renderQueue_->GetMainCamera());
+		textureManager_, windModel, rushModel);
 
 	// 敵
 	auto* enemyModel = modelManager_->GetNameByModel("BossBird.gltf");
@@ -76,7 +76,7 @@ GameScene::GameScene() {
 	// ステージに降っている雪を描画
 	auto* planeModel = modelManager_->GetNameByModel("plane.obj");
 	planeModel->SetDefaultIsEnableLight(false);
-	gameObjectManager_->AddObject<ParticleBehavior>("BgSnowParticle", 64, textureManager_, planeModel, &renderQueue_->GetMainCamera());
+	gameObjectManager_->AddObject<ParticleBehavior>("BgSnowParticle", 64, textureManager_, planeModel);
 
 	// タイトル中のUI
 	auto* titleUIManager = gameObjectManager_->AddObject<TitleUIManager>(textureManager_);

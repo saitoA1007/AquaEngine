@@ -151,6 +151,12 @@ namespace GameEngine {
 		/// <param name="up">向き</param>
 		/// <returns></returns>
 		Matrix4x4 LookAt(const Vector3& eye, const Vector3& center, const Vector3& up);
+
+		// rgbをhsvに変換
+		Vector3 RGBtoHSV(const Vector3& rgb);
+
+		// hsvをrgbに変換
+		Vector3 HSVtoRGB(float h, float s, float v);
 	}
 }
 

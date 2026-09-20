@@ -13,7 +13,7 @@ namespace GameEngine {
 class BossRangedAttackManager : public GameEngine::IGameObject {
 public:
 	BossRangedAttackManager(GameEngine::GameObjectManager* objectManager, GameEngine::Model* iceFallModel, GameEngine::Model* iceFallFractureModel,
-		GameEngine::TextureManager* textureManager, GameEngine::Model* windModel, GameEngine::Model* rushModel, GameEngine::Camera* camera);
+		GameEngine::TextureManager* textureManager, GameEngine::Model* windModel, GameEngine::Model* rushModel);
 	~BossRangedAttackManager() = default;
 	
 public:

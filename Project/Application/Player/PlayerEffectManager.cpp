@@ -28,14 +28,14 @@ PlayerEffectManager::PlayerEffectManager(GameEngine::GameObjectManager* objectMa
 	shockGH_ = textureManager->GetHandleByName("Power.png");
 	blastGH_ = textureManager->GetHandleByName("FX01_Flare_03.png");
 
-	blastEffect_ = objectManager_->AddObject<ParticleBehavior>("HitEffect", 16, textureManager, planeXYmodel, &renderQueue_->GetMainCamera());
+	blastEffect_ = objectManager_->AddObject<ParticleBehavior>("HitEffect", 16, textureManager, planeXYmodel);
 	blastEffect_->SetIsLoop(false);
 
-	afterEffect_ = objectManager_->AddObject<ParticleBehavior>("HitAfterEffect", 32, textureManager, planeXYmodel, &renderQueue_->GetMainCamera());
+	afterEffect_ = objectManager_->AddObject<ParticleBehavior>("HitAfterEffect", 32, textureManager, planeXYmodel);
 	afterEffect_->SetIsLoop(false);
 
 	// 着地エフェクト
-	landingEffect_ = objectManager_->AddObject<ParticleBehavior>("PlayerLandingEffect", 32, textureManager, waveModel, &renderQueue_->GetMainCamera());
+	landingEffect_ = objectManager_->AddObject<ParticleBehavior>("PlayerLandingEffect", 32, textureManager, waveModel);
 	landingEffect_->SetIsLoop(false);
 
 	// プレイヤーのヒットエフェクト

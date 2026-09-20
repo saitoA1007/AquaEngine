@@ -264,12 +264,6 @@
     <ClCompile Include="EngineSource\Core\FPSCounter.cpp">
       <Filter>EngineSource\Core</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Core\GameObjectManager.cpp">
-      <Filter>EngineSource\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="EngineSource\Core\IGameObject.cpp">
-      <Filter>EngineSource\Core</Filter>
-    </ClCompile>
     <ClCompile Include="EngineSource\Core\WindowsApp.cpp">
       <Filter>EngineSource\Core</Filter>
     </ClCompile>
@@ -541,8 +535,6 @@
     <ClCompile Include="Application\UI\Managers\PauseUIManager.cpp" />
     <ClCompile Include="Application\UI\Effects\DimmerUI.cpp" />
     <ClCompile Include="Application\Camera\State\CameraState.cpp" />
-    <ClCompile Include="EngineSource\Core\StaticGameObject.cpp" />
-    <ClCompile Include="EngineSource\Core\StaticGameObjectManager.cpp" />
     <ClCompile Include="EngineSource\Editor\EditorMenu\AddObjectBar.cpp" />
     <ClCompile Include="EngineSource\Editor\Command\EditorCommand.cpp" />
     <ClCompile Include="Application\Player\PlayerEffectManager.cpp" />
@@ -572,6 +564,10 @@
     <ClCompile Include="EngineSource\3D\ParticleSystem\ParticleBehaviorGPU.cpp" />
     <ClCompile Include="EngineSource\3D\ParticleSystem\ParticleEmitModules.cpp" />
     <ClCompile Include="EngineSource\3D\ParticleSystem\ParticleUpdateModules.cpp" />
+    <ClCompile Include="EngineSource\Core\Objects\GameObjectManager.cpp" />
+    <ClCompile Include="EngineSource\Core\Objects\IGameObject.cpp" />
+    <ClCompile Include="EngineSource\Core\Objects\StaticGameObject.cpp" />
+    <ClCompile Include="EngineSource\Core\Objects\StaticGameObjectManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -721,13 +717,7 @@
     <ClInclude Include="EngineSource\Core\FPSCounter.h">
       <Filter>EngineSource\Core</Filter>
     </ClInclude>
-    <ClInclude Include="EngineSource\Core\GameObjectManager.h">
-      <Filter>EngineSource\Core</Filter>
-    </ClInclude>
     <ClInclude Include="EngineSource\Core\IEngineSubsystem.h">
-      <Filter>EngineSource\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineSource\Core\IGameObject.h">
       <Filter>EngineSource\Core</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Core\SubsystemRegistry.h">
@@ -1087,8 +1077,6 @@
     <ClInclude Include="Application\UI\Effects\DimmerUI.h" />
     <ClInclude Include="Application\Camera\ICameraState.h" />
     <ClInclude Include="Application\Camera\State\CameraState.h" />
-    <ClInclude Include="EngineSource\Core\StaticGameObject.h" />
-    <ClInclude Include="EngineSource\Core\StaticGameObjectManager.h" />
     <ClInclude Include="EngineSource\Editor\EditorMenu\AddObjectBar.h" />
     <ClInclude Include="EngineSource\Editor\IEditorCommand.h" />
     <ClInclude Include="EngineSource\Editor\Command\EditorCommand.h" />
@@ -1128,6 +1116,10 @@
     <ClInclude Include="EngineSource\3D\ParticleSystem\ParticleEmitModules.h" />
     <ClInclude Include="EngineSource\3D\ParticleSystem\ParticleModules.h" />
     <ClInclude Include="EngineSource\3D\ParticleSystem\ParticleUpdateModules.h" />
+    <ClInclude Include="EngineSource\Core\Objects\GameObjectManager.h" />
+    <ClInclude Include="EngineSource\Core\Objects\IGameObject.h" />
+    <ClInclude Include="EngineSource\Core\Objects\StaticGameObject.h" />
+    <ClInclude Include="EngineSource\Core\Objects\StaticGameObjectManager.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />
