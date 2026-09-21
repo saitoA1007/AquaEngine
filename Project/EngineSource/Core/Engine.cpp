@@ -13,8 +13,17 @@ using namespace GameEngine;
 void Engine::RunEngine(HINSTANCE& hInstance) {
     // 初期化
     Initialize(hInstance);
+    // 非表示のままFPSが安定するまでフレームを回す
+    const bool isReady = WarmUp();
+    // ゲームウィンドウを表示してからロードウィンドウを閉じる
+    if (isReady) {
+        core_->GetWindowsApp()->ShowGameWindow();
+    }
+    loadingWindow_.Close();
     // 更新処理
-    MainLoop();
+    if (isReady) {
+        MainLoop();
+    }
     // 終了処理
     Finalize();
 }
@@ -22,6 +31,9 @@ void Engine::RunEngine(HINSTANCE& hInstance) {
 void Engine::Initialize(HINSTANCE hInstance) {
     SetUnhandledExceptionFilter(ExportDump);
     LogManager::GetInstance().Create();
+
+    // 重い初期化の前にロードウィンドウを表示する
+    loadingWindow_.Show(L"AquaEngine", L"Now_Loading");
 
     // サブシステムを生成
     core_ = std::make_unique<CoreSubsystem>(CoreSubsystemDesc{ L"AquaEngine", 1280, 720, hInstance });
@@ -92,25 +104,29 @@ void Engine::BuildSceneServices() {
 
 void Engine::MainLoop() {
     while (!core_->IsWindowCloseRequested()) {
-        PreUpdate();
-
-        if (isActiveUpdate_ && !isPause_) {
-            scene_->UpdateGameplay();
-        } else {
-            scene_->UpdateDebug();
-        }
-
-        scene_->GetCollisionManager()->DebugDraw(graphics_->GetDebugRenderer());
-
-        PostUpdate();
-
-        PreDraw();
-        scene_->Draw();
-#ifdef USE_IMGUI
-        graphics_->GetRenderQueue()->SubmitDebugLine(graphics_->GetDebugRenderer());
-#endif
-        PostDraw();
+        RunFrame();
     }
+}
+
+void Engine::RunFrame() {
+    PreUpdate();
+
+    if (isActiveUpdate_ && !isPause_) {
+        scene_->UpdateGameplay();
+    } else {
+        scene_->UpdateDebug();
+    }
+
+    scene_->GetCollisionManager()->DebugDraw(graphics_->GetDebugRenderer());
+
+    PostUpdate();
+
+    PreDraw();
+    scene_->Draw();
+#ifdef USE_IMGUI
+    graphics_->GetRenderQueue()->SubmitDebugLine(graphics_->GetDebugRenderer());
+#endif
+    PostDraw();
 }
 
 void Engine::PreUpdate() {
@@ -175,4 +191,43 @@ void Engine::PostDraw() {
 
 void Engine::Finalize() {
     subsystemRegistry_.FinalizeAll();
+}
+
+bool Engine::WarmUp() {
+    loadingWindow_.SetMessage(L"Preparing");
+
+    using Clock = std::chrono::steady_clock;
+    const Clock::time_point startTime = Clock::now();
+    Clock::time_point prevTime = startTime;
+    int frameCount = 0;
+    int stableFrameCount = 0;
+
+    while (true) {
+        if (core_->IsWindowCloseRequested()) {
+            return false;
+        }
+
+        RunFrame();
+
+        // 1フレームにかかった時間を計測
+        const Clock::time_point now = Clock::now();
+        const float frameTime = std::chrono::duration<float>(now - prevTime).count();
+        prevTime = now;
+        frameCount++;
+
+        if (frameCount > kWarmUpIgnoreFrames) {
+            // 規定時間内に収まったフレームが連続したら安定とみなす
+            stableFrameCount = (frameTime <= kStableFrameTime) ? stableFrameCount + 1 : 0;
+            if (stableFrameCount >= kRequiredStableFrames) {
+                break;
+            }
+        }
+
+        // 安定しない環境でも一定時間で表示する
+        if (now - startTime >= kWarmUpTimeout) {
+            LogManager::GetInstance().Log("WarmUp timeout");
+            break;
+        }
+    }
+    return true;
 }

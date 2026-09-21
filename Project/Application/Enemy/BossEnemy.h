@@ -8,6 +8,8 @@
 #include "IBossState.h"
 #include "Application/Enemy/BattleAction/IBossBattleAction.h"
 
+#include "WorldTransforms.h"
+
 // 前方宣言
 namespace GameEngine {
 	class GameObjectManager;

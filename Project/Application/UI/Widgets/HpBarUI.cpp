@@ -65,7 +65,7 @@ void HpBarUI::EffectUpdate() {
 
 		point.timer += FpsCounter::deltaTime / effectmaxTime_;
 
-		effectSprite_.scale_.x = Lerp(point.start, point.end, EaseIn(point.timer));
+		effectSprite_.scale_.x = Lerp(point.start, point.end, point.timer, EaseType::kEaseInQuad);
 
 		if (point.timer >= 1.0f) {
 			effectSprite_.scale_.x = point.end;

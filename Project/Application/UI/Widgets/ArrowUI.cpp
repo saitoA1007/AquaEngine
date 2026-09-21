@@ -30,10 +30,10 @@ void ArrowUI::Update() {
 	if (timer_ <= 0.5f) {
 		float localT = timer_ / 0.5f;
 
-		offsetY = Lerp(-1.0f, 1.0f,EaseIn(localT));
+		offsetY = Lerp(-1.0f, 1.0f,localT, EaseType::kEaseInQuad);
 	} else {
 		float localT = (timer_ - 0.5f) / 0.5f;
-		offsetY = Lerp(1.0f, -1.0f, EaseIn(localT));
+		offsetY = Lerp(1.0f, -1.0f, localT, EaseType::kEaseInQuad);
 	}
 
 	if (timer_ >= 1.0f) {

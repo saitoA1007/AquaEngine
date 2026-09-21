@@ -43,7 +43,7 @@ void ShockWave::Update() {
 
 	timer_ += FpsCounter::gameDeltaTime / maxTime_;
 
-	modelComponent_.materialData_->dissolveThreshold = Lerp(0.0f, 1.0f, EaseIn(timer_));
+	modelComponent_.materialData_->dissolveThreshold = Lerp(0.0f, 1.0f, timer_, EaseType::kEaseInQuad);
 
 	if (timer_ >= 1.0f) {
 		isDead_ = true;

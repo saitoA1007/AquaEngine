@@ -6,7 +6,7 @@
 using namespace GameEngine;
 
 BossRangedAttackManager::BossRangedAttackManager(GameEngine::GameObjectManager* objectManager, GameEngine::Model* iceFallModel, GameEngine::Model* iceFallFractureModel,
-	GameEngine::TextureManager* textureManager, GameEngine::Model* windModel, GameEngine::Model* rushModel, GameEngine::Camera* camera) {
+	GameEngine::TextureManager* textureManager, GameEngine::Model* windModel, GameEngine::Model* rushModel) {
 
 	objectManager_ = objectManager;
 
@@ -15,11 +15,11 @@ BossRangedAttackManager::BossRangedAttackManager(GameEngine::GameObjectManager* 
     iceFallFractureModel_ = iceFallFractureModel;
 
 	// 風攻撃の軌跡パーティクルを生成
-	auto* windParticle = objectManager_->AddObject<ParticleBehavior>("EnemyWindAttackParticle", 256, textureManager, windModel, camera);
+	auto* windParticle = objectManager_->AddObject<ParticleBehavior>("EnemyWindAttackParticle", 256, textureManager, windModel);
 	windParticle->SetIsLoop(false);
 
     // 突進パーティクルを生成
-    rushParticle_ = objectManager_->AddObject<ParticleBehavior>("BossRushEffect", 32, textureManager, rushModel, camera);
+    rushParticle_ = objectManager_->AddObject<ParticleBehavior>("BossRushEffect", 32, textureManager, rushModel);
     rushParticle_->SetIsLoop(false);
 
     // 風エフェクトを生成

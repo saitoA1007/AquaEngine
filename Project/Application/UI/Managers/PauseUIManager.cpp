@@ -115,21 +115,21 @@ void PauseUIManager::Animation() {
 		// フレームの移動
 		if (timer_ <= 0.8f) {
 			float localT = timer_ / 0.8f;
-			frameSprite_.position_.x = Lerp(-384.0f, 0.0f, EaseOut(localT));
+			frameSprite_.position_.x = Lerp(-384.0f, 0.0f, localT, EaseType::kEaseOutQuad);
 		}
 		// ポーズ文字の移動
 		if (timer_ <= 0.9f) {
 			float localT = timer_ / 0.9f;
-			pauseTextSprite_.position_.x = Lerp(-384.0f, 192.0f, EaseOut(localT));
+			pauseTextSprite_.position_.x = Lerp(-384.0f, 192.0f, localT, EaseType::kEaseOutQuad);
 		}
 		
 		// 選択テキストの移動
-		backUI_->world_.transform_.translate.x = Lerp(-256.0f, 128.0f, EaseIn(timer_));
-		retryUI_->world_.transform_.translate.x = Lerp(-256.0f, 96.0f, EaseIn(timer_));
-		backTitleUI_->world_.transform_.translate.x = Lerp(-256.0f, 96.0f, EaseIn(timer_));
+		backUI_->world_.transform_.translate.x = Lerp(-256.0f, 128.0f, timer_, EaseType::kEaseInQuad);
+		retryUI_->world_.transform_.translate.x = Lerp(-256.0f, 96.0f, timer_, EaseType::kEaseInQuad);
+		backTitleUI_->world_.transform_.translate.x = Lerp(-256.0f, 96.0f, timer_, EaseType::kEaseInQuad);
 
 		// 操作説明の表示
-		playGuideSprite_.color_.w = Lerp(0.0f, 1.0f, EaseIn(timer_));
+		playGuideSprite_.color_.w = Lerp(0.0f, 1.0f, timer_, EaseType::kEaseInQuad);
 
 		if (timer_ >= 1.0f) {
 			frameSprite_.position_.x = 0.0f;
@@ -149,23 +149,23 @@ void PauseUIManager::Animation() {
 		bgSprite_.color_.w = Lerp(0.5f, 0.0f, timer_);
 
 		// フレームの移動
-		frameSprite_.position_.x = Lerp(0.0f, -384.0f, EaseIn(timer_));
+		frameSprite_.position_.x = Lerp(0.0f, -384.0f, timer_, EaseType::kEaseInQuad);
 
 		// ポーズ文字の移動
 		if (timer_ <= 0.9f) {
 			float localT = timer_ / 0.9f;
-			pauseTextSprite_.position_.x = Lerp(192.0f, -384.0f, EaseOut(localT));
+			pauseTextSprite_.position_.x = Lerp(192.0f, -384.0f, localT, EaseType::kEaseOutQuad);
 		}
 		// 選択テキストの移動
 		if (timer_ <= 0.8f) {
 			float localT = timer_ / 0.8f;
 			// 選択テキストの移動
-			backUI_->world_.transform_.translate.x = Lerp(96.0f, -256.0f, EaseOut(localT));
-			retryUI_->world_.transform_.translate.x = Lerp(96.0f, -256.0f, EaseOut(localT));
-			backTitleUI_->world_.transform_.translate.x = Lerp(96.0f, -256.0f, EaseOut(localT));
+			backUI_->world_.transform_.translate.x = Lerp(96.0f, -256.0f, localT, EaseType::kEaseOutQuad);
+			retryUI_->world_.transform_.translate.x = Lerp(96.0f, -256.0f, localT, EaseType::kEaseOutQuad);
+			backTitleUI_->world_.transform_.translate.x = Lerp(96.0f, -256.0f, localT, EaseType::kEaseOutQuad);
 
 			// 操作説明の表示
-			playGuideSprite_.color_.w = Lerp(1.0f, 0.0f, EaseOut(localT));
+			playGuideSprite_.color_.w = Lerp(1.0f, 0.0f, localT, EaseType::kEaseOutQuad);
 		}
 
 		if (timer_ >= 1.0f) {

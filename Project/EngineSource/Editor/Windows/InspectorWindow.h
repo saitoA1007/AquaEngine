@@ -115,6 +115,7 @@ namespace GameEngine {
 
 				case EmitShapeType::Sphere:
 				case EmitShapeType::Hemisphere:
+				case EmitShapeType::Circle:
 					if (ImGui::DragFloat("Radius", &value.radius, 0.01f, 0.0f, FLT_MAX))
 						isDirty = true;
 					if (ImGui::Checkbox("EmitFromShell", &value.emitFromShell))
@@ -210,6 +211,15 @@ namespace GameEngine {
 				}
 
 				ImGui::TreePop();
+			}
+		}
+
+		void operator()(EaseType& value) const {
+			// 種類を選択
+			int typeIdx = static_cast<int>(value);
+			if (ImGui::Combo("EaseType", &typeIdx, EaseTypeNames, static_cast<int>(EaseType::kMaxCount))) {
+				value = static_cast<EaseType>(typeIdx);
+				isDirty = true;
 			}
 		}
 

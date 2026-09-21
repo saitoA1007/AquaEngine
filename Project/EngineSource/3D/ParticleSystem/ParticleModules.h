@@ -7,6 +7,7 @@ namespace GameEngine {
 	struct MainModule {
 		bool isLoop = true; // ループするか
 		bool isBillBoard = false; // ビルボードを使用するか判断する
+		bool isActiveBlendAdd_ = true; // 加算モードを有効
 
 		uint32_t spawnMaxCount = 1; // 出現する数
 		float spawnCoolTime = 1.0f; // 発生する間隔

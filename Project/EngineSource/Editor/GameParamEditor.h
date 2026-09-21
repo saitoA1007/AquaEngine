@@ -13,6 +13,7 @@
 
 #include <json.hpp>
 #include "MyMath.h"
+#include "EasingManager.h"
 
 namespace GameEngine {
 
@@ -22,7 +23,7 @@ namespace GameEngine {
 		// 項目
 		struct Item {
 			std::variant<int32_t, uint32_t, float, Vector2, Vector3, Vector4, Range3, Range4, bool, std::string,
-				EmitterShape, TextureData, ColliderShapeData> value;
+				EmitterShape, TextureData, ColliderShapeData, EaseType> value;
 			int priority = INT_MAX; // 優先順位
 			bool isDirty = false; // ImGuiで値が変更されたか
 		};
@@ -329,6 +330,11 @@ namespace GameEngine {
 				jsonData["_anchorPoint"] = { data.anchorPoint.x, data.anchorPoint.y, data.anchorPoint.z };
 				jsonData["_boxSize"] = { data.boxSize.x, data.boxSize.y, data.boxSize.z };
 				jsonData["_rotate"] = { data.rotate.x, data.rotate.y, data.rotate.z };
+			}
+
+			void operator()(const EaseType& value) const {
+				// イージングの名前を保存
+				jsonData["_EaseType"] = EaseTypeNames[static_cast<int>(value)];
 			}
 
 			template<typename T>

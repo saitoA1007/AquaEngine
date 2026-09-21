@@ -56,8 +56,8 @@ void LetterboxUI::BarAnimation() {
 		if (timer_ >= 1.0f) { return; }
 		timer_ += FpsCounter::gameDeltaTime / maxTime_;
 
-		upBarSprite_.position_.y = Lerp(upBarEndPosY_, upBarStartPosY_, EaseIn(timer_));
-		downBarSprite_.position_.y = Lerp(downBarEndPosY_, downBarStartPosY_, EaseIn(timer_));
+		upBarSprite_.position_.y = Lerp(upBarEndPosY_, upBarStartPosY_, timer_, EaseType::kEaseInQuad);
+		downBarSprite_.position_.y = Lerp(downBarEndPosY_, downBarStartPosY_, timer_, EaseType::kEaseInQuad);
 
 		if (timer_ >= 1.0f) {
 			upBarSprite_.position_.y = upBarStartPosY_;
@@ -68,8 +68,8 @@ void LetterboxUI::BarAnimation() {
 		if (timer_ >= 1.0f) { return; }
 		timer_ += FpsCounter::gameDeltaTime / maxTime_;
 
-		upBarSprite_.position_.y = Lerp(upBarStartPosY_, upBarEndPosY_, EaseOut(timer_));
-		downBarSprite_.position_.y = Lerp(downBarStartPosY_, downBarEndPosY_, EaseOut(timer_));
+		upBarSprite_.position_.y = Lerp(upBarStartPosY_, upBarEndPosY_, timer_, EaseType::kEaseOutQuad);
+		downBarSprite_.position_.y = Lerp(downBarStartPosY_, downBarEndPosY_, timer_, EaseType::kEaseOutQuad);
 		if (timer_ >= 1.0f) {
 			upBarSprite_.position_.y = upBarEndPosY_;
 			downBarSprite_.position_.y = downBarEndPosY_;

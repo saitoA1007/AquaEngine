@@ -17,11 +17,13 @@ ModulesControl::ModulesControl(DebugParameter* param) {
     RegisterModule<ShapeEmitModule>(mainGroup, "ShapeEmit");
     RegisterModule<ColorEmitModule>(mainGroup, "ColorEmit");
     RegisterModule<RotateVelocityEmitModule>(mainGroup, "RotateVelocityEmit");
+    RegisterModule<LifeTimeEmitModule>(mainGroup, "LifeTimeEmit");
 
     mainGroup = "Particle";
     RegisterModule<VelocityOverLifeTimeModule>(mainGroup, "VelocityOverLifeTime");
     RegisterModule<SizeOverLifeTimeModule>(mainGroup, "SizeOverLifeTime");
     RegisterModule<AlphaOverLifeTimeModule>(mainGroup, "AlphaOverLifeTime");
+    RegisterModule<ColorOverLifeTimeModule>(mainGroup, "ColorOverLifeTime");
     RegisterModule<AttractionModule>(mainGroup, "Attraction");
     RegisterModule<VortexModule>(mainGroup, "Vortex");
     RegisterModule<RotationByVelocityModule>(mainGroup, "RotationByVelocity");

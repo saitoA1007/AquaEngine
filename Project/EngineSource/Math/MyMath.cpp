@@ -659,5 +659,46 @@ namespace GameEngine {
 			} };
 			return result;
 		}
+
+		Vector3 RGBtoHSV(const Vector3& rgb) {
+			float maxVal = std::fmaxf(rgb.x, std::fmaxf(rgb.y, rgb.z));
+			float minVal = std::fminf(rgb.x, std::fminf(rgb.y, rgb.z));
+			float delta = maxVal - minVal;
+
+			float h = 0.0f;
+			float s = (maxVal > 0.0f) ? (delta / maxVal) : 0.0f;
+			float v = maxVal;
+
+			if (delta > 0.0f) {
+				if (maxVal == rgb.x) {
+					h = (rgb.y - rgb.z) / delta;
+					if (h < 0.0f) h += 6.0f;
+				} else if (maxVal == rgb.y) {
+					h = (rgb.z - rgb.x) / delta + 2.0f;
+				} else {
+					h = (rgb.x - rgb.y) / delta + 4.0f;
+				}
+				h /= 6.0f;
+			}
+
+			return { h, s, v };
+		}
+
+		Vector3 HSVtoRGB(float h, float s, float v) {
+			h = h - std::floorf(h);
+			float i = std::floorf(h * 6.0f);
+			float f = h * 6.0f - i;
+			float p = v * (1.0f - s);
+			float q = v * (1.0f - f * s);
+			float t = v * (1.0f - (1.0f - f) * s);
+			switch (static_cast<int>(i) % 6) {
+			case 0: return { v, t, p };
+			case 1: return { q, v, p };
+			case 2: return { p, v, t };
+			case 3: return { p, q, v };
+			case 4: return { t, p, v };
+			default:return { v, p, q };
+			}
+		}
 	}
 }

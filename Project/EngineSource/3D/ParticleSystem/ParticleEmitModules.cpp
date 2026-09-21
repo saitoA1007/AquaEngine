@@ -2,6 +2,7 @@
 #include "TextureManager.h"
 #include "RandomGenerator.h"
 #include "MyMath.h"
+#include <algorithm>
 #include <numbers>
 using namespace GameEngine;
 
@@ -53,6 +54,11 @@ void DirectionEmitModule::Create(ParticleData& particleData) {
 		float tiltAngle = RandomGenerator::Get(0.0f, spreadAngle_ * (std::numbers::pi_v<float> / 180.0f));
 		Quaternion tilt = Math::MakeRotateAxisAngleQuaternion(spreadAxis, tiltAngle);
 		baseDir = Math::RotateVector(baseDir, tilt);
+	}
+
+	// レンジ対策
+	if (maxSpeed_ < minSpeed_) {
+		std::swap(minSpeed_, maxSpeed_);
 	}
 
 	float speed = RandomGenerator::Get(minSpeed_, maxSpeed_);
@@ -155,6 +161,20 @@ void ShapeEmitModule::Create(ParticleData& particleData) {
 		particleData.transform.translate = RandomGenerator::GetVector3(centerPos - half, centerPos + half);
 		break;
 	}
+
+	case EmitShapeType::Circle: {
+		// XZ平面上の角度をランダムに決める
+		float angle = RandomGenerator::Get(0.0f, 2.0f * std::numbers::pi_v<float>);
+
+		float radius = emitterShape_.radius;
+		if (!emitterShape_.emitFromShell) {
+			// 内部に均等に散らすため、平方根を取ってから半径を掛ける
+			radius *= std::sqrt(RandomGenerator::Get(0.0f, 1.0f));
+		}
+
+		particleData.transform.translate = centerPos + Vector3(std::cos(angle) * radius, 0.0f, std::sin(angle) * radius);
+		break;
+	}
 	}
 }
 
@@ -163,11 +183,47 @@ void ShapeEmitModule::Create(ParticleData& particleData) {
 //==================================================
 
 void ColorEmitModule::Create(ParticleData& particleData) {
-	particleData.color = {
-		RandomGenerator::Get(minColor_.x, maxColor_.x),
-		RandomGenerator::Get(minColor_.y, maxColor_.y),
-		RandomGenerator::Get(minColor_.z, maxColor_.z),
+
+	Vector3 minHsv = Math::RGBtoHSV({ minColor_.x, minColor_.y, minColor_.z });
+	Vector3 maxHsv = Math::RGBtoHSV({ maxColor_.x, maxColor_.y, maxColor_.z });
+
+	if (maxHsv.x < minHsv.x) {
+		std::swap(minHsv.x, maxHsv.x);
+	}
+	if (maxHsv.y < minHsv.y) {
+		std::swap(minHsv.y, maxHsv.y);
+	}
+	if (maxHsv.z < minHsv.z) {
+		std::swap(minHsv.z, maxHsv.z);
+	}
+
+	Vector4 hsv = {
+		RandomGenerator::Get(minHsv.x, maxHsv.x),
+		RandomGenerator::Get(minHsv.y, maxHsv.y),
+		RandomGenerator::Get(minHsv.z, maxHsv.z),
 		RandomGenerator::Get(minColor_.w, maxColor_.w)
 	};
+	
+	Vector3 rgb = Math::HSVtoRGB(hsv.x, std::clamp(hsv.y, 0.0f, 1.0f), std::clamp(hsv.z, 0.0f, 1.0f));
+
+	particleData.color = {
+		rgb.x,rgb.y,rgb.z,hsv.w
+	};
 	particleData.startColor = particleData.color;
+}
+
+//==================================================
+// 生存時間モジュール
+//==================================================
+
+void LifeTimeEmitModule::Create(ParticleData& particleData) {
+	// 最小値と最大値が逆に設定されていても動くようにする
+	float minLifeTime = minLifeTime_;
+	float maxLifeTime = maxLifeTime_;
+	if (maxLifeTime < minLifeTime) {
+		std::swap(minLifeTime, maxLifeTime);
+	}
+
+	// 経過時間の割合を求める時に0除算しないよう、下限を設ける
+	particleData.lifeTime = (std::max)(RandomGenerator::Get(minLifeTime, maxLifeTime), 0.01f);
 }

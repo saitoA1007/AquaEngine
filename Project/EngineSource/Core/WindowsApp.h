@@ -35,6 +35,11 @@ namespace GameEngine {
 		void CreateGameWindow(const std::wstring& title, int32_t clientWidth = kWindowWidth, int32_t clientHeight = kWindowHeight);
 
 		/// <summary>
+		/// ウィンドウを表示する
+		/// </summary>
+		void ShowGameWindow();
+
+		/// <summary>
 		/// メッセージ処理
 		/// </summary>
 		bool ProcessMessage();
