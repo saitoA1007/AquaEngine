@@ -376,6 +376,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Input\InPut.cpp" />
     <ClCompile Include="EngineSource\Input\InputCommand.cpp" />
     <ClCompile Include="EngineSource\Math\EasingManager.cpp" />
+    <ClCompile Include="EngineSource\Math\EaseCurve.cpp" />
+    <ClCompile Include="EngineSource\Editor\CurveEditor.cpp" />
     <ClCompile Include="EngineSource\Math\MyMath.cpp" />
     <ClCompile Include="EngineSource\Scene\IScene.cpp" />
     <ClCompile Include="EngineSource\Scene\SceneManager.cpp" />
@@ -700,6 +702,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Input\InPut.h" />
     <ClInclude Include="EngineSource\Input\InputCommand.h" />
     <ClInclude Include="EngineSource\Math\EasingManager.h" />
+    <ClInclude Include="EngineSource\Math\EaseCurve.h" />
+    <ClInclude Include="EngineSource\Editor\CurveEditor.h" />
     <ClInclude Include="EngineSource\Math\Geometry.h" />
     <ClInclude Include="EngineSource\Math\Matrix4x4.h" />
     <ClInclude Include="EngineSource\Math\MyMath.h" />

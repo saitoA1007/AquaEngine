@@ -2,6 +2,7 @@
 #include"Vector2.h"
 #include"Vector3.h"
 #include"Quaternion.h"
+#include"EaseCurve.h"
 
 // イージングタイプ
 enum class EaseType {
@@ -175,6 +176,29 @@ namespace GameEngine {
 	template<typename T>
 	T Lerp(const T& start, const T& end, float t, EaseType type = EaseType::kLinear) {
 		float easedT = Apply(t, type);
+		return T(start + (end - start) * easedT);
+	}
+
+	/// <summary>
+	/// カスタムカーブを適応
+	/// </summary>
+	/// <param name="t">進行状況</param>
+	/// <param name="curve">使用するカーブ</param>
+	/// <returns></returns>
+	float Apply(float t, const EaseCurve& curve);
+
+	/// <summary>
+	/// カスタムカーブで補間
+	/// </summary>
+	/// <typeparam name="T">任意の型</typeparam>
+	/// <param name="start">開始</param>
+	/// <param name="end">終了</param>
+	/// <param name="t">進行状況</param>
+	/// <param name="curve">使用するカーブ</param>
+	/// <returns></returns>
+	template<typename T>
+	T Lerp(const T& start, const T& end, float t, const EaseCurve& curve) {
+		float easedT = Apply(t, curve);
 		return T(start + (end - start) * easedT);
 	}
 }

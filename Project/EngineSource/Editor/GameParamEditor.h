@@ -23,7 +23,7 @@ namespace GameEngine {
 		// 項目
 		struct Item {
 			std::variant<int32_t, uint32_t, float, Vector2, Vector3, Vector4, Range3, Range4, bool, std::string,
-				EmitterShape, TextureData, ColliderShapeData, EaseType> value;
+				EmitterShape, TextureData, ColliderShapeData, EaseType, EaseCurve> value;
 			int priority = INT_MAX; // 優先順位
 			bool isDirty = false; // ImGuiで値が変更されたか
 		};
@@ -335,6 +335,21 @@ namespace GameEngine {
 			void operator()(const EaseType& value) const {
 				// イージングの名前を保存
 				jsonData["_EaseType"] = EaseTypeNames[static_cast<int>(value)];
+			}
+
+			void operator()(const EaseCurve& value) const {
+				// 制御点を配列で保存
+				nlohmann::json keys = nlohmann::json::array();
+				for (const EaseKey& key : value.GetKeys()) {
+					keys.push_back({
+						{ "time", key.time },
+						{ "value", key.value },
+						{ "inTangent", key.inTangent },
+						{ "outTangent", key.outTangent },
+						{ "mode", TangentModeNames[static_cast<int>(key.mode)] }
+						});
+				}
+				jsonData["_EaseCurve"] = keys;
 			}
 
 			template<typename T>

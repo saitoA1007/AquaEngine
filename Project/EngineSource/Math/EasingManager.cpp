@@ -356,4 +356,10 @@ namespace GameEngine {
 			return t;
 		}
 	}
+
+	float Apply(float t, const EaseCurve& curve) {
+		// tを0.0～1.0の範囲にClamp
+		t = std::clamp(t, 0.0f, 1.0f);
+		return curve.Evaluate(t);
+	}
 }

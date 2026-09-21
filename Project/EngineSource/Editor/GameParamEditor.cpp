@@ -179,6 +179,24 @@ void GameParamEditor::DeserializeGroupFromJson(Group& group, const json& node) {
 					}
 				}
 				group.items[itemName].value = data;
+			} else if (itItem->contains("_EaseCurve")) {
+				std::vector<EaseKey> keys;
+				for (const auto& keyJson : itItem->at("_EaseCurve")) {
+					EaseKey key{};
+					key.time = keyJson.value("time", 0.0f);
+					key.value = keyJson.value("value", 0.0f);
+					key.inTangent = keyJson.value("inTangent", 0.0f);
+					key.outTangent = keyJson.value("outTangent", 0.0f);
+					std::string modeStr = keyJson.value("mode", std::string(TangentModeNames[0]));
+					for (int i = 0; i < static_cast<int>(TangentMode::kMaxCount); ++i) {
+						if (modeStr == TangentModeNames[i]) {
+							key.mode = static_cast<TangentMode>(i);
+							break;
+						}
+					}
+					keys.push_back(key);
+				}
+				group.items[itemName].value = EaseCurve(keys);
 			} else {
 				// それ以外のオブジェクトはサブグループとして再帰的に読み込む
 				DeserializeGroupFromJson(group.children[itemName], *itItem);

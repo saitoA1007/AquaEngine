@@ -123,9 +123,10 @@ void ParticleBehavior::Update() {
 void ParticleBehavior::Draw() {
 
     if (main_.isActiveBlendAdd_) {
-        renderQueue_->SubmitInstancing(model_, currentNumInstance_, *worldTransforms_, 0.0f, BlendMode::kBlendModeAdd, nullptr, "WBOITAccumulatePass");
+        // "WBOITAccumulatePass"
+        renderQueue_->SubmitInstancing(model_, currentNumInstance_, *worldTransforms_, 0.0f, BlendMode::kBlendModeAdd, nullptr);
     } else {
-        renderQueue_->SubmitInstancing(model_, currentNumInstance_, *worldTransforms_, 0.0f, BlendMode::kBlendModeNormal, nullptr, "WBOITAccumulatePass");
+        renderQueue_->SubmitInstancing(model_, currentNumInstance_, *worldTransforms_, 0.0f, BlendMode::kBlendModeNormal, nullptr);
     }
 }
 

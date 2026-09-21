@@ -447,6 +447,12 @@
     <ClCompile Include="EngineSource\Math\EasingManager.cpp">
       <Filter>EngineSource\Math</Filter>
     </ClCompile>
+    <ClCompile Include="EngineSource\Math\EaseCurve.cpp">
+      <Filter>EngineSource\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Editor\CurveEditor.cpp">
+      <Filter>EngineSource\Editor</Filter>
+    </ClCompile>
     <ClCompile Include="EngineSource\Math\MyMath.cpp">
       <Filter>EngineSource\Math</Filter>
     </ClCompile>
@@ -936,6 +942,12 @@
     </ClInclude>
     <ClInclude Include="EngineSource\Math\EasingManager.h">
       <Filter>EngineSource\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Math\EaseCurve.h">
+      <Filter>EngineSource\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Editor\CurveEditor.h">
+      <Filter>EngineSource\Editor</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Math\Geometry.h">
       <Filter>EngineSource\Math</Filter>
