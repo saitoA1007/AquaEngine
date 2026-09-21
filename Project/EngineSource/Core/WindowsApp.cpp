@@ -67,11 +67,14 @@ void WindowsApp::CreateGameWindow(const std::wstring& title, int32_t kClientWidt
 		wc_.hInstance,          // インスタンスハンドル
 		nullptr);               // オプション
 
-	// ウィンドウを表示する
-	ShowWindow(hwnd_, SW_SHOW);
-
 	// システムタイマーの分解能を上げる
 	timeBeginPeriod(1);
+}
+
+void WindowsApp::ShowGameWindow() {
+	// ウィンドウを表示して前面に出す
+	ShowWindow(hwnd_, SW_SHOW);
+	SetForegroundWindow(hwnd_);
 }
 
 bool WindowsApp::ProcessMessage() {

@@ -235,6 +235,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\3D\Fracture\FractureDamageController.cpp" />
     <ClCompile Include="EngineSource\Common\CreateBufferResource.cpp" />
     <ClCompile Include="EngineSource\Core\Engine.cpp" />
+    <ClCompile Include="EngineSource\Core\LoadingWIndow.cpp" />
     <ClCompile Include="EngineSource\Core\Objects\GameObjectManager.cpp" />
     <ClCompile Include="EngineSource\Core\Objects\IGameObject.cpp" />
     <ClCompile Include="EngineSource\Core\Objects\StaticGameObject.cpp" />
@@ -523,6 +524,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Core\Engine.h" />
     <ClInclude Include="EngineSource\Core\EngineContext.h" />
     <ClInclude Include="EngineSource\Core\IEngineSubsystem.h" />
+    <ClInclude Include="EngineSource\Core\LoadingWIndow.h" />
     <ClInclude Include="EngineSource\Core\Objects\GameObjectManager.h" />
     <ClInclude Include="EngineSource\Core\Objects\IGameObject.h" />
     <ClInclude Include="EngineSource\Core\Objects\StaticGameObject.h" />
