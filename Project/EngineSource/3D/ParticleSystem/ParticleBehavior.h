@@ -20,7 +20,7 @@ namespace GameEngine{
 	/// パーティクルのシミュレーション空間
 	/// </summary>
 	enum class ParticleSimulationSpace {
-		// ローカル空間：発生後も常に親に追従する（親が動くとパーティクルも一緒に動く）
+		// ローカル空間：発生後も常に親に追従する
 		kLocal,
 		// ワールド空間：発生時だけ親の影響を受け、その後は世界に置き去りになる
 		kWorld,
@@ -114,6 +114,26 @@ namespace GameEngine{
 
 		bool IsLoop() const { return main_.isLoop; }
 
+		/// <summary>
+		/// ループ時の連続発生を設定する
+		/// </summary>
+		/// <param name="isEmitting"></param>
+		void SetEmitting(bool isEmitting) { isEmitting_ = isEmitting; }
+
+		// 連続発生が有効か
+		bool IsEmitting() const { return isEmitting_; }
+
+		/// <summary>
+		/// 生きているパーティクルが残っているか
+		/// </summary>
+		/// <returns></returns>
+		bool HasAliveParticles() const;
+
+		/// <summary>
+		/// 全てのパーティクルを消去し、発生タイマーをリセットする
+		/// </summary>
+		void Clear();
+
 		// 色を設定
 		void SetColor(Vector4 color) {
 			main_.color = color;
@@ -185,9 +205,8 @@ namespace GameEngine{
 		// 発生位置
 		Vector3 emitterPos_ = { 0.0f,0.0f,0.0f };
 
-		bool isPlay_ = false;
-		bool isStop_ = false;
-		float playTimer_ = 0.0f;
+		// ループ時に連続発生させるか
+		bool isEmitting_ = true;
 
 		bool isSetEmitPos_ = false;
 

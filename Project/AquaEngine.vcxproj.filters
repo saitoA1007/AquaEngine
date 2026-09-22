@@ -575,6 +575,10 @@
     <ClCompile Include="EngineSource\Core\Objects\StaticGameObject.cpp" />
     <ClCompile Include="EngineSource\Core\Objects\StaticGameObjectManager.cpp" />
     <ClCompile Include="EngineSource\Core\LoadingWIndow.cpp" />
+    <ClCompile Include="EngineSource\3D\Effects\EffectsManager.cpp" />
+    <ClCompile Include="EngineSource\3D\Effects\EffectObject.cpp" />
+    <ClCompile Include="EngineSource\Editor\Windows\AnimatorWindow.cpp" />
+    <ClCompile Include="EngineSource\3D\Effects\EffectModule.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1134,6 +1138,10 @@
     <ClInclude Include="EngineSource\Core\Objects\StaticGameObject.h" />
     <ClInclude Include="EngineSource\Core\Objects\StaticGameObjectManager.h" />
     <ClInclude Include="EngineSource\Core\LoadingWIndow.h" />
+    <ClInclude Include="EngineSource\3D\Effects\EffectsManager.h" />
+    <ClInclude Include="EngineSource\3D\Effects\EffectObject.h" />
+    <ClInclude Include="EngineSource\Editor\Windows\AnimatorWindow.h" />
+    <ClInclude Include="EngineSource\3D\Effects\EffectModule.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />

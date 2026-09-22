@@ -108,7 +108,7 @@ void ParticleBehavior::Update() {
     }
 
     // パーティクルの発生を管理する
-    if (main_.isLoop) {
+    if (main_.isLoop && isEmitting_) {
         Create();
     }
 
@@ -138,6 +138,25 @@ void ParticleBehavior::Emit(const Vector3& pos) {
         // 生成する
         Create();
     }
+}
+
+bool ParticleBehavior::HasAliveParticles() const {
+    for (const auto& particle : particles_) {
+        // ParticleData::IsAlive は寿命を過ぎているとtrueになる
+        if (!particle.IsAlive()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void ParticleBehavior::Clear() {
+    // 全パーティクルを非アクティブ化
+    for (auto& particle : particles_) {
+        particle.currentTime = 1.0f;
+    }
+    currentNumInstance_ = 0;
+    spawnTimer_ = 0.0f;
 }
 
 ParticleData ParticleBehavior::MakeNewParticle() {

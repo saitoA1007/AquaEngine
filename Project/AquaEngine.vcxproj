@@ -208,6 +208,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\2D\SpriteRenderer.cpp" />
     <ClCompile Include="EngineSource\3D\Camera\Camera.cpp" />
     <ClCompile Include="EngineSource\3D\Camera\DebugCamera.cpp" />
+    <ClCompile Include="EngineSource\3D\Effects\EffectModule.cpp" />
+    <ClCompile Include="EngineSource\3D\Effects\EffectObject.cpp" />
+    <ClCompile Include="EngineSource\3D\Effects\EffectsManager.cpp" />
     <ClCompile Include="EngineSource\3D\Fracture\DestructibleObject.cpp" />
     <ClCompile Include="EngineSource\3D\Light\DirectionalLight.cpp" />
     <ClCompile Include="EngineSource\3D\Light\LightManager.cpp" />
@@ -259,6 +262,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Editor\NodeSystem\MaterialShaderGenerator.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="EngineSource\Editor\Windows\AnimatorWindow.cpp" />
     <ClCompile Include="EngineSource\Editor\Windows\MaterialNodeWindow.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -494,6 +498,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\2D\SpriteRenderer.h" />
     <ClInclude Include="EngineSource\3D\Camera\Camera.h" />
     <ClInclude Include="EngineSource\3D\Camera\DebugCamera.h" />
+    <ClInclude Include="EngineSource\3D\Effects\EffectModule.h" />
+    <ClInclude Include="EngineSource\3D\Effects\EffectObject.h" />
+    <ClInclude Include="EngineSource\3D\Effects\EffectsManager.h" />
     <ClInclude Include="EngineSource\3D\Fracture\DestructibleObject.h" />
     <ClInclude Include="EngineSource\3D\Fracture\RuntimeMeshFracturer.h" />
     <ClInclude Include="EngineSource\3D\Fracture\FractureBreakState.h" />
@@ -553,6 +560,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Editor\NodeSystem\MaterialShaderGenerator.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="EngineSource\Editor\Windows\AnimatorWindow.h" />
     <ClInclude Include="EngineSource\Editor\Windows\MaterialNodeWindow.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
