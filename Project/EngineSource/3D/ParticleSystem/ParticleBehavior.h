@@ -37,6 +37,12 @@ namespace GameEngine{
 		// 更新処理
 		void Update() override;
 
+		/// <summary>
+		/// 経過時間を指定して更新する（エディターでの早送りなどに使用）
+		/// </summary>
+		/// <param name="deltaTime">経過時間（秒）</param>
+		void Update(float deltaTime);
+
 		// 描画処理
 		void Draw() override;
 
@@ -147,7 +153,7 @@ namespace GameEngine{
 		/// <summary>
 		/// 親を設定する
 		/// </summary>
-		/// <param name="parentMatrix">親のワールド行列（nullptrで親子付けを解除）</param>
+		/// <param name="parentMatrix">親のワールド行列</param>
 		/// <param name="space">
 		/// kLocal : 発生後も常に親に追従する
 		/// kWorld : 発生時の親の姿勢だけを反映し、その後は追従しない
@@ -236,15 +242,15 @@ namespace GameEngine{
 		/// <summary>
 		/// パーティクルの発生管理
 		/// </summary>
-		void Create();
+		void Create(float deltaTime);
 
 		/// <summary>
 		/// 移動処理
 		/// </summary>
-		void Move(const Matrix4x4& cameraMatrix);
+		void Move(const Matrix4x4& cameraMatrix, float deltaTime);
 
 		/// <summary>
-		/// 常に親に追従するか（親があり、かつローカル空間のとき true）
+		/// 常に親に追従するか
 		/// </summary>
 		bool IsFollowParent() const {
 			return parentMatrix_ != nullptr && simulationSpace_ == ParticleSimulationSpace::kLocal;

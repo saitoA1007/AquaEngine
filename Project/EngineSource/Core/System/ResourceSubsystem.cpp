@@ -25,6 +25,10 @@ void ResourceSubsystem::Initialize() {
 	gameParamEditor_ = std::make_unique<GameParamEditor>();
 	DebugParameter::StaticInitialize(gameParamEditor_.get());
 
+	// エフェクトの管理
+	effectsManager_ = std::make_unique<EffectsManager>(textureManager_.get(), modelManager_.get());
+
+
 	// 全てのリソースをロードする
 	LoadAllResources();
 }

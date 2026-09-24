@@ -561,6 +561,7 @@
     <ClCompile Include="Application\Stage\BgIceRock.cpp" />
     <ClCompile Include="EngineSource\Graphics\Debug\PixCapture.cpp" />
     <ClCompile Include="EngineSource\Editor\Windows\PixWindow.cpp" />
+    <ClCompile Include="EngineSource\Editor\Windows\EffectEditorWindow.cpp" />
     <ClCompile Include="Application\UI\Widgets\ArrowUI.cpp" />
     <ClCompile Include="Application\Player\Effect\PlayerHitAttackEffect.cpp" />
     <ClCompile Include="Application\Demo\IceDemo.cpp" />
@@ -577,7 +578,7 @@
     <ClCompile Include="EngineSource\Core\LoadingWIndow.cpp" />
     <ClCompile Include="EngineSource\3D\Effects\EffectsManager.cpp" />
     <ClCompile Include="EngineSource\3D\Effects\EffectObject.cpp" />
-    <ClCompile Include="EngineSource\Editor\Windows\AnimatorWindow.cpp" />
+    <ClCompile Include="EngineSource\3D\Effects\EffectAsset.cpp" />
     <ClCompile Include="EngineSource\3D\Effects\EffectModule.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -1122,6 +1123,7 @@
     <ClInclude Include="EngineSource\Graphics\Debug\PixCapture.h" />
     <ClInclude Include="EngineSource\Graphics\Debug\PixMarker.h" />
     <ClInclude Include="EngineSource\Editor\Windows\PixWindow.h" />
+    <ClInclude Include="EngineSource\Editor\Windows\EffectEditorWindow.h" />
     <ClInclude Include="Application\UI\Widgets\ArrowUI.h" />
     <ClInclude Include="Application\Player\Effect\PlayerHitAttackEffect.h" />
     <ClInclude Include="Application\Demo\IceDemo.h" />
@@ -1140,7 +1142,7 @@
     <ClInclude Include="EngineSource\Core\LoadingWIndow.h" />
     <ClInclude Include="EngineSource\3D\Effects\EffectsManager.h" />
     <ClInclude Include="EngineSource\3D\Effects\EffectObject.h" />
-    <ClInclude Include="EngineSource\Editor\Windows\AnimatorWindow.h" />
+    <ClInclude Include="EngineSource\3D\Effects\EffectAsset.h" />
     <ClInclude Include="EngineSource\3D\Effects\EffectModule.h" />
   </ItemGroup>
   <ItemGroup>

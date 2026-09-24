@@ -7,6 +7,7 @@
 #include "AnimationManager.h"
 #include "AudioManager.h"
 #include "GameParamEditor.h"
+#include "EffectsManager.h"
 
 namespace GameEngine {
 
@@ -27,6 +28,7 @@ namespace GameEngine {
         ModelManager* GetModelManager()     const { return modelManager_.get(); }
         AnimationManager* GetAnimationManager() const { return animationManager_.get(); }
         GameParamEditor* GetGameParamEditor() const { return gameParamEditor_.get(); }
+        EffectsManager* GetEffectsManager() const { return effectsManager_.get(); }
     private:
         EngineContext context_;
 
@@ -38,5 +40,7 @@ namespace GameEngine {
         std::unique_ptr<AnimationManager> animationManager_;
         // パラメータシステム
         std::unique_ptr<GameParamEditor> gameParamEditor_;
+        // エフェクトの管理
+        std::unique_ptr<EffectsManager> effectsManager_;
     };
 }

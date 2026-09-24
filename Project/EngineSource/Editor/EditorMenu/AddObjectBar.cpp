@@ -4,6 +4,7 @@
 #include "DebugCamera.h"
 #include "Command/EditorCommand.h"
 #include "GameParamEditor.h"
+#include "Windows/IEditorWindow.h"
 using namespace GameEngine;
 
 AddObjectBar::AddObjectBar(StaticGameObjectManager* staticObjectManager, RenderQueue* renderQueue, DebugCamera* debugCamera, GameParamEditor* paramEditor) {
@@ -58,7 +59,8 @@ void AddObjectBar::Run() {
 
     // キーボードショートカット
     ImGuiIO& io = ImGui::GetIO();
-    if (!io.WantTextInput) {
+    // 独自のショートカットを持つウィンドウ（エフェクトエディタなど）がフォーカス中は無効にする
+    if (!io.WantTextInput && !EditorShortcut::IsLocalWindowFocused(ImGui::GetFrameCount())) {
         // undo
         if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_Z, false)) {
             commandHistory_.Undo();

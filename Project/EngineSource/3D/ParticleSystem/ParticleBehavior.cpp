@@ -96,6 +96,10 @@ void ParticleBehavior::Initialize() {
 }
 
 void ParticleBehavior::Update() {
+    Update(FpsCounter::deltaTime);
+}
+
+void ParticleBehavior::Update(float deltaTime) {
     // 値の適応
     debugParame_->ApplyIfDirty();
 
@@ -109,7 +113,7 @@ void ParticleBehavior::Update() {
 
     // パーティクルの発生を管理する
     if (main_.isLoop && isEmitting_) {
-        Create();
+        Create(deltaTime);
     }
 
     Matrix4x4 cameraMatrix = camera_->GetWorldMatrix();
@@ -117,7 +121,7 @@ void ParticleBehavior::Update() {
         cameraMatrix = renderQueue_->GetDebugCameraWorldMatrix();
     }
     // 移動処理
-    Move(cameraMatrix);
+    Move(cameraMatrix, deltaTime);
 }
 
 void ParticleBehavior::Draw() {
@@ -136,7 +140,7 @@ void ParticleBehavior::Emit(const Vector3& pos) {
     if (!main_.isLoop) {
         spawnTimer_ = main_.spawnCoolTime;
         // 生成する
-        Create();
+        Create(0.0f);
     }
 }
 
@@ -187,10 +191,10 @@ ParticleData ParticleBehavior::MakeNewParticle() {
     return tmpParticleData;
 }
 
-void ParticleBehavior::Create() {
+void ParticleBehavior::Create(float deltaTime) {
 
     // 経過時間を加算
-    spawnTimer_ += FpsCounter::deltaTime;
+    spawnTimer_ += deltaTime;
 
     if (spawnTimer_ >= main_.spawnCoolTime) {
         uint32_t spawnCount = 0;
@@ -209,7 +213,7 @@ void ParticleBehavior::Create() {
     }
 }
 
-void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
+void ParticleBehavior::Move(const Matrix4x4& cameraMatrix, float deltaTime) {
     currentNumInstance_ = 0;
     RotationByVelocityModule* module = modulesControl_->GetModule<RotationByVelocityModule>("RotationByVelocity");
     bool isRotateVelocity = false;
@@ -229,14 +233,14 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
         }
 
         // 更新
-        modulesControl_->ParticleUpdate(particle, FpsCounter::deltaTime);
+        modulesControl_->ParticleUpdate(particle, deltaTime);
 
         // 経過時間を加算
-        particle.currentTime += FpsCounter::deltaTime / particle.lifeTime;
+        particle.currentTime += deltaTime / particle.lifeTime;
         // 速度を追加
-        particle.transform.translate += particle.velocity * FpsCounter::deltaTime;
+        particle.transform.translate += particle.velocity * deltaTime;
         // 回転速度
-        particle.transform.rotate += particle.rotateVelocity * FpsCounter::deltaTime;
+        particle.transform.rotate += particle.rotateVelocity * deltaTime;
 
         // worldTransformsの更新
         if (main_.isBillBoard) {

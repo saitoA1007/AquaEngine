@@ -95,7 +95,8 @@ void Engine::BuildSceneServices() {
     // シーンに入力機能を設定
     IScene::SetInput(input_->GetInput(), input_->GetInputCommand());
     // シーンにリソース管理機能を設定
-    IScene::SetResourceManager(resource_->GetTextureManager(), resource_->GetModelManager(), resource_->GetAnimationManager(), scene_->GetGameObjectManager());
+    IScene::SetResourceManager(resource_->GetTextureManager(), resource_->GetModelManager(), resource_->GetAnimationManager(), 
+        scene_->GetGameObjectManager(), resource_->GetEffectsManager());
     // シーンに描画機能を設定
     IScene::SetRender(graphics_->GetRenderPassCtrl(), graphics_->GetRenderQueue(),graphics_->GetPostEffectManager());
     // デバック描画機能を設定

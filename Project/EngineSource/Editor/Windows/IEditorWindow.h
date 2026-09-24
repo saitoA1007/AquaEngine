@@ -11,4 +11,19 @@ namespace GameEngine {
 
 		bool isActive = true;
 	};
+
+	/// <summary>
+	/// 独自のUndo/Redo・保存のショートカットを持つウィンドウの管理
+	/// そのウィンドウがフォーカスされている間は、シーン全体のショートカットを無効にする
+	/// </summary>
+	namespace EditorShortcut {
+		// 最後にフォーカスが報告されたフレーム
+		inline int localFocusFrame = -100;
+
+		// フォーカス中であることを報告する
+		inline void ReportLocalFocus(int frameCount) { localFocusFrame = frameCount; }
+
+		// 直前のフレームまでにフォーカスが報告されていればtrue
+		inline bool IsLocalWindowFocused(int frameCount) { return localFocusFrame >= frameCount - 1; }
+	}
 }

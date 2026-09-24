@@ -24,6 +24,8 @@ namespace GameEngine {
 	class RenderQueue;
 	class StaticGameObjectManager;
 	class PSOManager;
+	class ModelManager;
+	class EffectsManager;
 
 	class EditorCore {
 	public:
@@ -31,9 +33,10 @@ namespace GameEngine {
 		~EditorCore();
 
 		// 初期化処理
-		void Initialize(TextureManager* textureManager, SceneChangeRequest* sceneChangeRequest, RenderPassController* renderPassController, 
+		void Initialize(TextureManager* textureManager, SceneChangeRequest* sceneChangeRequest, RenderPassController* renderPassController,
 			Input* input, RenderQueue* renderQueue, DebugRenderer* debugRenderer, Model* gridModel, GameParamEditor* gameParamEditor,
-			StaticGameObjectManager* staticObjectManager, PSOManager* psoManager);
+			StaticGameObjectManager* staticObjectManager, PSOManager* psoManager, ModelManager* modelManager,
+			EffectsManager* effectsManager);
 
 		// 実行
 		void Run();
