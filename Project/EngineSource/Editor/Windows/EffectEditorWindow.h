@@ -39,7 +39,6 @@ namespace GameEngine {
 		};
 
 	public:
-		/// <param name="effectsManager">保存したエフェクトをゲーム側にも反映するために使用する</param>
 		EffectEditorWindow(TextureManager* textureManager, ModelManager* modelManager, GameParamEditor* gameParamEditor,
 			EffectsManager* effectsManager);
 
@@ -75,8 +74,8 @@ namespace GameEngine {
 		std::unique_ptr<EffectObject> preview_;
 		// プレビューの位置
 		Vector3 previewPos_ = { 0.0f,0.0f,0.0f };
-		// プレビューを再生中か
-		bool isPreviewActive_ = false;
+		// プレビューの時間を進めているか
+		bool isPlaying_ = false;
 		// 再生が終わったら自動で最初から再生するか
 		bool isAutoReplay_ = true;
 		// パーティクルの作り直しが必要か
@@ -84,15 +83,17 @@ namespace GameEngine {
 		// タイミングの反映が必要か
 		bool needsApplyTiming_ = false;
 
-		// 一時停止中か
-		bool isPaused_ = false;
-
 		// Undo/Redoの履歴
 		EditorCommandHistory history_;
 		// 最後に履歴に積んだ状態
 		EffectAsset committedAsset_;
 		// 履歴に積んでいない変更があるか
 		bool hasPendingChange_ = false;
+
+		// トラック一覧の幅
+		float trackListWidth_ = 180.0f;
+		// プロパティの幅
+		float propertiesWidth_ = 300.0f;
 
 		// 新規作成の名前入力
 		char newEffectName_[64] = {};
@@ -110,11 +111,21 @@ namespace GameEngine {
 		// ファイル操作
 		void DrawFileBar();
 
-		// エフェクト全体の設定
-		void DrawEffectSettings();
+		// エフェクト全体と選択中トラックの設定
+		void DrawProperties();
+
+		/// <summary>
+		/// プロパティの幅を変えるための境界線
+		/// </summary>
+		/// <param name="width">境界の当たり判定の幅</param>
+		/// <param name="height">境界の高さ</param>
+		void DrawSplitter(float width, float height);
 
 		// 再生操作
-		void DrawPlayback();
+		void DrawPlaybackBar();
+
+		// トラックの一覧
+		void DrawTrackList();
 
 		// トラックの追加。複製。削除
 		void DrawTrackButtons();
@@ -144,7 +155,7 @@ namespace GameEngine {
 		// モデルの名前の一覧
 		std::vector<std::string> GetModelNames() const;
 
-		// 保存してゲーム中のEffectsManagerにも反映する
+		// 保存する
 		void Save();
 
 		// 編集対象を切り替えた時に履歴をリセットする
@@ -156,7 +167,12 @@ namespace GameEngine {
 		// ショートカットキー
 		void HandleShortcuts();
 
-		// プレビューを指定した時間まで移動して一時停止する
+		/// <summary>
+		/// 再生と停止を切り替え
+		/// </summary>
+		void TogglePlay();
+
+		// プレビューを指定した時間まで移動して停止する
 		void SeekPreview(float time);
 
 		// パーティクルの作り直しが不要な変更か

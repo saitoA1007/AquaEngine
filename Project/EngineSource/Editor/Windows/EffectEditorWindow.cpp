@@ -97,13 +97,38 @@ void EffectEditorWindow::Draw() {
 
 		if (hasAsset_) {
 			ImGui::Separator();
-			DrawEffectSettings();
-			DrawPlayback();
-			ImGui::Separator();
 
-			DrawTrackButtons();
+			// 下端の再生バーを除いた高さを、左からトラック一覧、タイムライン、プロパティで分ける
+			const ImGuiStyle& style = ImGui::GetStyle();
+			const float playbackHeight = ImGui::GetFrameHeight() + style.ItemSpacing.y * 2.0f;
+			const float areaHeight = (std::max)(ImGui::GetContentRegionAvail().y - playbackHeight, 60.0f);
+			constexpr float kSplitterWidth = 6.0f;
+
+			// 左側のトラック一覧
+			ImGui::BeginChild("TrackList", ImVec2(trackListWidth_, areaHeight), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeX);
+			DrawTrackList();
+			ImGui::EndChild();
+
+			// 中央のタイムライン
+			ImGui::SameLine();
+			const float timelineWidth = (std::max)(
+				ImGui::GetContentRegionAvail().x - propertiesWidth_ - kSplitterWidth - style.ItemSpacing.x, 100.0f);
+			ImGui::BeginChild("TimelineArea", ImVec2(timelineWidth, areaHeight), ImGuiChildFlags_Borders);
 			DrawTimeline();
-			DrawTrackInspector();
+			ImGui::EndChild();
+
+			// 境界をドラッグしてプロパティの幅を変える
+			ImGui::SameLine();
+			DrawSplitter(kSplitterWidth, areaHeight);
+
+			// 右側のプロパティ
+			ImGui::SameLine();
+			ImGui::BeginChild("Properties", ImVec2(0.0f, areaHeight), ImGuiChildFlags_Borders);
+			DrawProperties();
+			ImGui::EndChild();
+
+			// 下端側の再生バー
+			DrawPlaybackBar();
 		} else {
 			ImGui::TextDisabled("Select or create an effect.");
 		}
@@ -145,8 +170,7 @@ void EffectEditorWindow::LoadEffect(const std::string& name) {
 	hasAsset_ = true;
 	isDirty_ = false;
 	selectedTrack_ = asset_.tracks.empty() ? -1 : 0;
-	isPreviewActive_ = true;
-	isPaused_ = false;
+	isPlaying_ = false;
 	needsRebuild_ = true;
 	ResetHistory();
 }
@@ -184,8 +208,7 @@ void EffectEditorWindow::DrawFileBar() {
 			asset_.name = name;
 			hasAsset_ = true;
 			selectedTrack_ = -1;
-			isPreviewActive_ = true;
-			isPaused_ = false;
+			isPlaying_ = false;
 			isDirty_ = true;
 			needsRebuild_ = true;
 			ResetHistory();
@@ -224,32 +247,33 @@ void EffectEditorWindow::DrawFileBar() {
 	}
 }
 
-void EffectEditorWindow::DrawEffectSettings() {
-	ImGui::SetNextItemWidth(120.0f);
-	if (ImGui::DragFloat("Duration", &asset_.duration, 0.01f, 0.01f, 60.0f, "%.2f s")) {
-		asset_.duration = (std::max)(asset_.duration, 0.01f);
-		MarkTimingChanged();
-	}
-	ImGui::SameLine();
-	if (ImGui::Checkbox("Loop", &asset_.isLoop)) {
-		MarkTimingChanged();
-	}
+void EffectEditorWindow::DrawProperties() {
+	// 選択中トラックの設定
+	DrawTrackInspector();
 }
 
-void EffectEditorWindow::DrawPlayback() {
-	// 最初から再生
-	if (ImGui::Button("Play")) {
-		isPreviewActive_ = true;
-		isPaused_ = false;
-		if (preview_) {
-			preview_->Play(previewPos_);
-		}
+void EffectEditorWindow::DrawSplitter(float width, float height) {
+	const ImVec2 min = ImGui::GetCursorScreenPos();
+	ImGui::InvisibleButton("##Splitter", ImVec2(width, height));
+
+	if (ImGui::IsItemHovered() || ImGui::IsItemActive()) {
+		ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
 	}
-	// 一時停止 / 再開
-	ImGui::SameLine();
-	if (ImGui::Button(isPaused_ ? "Resume" : "Pause")) {
-		isPaused_ = !isPaused_;
-		isPreviewActive_ = true;
+	if (ImGui::IsItemActive()) {
+		// 左に動かすとプロパティが広くなる
+		propertiesWidth_ = std::clamp(propertiesWidth_ - ImGui::GetIO().MouseDelta.x, 120.0f, 800.0f);
+	}
+
+	const ImVec2 max = ImGui::GetItemRectMax();
+	const ImU32 color = ImGui::GetColorU32(ImGui::IsItemActive() ? ImGuiCol_SeparatorActive
+		: (ImGui::IsItemHovered() ? ImGuiCol_SeparatorHovered : ImGuiCol_Separator));
+	ImGui::GetWindowDrawList()->AddRectFilled(ImVec2(min.x + width * 0.5f - 1.0f, min.y), ImVec2(min.x + width * 0.5f + 1.0f, max.y), color);
+}
+
+void EffectEditorWindow::DrawPlaybackBar() {
+	// 再生 / 停止
+	if (ImGui::Button("Play")) {
+		TogglePlay();
 	}
 	// コマ送り
 	constexpr float kFrameStep = 1.0f / 60.0f;
@@ -261,31 +285,58 @@ void EffectEditorWindow::DrawPlayback() {
 	if (ImGui::ArrowButton("##NextFrame", ImGuiDir_Right) && preview_) {
 		SeekPreview(preview_->GetTime() + kFrameStep);
 	}
-	ImGui::SameLine();
-	if (ImGui::Button("Stop")) {
-		isPreviewActive_ = false;
-		isPaused_ = false;
-		if (preview_) {
-			preview_->Stop();
-		}
-	}
+	// 最初に戻す
 	ImGui::SameLine();
 	if (ImGui::Button("Clear")) {
-		isPreviewActive_ = false;
-		isPaused_ = false;
+		isPlaying_ = false;
 		if (preview_) {
 			preview_->StopImmediate();
 		}
 	}
-	ImGui::SameLine();
-	ImGui::Checkbox("AutoReplay", &isAutoReplay_);
-
 	// 再生時間
 	ImGui::SameLine();
 	float time = preview_ ? preview_->GetTime() : 0.0f;
 	ImGui::Text("%.2f / %.2f s", time, asset_.duration);
 
+	ImGui::SameLine();
+	if (ImGui::Checkbox("Loop", &asset_.isLoop)) {
+		MarkTimingChanged();
+	}
+	ImGui::SameLine();
+	ImGui::Checkbox("AutoReplay", &isAutoReplay_);
+
+	// エフェクト全体の長さ
+	ImGui::SameLine();
+	ImGui::SetNextItemWidth(120.0f);
+	if (ImGui::DragFloat("Duration", &asset_.duration, 0.01f, 0.01f, 60.0f, "%.2f s")) {
+		asset_.duration = (std::max)(asset_.duration, 0.01f);
+		MarkTimingChanged();
+	}
+
+	// プレビューの位置は保存しないので、変更として記録しない
+	ImGui::SameLine();
+	ImGui::SetNextItemWidth(200.0f);
 	ImGui::DragFloat3("PreviewPos", &previewPos_.x, 0.1f);
+}
+
+void EffectEditorWindow::DrawTrackList() {
+	// トラックの一覧
+	ImGui::SeparatorText("Tracks");
+
+	for (int i = 0; i < static_cast<int>(asset_.tracks.size()); ++i) {
+		const EffectTrackData& track = asset_.tracks[i];
+		std::string label = track.name + (track.emitMode == EffectEmitMode::kBurst ? " [B]" : "") + "##" + std::to_string(i);
+		if (ImGui::Selectable(label.c_str(), selectedTrack_ == i)) {
+			selectedTrack_ = i;
+		}
+	}
+
+	if (asset_.tracks.empty()) {
+		ImGui::TextDisabled("No tracks");
+	}
+
+	ImGui::Separator();
+	DrawTrackButtons();
 }
 
 void EffectEditorWindow::DrawTrackButtons() {
@@ -324,9 +375,6 @@ void EffectEditorWindow::DrawTrackButtons() {
 	}
 
 	ImGui::EndDisabled();
-
-	ImGui::SameLine();
-	ImGui::TextDisabled("Ruler: scrub / Drag: move / Edges: resize / Shift: snap 0.1s");
 }
 
 void EffectEditorWindow::DrawTimeline() {
@@ -334,13 +382,9 @@ void EffectEditorWindow::DrawTimeline() {
 	constexpr float kRulerHeight = 20.0f;  // 目盛りの高さ
 	constexpr float kRowHeight = 22.0f;    // 1トラックの高さ
 	constexpr float kBarInset = 3.0f;      // バーの上下の余白
-	constexpr float kMaxHeight = 260.0f;   // タイムラインの最大の高さ
 
 	const int trackCount = static_cast<int>(asset_.tracks.size());
 	const float contentHeight = kRulerHeight + kRowHeight * (std::max)(trackCount, 1) + 4.0f;
-	const float childHeight = (std::min)(contentHeight + ImGui::GetStyle().WindowPadding.y * 2.0f, kMaxHeight);
-
-	ImGui::BeginChild("Timeline", ImVec2(0.0f, childHeight), ImGuiChildFlags_Borders);
 
 	ImDrawList* drawList = ImGui::GetWindowDrawList();
 	const ImVec2 origin = ImGui::GetCursorScreenPos();
@@ -394,7 +438,7 @@ void EffectEditorWindow::DrawTimeline() {
 			float t = (io.MousePos.x - timelineX) / pixelsPerSec;
 			t = std::round(t / snap) * snap;
 			// 同じ時間への移動は再シミュレーションしない
-			if (!isPaused_ || std::abs(t - preview_->GetTime()) > 0.0001f) {
+			if (isPlaying_ || std::abs(t - preview_->GetTime()) > 0.0001f) {
 				SeekPreview(t);
 			}
 		}
@@ -413,7 +457,7 @@ void EffectEditorWindow::DrawTimeline() {
 		// 行の背景
 		drawList->AddRectFilled(rowMin, rowMax, isSelected ? selectedRowColor : (i % 2 == 0 ? rowColorA : rowColorB));
 
-		// トラック名（クリックで選択）
+		// トラック名
 		ImGui::SetCursorScreenPos(rowMin);
 		if (ImGui::InvisibleButton("Name", ImVec2(kNameWidth - 10.0f, kRowHeight))) {
 			selectedTrack_ = i;
@@ -480,8 +524,6 @@ void EffectEditorWindow::DrawTimeline() {
 	// スクロール範囲を確保する
 	ImGui::SetCursorScreenPos(origin);
 	ImGui::Dummy(ImVec2(totalWidth, contentHeight));
-
-	ImGui::EndChild();
 }
 
 void EffectEditorWindow::HandleBarDrag(int trackIndex, const ImVec2& min, const ImVec2& max, DragPart part, float pixelsPerSec) {
@@ -534,7 +576,7 @@ void EffectEditorWindow::HandleBarDrag(int trackIndex, const ImVec2& min, const 
 
 		switch (part) {
 		case DragPart::kMove: {
-			// 長さを保ったまま移動する（Burstは長さを使わない）
+			// 長さを保ったまま移動する
 			const float length = track.emitMode == EffectEmitMode::kBurst ? 0.0f : drag_.originalDuration;
 			const float maxStart = (std::max)(effectDuration - length, 0.0f);
 			newStart = std::clamp(snapTime(drag_.originalStart + delta), 0.0f, maxStart);
@@ -569,11 +611,10 @@ void EffectEditorWindow::HandleBarDrag(int trackIndex, const ImVec2& min, const 
 }
 
 void EffectEditorWindow::DrawTrackInspector() {
-	ImGui::BeginChild("TrackInspector", ImVec2(0.0f, 0.0f), ImGuiChildFlags_Borders);
+	ImGui::SeparatorText("Track");
 
 	if (selectedTrack_ < 0 || selectedTrack_ >= static_cast<int>(asset_.tracks.size())) {
 		ImGui::TextDisabled("No track selected");
-		ImGui::EndChild();
 		return;
 	}
 
@@ -586,7 +627,7 @@ void EffectEditorWindow::DrawTrackInspector() {
 
 	ImGui::SeparatorText("Particle");
 
-	// パーティクル（一覧から選択、または新しい名前を入力）
+	// パーティクルの一覧から選択
 	if (ComboString("Particle", track.particleName, GetParticleNames())) {
 		MarkStructureChanged();
 	}
@@ -645,8 +686,6 @@ void EffectEditorWindow::DrawTrackInspector() {
 	if (ImGui::DragFloat3("Offset", &track.offset.x, 0.01f)) {
 		MarkTimingChanged();
 	}
-
-	ImGui::EndChild();
 }
 
 void EffectEditorWindow::UpdatePreview() {
@@ -661,19 +700,15 @@ void EffectEditorWindow::UpdatePreview() {
 		preview_->SetPosition(previewPos_);
 		needsRebuild_ = false;
 		needsApplyTiming_ = false;
-		if (isPaused_) {
-			// 一時停止中は同じ時間の状態を表示する
-			preview_->Seek(prevTime);
-		} else if (isPreviewActive_) {
-			preview_->Play(previewPos_);
-		}
+		// 作り直す前と同じ時間の状態にする
+		preview_->Seek(prevTime);
 	}
 
 	// タイミングの変更を反映する
 	if (needsApplyTiming_) {
 		preview_->ApplyTiming(asset_);
 		needsApplyTiming_ = false;
-		if (isPaused_) {
+		if (!isPlaying_) {
 			// 変更後の設定で同じ時間までシミュレーションし直す
 			const float time = preview_->GetTime();
 			preview_->Play(previewPos_);
@@ -683,9 +718,9 @@ void EffectEditorWindow::UpdatePreview() {
 
 	preview_->SetPosition(previewPos_);
 
-	if (!isPaused_) {
+	if (isPlaying_) {
 		// 再生が終わったら最初から再生する
-		if (isPreviewActive_ && isAutoReplay_ && !preview_->IsPlaying()) {
+		if (isAutoReplay_ && !preview_->IsPlaying()) {
 			preview_->Play(previewPos_);
 		}
 		preview_->Update();
@@ -693,12 +728,26 @@ void EffectEditorWindow::UpdatePreview() {
 	preview_->Draw();
 }
 
+void EffectEditorWindow::TogglePlay() {
+	if (isPlaying_) {
+		// 停止する
+		isPlaying_ = false;
+		return;
+	}
+
+	isPlaying_ = true;
+
+	// 再生が終わっている場合は最初から再生する
+	if (preview_ && !preview_->IsPlaying()) {
+		preview_->Play(previewPos_);
+	}
+}
+
 void EffectEditorWindow::SeekPreview(float time) {
 	if (!preview_) {
 		return;
 	}
-	isPreviewActive_ = true;
-	isPaused_ = true;
+	isPlaying_ = false;
 	preview_->SetPosition(previewPos_);
 	preview_->Seek(std::clamp(time, 0.0f, asset_.duration));
 }
@@ -746,7 +795,7 @@ void EffectEditorWindow::ResetHistory() {
 }
 
 void EffectEditorWindow::CommitChanges() {
-	// ドラッグや入力の途中では積まない（操作が終わった時点で1回分として積む）
+	// ドラッグや入力の途中では積まない
 	if (!hasPendingChange_ || ImGui::IsAnyItemActive()) {
 		return;
 	}
@@ -777,8 +826,7 @@ void EffectEditorWindow::HandleShortcuts() {
 		}
 	} else if (ImGui::IsKeyPressed(ImGuiKey_Space, false)) {
 		// Space : 一時停止 / 再開
-		isPaused_ = !isPaused_;
-		isPreviewActive_ = true;
+		TogglePlay();
 	}
 }
 
