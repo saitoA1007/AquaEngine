@@ -39,6 +39,13 @@ namespace GameEngine {
 		void RegisterEffect(const EffectAsset& asset);
 
 		/// <summary>
+		/// 登録したエフェクトのデータからインスタンスを作成する
+		/// </summary>
+		/// <param name="name">エフェクトの名前</param>
+		/// <returns>作成したインスタンス。エフェクトが見つからなければnullptr</returns>
+		std::unique_ptr<EffectObject> GetEffect(const std::string& name) const;
+
+		/// <summary>
 		/// 名前からエフェクトの定義データを取得
 		/// </summary>
 		/// <param name="name">エフェクトの名前</param>

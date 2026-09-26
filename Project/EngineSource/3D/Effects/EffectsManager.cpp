@@ -63,6 +63,15 @@ void EffectsManager::RegisterEffect(const EffectAsset& asset) {
 	}
 }
 
+std::unique_ptr<EffectObject> EffectsManager::GetEffect(const std::string& name) const {
+	const EffectAsset* asset = GetAsset(name);
+	if (asset == nullptr) {
+		Log("EffectsManager: effect \"" + name + "\" not found");
+		return nullptr;
+	}
+	return std::make_unique<EffectObject>(*asset, textureManager_, modelManager_);
+}
+
 const EffectAsset* EffectsManager::GetAsset(const std::string& name) const {
 	auto it = assets_.find(name);
 	if (it == assets_.end()) {
@@ -72,12 +81,6 @@ const EffectAsset* EffectsManager::GetAsset(const std::string& name) const {
 }
 
 EffectObject* EffectsManager::Play(const std::string& name, const Vector3& pos) {
-	const EffectAsset* asset = GetAsset(name);
-	if (asset == nullptr) {
-		Log("EffectsManager: effect \"" + name + "\" not found");
-		return nullptr;
-	}
-
 	auto& list = instances_[name];
 
 	// 再生が終わっているインスタンスを再利用する
@@ -89,7 +92,11 @@ EffectObject* EffectsManager::Play(const std::string& name, const Vector3& pos) 
 	}
 
 	// 無ければ新しく生成する
-	list.push_back(std::make_unique<EffectObject>(*asset, textureManager_, modelManager_));
+	std::unique_ptr<EffectObject> newInstance = GetEffect(name);
+	if (newInstance == nullptr) {
+		return nullptr;
+	}
+	list.push_back(std::move(newInstance));
 	EffectObject* instance = list.back().get();
 	instance->Play(pos);
 	return instance;
