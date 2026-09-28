@@ -51,14 +51,14 @@ void SceneRenderManager::Execute() {
     // ラスタライズ描画コマンドを解放
     RasterizeExecute();
 
-    // 半透明描画
-    RasterizeTranslucentExecute();
-
     // レイトレとラスタライズの描画を合成する
     LightingComposite();
 
+    // 半透明描画
+    RasterizeTranslucentExecute();
+
     // 半透明の描画結果を合成する
-    Composite();
+    //Composite();
 
     // 最終的に画面に出すためのパスの設定
     renderPassController_->SetSceneFinalPass(finalPassName_);
@@ -97,6 +97,8 @@ void SceneRenderManager::RegisterPSOs(PSOManager* psoManager) {
         "LightingComposite",
         // 深度コピー用
         "DepthCopy",
+        // カラーコピー
+        "ColorCopy",
 
         // 破片描画用
         "Fracture3D",
@@ -374,35 +376,67 @@ void SceneRenderManager::RasterizeTranslucentExecute() {
 
     bool hasTranslucent = translucentDrawQueueList.count(passName) > 0;
 
-    // 半透明描画コマンドを解放
+    // =========================================
+    // パスの名前を参照はしつつおこなうのはコピーのみ
+
+    std::string drawPassName = "LightingCompositePass";
+
     if (hasTranslucent) {
+
+        // 描画前処理
+        if (enableDrawRaytracing_ && enableDrawRasterize_) {
+            // レイトレとラスタライズ描画
+            renderPassController_->PrePass({ drawPassName }, rasterizeFinalPassName_);
+            renderPassController_->SetOnlyDsvRenderTarget(drawPassName);
+
+            // レイトレの深度値をコピーする
+            CopyRaytracingDepth();
+
+            // 深度値をコピーした状態で再びターゲット
+            renderPassController_->PrePass(drawPassName);
+
+        } else if (enableDrawRaytracing_ && !enableDrawRasterize_) {
+            // レイトレのみ
+            renderPassController_->PrePass(drawPassName);
+            renderPassController_->ClearRenderPass(drawPassName);
+            renderPassController_->SetOnlyDsvRenderTarget(drawPassName);
+
+            // レイトレの深度値をコピーする
+            CopyRaytracingDepth();
+
+            // 深度値をコピーした状態で再びターゲット
+            renderPassController_->PrePass(drawPassName);
+
+            // レイトレのカラーをコピー
+            PreDraw("ColorCopy");
+            commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+            commandList_->SetGraphicsRootDescriptorTable(0, srvManager_->GetGPUHandle(renderPassController_->GetSrvIndex(raytracingFinalPassName_)));
+            commandList_->DrawInstanced(3, 1, 0, 0);
+        } else if (!enableDrawRaytracing_ && enableDrawRasterize_) {
+            // ラスタライズのみ
+            drawPassName = rasterizeFinalPassName_;
+            renderPassController_->PrePass(drawPassName);
+            renderPassController_->ClearRenderPass(drawPassName);
+        }
+
+        // 最終描画パス
+        finalPassName_ = drawPassName;
+
+        // 描画
         auto& translucentList = translucentDrawQueueList[passName];
-
-        std::vector<std::string> passList = { "WBOITAccumulatePass", "WBOITResolvePass" };
-        renderPassController_->PrePass(rasterizeFinalPassName_);
-        renderPassController_->PrePass(passList, rasterizeFinalPassName_);
-
-        renderPassController_->ClearRenderPass(passName);
-        renderPassController_->ClearRenderPass("WBOITResolvePass");
-
         for (const auto& request : translucentList) {
             // 描画前処理
             PreDraw(renderQueue_->Get3dPsoName(request.type));
             // 描画コマンド解放
             Execute3dRequest(request);
         }
-        // リソースの状態を遷移
-        for (const auto& pass : passList) {
-            renderPassController_->PostPass(pass);
-        }
-        renderPassController_->PostPass(rasterizeFinalPassName_);
 
+        // 描画後処理
+        renderPassController_->PostPass(drawPassName);
+
+        // 透明描画の有効
         enableDrawRasterizeTranslucent_ = true;
-    } else {
-        renderPassController_->PrePass(passName);
-        renderPassController_->ClearRenderPass(passName);
-        renderPassController_->PostPass(passName);
-    }
+    } 
 }
 
 void SceneRenderManager::RaytracingExecute() {

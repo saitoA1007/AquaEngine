@@ -821,6 +821,19 @@ void PSOManager::DefaultLoadPostEffectPSO() {
     rsWboitBuilder.CreateRootSignature();
     RegisterPSO("wboitResolve", defaultPostEffect, &rsWboitBuilder, &inputLayoutBuilder);
 
+    // rtvのコピー
+    defaultPostEffect.rootSigName = "ColorCopy";
+    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/Copy.PS.hlsl";
+    defaultPostEffect.drawMode = DrawModel::FillFront;
+    defaultPostEffect.blendMode = { BlendMode::kBlendModeNone };
+    defaultPostEffect.isDepthEnable = false;
+    RootSignatureBuilder rsCopyBuilder;
+    rsCopyBuilder.Initialize(device_);
+    rsCopyBuilder.AddSRVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_PIXEL);
+    rsCopyBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
+    rsCopyBuilder.CreateRootSignature();
+    RegisterPSO("ColorCopy", defaultPostEffect, &rsCopyBuilder, &inputLayoutBuilder);
+
     // 深度値をコピーするため
     defaultPostEffect.rootSigName = "DepthCopy";
     defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/DepthCopy.PS.hlsl";
