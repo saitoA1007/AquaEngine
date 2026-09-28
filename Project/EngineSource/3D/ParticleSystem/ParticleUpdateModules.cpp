@@ -9,7 +9,7 @@ using namespace GameEngine;
 
 void VelocityOverLifeTimeModule::Update(ParticleData& particleData, [[maybe_unused]] float time) {
 	// 速度を補間
-	particleData.velocity = Lerp(particleData.startSpeed, endVelocity_, particleData.currentTime, easeType_);
+	particleData.velocity = Lerp(particleData.startSpeed, endVelocity_, particleData.currentTime, easeCurve_);
 }
 
 //==================================================
@@ -19,9 +19,9 @@ void VelocityOverLifeTimeModule::Update(ParticleData& particleData, [[maybe_unus
 void SizeOverLifeTimeModule::Update(ParticleData& particleData, [[maybe_unused]] float time) {
 
 	if (separateAxes_) {
-		particleData.transform.scale = Lerp(particleData.startSize, separateAxesEndSize_, particleData.currentTime, easeType_);
+		particleData.transform.scale = Lerp(particleData.startSize, separateAxesEndSize_, particleData.currentTime, easeCurve_);
 	} else {
-		particleData.transform.scale = Lerp(particleData.startSize, Vector3(endSize_, endSize_, endSize_), particleData.currentTime, easeType_);
+		particleData.transform.scale = Lerp(particleData.startSize, Vector3(endSize_, endSize_, endSize_), particleData.currentTime, easeCurve_);
 	}
 }
 
@@ -30,7 +30,7 @@ void SizeOverLifeTimeModule::Update(ParticleData& particleData, [[maybe_unused]]
 //==================================================
 
 void AlphaOverLifeTimeModule::Update(ParticleData& particleData, [[maybe_unused]] float time) {
-	particleData.color.w = Lerp(particleData.startColor.w, endAlpha_, particleData.currentTime, easeType_);
+	particleData.color.w = Lerp(particleData.startColor.w, endAlpha_, particleData.currentTime, easeCurve_);
 }
 
 //==================================================
@@ -45,7 +45,7 @@ void ColorOverLifeTimeModule::Update(ParticleData& particleData, [[maybe_unused]
 	//Vector3 startHsv = Math::RGBtoHSV({ particleData.startColor.x,particleData.startColor.y,particleData.startColor.z });
 	Vector3 endHsv = Math::RGBtoHSV({ endRGB_.x,endRGB_.y,endRGB_.z });
 	
-	Vector3 hsv = Lerp(startHSV_, endHsv, particleData.currentTime, easeType_);
+	Vector3 hsv = Lerp(startHSV_, endHsv, particleData.currentTime, easeCurve_);
 
 	// RGBに変換して反映する
 	Vector3 rgb = Math::HSVtoRGB(hsv.x, std::clamp(hsv.y, 0.0f, 1.0f), std::clamp(hsv.z, 0.0f, 1.0f));

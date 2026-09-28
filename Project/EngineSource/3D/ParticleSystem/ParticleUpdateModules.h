@@ -12,13 +12,13 @@ namespace GameEngine {
 		void Register(DebugParameter* param) override {
 			int index = 1;
 			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
-			param->Register("EaseType", easeType_, index++, subGroup);
+			param->Register("EaseCurve", easeCurve_, index++, subGroup);
 			param->Register("EndVelocity", endVelocity_, index++, subGroup);
 		}
 
 		void Remove(DebugParameter* param) override {
 			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
-			param->RemoveItem("EaseType", subGroup);
+			param->RemoveItem("EaseCurve", subGroup);
 			param->RemoveItem("EndVelocity", subGroup);
 		}
 
@@ -26,7 +26,7 @@ namespace GameEngine {
 
 	private:
 		Vector3 endVelocity_;
-		EaseType easeType_ = EaseType::kLinear;
+		EaseCurve easeCurve_;
 	};
 
 	// サイズを変化させる
@@ -37,7 +37,7 @@ namespace GameEngine {
 		void Register(DebugParameter* param) override {
 			int index = 1;
 			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
-			param->Register("EaseType", easeType_, index++, subGroup);
+			param->Register("EaseCurve", easeCurve_, index++, subGroup);
 			param->Register("SeparateAxesEndSize", separateAxesEndSize_, index++, subGroup);
 			param->Register("EndSize", endSize_, index++, subGroup);
 			param->Register("SeparateAxes", separateAxes_, index++, subGroup);
@@ -45,7 +45,7 @@ namespace GameEngine {
 
 		void Remove(DebugParameter* param) override {
 			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
-			param->RemoveItem("EaseType", subGroup);
+			param->RemoveItem("EaseCurve", subGroup);
 			param->RemoveItem("SeparateAxesEndSize", subGroup);
 			param->RemoveItem("EndSize", subGroup);
 			param->RemoveItem("SeparateAxes", subGroup);
@@ -62,7 +62,7 @@ namespace GameEngine {
 		Vector3 separateAxesEndSize_ = {};
 		// 各軸制御
 		bool separateAxes_ = false;
-		EaseType easeType_ = EaseType::kLinear;
+		EaseCurve easeCurve_;
 	};
 
 	// 透明度補間
@@ -73,13 +73,13 @@ namespace GameEngine {
 		void Register(DebugParameter* param) override {
 			int index = 1;
 			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
-			param->Register("EaseType", easeType_, index++, subGroup);
+			param->Register("EaseCurve", easeCurve_, index++, subGroup);
 			param->Register("EndAlpha", endAlpha_, index++, subGroup);
 		}
 
 		void Remove(DebugParameter* param) override {
 			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
-			param->RemoveItem("EaseType", subGroup);
+			param->RemoveItem("EaseCurve", subGroup);
 			param->RemoveItem("EndAlpha", subGroup);
 		}
 
@@ -87,7 +87,7 @@ namespace GameEngine {
 
 	private:
 		float endAlpha_ = 0.0f;
-		EaseType easeType_ = EaseType::kLinear;
+		EaseCurve easeCurve_;
 	};
 
 	// 色変化
@@ -99,13 +99,13 @@ namespace GameEngine {
 			int index = 1;
 			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
 			param->Register("EndColor", endRGB_, index++, subGroup);
-			param->Register("EaseType", easeType_, index++, subGroup);
+			param->Register("EaseCurve", easeCurve_, index++, subGroup);
 		}
 
 		void Remove(DebugParameter* param) override {
 			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
 			param->RemoveItem("EndColor", subGroup);
-			param->RemoveItem("EaseType", subGroup);
+			param->RemoveItem("EaseCurve", subGroup);
 		}
 
 		void Create(ParticleData& particleData) override;
@@ -120,7 +120,7 @@ namespace GameEngine {
 		// 色相、彩度、明度
 		Vector3 startHSV_ = {};
 		Vector4 endRGB_ = { 1.0f, 1.0f, 1.0f,1.0f };
-		EaseType easeType_ = EaseType::kLinear;
+		EaseCurve easeCurve_;
 	};
 
 	// 引力モジュール

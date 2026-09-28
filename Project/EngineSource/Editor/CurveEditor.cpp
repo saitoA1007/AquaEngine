@@ -340,10 +340,7 @@ namespace GameEngine::CurveEditor {
 				curve.SetKey(selected, key);
 				changed = true;
 			}
-		} else {
-			ImGui::TextDisabled("DoubleClick: Add key / RightClick: Key menu");
 		}
-
 		storage->SetInt(selectedId, selected);
 		storage->SetInt(dragId, static_cast<int>(drag));
 
