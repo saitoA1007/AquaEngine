@@ -426,7 +426,13 @@ void PlayerAttackDownAction::Update() {
 		} else {
 			// 下への加速度
 			commonData_->velocity.y += kAttackDownAcceleration_ * FpsCounter::gameDeltaTime;
+
+			// 落下エフェクトを再生
+			commonData_->effectManager_->StartDownAttackEffect(commonData_->transform.translate, true);
 		}
+	} else {
+		// 落下エフェクトの停止
+		commonData_->effectManager_->StartDownAttackEffect({}, false);
 	}
 }
 

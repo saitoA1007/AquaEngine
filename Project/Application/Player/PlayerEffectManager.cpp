@@ -19,6 +19,9 @@ PlayerEffectManager::PlayerEffectManager(GameEngine::GameObjectManager* objectMa
 		}
 	}
 
+	// 落下エフェクト
+	downAttackEffect_ = effectsManager_->GetEffect("PlayerDownAttackEffect");
+
 	auto* shockWaveModel = modelManager->GetNameByModel("RushPower.obj");
 	shockWaveModel->SetDefaultIsEnableLight(false);
 	auto* planeXZModel = modelManager->GetNameByModel("planeXZ.obj");
@@ -82,6 +85,9 @@ void PlayerEffectManager::Update() {
 	for (auto& effect : playerHitAttackEffects_) {
 		effect->Update();
 	}
+
+	// 落下エフェクトの更新
+	downAttackEffect_->Update();
 }
 
 void PlayerEffectManager::Draw() {
@@ -89,6 +95,9 @@ void PlayerEffectManager::Draw() {
 	for (auto& effect : playerHitAttackEffects_) {
 		effect->Draw();
 	}
+
+	// 落下エフェクトの描画
+	downAttackEffect_->Draw();
 }
 
 void PlayerEffectManager::StartShockWave(Vector3 pos) {
@@ -128,4 +137,17 @@ void PlayerEffectManager::StartLandingEffect(Vector3 pos) {
 	timer_ = 0.0f;
 	landingEffect_->SetEmitterPos(pos);
 	landingEffect_->SetIsLoop(true);
+}
+
+void PlayerEffectManager::StartDownAttackEffect(Vector3 pos, bool isActive) {
+
+	if (isActive) {
+		if (!downAttackEffect_->IsPlaying()) {
+			downAttackEffect_->Play(pos);
+		} else {
+			downAttackEffect_->SetPosition(pos);
+		}
+	} else {
+		downAttackEffect_->Stop();
+	}
 }

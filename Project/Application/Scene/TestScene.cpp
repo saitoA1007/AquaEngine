@@ -64,6 +64,9 @@ TestScene::TestScene() {
 	//gameObjectManager_->AddObject<ParticleBehavior>("BossHitStarParticle", 8, textureManager_, effectModel_);
 	//gameObjectManager_->AddObject<ParticleBehavior>("BossHitLineParticle", 32, textureManager_, effectModel_);
 	//gameObjectManager_->AddObject<ParticleBehavior>("BossHitParticle", 32, textureManager_, effectModel_);
+	 
+	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerDownAttackParticle", 128, textureManager_, effectModel_);
+	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerDownTrailParticle", 128, textureManager_, effectModel_);
 
 	// ボスのラッシュ演出
 	auto* waModel = modelManager_->GetNameByModel("rushWave.obj");

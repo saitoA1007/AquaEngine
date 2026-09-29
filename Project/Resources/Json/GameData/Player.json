@@ -24,7 +24,7 @@
             "RushStrengthLevel3": 1.0
         },
         "Bounce": {
-            "WallBounceAwaySpeed": 3.0,
+            "WallBounceAwaySpeed": -3.0,
             "WallBounceLockTime": 0.800000011920929,
             "WallBounceMaxSpeedFactor": 1.5,
             "WallBounceMinSpeedFactor": 0.5,
@@ -33,9 +33,9 @@
             "WallHitReflectFactor": 0.20000000298023224
         },
         "Move": {
-            "AirAcceleration": 2.0,
-            "AirDeceleration": 1.0,
-            "AirMaxMoveSpeed": 16.0,
+            "AirAcceleration": 8.0,
+            "AirDeceleration": 8.0,
+            "AirMaxMoveSpeed": 10.0,
             "GroundAcceleration": 8.0,
             "GroundDeceleration": 2.0,
             "GroundMaxMoveSpeed": 16.0

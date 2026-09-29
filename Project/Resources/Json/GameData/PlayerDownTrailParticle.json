@@ -1,5 +1,5 @@
 {
-    "BossRushEffect": {
+    "PlayerDownTrailParticle": {
         "Emitter": {
             "ColorEmit": {
                 "Enable": false
@@ -7,8 +7,8 @@
             "Defalut": {
                 "Color": [
                     1.0,
-                    1.0,
-                    1.0,
+                    0.7562945485115051,
+                    0.05791503190994263,
                     1.0
                 ],
                 "EmittePos": [
@@ -16,7 +16,7 @@
                     0.0,
                     0.0
                 ],
-                "LifeTime": 0.20000000298023224,
+                "LifeTime": 0.5,
                 "Rotate": [
                     0.0,
                     0.0,
@@ -29,66 +29,44 @@
                 ]
             },
             "DirectionEmit": {
-                "Direction": [
-                    0.0,
-                    0.0,
-                    1.0
-                ],
-                "Enable": true,
-                "MaxSpeed": -29.15999984741211,
-                "MinSpeed": -30.0,
-                "SpreadAngle": 0.0
+                "Enable": false
             },
             "IsActiveBlendAdd": true,
-            "IsBillBoard": false,
+            "IsBillBoard": true,
             "IsLoop": true,
-            "LifeTime": 0.20000000298023224,
             "LifeTimeEmit": {
                 "Enable": false
             },
             "RotateEmit": {
-                "Enable": false
-            },
-            "RotateVelocityEmit": {
                 "Enable": true,
-                "RangeRotateVelocity": {
+                "RangeRotate": {
                     "_Max": [
                         0.0,
                         0.0,
-                        40.0
+                        6.400000095367432
                     ],
                     "_Min": [
                         0.0,
                         0.0,
-                        40.0
+                        0.0
                     ]
                 }
             },
+            "RotateVelocityEmit": {
+                "Enable": false
+            },
             "ScaleEmit": {
-                "Enable": true,
-                "RangeScale": {
-                    "_Max": [
-                        0.9300000071525574,
-                        0.0,
-                        0.0
-                    ],
-                    "_Min": [
-                        0.9200000166893005,
-                        0.0,
-                        0.0
-                    ]
-                },
-                "SeparateAxes": false
+                "Enable": false
             },
             "ShapeEmit": {
                 "Enable": false
             },
-            "SpawnCoolTime": 0.05000000074505806,
-            "SpawnMaxCount": 1,
+            "SpawnCoolTime": 0.0,
+            "SpawnMaxCount": 2,
             "TextureEmit": {
                 "Enable": true,
                 "Texture": {
-                    "_TextureName": "rushWave.png"
+                    "_TextureName": "FX01_Flare_03.png"
                 }
             },
             "VelocityEmit": {
@@ -100,41 +78,28 @@
                 "EaseCurve": {
                     "_EaseCurve": [
                         {
-                            "inTangent": -2.9041526317596436,
-                            "mode": "Linear",
-                            "outTangent": -2.9041526317596436,
+                            "inTangent": 2.0,
+                            "mode": "Free",
+                            "outTangent": 2.0,
                             "time": 0.0,
-                            "value": 0.9950000047683716
+                            "value": 0.0
                         },
                         {
-                            "inTangent": 0.007741570472717285,
-                            "mode": "Auto",
-                            "outTangent": 0.007741570472717285,
-                            "time": 0.3391812741756439,
-                            "value": 0.009965844452381134
-                        },
-                        {
-                            "inTangent": 1.5023421049118042,
-                            "mode": "Linear",
-                            "outTangent": 1.5023421049118042,
+                            "inTangent": 0.0,
+                            "mode": "Free",
+                            "outTangent": 0.0,
                             "time": 1.0,
-                            "value": 1.0027415752410889
+                            "value": 1.0
                         }
                     ]
                 },
                 "Enable": true,
-                "EndAlpha": 0.20000000298023224
+                "EndAlpha": 0.0
             },
             "Attraction": {
                 "Enable": false
             },
             "ColorOverLifeTime": {
-                "Enable": false
-            },
-            "RotationByVelocity": {
-                "Enable": true
-            },
-            "SizeOverLifeTime": {
                 "EaseCurve": {
                     "_EaseCurve": [
                         {
@@ -154,7 +119,37 @@
                     ]
                 },
                 "Enable": true,
-                "EndSize": 8.0,
+                "EndColor": [
+                    1.0,
+                    0.07722008228302002,
+                    0.07722008228302002,
+                    1.0
+                ]
+            },
+            "RotationByVelocity": {
+                "Enable": false
+            },
+            "SizeOverLifeTime": {
+                "EaseCurve": {
+                    "_EaseCurve": [
+                        {
+                            "inTangent": 0.0,
+                            "mode": "Free",
+                            "outTangent": 0.0,
+                            "time": 0.0,
+                            "value": 0.0
+                        },
+                        {
+                            "inTangent": 2.0,
+                            "mode": "Free",
+                            "outTangent": 2.0,
+                            "time": 1.0,
+                            "value": 1.0
+                        }
+                    ]
+                },
+                "Enable": true,
+                "EndSize": 0.0,
                 "SeparateAxes": false,
                 "SeparateAxesEndSize": [
                     0.0,
@@ -169,6 +164,6 @@
                 "Enable": false
             }
         },
-        "SceneName": "Game"
+        "SceneName": "Test"
     }
 }

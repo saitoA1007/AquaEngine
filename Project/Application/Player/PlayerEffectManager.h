@@ -32,8 +32,8 @@ public:
 	// 着地エフェクト
 	void StartLandingEffect(Vector3 pos);
 
-	//void StartDown();
-	//void EndDown();
+	// 落下エフェクト
+	void StartDownAttackEffect(Vector3 pos, bool isActive);
 
 private:
 	GameEngine::GameObjectManager* objectManager_ = nullptr;
@@ -41,6 +41,9 @@ private:
 
 	// 攻撃がヒットした時
 	std::vector<std::unique_ptr<GameEngine::EffectObject>> playerHitAttackEffects_;
+
+	// 落下エフェクト
+	std::unique_ptr<GameEngine::EffectObject> downAttackEffect_;
 	
 	GameEngine::Model* shockModel_ = nullptr;
 	GameEngine::Model* planeXZmodel_ = nullptr;
