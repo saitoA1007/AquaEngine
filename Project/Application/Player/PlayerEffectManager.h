@@ -50,7 +50,9 @@ private:
 
 	// チャージエフェクト
 	GameEngine::ParticleBehavior* chargeEffect_;
-	
+	// チャージエフェクトの親行列
+	Matrix4x4 chargeParentMatrix_{};
+
 	GameEngine::Model* shockModel_ = nullptr;
 	GameEngine::Model* planeXZmodel_ = nullptr;
 	GameEngine::Model* planeXYmodel_ = nullptr;
