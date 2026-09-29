@@ -4,7 +4,20 @@
 #include "FPSCounter.h"
 using namespace GameEngine;
 
-PlayerEffectManager::PlayerEffectManager(GameEngine::GameObjectManager* objectManager, GameEngine::ModelManager* modelManager,GameEngine::TextureManager* textureManager) {
+PlayerEffectManager::PlayerEffectManager(GameEngine::GameObjectManager* objectManager, GameEngine::ModelManager* modelManager,
+	GameEngine::TextureManager* textureManager, GameEngine::EffectsManager* effectsManager) {
+
+	// エフェクト管理機能を取得
+	effectsManager_ = effectsManager;
+
+	// プレイヤーがボスに攻撃を当てた時のエフェクト
+	playerHitAttackEffects_.reserve(2);
+	for (int i = 0; i < 2; ++i) {
+		std::unique_ptr<EffectObject> effectObject = effectsManager_->GetEffect("BossHitEffect");
+		if (effectObject) {
+			playerHitAttackEffects_.push_back(std::move(effectObject));
+		}
+	}
 
 	auto* shockWaveModel = modelManager->GetNameByModel("RushPower.obj");
 	shockWaveModel->SetDefaultIsEnableLight(false);
@@ -64,6 +77,18 @@ void PlayerEffectManager::Update() {
 			}
 		}
 	}
+
+	// ヒットエフェクトの更新
+	for (auto& effect : playerHitAttackEffects_) {
+		effect->Update();
+	}
+}
+
+void PlayerEffectManager::Draw() {
+	// ヒットエフェクトの描画
+	for (auto& effect : playerHitAttackEffects_) {
+		effect->Draw();
+	}
 }
 
 void PlayerEffectManager::StartShockWave(Vector3 pos) {
@@ -89,6 +114,14 @@ void PlayerEffectManager::StartShockWave(Vector3 pos) {
 
 void PlayerEffectManager::StartHitEffect(Vector3 pos, uint32_t level) {
 	playerHitAttackEffect_->Start(pos, level);
+
+	if (playerHitAttackEffects_.empty()) { return; }
+	for (auto& effect : playerHitAttackEffects_) {
+		if (!effect->IsPlaying()) {
+			effect->Play(pos);
+			break;
+		}
+	}
 }
 
 void PlayerEffectManager::StartLandingEffect(Vector3 pos) {

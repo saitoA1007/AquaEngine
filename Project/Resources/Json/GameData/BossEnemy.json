@@ -85,7 +85,7 @@
             "WindAttack": 20
         },
         "Wait": {
-            "MaxTime": 2.5
+            "MaxTime": 3.5
         },
         "WindAttack": {
             "InMaxTime": 1.0,

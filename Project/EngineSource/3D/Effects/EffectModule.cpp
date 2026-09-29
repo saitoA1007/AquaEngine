@@ -11,6 +11,8 @@ EffectModule::EffectModule(const EffectTrackData& data, TextureManager* textureM
 void EffectModule::UpdateEmission(float prevTime, float time, const Vector3& basePos) {
 	const Vector3 emitPos = basePos + data_.offset;
 	particle_->SetEmitterPos(emitPos);
+	// 引き寄せ・らせんの中心も発生位置に合わせる
+	particle_->SetAttractionTarget(emitPos);
 
 	if (data_.emitMode == EffectEmitMode::kBurst) {
 		// 開始時間をこのフレームで通過したら1回だけ発生させる

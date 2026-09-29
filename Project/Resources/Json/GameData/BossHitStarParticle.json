@@ -1,14 +1,14 @@
 {
-    "PlayerLandingEffect": {
+    "BossHitStarParticle": {
         "Emitter": {
             "ColorEmit": {
                 "Enable": false
             },
             "Defalut": {
                 "Color": [
-                    0.9607843160629272,
-                    0.18431372940540314,
-                    0.18431372940540314,
+                    1.0,
+                    0.14671814441680908,
+                    0.14671814441680908,
                     1.0
                 ],
                 "EmittePos": [
@@ -16,15 +16,15 @@
                     0.0,
                     0.0
                 ],
-                "LifeTime": 0.30000001192092896,
+                "LifeTime": 0.20000000298023224,
                 "Rotate": [
-                    1.600000023841858,
+                    0.0,
                     0.0,
                     0.0
                 ],
                 "Scale": [
-                    1.0,
-                    1.0,
+                    20.0,
+                    20.0,
                     1.0
                 ]
             },
@@ -32,9 +32,8 @@
                 "Enable": false
             },
             "IsActiveBlendAdd": true,
-            "IsBillBoard": false,
+            "IsBillBoard": true,
             "IsLoop": true,
-            "LifeTime": 0.30000001192092896,
             "LifeTimeEmit": {
                 "Enable": false
             },
@@ -50,12 +49,12 @@
             "ShapeEmit": {
                 "Enable": false
             },
-            "SpawnCoolTime": 0.15000000596046448,
+            "SpawnCoolTime": 0.5,
             "SpawnMaxCount": 4,
             "TextureEmit": {
                 "Enable": true,
                 "Texture": {
-                    "_TextureName": "rushWave.png"
+                    "_TextureName": "star.png"
                 }
             },
             "VelocityEmit": {
@@ -67,23 +66,23 @@
                 "EaseCurve": {
                     "_EaseCurve": [
                         {
-                            "inTangent": 1.0,
-                            "mode": "Linear",
-                            "outTangent": 1.0,
+                            "inTangent": -0.3106040060520172,
+                            "mode": "Free",
+                            "outTangent": -0.3106040060520172,
                             "time": 0.0,
-                            "value": 0.0
+                            "value": -0.0034721121191978455
                         },
                         {
-                            "inTangent": 1.0,
-                            "mode": "Linear",
-                            "outTangent": 1.0,
+                            "inTangent": 3.354231119155884,
+                            "mode": "Free",
+                            "outTangent": 3.354231119155884,
                             "time": 1.0,
-                            "value": 1.0
+                            "value": 0.9800000190734863
                         }
                     ]
                 },
                 "Enable": true,
-                "EndAlpha": 0.2800000011920929
+                "EndAlpha": 0.0
             },
             "Attraction": {
                 "Enable": false
@@ -95,32 +94,7 @@
                 "Enable": false
             },
             "SizeOverLifeTime": {
-                "EaseCurve": {
-                    "_EaseCurve": [
-                        {
-                            "inTangent": 1.0,
-                            "mode": "Linear",
-                            "outTangent": 1.0,
-                            "time": 0.0,
-                            "value": 0.0
-                        },
-                        {
-                            "inTangent": 1.0,
-                            "mode": "Linear",
-                            "outTangent": 1.0,
-                            "time": 1.0,
-                            "value": 1.0
-                        }
-                    ]
-                },
-                "Enable": true,
-                "EndSize": 3.0,
-                "SeparateAxes": false,
-                "SeparateAxesEndSize": [
-                    0.0,
-                    0.0,
-                    0.0
-                ]
+                "Enable": false
             },
             "VelocityOverLifeTime": {
                 "Enable": false
@@ -129,6 +103,6 @@
                 "Enable": false
             }
         },
-        "SceneName": "Game"
+        "SceneName": "Test"
     }
 }

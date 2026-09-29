@@ -67,6 +67,9 @@ void ResourceSubsystem::LoadAllResources() {
 
 	// 音声データを全てロードする
 	AudioManager::GetInstance().LoadAllAudio();
+
+	// エフェクトデータを全てロードする
+	effectsManager_->Initialize();
 }
 
 void ResourceSubsystem::Finalize() {

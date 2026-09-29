@@ -467,6 +467,7 @@ void PSOManager::DefaultLoadPSO() {
     // インスタンシング描画の加算合成用PSO
     instancing3D.drawMode = DrawModel::None;
     instancing3D.blendMode = { BlendMode::kBlendModeAddAndSaveObjectAlpha };
+    instancing3D.depthMask = D3D12_DEPTH_WRITE_MASK::D3D12_DEPTH_WRITE_MASK_ZERO; // 書き込みだけ無効化
     RegisterPSO("AdditiveInstancing3D", instancing3D, &instancingRootSigBuilder, &inputLayoutBuilder);
 
     // グリッド描画用のPSO

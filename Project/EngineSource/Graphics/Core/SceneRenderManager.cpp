@@ -41,7 +41,6 @@ void SceneRenderManager::Begin() {
 }
 
 void SceneRenderManager::Execute() {
-
     // 更新
     renderQueue_->Update();
 

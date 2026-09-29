@@ -5,10 +5,12 @@
 #include "ModelManager.h"
 #include "TextureManager.h"
 #include "Effect/PlayerHitAttackEffect.h"
+#include "EffectsManager.h"
 
 class PlayerEffectManager : public GameEngine::IGameObject {
 public:
-	PlayerEffectManager(GameEngine::GameObjectManager* objectManager, GameEngine::ModelManager* modelManager, GameEngine::TextureManager* textureManager);
+	PlayerEffectManager(GameEngine::GameObjectManager* objectManager, GameEngine::ModelManager* modelManager, GameEngine::TextureManager* textureManager,
+		GameEngine::EffectsManager* effectsManager);
 	~PlayerEffectManager() = default;
 
 	// 初期化処理
@@ -17,9 +19,8 @@ public:
 	//// 更新処理
 	void Update() override;
 
-	//
-	//// 描画処理
-	//void Draw() override;
+	// 描画処理
+	void Draw() override;
 
 public:
 
@@ -36,6 +37,10 @@ public:
 
 private:
 	GameEngine::GameObjectManager* objectManager_ = nullptr;
+	GameEngine::EffectsManager* effectsManager_ = nullptr;
+
+	// 攻撃がヒットした時
+	std::vector<std::unique_ptr<GameEngine::EffectObject>> playerHitAttackEffects_;
 	
 	GameEngine::Model* shockModel_ = nullptr;
 	GameEngine::Model* planeXZmodel_ = nullptr;

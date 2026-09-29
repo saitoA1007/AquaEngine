@@ -39,7 +39,7 @@ GameScene::GameScene() {
 	renderQueue_->SetCamera(mainCamera_.get());
 
 	// プレイヤーエフェクト管理
-	auto* playerEffectManager = gameObjectManager_->AddObject<PlayerEffectManager>(gameObjectManager_, modelManager_, textureManager_);
+	auto* playerEffectManager = gameObjectManager_->AddObject<PlayerEffectManager>(gameObjectManager_, modelManager_, textureManager_, effectsManager_);
 
 	// プレイヤー
 	auto* playerModel = modelManager_->GetNameByModel("PlayerRush.gltf");
