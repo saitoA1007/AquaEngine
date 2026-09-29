@@ -20,10 +20,8 @@ namespace GameEngine{
 	/// パーティクルのシミュレーション空間
 	/// </summary>
 	enum class ParticleSimulationSpace {
-		// ローカル空間：発生後も常に親に追従する
-		kLocal,
-		// ワールド空間：発生時だけ親の影響を受け、その後は世界に置き去りになる
-		kWorld,
+		kLocal, // ローカル空間：発生後も常に親に追従する
+		kWorld, // ワールド空間：発生時だけ親の影響を受け、その後は世界に置き去りになる
 	};
 
 	class ParticleBehavior : public IGameObject {
@@ -38,7 +36,7 @@ namespace GameEngine{
 		void Update() override;
 
 		/// <summary>
-		/// 経過時間を指定して更新する（エディターでの早送りなどに使用）
+		/// 経過時間を指定して更新する
 		/// </summary>
 		/// <param name="deltaTime">経過時間（秒）</param>
 		void Update(float deltaTime);

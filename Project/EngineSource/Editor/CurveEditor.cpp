@@ -178,7 +178,7 @@ namespace GameEngine::CurveEditor {
 			}
 		}
 
-		// ダブルクリック: 何もない場所にキーを追加
+		// ダブルクリックは何もない場所にキーを追加
 		if (isHovered && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && drag == DragTarget::kNone) {
 			EaseKey key{};
 			key.time = std::clamp(view.ToTime(mouse.x), kMinKeySpacing, 1.0f - kMinKeySpacing);

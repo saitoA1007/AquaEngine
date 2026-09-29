@@ -57,6 +57,9 @@ void SceneRenderManager::Execute() {
     // 半透明描画
     RasterizeTranslucentExecute();
 
+    // 2D描画
+    Draw2dExecute();
+
     // 半透明の描画結果を合成する
     //Composite();
 
@@ -287,8 +290,8 @@ void SceneRenderManager::RasterizeExecute() {
         bool hasOpaque = draw3dQueueList.count(passName) > 0;
         bool hasTranslucent = translucentDrawQueueList.count(passName) > 0;
         if (hasTranslucent && passName == "WBOITAccumulatePass") { hasTranslucent = false; }
-        bool has2d = draw2dQueueList.count(passName) > 0;
-        if (!hasOpaque && !hasTranslucent && !has2d) {
+        //bool has2d = draw2dQueueList.count(passName) > 0;
+        if (!hasOpaque && !hasTranslucent) {
             renderPassController_->PrePass(passName);
             renderPassController_->ClearRenderPass(passName);
             renderPassController_->PostPass(passName);
@@ -345,19 +348,19 @@ void SceneRenderManager::RasterizeExecute() {
         }
 
         // 2D描画コマンドを解放
-        if (has2d) {
-            for (auto& [layer, psoMap] : draw2dQueueList[passName]) {
-                for (auto& [psoName, requests] : psoMap) {
-                    if (requests.empty()) { continue; }
-                    // 描画前処理
-                    PreDraw(psoName);
-                    for (const auto& request : requests) {
-                        // 描画コマンド解放
-                        Execute2dRequest(request);
-                    }
-                }
-            }
-        }
+        //if (has2d) {
+        //    for (auto& [layer, psoMap] : draw2dQueueList[passName]) {
+        //        for (auto& [psoName, requests] : psoMap) {
+        //            if (requests.empty()) { continue; }
+        //            // 描画前処理
+        //            PreDraw(psoName);
+        //            for (const auto& request : requests) {
+        //                // 描画コマンド解放
+        //                Execute2dRequest(request);
+        //            }
+        //        }
+        //    }
+        //}
         renderPassController_->PostPass(passName);
     }
 
@@ -469,6 +472,31 @@ void SceneRenderManager::RaytracingExecute() {
 
     // 最終描画先に設定
     finalPassName_ = raytracingFinalPassName_;
+}
+
+void SceneRenderManager::Draw2dExecute() {
+
+    auto draw2dQueueList = renderQueue_->GetDraw2dQueue();
+    
+    renderPassController_->PrePass(finalPassName_);
+    currentPsoName_.clear();
+    for (const auto& passName : passExecuteOrder_) {
+
+        if (draw2dQueueList.count(passName) == 0) { continue; }
+
+        for (auto& [layer, psoMap] : draw2dQueueList[passName]) {
+            for (auto& [psoName, requests] : psoMap) {
+                if (requests.empty()) { continue; }
+                // 描画前処理
+                PreDraw(psoName);
+                for (const auto& request : requests) {
+                    // 描画コマンド解放
+                    Execute2dRequest(request);
+                }
+            }
+        }
+    }
+    renderPassController_->PostPass(finalPassName_);
 }
 
 void SceneRenderManager::LightingComposite() {
