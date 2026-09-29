@@ -77,7 +77,9 @@ namespace GameEngine {
 		/// 終了したことを伝える
 		/// </summary>
 		/// <returns></returns>
-		virtual bool IsFinished() = 0;
+		bool IsFinished() {
+			return isFinished_;
+		};
 
 		/// <summary>
 		/// 次のシーン遷移する場面の名前を取得
@@ -89,6 +91,9 @@ namespace GameEngine {
 		virtual std::unique_ptr<ITransitionEffect> GetTransitionEffect() = 0;
 
 	protected:
+		// 終了処理
+		bool isFinished_ = false;
+
 		static Input* input_; // 純粋な入力処理を取得
 		static InputCommand* inputCommand_; // 登録した入力処理を取得可能
 

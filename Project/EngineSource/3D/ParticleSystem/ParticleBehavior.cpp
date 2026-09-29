@@ -7,7 +7,7 @@ using namespace GameEngine;
 namespace {
 
     /// <summary>
-    /// 位置に行列を掛ける（平行移動あり）
+    /// 位置に行列を掛ける
     /// </summary>
     Vector3 TransformPosition(const Vector3& v, const Matrix4x4& m) {
         Vector3 result{};
@@ -24,7 +24,7 @@ namespace {
     }
 
     /// <summary>
-    /// 方向ベクトルに行列を掛ける（平行移動なし）
+    /// 方向ベクトルに行列を掛ける
     /// </summary>
     Vector3 TransformDirection(const Vector3& v, const Matrix4x4& m) {
         return {
@@ -127,7 +127,6 @@ void ParticleBehavior::Update(float deltaTime) {
 void ParticleBehavior::Draw() {
 
     if (main_.isActiveBlendAdd_) {
-        // "WBOITAccumulatePass"
         renderQueue_->SubmitInstancing(model_, currentNumInstance_, *worldTransforms_, 0.0f, BlendMode::kBlendModeAdd, nullptr, "WBOITAccumulatePass");
     } else {
         renderQueue_->SubmitInstancing(model_, currentNumInstance_, *worldTransforms_, 0.0f, BlendMode::kBlendModeNormal, nullptr, "WBOITAccumulatePass");
@@ -221,7 +220,7 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix, float deltaTime) {
         isRotateVelocity = true;
     }
 
-    // 常に親に追従するか（ローカル空間のときのみ毎フレーム親行列を掛ける）
+    // 常に親に追従するか
     const bool isFollowParent = IsFollowParent();
 
     for (uint32_t i = 0; i < maxNumInstance_; ++i) {
@@ -245,8 +244,6 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix, float deltaTime) {
         // worldTransformsの更新
         if (main_.isBillBoard) {
 
-            // ビルボードは親の回転を掛けてしまうとカメラを向かなくなるので
-           // 「位置（と進行方向）だけ」を親空間からワールドへ変換して使う
             Vector3 worldPos = particle.transform.translate;
             Vector3 worldVelocity = particle.velocity;
             if (isFollowParent) {
@@ -275,7 +272,6 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix, float deltaTime) {
             } else {
                 worldTransforms_->transformDatas_[currentNumInstance_].transform = particle.transform;
             }
-            //worldTransforms_->transformDatas_[currentNumInstance_].transform = particle.transform;
         }
 
         worldTransforms_->transformDatas_[currentNumInstance_].color = particle.color;

@@ -59,7 +59,7 @@ void AddObjectBar::Run() {
 
     // キーボードショートカット
     ImGuiIO& io = ImGui::GetIO();
-    // 独自のショートカットを持つウィンドウ（エフェクトエディタなど）がフォーカス中は無効にする
+    // 独自のショートカットを持つウィンドウがフォーカス中は無効にする
     if (!io.WantTextInput && !EditorShortcut::IsLocalWindowFocused(ImGui::GetFrameCount())) {
         // undo
         if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_Z, false)) {
