@@ -92,7 +92,8 @@ void BossStateBattle::Update() {
 }
 
 void BossStateBattle::Exit() {
-
+	// 実行中の行動の終了処理をおこなう
+	battleStatesTable_[currentBattleState_]->Finalize();
 }
 
 BossBattleState BossStateBattle::SelectWeightedBattleState() {

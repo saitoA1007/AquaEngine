@@ -63,7 +63,8 @@ void BossRushAttackAction::Update() {
 }
 
 void BossRushAttackAction::Finalize() {
-
+	// 途中で中断された場合も突進エフェクトを無効化する
+	commonData_.rangedAttackManager->SetRush(commonData_.transform.translate, { 0.0f,0.0f,1.0f }, false);
 }
 
 void BossRushAttackAction::RegisterParameter(GameEngine::DebugParameter* param) {
