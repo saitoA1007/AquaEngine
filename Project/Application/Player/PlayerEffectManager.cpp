@@ -58,6 +58,9 @@ PlayerEffectManager::PlayerEffectManager(GameEngine::GameObjectManager* objectMa
 	uint32_t hitEffectGH = textureManager->GetHandleByName("HitEffect.png");
 	playerHitAttackEffect_ = objectManager_->AddObject<PlayerHitAttackEffect>(hitEffectGH, planeXYmodel);
 	playerHitAttackEffect_->SetActive(false);
+
+	// チャージ演出
+	chargeEffect_ = objectManager_->AddObject<ParticleBehavior>("PlayerChargeParticle", 32, textureManager, waveModel);
 }
 
 void PlayerEffectManager::Update() {
@@ -150,4 +153,10 @@ void PlayerEffectManager::StartDownAttackEffect(Vector3 pos, bool isActive) {
 	} else {
 		downAttackEffect_->Stop();
 	}
+}
+
+void PlayerEffectManager::StartChargeEffect(Vector3 pos, Vector4 color, bool isActive) {
+	chargeEffect_->SetEmitterPos(pos);
+	chargeEffect_->SetColor(color);
+	chargeEffect_->SetIsLoop(isActive);
 }

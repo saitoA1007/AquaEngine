@@ -35,6 +35,9 @@ public:
 	// 落下エフェクト
 	void StartDownAttackEffect(Vector3 pos, bool isActive);
 
+	// チャージエフェクト
+	void StartChargeEffect(Vector3 pos, Vector4 color, bool isActive);
+
 private:
 	GameEngine::GameObjectManager* objectManager_ = nullptr;
 	GameEngine::EffectsManager* effectsManager_ = nullptr;
@@ -44,6 +47,9 @@ private:
 
 	// 落下エフェクト
 	std::unique_ptr<GameEngine::EffectObject> downAttackEffect_;
+
+	// チャージエフェクト
+	GameEngine::ParticleBehavior* chargeEffect_;
 	
 	GameEngine::Model* shockModel_ = nullptr;
 	GameEngine::Model* planeXZmodel_ = nullptr;

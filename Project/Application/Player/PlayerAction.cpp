@@ -234,6 +234,8 @@ void PlayerAttackRushAction::ProcessInput() {
 			commonData_->state = PlayerState::kAttackRush;
 			// 突進アニメーション
 			commonData_->animator_->StartAnimation(PlayerAnimationType::kRushAttack, "突進_Main", 0.2f, false);
+			// チャージエフェクトを無効
+			commonData_->effectManager_->StartChargeEffect({}, {}, false);
 			Log("Player start attackRush");
 		}
 	}
@@ -244,6 +246,28 @@ void PlayerAttackRushAction::Update() {
 	// ため時間計測
 	if (commonData_->state == PlayerState::kCharging) {
 		chargeTimer_ += FpsCounter::gameDeltaTime / kRushChargeMaxTime_;
+
+		// 予備動作時間を溜め比率で決定
+		float chargeRatio_ = std::clamp(chargeTimer_, 0.0f, 1.0f);
+		// 溜め比率に応じてレベル決定
+		if (chargeRatio_ < kRushChargeLevel2Ratio_) {
+			rushChargeLevel_ = 1;
+		} else if (chargeRatio_ < kRushChargeLevel3Ratio_) {
+			rushChargeLevel_ = 2;
+		} else {
+			rushChargeLevel_ = 3;
+		}
+
+		Vector4 color = {};
+		switch (rushChargeLevel_) {
+		case 1: color = { 0.88f,1.0f,0.0f,1.0f}; break;
+		case 2: color = { 1.0f,0.6f,0.0f,1.0f }; break;
+		case 3: color = { 1.0f,0.09f,0.0f,1.0f }; break;
+		default: color = { 0.88f,1.0f,0.0f,1.0f }; break;
+		}
+
+		// チャージ演出
+		commonData_->effectManager_->StartChargeEffect(commonData_->transform.translate, color, true);
 	}
 
 	// 突進
