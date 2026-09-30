@@ -67,12 +67,14 @@ TestScene::TestScene() {
 	 
 	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerDownAttackParticle", 128, textureManager_, effectModel_);
 	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerDownTrailParticle", 128, textureManager_, effectModel_);
+	 
+	gameObjectManager_->AddObject<ParticleBehavior>("tParticle", 128, textureManager_, effectModel_);
 
 	// ボスのラッシュ演出
 	auto* waModel = modelManager_->GetNameByModel("rushWave.obj");
 	waModel->SetDefaultIsEnableLight(false);
 	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerLandingEffect", 32, textureManager_, waModel);
-	gameObjectManager_->AddObject<ParticleBehavior>("PlayerChargeParticle", 32, textureManager_, waModel);
+	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerChargeParticle", 32, textureManager_, waModel);
 
 	// 中ポリゴン氷
 	iceMiddleModel_ = modelManager_->GetNameByModel("ice_middlePolygon.gltf");

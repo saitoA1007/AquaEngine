@@ -207,4 +207,68 @@ namespace GameEngine {
 		void Update(ParticleData& particleData, [[maybe_unused]] float time) override;
 	};
 
+	// トレイル
+	class TrailModule : public IParticleModule {
+	public:
+		~TrailModule() = default;
+
+		void Register(DebugParameter* param) override {
+			int index = 1;
+			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
+			param->Register("TrailLength", trailLength_, index++, subGroup);
+			param->Register("RecordInterval", recordInterval_, index++, subGroup);
+			param->Register("StartScale", startScale_, index++, subGroup);
+			param->Register("EndScale", endScale_, index++, subGroup);
+			param->Register("StartAlpha", startAlpha_, index++, subGroup);
+			param->Register("EndAlpha", endAlpha_, index++, subGroup);
+			param->Register("TrailColor", trailColor_, index++, subGroup);
+			param->Register("EaseCurve", easeCurve_, index++, subGroup);
+		}
+
+		void Remove(DebugParameter* param) override {
+			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
+			param->RemoveItem("TrailLength", subGroup);
+			param->RemoveItem("RecordInterval", subGroup);
+			param->RemoveItem("StartScale", subGroup);
+			param->RemoveItem("EndScale", subGroup);
+			param->RemoveItem("StartAlpha", subGroup);
+			param->RemoveItem("EndAlpha", subGroup);
+			param->RemoveItem("TrailColor", subGroup);
+			param->RemoveItem("EaseCurve", subGroup);
+		}
+
+		void Create(ParticleData& particleData) override;
+		void Update(ParticleData& particleData, float time) override;
+
+		/// <summary>
+		/// 軌跡のindex番目の大きさと色を求める
+		/// </summary>
+		/// <param name="particleData">元のパーティクル</param>
+		/// <param name="index">軌跡の番号</param>
+		/// <param name="outScale">大きさ</param>
+		/// <param name="outColor">色</param>
+		void CalcTrailPoint(const ParticleData& particleData, uint32_t index, Vector3& outScale, Vector4& outColor) const;
+
+		// 描画する軌跡の数
+		uint32_t GetTrailLength() const;
+
+		// 外部から軌跡の長さを設定する
+		void SetTrailLength(uint32_t length) { trailLength_ = length; }
+
+	private:
+		// 軌跡の数
+		uint32_t trailLength_ = 8;
+		// 位置を記録する間隔。0以下なら毎フレーム記録
+		float recordInterval_ = 0.02f;
+		// パーティクルに対する大きさの割合
+		float startScale_ = 1.0f;
+		float endScale_ = 0.0f;
+		// パーティクルに対する透明度の割合
+		float startAlpha_ = 1.0f;
+		float endAlpha_ = 0.0f;
+		// 最も古い軌跡の目標色。パーティクルの色からHSV空間で補間する
+		Vector4 trailColor_ = { 1.0f, 1.0f, 1.0f, 1.0f };
+		EaseCurve easeCurve_;
+	};
+
 }

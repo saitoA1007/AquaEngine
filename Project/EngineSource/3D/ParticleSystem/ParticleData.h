@@ -2,10 +2,14 @@
 #include "Vector3.h"
 #include "Vector4.h"
 #include "Transform.h"
+#include <array>
 #include <cstdint>
 #include <string>
 
 namespace GameEngine {
+
+	// トレイルで保持できる最大の軌跡数
+	inline constexpr uint32_t kMaxTrailLength = 32;
 
 	// パーティクルデータ
 	struct ParticleData {
@@ -21,6 +25,17 @@ namespace GameEngine {
 		Vector3 startSize;
 		Vector3 startSpeed;
 		Vector3 rotateVelocity; // 回転速度
+
+		// トレイル
+		std::array<Vector3, kMaxTrailLength> trailPositions{};
+		uint32_t trailHead = 0;   // 次に書き込む位置
+		uint32_t trailCount = 0;  // 記録済みの数
+		float trailTimer = 0.0f;  // 記録間隔の計測
+
+		// 新しい順にindex番目の軌跡位置を取得する
+		const Vector3& GetTrailPosition(uint32_t index) const {
+			return trailPositions[(trailHead + kMaxTrailLength - 1 - index) % kMaxTrailLength];
+		}
 
 		bool IsAlive() const { return 1.0f <= currentTime; }
 	};
@@ -42,7 +57,7 @@ namespace GameEngine {
 		Sphere,      // 球
 		Hemisphere,  // 半球
 		Box,         // 直方体
-		Circle,      // 円(XZ平面)
+		Circle,      // XZ平面の円
 	};
 	inline constexpr const char* EmitShapeTypeNames[] = {
 		"Point", "Sphere", "Hemisphere", "Box", "Circle"

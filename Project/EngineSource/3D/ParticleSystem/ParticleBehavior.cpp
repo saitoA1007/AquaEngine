@@ -2,6 +2,7 @@
 #include "FPSCounter.h"
 #include "MyMath.h"
 #include "ParticleEmitModules.h"
+#include <algorithm>
 using namespace GameEngine;
 
 namespace {
@@ -126,10 +127,12 @@ void ParticleBehavior::Update(float deltaTime) {
 
 void ParticleBehavior::Draw() {
 
-    if (main_.isActiveBlendAdd_) {
-        renderQueue_->SubmitInstancing(model_, currentNumInstance_, *worldTransforms_, 0.0f, BlendMode::kBlendModeAdd, nullptr, "WBOITAccumulatePass");
-    } else {
-        renderQueue_->SubmitInstancing(model_, currentNumInstance_, *worldTransforms_, 0.0f, BlendMode::kBlendModeNormal, nullptr, "WBOITAccumulatePass");
+    BlendMode blendMode = main_.isActiveBlendAdd_ ? BlendMode::kBlendModeAdd : BlendMode::kBlendModeNormal;
+    renderQueue_->SubmitInstancing(model_, currentNumInstance_, *worldTransforms_, 0.0f, blendMode, nullptr, "WBOITAccumulatePass");
+
+    // トレイル
+    if (trailTransforms_ && trailNumInstance_ > 0) {
+        renderQueue_->SubmitInstancing(model_, trailNumInstance_, *trailTransforms_, 0.0f, blendMode, nullptr, "WBOITAccumulatePass");
     }
 }
 
@@ -159,6 +162,7 @@ void ParticleBehavior::Clear() {
         particle.currentTime = 1.0f;
     }
     currentNumInstance_ = 0;
+    trailNumInstance_ = 0;
     spawnTimer_ = 0.0f;
 }
 
@@ -223,6 +227,16 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix, float deltaTime) {
     // 常に親に追従するか
     const bool isFollowParent = IsFollowParent();
 
+    // トレイル
+    trailNumInstance_ = 0;
+    const TrailModule* trailModule = modulesControl_->GetModule<TrailModule>("Trail");
+    if (trailModule != nullptr && !trailTransforms_) {
+        // 初めて有効になった時に確保する
+        trailTransforms_ = std::make_unique<WorldTransforms>();
+        Transform defaultTransform = { {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
+        trailTransforms_->Initialize(maxNumInstance_ * kMaxTrailLength, defaultTransform);
+    }
+
     for (uint32_t i = 0; i < maxNumInstance_; ++i) {
         ParticleData& particle = particles_[i];
 
@@ -277,10 +291,54 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix, float deltaTime) {
         worldTransforms_->transformDatas_[currentNumInstance_].color = particle.color;
         worldTransforms_->transformDatas_[currentNumInstance_].textureHandle = particle.textureHandle;
         currentNumInstance_++;
+
+        // トレイルを追加
+        if (trailModule != nullptr) {
+            AddTrail(particle, *trailModule, cameraMatrix, isRotateVelocity, isFollowParent);
+        }
     }
 
     // 行列の更新処理
     if (!main_.isBillBoard && !isFollowParent) {
         worldTransforms_->UpdateTransformMatrix(currentNumInstance_);
+    }
+}
+
+void ParticleBehavior::AddTrail(const ParticleData& particle, const TrailModule& trailModule, const Matrix4x4& cameraMatrix, bool isRotateVelocity, bool isFollowParent) {
+
+    const uint32_t count = (std::min)(particle.trailCount, trailModule.GetTrailLength());
+
+    for (uint32_t index = 0; index < count; ++index) {
+        WorldTransforms::TransformData& data = trailTransforms_->transformDatas_[trailNumInstance_];
+
+        const Vector3& position = particle.GetTrailPosition(index);
+        Vector3 scale{};
+        Vector4 color{};
+        trailModule.CalcTrailPoint(particle, index, scale, color);
+
+        // パーティクル本体と同じ方法で行列を作る
+        if (main_.isBillBoard) {
+            if (isRotateVelocity) {
+                data.worldMatrix = Math::MakeDirectionalBillboardMatrix(scale, position, cameraMatrix, camera_->GetViewMatrix(), particle.velocity, particle.transform.rotate.z);
+            } else {
+                data.worldMatrix = Math::MakeBillboardMatrix(scale, position, particle.transform.rotate.z, cameraMatrix);
+            }
+
+            // ペアレント
+            if (parentMatrix_ != nullptr) {
+                data.worldMatrix *= *parentMatrix_;
+            }
+        } else {
+            if (isFollowParent) {
+                data.worldMatrix = Math::MakeAffineMatrix(scale, particle.transform.rotate, position) * (*parentMatrix_);
+            } else {
+                data.worldMatrix = Math::MakeWorldMatrixFromEulerRotation(position, particle.transform.rotate, scale);
+            }
+        }
+
+        data.transform = { scale, particle.transform.rotate, position };
+        data.color = color;
+        data.textureHandle = particle.textureHandle;
+        trailNumInstance_++;
     }
 }

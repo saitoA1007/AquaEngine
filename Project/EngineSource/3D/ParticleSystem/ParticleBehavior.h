@@ -174,7 +174,7 @@ namespace GameEngine{
 		/// </summary>
 		void SetSimulationSpace(ParticleSimulationSpace space) { simulationSpace_ = space; }
 
-		// 親の行列を取得（未設定ならnullptr）
+		// 親の行列を取得
 		const Matrix4x4* GetParent() const { return parentMatrix_; }
 
 		// 親が設定されているか
@@ -188,6 +188,11 @@ namespace GameEngine{
 
 		// 描画用のトランスフォーム
 		std::unique_ptr<WorldTransforms> worldTransforms_;
+
+		// トレイル描画用のトランスフォーム
+		std::unique_ptr<WorldTransforms> trailTransforms_;
+		// 現在のトレイルの描画数
+		uint32_t trailNumInstance_ = 0;
 
 		// モジュールの管理
 		std::unique_ptr<ModulesControl> modulesControl_;
@@ -246,6 +251,11 @@ namespace GameEngine{
 		/// 移動処理
 		/// </summary>
 		void Move(const Matrix4x4& cameraMatrix, float deltaTime);
+
+		/// <summary>
+		/// トレイルの描画データを追加する
+		/// </summary>
+		void AddTrail(const ParticleData& particle, const TrailModule& trailModule, const Matrix4x4& cameraMatrix, bool isRotateVelocity, bool isFollowParent);
 
 		/// <summary>
 		/// 常に親に追従するか

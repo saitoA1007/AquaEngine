@@ -133,3 +133,50 @@ void RotationByVelocityModule::Update(ParticleData& particleData, [[maybe_unused
 		particleData.transform.rotate.y = euler.y;
 	}
 }
+
+//==================================================
+// トレイルモジュール
+//==================================================
+
+void TrailModule::Create(ParticleData& particleData) {
+	// 軌跡をリセット
+	particleData.trailHead = 0;
+	particleData.trailCount = 0;
+	particleData.trailTimer = 0.0f;
+}
+
+void TrailModule::Update(ParticleData& particleData, float time) {
+	particleData.trailTimer += time;
+	if (particleData.trailTimer < recordInterval_) {
+		return;
+	}
+	particleData.trailTimer = 0.0f;
+
+	// 現在の位置を記録
+	particleData.trailPositions[particleData.trailHead] = particleData.transform.translate;
+	particleData.trailHead = (particleData.trailHead + 1) % kMaxTrailLength;
+	if (particleData.trailCount < kMaxTrailLength) {
+		particleData.trailCount++;
+	}
+}
+
+void TrailModule::CalcTrailPoint(const ParticleData& particleData, uint32_t index, Vector3& outScale, Vector4& outColor) const {
+	// 最新が0、最も古いものが1に近づく
+	float t = static_cast<float>(index + 1) / static_cast<float>(GetTrailLength());
+
+	float scale = Lerp(startScale_, endScale_, t, easeCurve_);
+	outScale = particleData.transform.scale * scale;
+
+	// パーティクルの色から目標の色へHSV空間で補間する
+	Vector3 startHsv = Math::RGBtoHSV({ particleData.color.x, particleData.color.y, particleData.color.z });
+	Vector3 endHsv = Math::RGBtoHSV({ trailColor_.x, trailColor_.y, trailColor_.z });
+	Vector3 hsv = Lerp(startHsv, endHsv, t, easeCurve_);
+	Vector3 rgb = Math::HSVtoRGB(hsv.x, std::clamp(hsv.y, 0.0f, 1.0f), std::clamp(hsv.z, 0.0f, 1.0f));
+
+	float alpha = Lerp(startAlpha_, endAlpha_, t, easeCurve_);
+	outColor = { rgb.x, rgb.y, rgb.z, particleData.color.w * alpha };
+}
+
+uint32_t TrailModule::GetTrailLength() const {
+	return std::clamp(trailLength_, 1u, kMaxTrailLength);
+}
