@@ -48,24 +48,57 @@ void WindowsApp::CreateGameWindow(const std::wstring& title, int32_t kClientWidt
 	// ウィンドウクラスを登録する
 	RegisterClass(&wc_);
 
-	// ウィンドウサイズを表す構造体にクライアント領域を入れる
+#ifdef USE_IMGUI
+	// ウィンドウスタイル(サイズ変更は無効)
+	const DWORD style = WS_OVERLAPPEDWINDOW & ~WS_THICKFRAME;
+#else
+	// ウィンドウスタイル(最大化・サイズ変更は無効)
+	const DWORD style = WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME;
+#endif
+
+	int32_t posX = CW_USEDEFAULT;
+	int32_t posY = CW_USEDEFAULT;
+	int32_t windowWidth = 0;
+	int32_t windowHeight = 0;
+
+#ifdef USE_IMGUI
+	// Debug/Development版はタスクバーを除いた作業領域いっぱいにウィンドウを表示する
+	RECT workArea{};
+	SystemParametersInfo(SPI_GETWORKAREA, 0, &workArea, 0);
+	posX = workArea.left;
+	posY = workArea.top;
+	windowWidth = workArea.right - workArea.left;
+	windowHeight = workArea.bottom - workArea.top;
+	(void)kClientWidth;
+	(void)kClientHeight;
+#else
+	// Release版は指定されたクライアント領域のサイズで表示する
 	wrc_ = { 0,0,kClientWidth,kClientHeight };
 
 	// クライアント領域を元に実際のサイズをwrcを変更してもらう
-	AdjustWindowRect(&wrc_, WS_OVERLAPPEDWINDOW, false);
+	AdjustWindowRect(&wrc_, style, false);
+	windowWidth = wrc_.right - wrc_.left;
+	windowHeight = wrc_.bottom - wrc_.top;
+#endif
 
 	hwnd_ = CreateWindow(
 		wc_.lpszClassName,      // 利用するクラス名
 		title.c_str(),          // タイトルバーの文字
-		WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME, // 最大化を無効にしたスタイル
-		CW_USEDEFAULT,          // 表示X座標(Windowに任せる)
-		CW_USEDEFAULT,          // 表示Y座標(WindowOSに任せる)
-		wrc_.right - wrc_.left, // ウィンドウ横幅
-		wrc_.bottom - wrc_.top, // ウィンドウ縦幅
+		style,                  // ウィンドウスタイル
+		posX,                   // 表示X座標
+		posY,                   // 表示Y座標
+		windowWidth,            // ウィンドウ横幅
+		windowHeight,           // ウィンドウ縦幅
 		nullptr,                // 親ウィンドウハンドル
 		nullptr,                // メニューハンドル
 		wc_.hInstance,          // インスタンスハンドル
 		nullptr);               // オプション
+
+	// 実際に作成されたクライアント領域のサイズを取得する
+	RECT clientRect{};
+	GetClientRect(hwnd_, &clientRect);
+	clientWidth_ = clientRect.right - clientRect.left;
+	clientHeight_ = clientRect.bottom - clientRect.top;
 
 	// システムタイマーの分解能を上げる
 	timeBeginPeriod(1);

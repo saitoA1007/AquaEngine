@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <Windows.h>
 #include <cstdint>
 #include <string>
@@ -56,6 +56,12 @@ namespace GameEngine {
 		HWND GetHwnd() const { return hwnd_; }
 
 		HINSTANCE GetHInstance() const { return wc_.hInstance; }
+
+		/// <summary>
+		/// 実際に作成されたクライアント領域のサイズを取得
+		/// </summary>
+		int32_t GetClientWidth() const { return clientWidth_; }
+		int32_t GetClientHeight() const { return clientHeight_; }
 	private:
 		//WindowsApp() = default;
 		//~WindowsApp() = default;
@@ -67,6 +73,10 @@ namespace GameEngine {
 		// ウィンドウハンドル
 		HWND hwnd_ = nullptr;
 		RECT wrc_{};
+
+		// 実際のクライアント領域のサイズ
+		int32_t clientWidth_ = kWindowWidth;
+		int32_t clientHeight_ = kWindowHeight;
 
 		MSG msg_{};
 	};

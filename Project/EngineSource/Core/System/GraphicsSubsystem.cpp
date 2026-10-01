@@ -23,17 +23,11 @@ void GraphicsSubsystem::Initialize() {
     graphicsDevice_ = std::make_unique<GraphicsDevice>();
     graphicsDevice_->Initialize(
         windowsApp->GetHwnd(),
-        windowsApp->kWindowWidth,
-        windowsApp->kWindowHeight);
+        windowsApp->GetClientWidth(),
+        windowsApp->GetClientHeight());
 
     // HUD表示の設定は、スワップチェーン生成後に行う。
-    // （生成前に呼ぶと左上のオーバーレイ設定が反映されない）
     PixCapture::GetInstance().SetHudVisible(false);
-
-    // PIXSetTargetWindow を設定すると、そのHWNDのPresent以外ではキャプチャが
-    // 開始/終了されなくなる。HWNDが想定と違うとキャプチャが一切取れなくなるため、
-    // 既定では設定しない。複数ウィンドウで対象を絞りたい場合だけ有効化する。
-    //PixCapture::GetInstance().SetTargetWindow(windowsApp->GetHwnd());
 
     // dxcCompilerの初期化
     dxc_ = std::make_unique<DXC>();
