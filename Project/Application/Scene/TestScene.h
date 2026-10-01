@@ -70,7 +70,7 @@ private: // シーン機能
 	// アニメーションを再生するクラス
 	std::unique_ptr<GameEngine::Animator> walkAnimator_;
 
-	float intensity_ = 1.0f;
+	float intensity_ = 0.8f;
 	Vector3 dir_ = { 0.0f,-1.0f,0.0f };
 	Vector4 lightColor_ = { 1.0f,1.0f,1.0f,1.0f };
 
