@@ -5,6 +5,8 @@
 
 #ifdef USE_IMGUI
 #include "NodeSystem/MaterialShaderGenerator.h"
+#include "RayQueryMaterialRegistry.h"
+#include "ConvertString.h"
 #endif
 
 namespace fs = std::filesystem;
@@ -23,6 +25,10 @@ void ShaderCompiler::Initialize(DXC* dxc) {
 	fs::path genDir(generatedHlslDirectory_);
 	if (!fs::exists(genDir)) {
 		fs::create_directories(genDir);
+	}
+	fs::path rayQueryGenDir(generatedRayQueryDirectory_);
+	if (!fs::exists(rayQueryGenDir)) {
+		fs::create_directories(rayQueryGenDir);
 	}
 }
 
@@ -48,16 +54,26 @@ Microsoft::WRL::ComPtr<IDxcBlob> ShaderCompiler::CompileShader(Type type, const 
 
 Microsoft::WRL::ComPtr<IDxcBlob> ShaderCompiler::CompileMaterialGraph(const MaterialGraph& graph, const std::wstring& materialName) {
 #ifdef USE_IMGUI
-	// グラフからHLSLソースを生成
-	std::string hlslSource = MaterialShaderGenerator::Generate(graph);
-	assert(!hlslSource.empty() && "MaterialGraph: HLSL生成に失敗しました");
+	// マテリアル名をHLSLの識別子として使える形にする
+	std::string identifier = MaterialShaderGenerator::ToIdentifier(ConvertString(materialName));
+	std::wstring wIdentifier = ConvertString(identifier);
 
-	// 生成先のパスを決定し、ファイルを生成
-	std::wstring hlslPath = generatedHlslDirectory_ + materialName + L".PS.hlsl";
-	WriteGeneratedHlsl(hlslPath, hlslSource);
+	// グラフからサーフェス関数を生成。PSとRayQueryの両方から使う
+	std::string surfaceSource = MaterialShaderGenerator::GenerateSurface(graph, identifier);
+	assert(!surfaceSource.empty() && "MaterialGraph: HLSL生成に失敗しました");
+	if (surfaceSource.empty()) { return nullptr; }
+	WriteGeneratedHlsl(generatedHlslDirectory_ + wIdentifier + L".Surface.hlsli", surfaceSource);
 
-	// コンパイルする
-	return CompileShader(Type::PS, hlslPath);
+	// RayQuery用のマテリアル関数を生成して登録する
+	WriteGeneratedHlsl(generatedRayQueryDirectory_ + wIdentifier + L".hlsli", MaterialShaderGenerator::GenerateRayQueryMaterial(identifier));
+	RayQueryMaterialRegistry::GetInstance().RegisterMaterial(identifier);
+
+	// ラスタライズ用のPSを生成
+	std::wstring hlslPath = generatedHlslDirectory_ + wIdentifier + L".PS.hlsl";
+	WriteGeneratedHlsl(hlslPath, MaterialShaderGenerator::GeneratePixelShader(identifier));
+
+	// サーフェス関数の変更をCSOのキャッシュ判定で検出できないため、常にコンパイルする
+	return CompileAndSave(Type::PS, hlslPath);
 #else
 	return nullptr;
 #endif

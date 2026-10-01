@@ -61,9 +61,9 @@ void GraphicsSubsystem::Initialize() {
     renderPassController_ = std::make_unique<RenderPassController>();
     renderPassController_->Initialize(renderTextureManager_.get(), graphicsDevice_->GetCommandList());
 
-    // レイトレーシング用のパイプライン
-    raytracingPipeline_ = std::make_unique<RaytracingPipeline>();
-    raytracingPipeline_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetSrvManager(), dxc_.get());
+    // RayQueryでレイトレーシングを行うパイプライン
+    rayQueryPipeline_ = std::make_unique<RayQueryPipeline>();
+    rayQueryPipeline_->Initialize(graphicsDevice_->GetDevice(), dxc_.get());
 
     // 描画コマンド発行機能
     renderQueue_ = std::make_unique<RenderQueue>();
@@ -72,7 +72,7 @@ void GraphicsSubsystem::Initialize() {
     // シーン描画の管理
     sceneRenderManager_ = std::make_unique<SceneRenderManager>();
     sceneRenderManager_->Initialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager(), psoManager_.get(),
-        renderPassController_.get(), raytracingPipeline_.get(), bufferRefManager_.get(),renderQueue_.get());
+        renderPassController_.get(), rayQueryPipeline_.get(), bufferRefManager_.get(),renderQueue_.get());
 
     // ポストエフェクトマネージャーの初期化
     postEffectManager_ = std::make_unique<PostEffectManager>();

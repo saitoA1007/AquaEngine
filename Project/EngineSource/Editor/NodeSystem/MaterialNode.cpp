@@ -50,12 +50,14 @@ std::string MathNode::GenerateHLSL(const std::unordered_map<int, std::string>& p
     // 現在の型に応じたHLSLの型名とデフォルト値を決める
     std::string typeStr = "float4";
     std::string defaultStr = "float4(1,1,1,1)";
+    // 接続先の型が異なっても良いように明示的に変換する関数
+    std::string convertStr = "AsFloat4";
 
     switch (valueType_) {
-    case PinType::kFloat:  typeStr = "float";  defaultStr = "1.0f"; break;
-    case PinType::kFloat2: typeStr = "float2"; defaultStr = "float2(1,1)"; break;
-    case PinType::kFloat3: typeStr = "float3"; defaultStr = "float3(1,1,1)"; break;
-    case PinType::kFloat4: typeStr = "float4"; defaultStr = "float4(1,1,1,1)"; break;
+    case PinType::kFloat:  typeStr = "float";  defaultStr = "1.0f"; convertStr = "AsFloat"; break;
+    case PinType::kFloat2: typeStr = "float2"; defaultStr = "float2(1,1)"; convertStr = "AsFloat2"; break;
+    case PinType::kFloat3: typeStr = "float3"; defaultStr = "float3(1,1,1)"; convertStr = "AsFloat3"; break;
+    case PinType::kFloat4: typeStr = "float4"; defaultStr = "float4(1,1,1,1)"; convertStr = "AsFloat4"; break;
     }
 
     // 適切なデフォルト値を使って変数名を取得
@@ -70,7 +72,7 @@ std::string MathNode::GenerateHLSL(const std::unordered_map<int, std::string>& p
     case MathOperation::kDivide: op = "/"; break;
     }
 
-    return std::format("{} v{} = {} {} {};\\n", typeStr, outputs_[0].id, a, op, b);
+    return std::format("{0} v{1} = {2}({3}) {4} {2}({5});\n", typeStr, outputs_[0].id, convertStr, a, op, b);
 }
 
 void MathNode::OnConnectTypePropagate(PinType newType) {
@@ -147,8 +149,9 @@ std::string TextureSampleNode::GenerateHLSL(const std::unordered_map<int, std::s
     std::string uv = GetPinVar(pinVars, inputs_[0].id, "input.texcoord");
 
     // バインドレース配列をハンドルで直接添字アクセスする
+    // PSではSample、RayQueryではSampleLevelになるようMATERIAL_SAMPLEを使う
     return std::format(
-        "float4 v{0} = gTexture[{1}].Sample(gSampler, {2});\n"
+        "float4 v{0} = MATERIAL_SAMPLE(gTexture[{1}], AsFloat2({2}));\n"
         "float3 v{3} = v{0}.rgb;\n"
         "float  v{4} = v{0}.a;\n",
         outputs_[0].id, textureHandle_, uv,

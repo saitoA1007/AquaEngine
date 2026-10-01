@@ -18,7 +18,7 @@ namespace GameEngine {
 		BLAS* blas = nullptr;             // BLAS
 		float transform[3][4];            // ワールド変換行列
 		uint32_t instanceID = 0;          // シェーダー側で取得できる任意のID
-		uint32_t hitGroupIndexOffset = 0; // hitGroupのどのレコードを使用するか
+		uint32_t hitGroupIndexOffset = 0; // マテリアルID。RayQueryMaterialRegistryのIDを指定する
 		uint32_t instanceMask = static_cast<uint32_t>(RayInstanceMask::kRayMaskOpaque); // レイキャスト時のフィルタリング用マスク
 	};
 

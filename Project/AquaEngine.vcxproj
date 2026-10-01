@@ -82,7 +82,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Externals\assimp\include;$(ProjectDir)EngineSource\2D;$(ProjectDir)EngineSource\3D;$(ProjectDir)EngineSource\Core;$(ProjectDir)EngineSource\Audio;$(ProjectDir)EngineSource\Collision;$(ProjectDir)EngineSource\Common;$(ProjectDir)EngineSource\Input;$(ProjectDir)EngineSource\Math;$(ProjectDir)EngineSource\Graphics\PSO;$(ProjectDir)EngineSource\3D\Camera;$(ProjectDir)EngineSource\3D\Light;$(ProjectDir)EngineSource\Scene;$(ProjectDir)EngineSource\3D\Model;$(ProjectDir)EngineSource\Graphics\DirectX;$(ProjectDir)EngineSource\Editor;$(ProjectDir)EngineSource\Graphics;$(ProjectDir)EngineSource\Graphics\DirectX\Memory;$(ProjectDir)EngineSource\3D\Transform;$(ProjectDir)EngineSource\3D\Renderer;$(ProjectDir)EngineSource\3D\Material;$(ProjectDir)EngineSource\3D\Animation;$(ProjectDir)EngineSource\Graphics\Core;$(ProjectDir)EngineSource\Graphics\Buffers;$(ProjectDir)EngineSource\Graphics\Resources;$(ProjectDir)EngineSource\Graphics\Texture;$(ProjectDir)EngineSource\Graphics\RenderPass;$(ProjectDir)EngineSource\Core\System;$(ProjectDir)EngineSource\Graphics\PSO\Raytracing;$(ProjectDir)EngineSource\Graphics\PSO\Rasterize;$(ProjectDir)EngineSource\Graphics\PSO\Core;$(ProjectDir)EngineSource\3D\ParticleSystem;$(ProjectDir)EngineSource\3D\Effects;$(ProjectDir)EngineSource\3D\Fracture;$(ProjectDir)EngineSource\Core\Objects;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Externals\assimp\include;$(ProjectDir)EngineSource\2D;$(ProjectDir)EngineSource\3D;$(ProjectDir)EngineSource\Core;$(ProjectDir)EngineSource\Audio;$(ProjectDir)EngineSource\Collision;$(ProjectDir)EngineSource\Common;$(ProjectDir)EngineSource\Input;$(ProjectDir)EngineSource\Math;$(ProjectDir)EngineSource\Graphics\PSO;$(ProjectDir)EngineSource\3D\Camera;$(ProjectDir)EngineSource\3D\Light;$(ProjectDir)EngineSource\Scene;$(ProjectDir)EngineSource\3D\Model;$(ProjectDir)EngineSource\Graphics\DirectX;$(ProjectDir)EngineSource\Editor;$(ProjectDir)EngineSource\Graphics;$(ProjectDir)EngineSource\Graphics\DirectX\Memory;$(ProjectDir)EngineSource\3D\Transform;$(ProjectDir)EngineSource\3D\Renderer;$(ProjectDir)EngineSource\3D\Material;$(ProjectDir)EngineSource\3D\Animation;$(ProjectDir)EngineSource\Graphics\Core;$(ProjectDir)EngineSource\Graphics\Buffers;$(ProjectDir)EngineSource\Graphics\Resources;$(ProjectDir)EngineSource\Graphics\Texture;$(ProjectDir)EngineSource\Graphics\RenderPass;$(ProjectDir)EngineSource\Core\System;$(ProjectDir)EngineSource\Graphics\PSO\Rasterize;$(ProjectDir)EngineSource\Graphics\PSO\Core;$(ProjectDir)EngineSource\3D\ParticleSystem;$(ProjectDir)EngineSource\3D\Effects;$(ProjectDir)EngineSource\3D\Fracture;$(ProjectDir)EngineSource\Core\Objects;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -112,7 +112,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Externals\assimp\include;$(ProjectDir)EngineSource\2D;$(ProjectDir)EngineSource\3D;$(ProjectDir)EngineSource\Core;$(ProjectDir)EngineSource\Audio;$(ProjectDir)EngineSource\Collision;$(ProjectDir)EngineSource\Common;$(ProjectDir)EngineSource\Input;$(ProjectDir)EngineSource\Math;$(ProjectDir)EngineSource\Graphics\PSO;$(ProjectDir)EngineSource\3D\Camera;$(ProjectDir)EngineSource\3D\Light;$(ProjectDir)EngineSource\Scene;$(ProjectDir)EngineSource\3D\Model;$(ProjectDir)EngineSource\Graphics\DirectX;$(ProjectDir)EngineSource\Editor;$(ProjectDir)EngineSource\Graphics;$(ProjectDir)EngineSource\Graphics\DirectX\Memory;$(ProjectDir)EngineSource\3D\Transform;$(ProjectDir)EngineSource\3D\Renderer;$(ProjectDir)EngineSource\3D\Material;$(ProjectDir)EngineSource\3D\Animation;$(ProjectDir)EngineSource\Graphics\Core;$(ProjectDir)EngineSource\Graphics\Buffers;$(ProjectDir)EngineSource\Graphics\Resources;$(ProjectDir)EngineSource\Graphics\Texture;$(ProjectDir)EngineSource\Graphics\RenderPass;$(ProjectDir)EngineSource\Core\System;$(ProjectDir)EngineSource\Graphics\PSO\Raytracing;$(ProjectDir)EngineSource\Graphics\PSO\Rasterize;$(ProjectDir)EngineSource\Graphics\PSO\Core;$(ProjectDir)EngineSource\3D\ParticleSystem;$(ProjectDir)EngineSource\3D\Effects;$(ProjectDir)EngineSource\3D\Fracture;$(ProjectDir)EngineSource\Core\Objects;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Externals\assimp\include;$(ProjectDir)EngineSource\2D;$(ProjectDir)EngineSource\3D;$(ProjectDir)EngineSource\Core;$(ProjectDir)EngineSource\Audio;$(ProjectDir)EngineSource\Collision;$(ProjectDir)EngineSource\Common;$(ProjectDir)EngineSource\Input;$(ProjectDir)EngineSource\Math;$(ProjectDir)EngineSource\Graphics\PSO;$(ProjectDir)EngineSource\3D\Camera;$(ProjectDir)EngineSource\3D\Light;$(ProjectDir)EngineSource\Scene;$(ProjectDir)EngineSource\3D\Model;$(ProjectDir)EngineSource\Graphics\DirectX;$(ProjectDir)EngineSource\Editor;$(ProjectDir)EngineSource\Graphics;$(ProjectDir)EngineSource\Graphics\DirectX\Memory;$(ProjectDir)EngineSource\3D\Transform;$(ProjectDir)EngineSource\3D\Renderer;$(ProjectDir)EngineSource\3D\Material;$(ProjectDir)EngineSource\3D\Animation;$(ProjectDir)EngineSource\Graphics\Core;$(ProjectDir)EngineSource\Graphics\Buffers;$(ProjectDir)EngineSource\Graphics\Resources;$(ProjectDir)EngineSource\Graphics\Texture;$(ProjectDir)EngineSource\Graphics\RenderPass;$(ProjectDir)EngineSource\Core\System;$(ProjectDir)EngineSource\Graphics\PSO\Rasterize;$(ProjectDir)EngineSource\Graphics\PSO\Core;$(ProjectDir)EngineSource\3D\ParticleSystem;$(ProjectDir)EngineSource\3D\Effects;$(ProjectDir)EngineSource\3D\Fracture;$(ProjectDir)EngineSource\Core\Objects;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -140,7 +140,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Externals\assimp\include;$(ProjectDir)EngineSource\2D;$(ProjectDir)EngineSource\3D;$(ProjectDir)EngineSource\Core;$(ProjectDir)EngineSource\Audio;$(ProjectDir)EngineSource\Collision;$(ProjectDir)EngineSource\Common;$(ProjectDir)EngineSource\Input;$(ProjectDir)EngineSource\Math;$(ProjectDir)EngineSource\Graphics\PSO;$(ProjectDir)EngineSource\3D\Camera;$(ProjectDir)EngineSource\3D\Light;$(ProjectDir)EngineSource\Scene;$(ProjectDir)EngineSource\3D\Model;$(ProjectDir)EngineSource\Graphics\DirectX;$(ProjectDir)EngineSource\Editor;$(ProjectDir)EngineSource\Graphics;$(ProjectDir)EngineSource\Graphics\DirectX\Memory;$(ProjectDir)EngineSource\3D\Transform;$(ProjectDir)EngineSource\3D\Renderer;$(ProjectDir)EngineSource\3D\Material;$(ProjectDir)EngineSource\3D\Animation;$(ProjectDir)EngineSource\Graphics\Core;$(ProjectDir)EngineSource\Graphics\Buffers;$(ProjectDir)EngineSource\Graphics\Resources;$(ProjectDir)EngineSource\Graphics\Texture;$(ProjectDir)EngineSource\Graphics\RenderPass;$(ProjectDir)EngineSource\Core\System;$(ProjectDir)EngineSource\Graphics\PSO\Raytracing;$(ProjectDir)EngineSource\Graphics\PSO\Rasterize;$(ProjectDir)EngineSource\Graphics\PSO\Core;$(ProjectDir)EngineSource\3D\ParticleSystem;$(ProjectDir)EngineSource\3D\Effects;$(ProjectDir)EngineSource\3D\Fracture;$(ProjectDir)EngineSource\Core\Objects;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Externals\assimp\include;$(ProjectDir)EngineSource\2D;$(ProjectDir)EngineSource\3D;$(ProjectDir)EngineSource\Core;$(ProjectDir)EngineSource\Audio;$(ProjectDir)EngineSource\Collision;$(ProjectDir)EngineSource\Common;$(ProjectDir)EngineSource\Input;$(ProjectDir)EngineSource\Math;$(ProjectDir)EngineSource\Graphics\PSO;$(ProjectDir)EngineSource\3D\Camera;$(ProjectDir)EngineSource\3D\Light;$(ProjectDir)EngineSource\Scene;$(ProjectDir)EngineSource\3D\Model;$(ProjectDir)EngineSource\Graphics\DirectX;$(ProjectDir)EngineSource\Editor;$(ProjectDir)EngineSource\Graphics;$(ProjectDir)EngineSource\Graphics\DirectX\Memory;$(ProjectDir)EngineSource\3D\Transform;$(ProjectDir)EngineSource\3D\Renderer;$(ProjectDir)EngineSource\3D\Material;$(ProjectDir)EngineSource\3D\Animation;$(ProjectDir)EngineSource\Graphics\Core;$(ProjectDir)EngineSource\Graphics\Buffers;$(ProjectDir)EngineSource\Graphics\Resources;$(ProjectDir)EngineSource\Graphics\Texture;$(ProjectDir)EngineSource\Graphics\RenderPass;$(ProjectDir)EngineSource\Core\System;$(ProjectDir)EngineSource\Graphics\PSO\Rasterize;$(ProjectDir)EngineSource\Graphics\PSO\Core;$(ProjectDir)EngineSource\3D\ParticleSystem;$(ProjectDir)EngineSource\3D\Effects;$(ProjectDir)EngineSource\3D\Fracture;$(ProjectDir)EngineSource\Core\Objects;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
@@ -297,10 +297,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Graphics\Debug\PixCapture.cpp" />
     <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectData.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.cpp" />
-    <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\RayLibShaderCompiler.cpp" />
-    <ClCompile Include="EngineSource\Graphics\PSO\Core\RaytracingPipeline.cpp" />
-    <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\ShaderTableBuilder.cpp" />
-    <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\StateObjectBuilder.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Core\RayQueryPipeline.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Core\RayQueryMaterialRegistry.cpp" />
     <ClCompile Include="EngineSource\Graphics\Resources\BufferRefResource.cpp" />
     <ClCompile Include="EngineSource\Math\RandomGenerator.cpp" />
     <ClCompile Include="EngineSource\Graphics\Texture\Texture.cpp" />
@@ -622,12 +620,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Graphics\Debug\PixMarker.h" />
     <ClInclude Include="EngineSource\Graphics\PostProcess\IPostEffect.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.h" />
-    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\RayLibShaderCompiler.h" />
-    <ClInclude Include="EngineSource\Graphics\PSO\Core\RaytracingPipeline.h" />
-    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderRecord.h" />
-    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderTable.h" />
-    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderTableBuilder.h" />
-    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\StateObjectBuilder.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Core\RayQueryPipeline.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Core\RayQueryMaterialRegistry.h" />
     <ClInclude Include="EngineSource\Graphics\Resources\BufferRefResource.h" />
     <ClInclude Include="EngineSource\Math\RandomGenerator.h" />
     <ClInclude Include="EngineSource\Graphics\Texture\Texture.h" />
@@ -769,7 +763,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <None Include="Resources\Shaders\NoiseUtils.hlsli" />
     <None Include="Resources\Shaders\RandomUtils.hlsli" />
     <None Include="Resources\Shaders\Rasterize\WBOIT.hlsli" />
-    <None Include="Resources\Shaders\Raytracing\Common.hlsli" />
+    <None Include="Resources\Shaders\RayQuery\RayQueryCommon.hlsli" />
+    <None Include="Resources\Shaders\RayQuery\Materials\SurfaceShading.hlsli" />
+    <None Include="Resources\Shaders\Material\MaterialSurface.hlsli" />
+    <None Include="Resources\Shaders\RayQuery\MaterialDispatch.hlsli" />
+    <None Include="Resources\Shaders\RayQuery\Materials\DefaultMaterial.hlsli" />
+    <None Include="Resources\Shaders\RayQuery\Materials\IceMaterial.hlsli" />
+    <None Include="Resources\Shaders\RayQuery\RayQueryRender.CS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />
@@ -909,25 +909,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Resources\Shaders\Raytracing\ChsIceObject.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Library</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Library</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Library</ShaderType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="Resources\Shaders\Raytracing\chsObject.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Library</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Library</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Library</ShaderType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Development|x64'">6.6</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.6</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.6</ShaderModel>
-    </FxCompile>
     <FxCompile Include="Resources\Shaders\IceFracture.PS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
@@ -935,28 +916,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="Resources\Shaders\Raytracing\Miss.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Library</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Library</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Library</ShaderType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Development|x64'">6.6</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.6</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.6</ShaderModel>
-    </FxCompile>
-    <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Library</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Library</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Library</ShaderType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Development|x64'">6.6</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.6</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.6</ShaderModel>
     </FxCompile>
     <FxCompile Include="Resources\Shaders\CS\Skinning.CS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>

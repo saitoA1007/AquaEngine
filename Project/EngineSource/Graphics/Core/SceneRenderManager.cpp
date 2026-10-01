@@ -1,7 +1,7 @@
 #include "SceneRenderManager.h"
 #include <cassert>
 #include "PSO/Core/PSOManager.h"
-#include "raytracingPipeline.h"
+#include "RayQueryPipeline.h"
 #include "BufferRefManager.h"
 #include "ModelRenderer.h"
 #include "DebugRenderer.h"
@@ -9,10 +9,10 @@
 using namespace GameEngine;
 
 void SceneRenderManager::Initialize(ID3D12GraphicsCommandList4* commandList, SrvManager* srvManager, PSOManager* psoManager, RenderPassController* renderPassController,
-	RaytracingPipeline* raytracingPipeline, BufferRefManager* bufferRefManager, RenderQueue* renderQueue) {
+	RayQueryPipeline* rayQueryPipeline, BufferRefManager* bufferRefManager, RenderQueue* renderQueue) {
     commandList_ = commandList;
     renderPassController_ = renderPassController;
-    raytracingPipeline_ = raytracingPipeline;
+    rayQueryPipeline_ = rayQueryPipeline;
     srvManager_ = srvManager;
     bufferRefManager_ = bufferRefManager;
 	renderQueue_ = renderQueue;
@@ -252,33 +252,38 @@ void SceneRenderManager::Execute2dRequest(const Draw2dRequest& request) {
     }
 }
 
-void SceneRenderManager::DrawRaytracing() {
-    commandList_->SetComputeRootSignature(raytracingPipeline_->GetGlobalRootSignature());
+void SceneRenderManager::DrawRayQuery() {
+    using RootParam = RayQueryPipeline::RootParam;
+
+    // マテリアルが追加、更新されていればパイプラインを作り直す
+    rayQueryPipeline_->ReloadIfNeeded();
+
+    commandList_->SetComputeRootSignature(rayQueryPipeline_->GetRootSignature());
     // TLASのセット
-    commandList_->SetComputeRootDescriptorTable(0, tlas_.GetSrvHandleGPU());
+    commandList_->SetComputeRootDescriptorTable(RootParam::kTLAS, tlas_.GetSrvHandleGPU());
     // テスクチャのセット
-    commandList_->SetComputeRootDescriptorTable(1, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+    commandList_->SetComputeRootDescriptorTable(RootParam::kTextures, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
     // BufferRefのセット
-    commandList_->SetComputeRootDescriptorTable(2, bufferRefManager_->GetSrvHandleGPU());
+    commandList_->SetComputeRootDescriptorTable(RootParam::kBufferRefs, bufferRefManager_->GetSrvHandleGPU());
     // Bufferのセット
-    commandList_->SetComputeRootDescriptorTable(3, srvManager_->GetGPUHandle(bufferStartSrvIndex_));
+    commandList_->SetComputeRootDescriptorTable(RootParam::kBuffers, srvManager_->GetGPUHandle(bufferStartSrvIndex_));
     // カメラのセット
     if (renderQueue_->GetUseDebugCamera()) {
-        commandList_->SetComputeRootConstantBufferView(4, renderQueue_->GetDebugCameraResource()->GetGpuVirtualAddress());
+        commandList_->SetComputeRootConstantBufferView(RootParam::kCamera, renderQueue_->GetDebugCameraResource()->GetGpuVirtualAddress());
     } else {
-        commandList_->SetComputeRootConstantBufferView(4, renderQueue_->GetCameraResource()->GetGpuVirtualAddress());
+        commandList_->SetComputeRootConstantBufferView(RootParam::kCamera, renderQueue_->GetCameraResource()->GetGpuVirtualAddress());
     }
     // ライトのセット
-    commandList_->SetComputeRootConstantBufferView(5, renderQueue_->GetLightResource()->GetGpuVirtualAddress());
+    commandList_->SetComputeRootConstantBufferView(RootParam::kLight, renderQueue_->GetLightResource()->GetGpuVirtualAddress());
     // 出力画像を設定
-    commandList_->SetComputeRootDescriptorTable(6, srvManager_->GetGPUHandle(renderPassController_->GetUavIndex("RaytracingPass")));
-    commandList_->SetComputeRootDescriptorTable(7, srvManager_->GetGPUHandle(renderPassController_->GetUavIndex("RaytracingPassDepth")));
+    commandList_->SetComputeRootDescriptorTable(RootParam::kOutput, srvManager_->GetGPUHandle(renderPassController_->GetUavIndex("RaytracingPass")));
+    commandList_->SetComputeRootDescriptorTable(RootParam::kOutputDepth, srvManager_->GetGPUHandle(renderPassController_->GetUavIndex("RaytracingPassDepth")));
     // 背景画像
-    commandList_->SetComputeRootDescriptorTable(8, srvManager_->GetGPUHandle(renderQueue_->GetSkyboxTexture()));
+    commandList_->SetComputeRootDescriptorTable(RootParam::kSkybox, srvManager_->GetGPUHandle(renderQueue_->GetSkyboxTexture()));
 
     // レイトレーシングを開始
-    commandList_->SetPipelineState1(raytracingPipeline_->GetStateObject());
-    commandList_->DispatchRays(&raytracingPipeline_->GetDispatchRayDesc());
+    commandList_->SetPipelineState(rayQueryPipeline_->GetPipelineState());
+    commandList_->Dispatch(RayQueryPipeline::GetDispatchCount(kRaytracingWidth_), RayQueryPipeline::GetDispatchCount(kRaytracingHeight_), 1);
 }
 
 void SceneRenderManager::RasterizeExecute() {
@@ -468,7 +473,7 @@ void SceneRenderManager::RaytracingExecute() {
     renderPassController_->SwitchToUAV("RaytracingPassDepth");
 
     // レイトレーシングの描画
-    DrawRaytracing();
+    DrawRayQuery();
 
     // UAV書き込み完了
     renderPassController_->InsertUavBarrier("RaytracingPass");

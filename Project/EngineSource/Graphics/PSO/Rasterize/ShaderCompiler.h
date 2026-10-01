@@ -28,6 +28,7 @@ namespace GameEngine {
 		Microsoft::WRL::ComPtr<IDxcBlob> CompileShader(Type type, const std::wstring& path);
 
 		// マテリアルグラフからhlslを生成してコンパイルする
+		// ラスタライズ用のPSと、RayQuery用のマテリアル関数を生成する。RayQuery側は次のフレームで反映される
 		Microsoft::WRL::ComPtr<IDxcBlob> CompileMaterialGraph(const MaterialGraph& graph, const std::wstring& materialName);
 
 	private:
@@ -46,6 +47,8 @@ namespace GameEngine {
 
 		// 生成するファイルパス
 		const std::wstring generatedHlslDirectory_ = L"Resources/Shaders/Material/Generated/";
+		// RayQuery用のマテリアル関数の生成先
+		const std::wstring generatedRayQueryDirectory_ = L"Resources/Shaders/RayQuery/Materials/Generated/";
 
 	private:
 

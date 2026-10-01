@@ -14,13 +14,13 @@ namespace GameEngine {
 	// 前方宣言
 	class PSOManager;
 	class BufferRefManager;
-	class RaytracingPipeline;
+	class RayQueryPipeline;
 
 	class SceneRenderManager {
 	public:
 
 		void Initialize(ID3D12GraphicsCommandList4* commandList, SrvManager* srvManager, PSOManager* psoManager, RenderPassController* renderPassController,
-			RaytracingPipeline* raytracingPipeline, BufferRefManager* bufferRefManager, RenderQueue* renderQueue);
+			RayQueryPipeline* rayQueryPipeline, BufferRefManager* bufferRefManager, RenderQueue* renderQueue);
 
 		// フレーム開始前処理
 		void Begin();
@@ -31,7 +31,7 @@ namespace GameEngine {
 	private:
 		ID3D12GraphicsCommandList4* commandList_ = nullptr;
 		RenderPassController* renderPassController_ = nullptr;
-		RaytracingPipeline* raytracingPipeline_ = nullptr;
+		RayQueryPipeline* rayQueryPipeline_ = nullptr;
 		SrvManager* srvManager_ = nullptr;
 		BufferRefManager* bufferRefManager_ = nullptr;
 		RenderQueue* renderQueue_ = nullptr;
@@ -51,6 +51,10 @@ namespace GameEngine {
 
 		// bufferが存在しているsrvのスタート位置
 		uint32_t bufferStartSrvIndex_ = 0;
+
+		// レイトレーシングの描画サイズ。RaytracingPassのサイズと合わせる
+		static constexpr uint32_t kRaytracingWidth_ = 1280;
+		static constexpr uint32_t kRaytracingHeight_ = 720;
 
 		// レイトレーシングでの最大描画数
 		uint32_t maxRayInstanceNum_ = 200;
@@ -100,8 +104,8 @@ namespace GameEngine {
 		void Execute3dRequest(const Draw3dRequest& request);
 		void Execute2dRequest(const Draw2dRequest& request);
 
-		// レイトレーシングの描画
-		void DrawRaytracing();
+		// RayQueryでのレイトレーシングの描画
+		void DrawRayQuery();
 
 		// ラスタライズの描画コマンドを解放
 		void RasterizeExecute();

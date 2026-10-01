@@ -514,10 +514,8 @@
       <Filter>Externals\imgui</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.cpp" />
-    <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\RayLibShaderCompiler.cpp" />
-    <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\ShaderTableBuilder.cpp" />
-    <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\StateObjectBuilder.cpp" />
-    <ClCompile Include="EngineSource\Graphics\PSO\Core\RaytracingPipeline.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Core\RayQueryPipeline.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Core\RayQueryMaterialRegistry.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\TLAS.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\BufferRefManager.cpp" />
     <ClCompile Include="EngineSource\Graphics\Resources\BufferRefResource.cpp" />
@@ -1069,12 +1067,8 @@
       <Filter>Externals\imgui</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.h" />
-    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\RayLibShaderCompiler.h" />
-    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderRecord.h" />
-    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderTable.h" />
-    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderTableBuilder.h" />
-    <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\StateObjectBuilder.h" />
-    <ClInclude Include="EngineSource\Graphics\PSO\Core\RaytracingPipeline.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Core\RayQueryPipeline.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Core\RayQueryMaterialRegistry.h" />
     <ClInclude Include="EngineSource\Graphics\Core\TLAS.h" />
     <ClInclude Include="EngineSource\Graphics\Core\BufferRefManager.h" />
     <ClInclude Include="EngineSource\Graphics\Resources\BufferRefResource.h" />
@@ -1164,16 +1158,12 @@
     <ClInclude Include="EngineSource\3D\Effects\EffectModule.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />
-    <FxCompile Include="Resources\Shaders\Raytracing\Miss.hlsl" />
-    <FxCompile Include="Resources\Shaders\Raytracing\chsObject.hlsl" />
     <FxCompile Include="Resources\Shaders\CS\Skinning.CS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\LightingComposite.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\DepthCopy.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\Rasterize\WBOITAccumulate.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\WBOITResolve.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\Rasterize\WBOITAccumulate.VS.hlsl" />
-    <FxCompile Include="Resources\Shaders\Raytracing\ChsIceObject.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\OutLine\DepthOutLine.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\Dissolve\Dissolve.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\CS\ParticleUpdate.CS.hlsl" />
@@ -1194,7 +1184,6 @@
     <None Include="Externals\imgui\imgui_bezier_math.inl" />
     <None Include="Externals\imgui\imgui_extra_math.inl" />
     <None Include="Externals\imgui\imgui_node_editor_internal.inl" />
-    <None Include="Resources\Shaders\Raytracing\Common.hlsli" />
     <None Include="Resources\Shaders\Rasterize\WBOIT.hlsli" />
     <None Include="Resources\Shaders\NoiseUtils.hlsli" />
     <None Include="Resources\Shaders\RandomUtils.hlsli" />
