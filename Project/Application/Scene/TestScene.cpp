@@ -61,10 +61,20 @@ TestScene::TestScene() {
 	//gameObjectManager_->AddObject<ParticleBehavior>("HitAfterEffect", 32, textureManager_, effectModel_, &renderQueue_->GetMainCamera());
 	//gpuParticle_ = gameObjectManager_->AddObject<ParticleBehaviorGPU>("GpuParticle", 1024, effectModel_);
 
+	//gameObjectManager_->AddObject<ParticleBehavior>("BossHitStarParticle", 8, textureManager_, effectModel_);
+	//gameObjectManager_->AddObject<ParticleBehavior>("BossHitLineParticle", 32, textureManager_, effectModel_);
+	//gameObjectManager_->AddObject<ParticleBehavior>("BossHitParticle", 32, textureManager_, effectModel_);
+	 
+	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerDownAttackParticle", 128, textureManager_, effectModel_);
+	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerDownTrailParticle", 128, textureManager_, effectModel_);
+	 
+	gameObjectManager_->AddObject<ParticleBehavior>("tParticle", 128, textureManager_, effectModel_);
+
 	// ボスのラッシュ演出
 	auto* waModel = modelManager_->GetNameByModel("rushWave.obj");
 	waModel->SetDefaultIsEnableLight(false);
-	gameObjectManager_->AddObject<ParticleBehavior>("PlayerLandingEffect", 32, textureManager_, waModel);
+	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerLandingEffect", 32, textureManager_, waModel);
+	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerChargeParticle", 32, textureManager_, waModel);
 
 	// 中ポリゴン氷
 	iceMiddleModel_ = modelManager_->GetNameByModel("ice_middlePolygon.gltf");
@@ -95,7 +105,7 @@ TestScene::TestScene() {
 	// 氷のデモ
 	gameObjectManager_->AddObject<IceDemo>("IceDemo", iceMiddleModel_);
 	// 破片のデモ
-	gameObjectManager_->AddObject<FructureDemo>("FructureDemo", inputCommand_, testModel_);
+	//gameObjectManager_->AddObject<FructureDemo>("FructureDemo", inputCommand_, testModel_);
 }
 
 void TestScene::Initialize() {

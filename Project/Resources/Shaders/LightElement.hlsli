@@ -127,7 +127,7 @@ float3 CalculateBRDF(
     float denominator = max(4.0f * NdotV * NdotL, 0.0001f);
     float3 specular = numerator / denominator;
     
-    return (kD * albedo / PI + specular) * lightColor * NdotL;
+    return (kD * albedo + specular * PI) * lightColor * NdotL;
 }
 
 float3 CalculateIBL(float3 albedo, float3 reflectColor, float3 N, float3 V, float metallic, float roughness)

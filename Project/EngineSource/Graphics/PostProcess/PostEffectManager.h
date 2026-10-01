@@ -1,9 +1,10 @@
 #pragma once
+#include "ConstantBuffer.h"
 #include "SrvManager.h"
 #include "PSO/Core/PSOManager.h"
-#include "ConstantBuffer.h"
 #include "RenderPass/RenderPassController.h"
 #include "IPostEffect.h"
+#include "PostEffectData.h"
 
 namespace GameEngine {
 
@@ -69,6 +70,10 @@ namespace GameEngine {
 
 		// psoのリスト
 		std::unordered_map<std::string, DrawPsoData> psoList_;
+
+		// ブルーム
+		Bloom* bloom_ = nullptr;
+
 	private:
 
 		// psoを登録する

@@ -112,6 +112,9 @@ namespace GameEngine {
 		// レイトレの描画コマンドを解放
 		void RaytracingExecute();
 
+		// 2Dのスプライトを描画
+		void Draw2dExecute();
+
 		// レイトレとラスタライズの描画を合成する
 		void LightingComposite();
 

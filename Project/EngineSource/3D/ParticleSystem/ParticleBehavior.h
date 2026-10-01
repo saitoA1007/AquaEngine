@@ -20,10 +20,8 @@ namespace GameEngine{
 	/// パーティクルのシミュレーション空間
 	/// </summary>
 	enum class ParticleSimulationSpace {
-		// ローカル空間：発生後も常に親に追従する（親が動くとパーティクルも一緒に動く）
-		kLocal,
-		// ワールド空間：発生時だけ親の影響を受け、その後は世界に置き去りになる
-		kWorld,
+		kLocal, // ローカル空間：発生後も常に親に追従する
+		kWorld, // ワールド空間：発生時だけ親の影響を受け、その後は世界に置き去りになる
 	};
 
 	class ParticleBehavior : public IGameObject {
@@ -36,6 +34,12 @@ namespace GameEngine{
 
 		// 更新処理
 		void Update() override;
+
+		/// <summary>
+		/// 経過時間を指定して更新する
+		/// </summary>
+		/// <param name="deltaTime">経過時間（秒）</param>
+		void Update(float deltaTime);
 
 		// 描画処理
 		void Draw() override;
@@ -114,6 +118,26 @@ namespace GameEngine{
 
 		bool IsLoop() const { return main_.isLoop; }
 
+		/// <summary>
+		/// ループ時の連続発生を設定する
+		/// </summary>
+		/// <param name="isEmitting"></param>
+		void SetEmitting(bool isEmitting) { isEmitting_ = isEmitting; }
+
+		// 連続発生が有効か
+		bool IsEmitting() const { return isEmitting_; }
+
+		/// <summary>
+		/// 生きているパーティクルが残っているか
+		/// </summary>
+		/// <returns></returns>
+		bool HasAliveParticles() const;
+
+		/// <summary>
+		/// 全てのパーティクルを消去し、発生タイマーをリセットする
+		/// </summary>
+		void Clear();
+
 		// 色を設定
 		void SetColor(Vector4 color) {
 			main_.color = color;
@@ -127,7 +151,7 @@ namespace GameEngine{
 		/// <summary>
 		/// 親を設定する
 		/// </summary>
-		/// <param name="parentMatrix">親のワールド行列（nullptrで親子付けを解除）</param>
+		/// <param name="parentMatrix">親のワールド行列</param>
 		/// <param name="space">
 		/// kLocal : 発生後も常に親に追従する
 		/// kWorld : 発生時の親の姿勢だけを反映し、その後は追従しない
@@ -150,7 +174,7 @@ namespace GameEngine{
 		/// </summary>
 		void SetSimulationSpace(ParticleSimulationSpace space) { simulationSpace_ = space; }
 
-		// 親の行列を取得（未設定ならnullptr）
+		// 親の行列を取得
 		const Matrix4x4* GetParent() const { return parentMatrix_; }
 
 		// 親が設定されているか
@@ -164,6 +188,11 @@ namespace GameEngine{
 
 		// 描画用のトランスフォーム
 		std::unique_ptr<WorldTransforms> worldTransforms_;
+
+		// トレイル描画用のトランスフォーム
+		std::unique_ptr<WorldTransforms> trailTransforms_;
+		// 現在のトレイルの描画数
+		uint32_t trailNumInstance_ = 0;
 
 		// モジュールの管理
 		std::unique_ptr<ModulesControl> modulesControl_;
@@ -185,9 +214,8 @@ namespace GameEngine{
 		// 発生位置
 		Vector3 emitterPos_ = { 0.0f,0.0f,0.0f };
 
-		bool isPlay_ = false;
-		bool isStop_ = false;
-		float playTimer_ = 0.0f;
+		// ループ時に連続発生させるか
+		bool isEmitting_ = true;
 
 		bool isSetEmitPos_ = false;
 
@@ -217,15 +245,20 @@ namespace GameEngine{
 		/// <summary>
 		/// パーティクルの発生管理
 		/// </summary>
-		void Create();
+		void Create(float deltaTime);
 
 		/// <summary>
 		/// 移動処理
 		/// </summary>
-		void Move(const Matrix4x4& cameraMatrix);
+		void Move(const Matrix4x4& cameraMatrix, float deltaTime);
 
 		/// <summary>
-		/// 常に親に追従するか（親があり、かつローカル空間のとき true）
+		/// トレイルの描画データを追加する
+		/// </summary>
+		void AddTrail(const ParticleData& particle, const TrailModule& trailModule, const Matrix4x4& cameraMatrix, bool isRotateVelocity, bool isFollowParent);
+
+		/// <summary>
+		/// 常に親に追従するか
 		/// </summary>
 		bool IsFollowParent() const {
 			return parentMatrix_ != nullptr && simulationSpace_ == ParticleSimulationSpace::kLocal;

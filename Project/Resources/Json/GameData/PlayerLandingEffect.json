@@ -16,6 +16,7 @@
                     0.0,
                     0.0
                 ],
+                "LifeTime": 0.30000001192092896,
                 "Rotate": [
                     1.600000023841858,
                     0.0,
@@ -30,9 +31,13 @@
             "DirectionEmit": {
                 "Enable": false
             },
+            "IsActiveBlendAdd": true,
             "IsBillBoard": false,
             "IsLoop": true,
             "LifeTime": 0.30000001192092896,
+            "LifeTimeEmit": {
+                "Enable": false
+            },
             "RotateEmit": {
                 "Enable": false
             },
@@ -59,16 +64,55 @@
         },
         "Particle": {
             "AlphaOverLifeTime": {
+                "EaseCurve": {
+                    "_EaseCurve": [
+                        {
+                            "inTangent": 1.0,
+                            "mode": "Linear",
+                            "outTangent": 1.0,
+                            "time": 0.0,
+                            "value": 0.0
+                        },
+                        {
+                            "inTangent": 1.0,
+                            "mode": "Linear",
+                            "outTangent": 1.0,
+                            "time": 1.0,
+                            "value": 1.0
+                        }
+                    ]
+                },
                 "Enable": true,
                 "EndAlpha": 0.2800000011920929
             },
             "Attraction": {
                 "Enable": false
             },
+            "ColorOverLifeTime": {
+                "Enable": false
+            },
             "RotationByVelocity": {
                 "Enable": false
             },
             "SizeOverLifeTime": {
+                "EaseCurve": {
+                    "_EaseCurve": [
+                        {
+                            "inTangent": 1.0,
+                            "mode": "Linear",
+                            "outTangent": 1.0,
+                            "time": 0.0,
+                            "value": 0.0
+                        },
+                        {
+                            "inTangent": 1.0,
+                            "mode": "Linear",
+                            "outTangent": 1.0,
+                            "time": 1.0,
+                            "value": 1.0
+                        }
+                    ]
+                },
                 "Enable": true,
                 "EndSize": 3.0,
                 "SeparateAxes": false,

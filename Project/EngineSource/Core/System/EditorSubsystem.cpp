@@ -25,7 +25,9 @@ void EditorSubsystem::Initialize() {
         gridModel,
         resource->GetGameParamEditor(),
         scene->GetStaticObjectManager(),
-        graphics->GetPSOManager());
+        graphics->GetPSOManager(),
+        resource->GetModelManager(),
+        resource->GetEffectsManager());
 }
 
 void EditorSubsystem::Update() {

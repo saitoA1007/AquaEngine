@@ -92,6 +92,9 @@ void BossEnemy::Initialize() {
 	stateCommonData_.isDrawEgg = true;
 
 	// 初期化
+	if (currentState_) {
+		currentState_->Exit();
+	}
 	bossState_ = BossState::kIn;
 	currentState_ = statesTable_[static_cast<size_t>(BossState::kIn)].get();
 	currentState_->Enter();

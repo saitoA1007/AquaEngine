@@ -3,6 +3,7 @@
 #include "GameParamEditor.h"
 #include "ImGuiManager.h"
 #include "TextureManager.h"
+#include "CurveEditor.h"
 
 namespace GameEngine {
 
@@ -220,6 +221,13 @@ namespace GameEngine {
 			if (ImGui::Combo("EaseType", &typeIdx, EaseTypeNames, static_cast<int>(EaseType::kMaxCount))) {
 				value = static_cast<EaseType>(typeIdx);
 				isDirty = true;
+			}
+		}
+
+		void operator()(EaseCurve& value) const {
+			if (ImGui::TreeNode(itemName.c_str())) {
+				if (CurveEditor::Draw(HiddenLabel().c_str(), value)) { isDirty = true; }
+				ImGui::TreePop();
 			}
 		}
 

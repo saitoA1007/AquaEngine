@@ -41,7 +41,6 @@ void SceneRenderManager::Begin() {
 }
 
 void SceneRenderManager::Execute() {
-
     // 更新
     renderQueue_->Update();
 
@@ -51,14 +50,17 @@ void SceneRenderManager::Execute() {
     // ラスタライズ描画コマンドを解放
     RasterizeExecute();
 
-    // 半透明描画
-    RasterizeTranslucentExecute();
-
     // レイトレとラスタライズの描画を合成する
     LightingComposite();
 
+    // 半透明描画
+    RasterizeTranslucentExecute();
+
+    // 2D描画
+    Draw2dExecute();
+
     // 半透明の描画結果を合成する
-    Composite();
+    //Composite();
 
     // 最終的に画面に出すためのパスの設定
     renderPassController_->SetSceneFinalPass(finalPassName_);
@@ -97,6 +99,8 @@ void SceneRenderManager::RegisterPSOs(PSOManager* psoManager) {
         "LightingComposite",
         // 深度コピー用
         "DepthCopy",
+        // カラーコピー
+        "ColorCopy",
 
         // 破片描画用
         "Fracture3D",
@@ -285,8 +289,8 @@ void SceneRenderManager::RasterizeExecute() {
         bool hasOpaque = draw3dQueueList.count(passName) > 0;
         bool hasTranslucent = translucentDrawQueueList.count(passName) > 0;
         if (hasTranslucent && passName == "WBOITAccumulatePass") { hasTranslucent = false; }
-        bool has2d = draw2dQueueList.count(passName) > 0;
-        if (!hasOpaque && !hasTranslucent && !has2d) {
+        //bool has2d = draw2dQueueList.count(passName) > 0;
+        if (!hasOpaque && !hasTranslucent) {
             renderPassController_->PrePass(passName);
             renderPassController_->ClearRenderPass(passName);
             renderPassController_->PostPass(passName);
@@ -343,19 +347,19 @@ void SceneRenderManager::RasterizeExecute() {
         }
 
         // 2D描画コマンドを解放
-        if (has2d) {
-            for (auto& [layer, psoMap] : draw2dQueueList[passName]) {
-                for (auto& [psoName, requests] : psoMap) {
-                    if (requests.empty()) { continue; }
-                    // 描画前処理
-                    PreDraw(psoName);
-                    for (const auto& request : requests) {
-                        // 描画コマンド解放
-                        Execute2dRequest(request);
-                    }
-                }
-            }
-        }
+        //if (has2d) {
+        //    for (auto& [layer, psoMap] : draw2dQueueList[passName]) {
+        //        for (auto& [psoName, requests] : psoMap) {
+        //            if (requests.empty()) { continue; }
+        //            // 描画前処理
+        //            PreDraw(psoName);
+        //            for (const auto& request : requests) {
+        //                // 描画コマンド解放
+        //                Execute2dRequest(request);
+        //            }
+        //        }
+        //    }
+        //}
         renderPassController_->PostPass(passName);
     }
 
@@ -374,35 +378,67 @@ void SceneRenderManager::RasterizeTranslucentExecute() {
 
     bool hasTranslucent = translucentDrawQueueList.count(passName) > 0;
 
-    // 半透明描画コマンドを解放
+    // =========================================
+    // パスの名前を参照はしつつおこなうのはコピーのみ
+
+    std::string drawPassName = "LightingCompositePass";
+
     if (hasTranslucent) {
+
+        // 描画前処理
+        if (enableDrawRaytracing_ && enableDrawRasterize_) {
+            // レイトレとラスタライズ描画
+            renderPassController_->PrePass({ drawPassName }, rasterizeFinalPassName_);
+            renderPassController_->SetOnlyDsvRenderTarget(drawPassName);
+
+            // レイトレの深度値をコピーする
+            CopyRaytracingDepth();
+
+            // 深度値をコピーした状態で再びターゲット
+            renderPassController_->PrePass(drawPassName);
+
+        } else if (enableDrawRaytracing_ && !enableDrawRasterize_) {
+            // レイトレのみ
+            renderPassController_->PrePass(drawPassName);
+            renderPassController_->ClearRenderPass(drawPassName);
+            renderPassController_->SetOnlyDsvRenderTarget(drawPassName);
+
+            // レイトレの深度値をコピーする
+            CopyRaytracingDepth();
+
+            // 深度値をコピーした状態で再びターゲット
+            renderPassController_->PrePass(drawPassName);
+
+            // レイトレのカラーをコピー
+            PreDraw("ColorCopy");
+            commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+            commandList_->SetGraphicsRootDescriptorTable(0, srvManager_->GetGPUHandle(renderPassController_->GetSrvIndex(raytracingFinalPassName_)));
+            commandList_->DrawInstanced(3, 1, 0, 0);
+        } else if (!enableDrawRaytracing_ && enableDrawRasterize_) {
+            // ラスタライズのみ
+            drawPassName = rasterizeFinalPassName_;
+            renderPassController_->PrePass(drawPassName);
+            renderPassController_->ClearRenderPass(drawPassName);
+        }
+
+        // 最終描画パス
+        finalPassName_ = drawPassName;
+
+        // 描画
         auto& translucentList = translucentDrawQueueList[passName];
-
-        std::vector<std::string> passList = { "WBOITAccumulatePass", "WBOITResolvePass" };
-        renderPassController_->PrePass(rasterizeFinalPassName_);
-        renderPassController_->PrePass(passList, rasterizeFinalPassName_);
-
-        renderPassController_->ClearRenderPass(passName);
-        renderPassController_->ClearRenderPass("WBOITResolvePass");
-
         for (const auto& request : translucentList) {
             // 描画前処理
             PreDraw(renderQueue_->Get3dPsoName(request.type));
             // 描画コマンド解放
             Execute3dRequest(request);
         }
-        // リソースの状態を遷移
-        for (const auto& pass : passList) {
-            renderPassController_->PostPass(pass);
-        }
-        renderPassController_->PostPass(rasterizeFinalPassName_);
 
+        // 描画後処理
+        renderPassController_->PostPass(drawPassName);
+
+        // 透明描画の有効
         enableDrawRasterizeTranslucent_ = true;
-    } else {
-        renderPassController_->PrePass(passName);
-        renderPassController_->ClearRenderPass(passName);
-        renderPassController_->PostPass(passName);
-    }
+    } 
 }
 
 void SceneRenderManager::RaytracingExecute() {
@@ -435,6 +471,31 @@ void SceneRenderManager::RaytracingExecute() {
 
     // 最終描画先に設定
     finalPassName_ = raytracingFinalPassName_;
+}
+
+void SceneRenderManager::Draw2dExecute() {
+
+    auto draw2dQueueList = renderQueue_->GetDraw2dQueue();
+    
+    renderPassController_->PrePass(finalPassName_);
+    currentPsoName_.clear();
+    for (const auto& passName : passExecuteOrder_) {
+
+        if (draw2dQueueList.count(passName) == 0) { continue; }
+
+        for (auto& [layer, psoMap] : draw2dQueueList[passName]) {
+            for (auto& [psoName, requests] : psoMap) {
+                if (requests.empty()) { continue; }
+                // 描画前処理
+                PreDraw(psoName);
+                for (const auto& request : requests) {
+                    // 描画コマンド解放
+                    Execute2dRequest(request);
+                }
+            }
+        }
+    }
+    renderPassController_->PostPass(finalPassName_);
 }
 
 void SceneRenderManager::LightingComposite() {

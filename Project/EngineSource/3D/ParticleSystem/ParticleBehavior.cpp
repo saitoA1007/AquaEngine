@@ -2,12 +2,13 @@
 #include "FPSCounter.h"
 #include "MyMath.h"
 #include "ParticleEmitModules.h"
+#include <algorithm>
 using namespace GameEngine;
 
 namespace {
 
     /// <summary>
-    /// 位置に行列を掛ける（平行移動あり）
+    /// 位置に行列を掛ける
     /// </summary>
     Vector3 TransformPosition(const Vector3& v, const Matrix4x4& m) {
         Vector3 result{};
@@ -24,7 +25,7 @@ namespace {
     }
 
     /// <summary>
-    /// 方向ベクトルに行列を掛ける（平行移動なし）
+    /// 方向ベクトルに行列を掛ける
     /// </summary>
     Vector3 TransformDirection(const Vector3& v, const Matrix4x4& m) {
         return {
@@ -96,6 +97,10 @@ void ParticleBehavior::Initialize() {
 }
 
 void ParticleBehavior::Update() {
+    Update(FpsCounter::deltaTime);
+}
+
+void ParticleBehavior::Update(float deltaTime) {
     // 値の適応
     debugParame_->ApplyIfDirty();
 
@@ -108,8 +113,8 @@ void ParticleBehavior::Update() {
     }
 
     // パーティクルの発生を管理する
-    if (main_.isLoop) {
-        Create();
+    if (main_.isLoop && isEmitting_) {
+        Create(deltaTime);
     }
 
     Matrix4x4 cameraMatrix = camera_->GetWorldMatrix();
@@ -117,15 +122,17 @@ void ParticleBehavior::Update() {
         cameraMatrix = renderQueue_->GetDebugCameraWorldMatrix();
     }
     // 移動処理
-    Move(cameraMatrix);
+    Move(cameraMatrix, deltaTime);
 }
 
 void ParticleBehavior::Draw() {
 
-    if (main_.isActiveBlendAdd_) {
-        renderQueue_->SubmitInstancing(model_, currentNumInstance_, *worldTransforms_, 0.0f, BlendMode::kBlendModeAdd, nullptr, "WBOITAccumulatePass");
-    } else {
-        renderQueue_->SubmitInstancing(model_, currentNumInstance_, *worldTransforms_, 0.0f, BlendMode::kBlendModeNormal, nullptr, "WBOITAccumulatePass");
+    BlendMode blendMode = main_.isActiveBlendAdd_ ? BlendMode::kBlendModeAdd : BlendMode::kBlendModeNormal;
+    renderQueue_->SubmitInstancing(model_, currentNumInstance_, *worldTransforms_, 0.0f, blendMode, nullptr, "WBOITAccumulatePass");
+
+    // トレイル
+    if (trailTransforms_ && trailNumInstance_ > 0) {
+        renderQueue_->SubmitInstancing(model_, trailNumInstance_, *trailTransforms_, 0.0f, blendMode, nullptr, "WBOITAccumulatePass");
     }
 }
 
@@ -135,8 +142,28 @@ void ParticleBehavior::Emit(const Vector3& pos) {
     if (!main_.isLoop) {
         spawnTimer_ = main_.spawnCoolTime;
         // 生成する
-        Create();
+        Create(0.0f);
     }
+}
+
+bool ParticleBehavior::HasAliveParticles() const {
+    for (const auto& particle : particles_) {
+        // ParticleData::IsAlive は寿命を過ぎているとtrueになる
+        if (!particle.IsAlive()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void ParticleBehavior::Clear() {
+    // 全パーティクルを非アクティブ化
+    for (auto& particle : particles_) {
+        particle.currentTime = 1.0f;
+    }
+    currentNumInstance_ = 0;
+    trailNumInstance_ = 0;
+    spawnTimer_ = 0.0f;
 }
 
 ParticleData ParticleBehavior::MakeNewParticle() {
@@ -167,10 +194,10 @@ ParticleData ParticleBehavior::MakeNewParticle() {
     return tmpParticleData;
 }
 
-void ParticleBehavior::Create() {
+void ParticleBehavior::Create(float deltaTime) {
 
     // 経過時間を加算
-    spawnTimer_ += FpsCounter::deltaTime;
+    spawnTimer_ += deltaTime;
 
     if (spawnTimer_ >= main_.spawnCoolTime) {
         uint32_t spawnCount = 0;
@@ -189,7 +216,7 @@ void ParticleBehavior::Create() {
     }
 }
 
-void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
+void ParticleBehavior::Move(const Matrix4x4& cameraMatrix, float deltaTime) {
     currentNumInstance_ = 0;
     RotationByVelocityModule* module = modulesControl_->GetModule<RotationByVelocityModule>("RotationByVelocity");
     bool isRotateVelocity = false;
@@ -197,8 +224,18 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
         isRotateVelocity = true;
     }
 
-    // 常に親に追従するか（ローカル空間のときのみ毎フレーム親行列を掛ける）
+    // 常に親に追従するか
     const bool isFollowParent = IsFollowParent();
+
+    // トレイル
+    trailNumInstance_ = 0;
+    const TrailModule* trailModule = modulesControl_->GetModule<TrailModule>("Trail");
+    if (trailModule != nullptr && !trailTransforms_) {
+        // 初めて有効になった時に確保する
+        trailTransforms_ = std::make_unique<WorldTransforms>();
+        Transform defaultTransform = { {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
+        trailTransforms_->Initialize(maxNumInstance_ * kMaxTrailLength, defaultTransform);
+    }
 
     for (uint32_t i = 0; i < maxNumInstance_; ++i) {
         ParticleData& particle = particles_[i];
@@ -209,20 +246,18 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
         }
 
         // 更新
-        modulesControl_->ParticleUpdate(particle, FpsCounter::deltaTime);
+        modulesControl_->ParticleUpdate(particle, deltaTime);
 
         // 経過時間を加算
-        particle.currentTime += FpsCounter::deltaTime / particle.lifeTime;
+        particle.currentTime += deltaTime / particle.lifeTime;
         // 速度を追加
-        particle.transform.translate += particle.velocity * FpsCounter::deltaTime;
+        particle.transform.translate += particle.velocity * deltaTime;
         // 回転速度
-        particle.transform.rotate += particle.rotateVelocity * FpsCounter::deltaTime;
+        particle.transform.rotate += particle.rotateVelocity * deltaTime;
 
         // worldTransformsの更新
         if (main_.isBillBoard) {
 
-            // ビルボードは親の回転を掛けてしまうとカメラを向かなくなるので
-           // 「位置（と進行方向）だけ」を親空間からワールドへ変換して使う
             Vector3 worldPos = particle.transform.translate;
             Vector3 worldVelocity = particle.velocity;
             if (isFollowParent) {
@@ -251,16 +286,59 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix) {
             } else {
                 worldTransforms_->transformDatas_[currentNumInstance_].transform = particle.transform;
             }
-            //worldTransforms_->transformDatas_[currentNumInstance_].transform = particle.transform;
         }
 
         worldTransforms_->transformDatas_[currentNumInstance_].color = particle.color;
         worldTransforms_->transformDatas_[currentNumInstance_].textureHandle = particle.textureHandle;
         currentNumInstance_++;
+
+        // トレイルを追加
+        if (trailModule != nullptr) {
+            AddTrail(particle, *trailModule, cameraMatrix, isRotateVelocity, isFollowParent);
+        }
     }
 
     // 行列の更新処理
     if (!main_.isBillBoard && !isFollowParent) {
         worldTransforms_->UpdateTransformMatrix(currentNumInstance_);
+    }
+}
+
+void ParticleBehavior::AddTrail(const ParticleData& particle, const TrailModule& trailModule, const Matrix4x4& cameraMatrix, bool isRotateVelocity, bool isFollowParent) {
+
+    const uint32_t count = (std::min)(particle.trailCount, trailModule.GetTrailLength());
+
+    for (uint32_t index = 0; index < count; ++index) {
+        WorldTransforms::TransformData& data = trailTransforms_->transformDatas_[trailNumInstance_];
+
+        const Vector3& position = particle.GetTrailPosition(index);
+        Vector3 scale{};
+        Vector4 color{};
+        trailModule.CalcTrailPoint(particle, index, scale, color);
+
+        // パーティクル本体と同じ方法で行列を作る
+        if (main_.isBillBoard) {
+            if (isRotateVelocity) {
+                data.worldMatrix = Math::MakeDirectionalBillboardMatrix(scale, position, cameraMatrix, camera_->GetViewMatrix(), particle.velocity, particle.transform.rotate.z);
+            } else {
+                data.worldMatrix = Math::MakeBillboardMatrix(scale, position, particle.transform.rotate.z, cameraMatrix);
+            }
+
+            // ペアレント
+            if (parentMatrix_ != nullptr) {
+                data.worldMatrix *= *parentMatrix_;
+            }
+        } else {
+            if (isFollowParent) {
+                data.worldMatrix = Math::MakeAffineMatrix(scale, particle.transform.rotate, position) * (*parentMatrix_);
+            } else {
+                data.worldMatrix = Math::MakeWorldMatrixFromEulerRotation(position, particle.transform.rotate, scale);
+            }
+        }
+
+        data.transform = { scale, particle.transform.rotate, position };
+        data.color = color;
+        data.textureHandle = particle.textureHandle;
+        trailNumInstance_++;
     }
 }

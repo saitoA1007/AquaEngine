@@ -25,6 +25,10 @@ void ResourceSubsystem::Initialize() {
 	gameParamEditor_ = std::make_unique<GameParamEditor>();
 	DebugParameter::StaticInitialize(gameParamEditor_.get());
 
+	// エフェクトの管理
+	effectsManager_ = std::make_unique<EffectsManager>(textureManager_.get(), modelManager_.get());
+
+
 	// 全てのリソースをロードする
 	LoadAllResources();
 }
@@ -63,6 +67,9 @@ void ResourceSubsystem::LoadAllResources() {
 
 	// 音声データを全てロードする
 	AudioManager::GetInstance().LoadAllAudio();
+
+	// エフェクトデータを全てロードする
+	effectsManager_->Initialize();
 }
 
 void ResourceSubsystem::Finalize() {

@@ -43,12 +43,6 @@ public:
 	void Draw() override;
 
 	/// <summary>
-	/// 終了したことを伝える
-	/// </summary>
-	/// <returns></returns>
-	bool IsFinished() override { return isFinished_; };
-
-	/// <summary>
 	/// 次のシーン遷移する場面の名前を取得
 	/// </summary>
 	/// <returns></returns>
@@ -61,9 +55,6 @@ public:
 	std::unique_ptr<ITransitionEffect> GetTransitionEffect() override { return std::make_unique<Fade>(); }
 
 private: // シーン機能
-
-	// 終了フラグ
-	bool isFinished_ = false;
 
 	// メインカメラ
 	std::unique_ptr<GameEngine::Camera> mainCamera_;

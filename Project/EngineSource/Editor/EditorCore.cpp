@@ -24,6 +24,7 @@
 #include "Windows/PerformanceWindow.h"
 #include "Windows/MaterialNodeWindow.h"
 #include "Windows/PixWindow.h"
+#include "Windows/EffectEditorWindow.h"
 
 using namespace GameEngine;
 
@@ -32,7 +33,8 @@ EditorCore::~EditorCore() {}
 
 void EditorCore::Initialize(TextureManager* textureManager, SceneChangeRequest* sceneChangeRequest, RenderPassController* renderPassController,
 	Input* input, RenderQueue* renderQueue, DebugRenderer* debugRenderer, Model* gridModel, GameParamEditor* gameParamEditor,
-	StaticGameObjectManager* staticObjectManager, PSOManager* psoManager) {
+	StaticGameObjectManager* staticObjectManager, PSOManager* psoManager, ModelManager* modelManager,
+	EffectsManager* effectsManager) {
 	windowManager_ = std::make_unique<EditorWindowManager>();
 	menuBar_ = std::make_unique<EditorMenuBar>();
 	editorLayout_ = std::make_unique<EditorLayout>();
@@ -50,6 +52,7 @@ void EditorCore::Initialize(TextureManager* textureManager, SceneChangeRequest* 
 	windowManager_->RegisterWindow(std::make_unique<PerformanceWindow>());
 	windowManager_->RegisterWindow(std::make_unique<MaterialNodeWindow>(psoManager));
 	windowManager_->RegisterWindow(std::make_unique<PixWindow>());
+	windowManager_->RegisterWindow(std::make_unique<EffectEditorWindow>(textureManager, modelManager, gameParamEditor, effectsManager));
 
 	// レイアウトのデータを取得する
 	editorLayout_->LoadLayout(windowManager_->GetWindows());

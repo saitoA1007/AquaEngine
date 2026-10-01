@@ -27,6 +27,7 @@ ModulesControl::ModulesControl(DebugParameter* param) {
     RegisterModule<AttractionModule>(mainGroup, "Attraction");
     RegisterModule<VortexModule>(mainGroup, "Vortex");
     RegisterModule<RotationByVelocityModule>(mainGroup, "RotationByVelocity");
+    RegisterModule<TrailModule>(mainGroup, "Trail");
 }
 
 void ModulesControl::Update() {

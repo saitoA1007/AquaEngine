@@ -7,6 +7,7 @@
 #include "ModelManager.h"
 #include "AnimationManager.h"
 #include "GameObjectManager.h"
+#include "EffectsManager.h"
 #include "RenderQueue.h"
 #include "RenderPass/RenderPassController.h"
 #include "DebugRenderer.h"
@@ -27,11 +28,12 @@ namespace GameEngine {
 
 		// リソース管理機能を取得
 		static void SetResourceManager(TextureManager* textureManager,ModelManager* modelManager,
-			AnimationManager* animationManager, GameObjectManager* gameObjectManager) {
+			AnimationManager* animationManager, GameObjectManager* gameObjectManager, EffectsManager* effectsManager) {
 			textureManager_ = textureManager;
 			modelManager_ = modelManager;
 			animationManager_ = animationManager;
 			gameObjectManager_ = gameObjectManager;
+			effectsManager_ = effectsManager;
 		}
 
 		// 描画機能を取得
@@ -75,7 +77,9 @@ namespace GameEngine {
 		/// 終了したことを伝える
 		/// </summary>
 		/// <returns></returns>
-		virtual bool IsFinished() = 0;
+		bool IsFinished() {
+			return isFinished_;
+		};
 
 		/// <summary>
 		/// 次のシーン遷移する場面の名前を取得
@@ -87,6 +91,9 @@ namespace GameEngine {
 		virtual std::unique_ptr<ITransitionEffect> GetTransitionEffect() = 0;
 
 	protected:
+		// 終了処理
+		bool isFinished_ = false;
+
 		static Input* input_; // 純粋な入力処理を取得
 		static InputCommand* inputCommand_; // 登録した入力処理を取得可能
 
@@ -94,6 +101,7 @@ namespace GameEngine {
 		static ModelManager* modelManager_; // モデルを取得可能
 		static AnimationManager* animationManager_; // アニメーションデータを取得可能
 		static GameObjectManager* gameObjectManager_; // ゲームオブジェクト監理
+		static EffectsManager* effectsManager_; // エフェクトの管理
 
 		static RenderPassController* renderPassController_; // 描画パスを管理する
 		static RenderQueue* renderQueue_; // 描画コマンドを管理
