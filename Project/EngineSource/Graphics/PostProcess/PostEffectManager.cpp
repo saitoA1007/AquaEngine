@@ -1,6 +1,5 @@
 #include "PostEffectManager.h"
 #include "LogManager.h"
-#include "PostEffectData.h"
 using namespace GameEngine;
 
 void PostEffectManager::Initialize(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager, PSOManager* psoManager, RenderPassController* renderPassController) {
@@ -36,12 +35,15 @@ void PostEffectManager::Initialize(ID3D12GraphicsCommandList* commandList, SrvMa
     AddPostEffect<HighLumMask>("HighLumMaskPass", "HighLumMask");
     AddPostEffect<GaussVertical>("GaussVerticalPass", "GaussVertical");
     AddPostEffect<GaussHorizontal>("GaussHorizontalPass", "GaussHorizontal");
-    auto* bloom = AddPostEffect<Bloom>("BloomPass", "Bloom");
-    bloom->SetGamePassIndex(renderPassController_->GetSrvIndex(renderPassController_->GetSceneFinalPass()));
+    bloom_ = AddPostEffect<Bloom>("BloomPass", "Bloom");
+    bloom_->SetGamePassIndex(renderPassController_->GetSrvIndex(renderPassController_->GetSceneFinalPass()));
     AddPostEffect<Dissolve>("DissolvePass", "Dissolve");
 }
 
 void PostEffectManager::Execute() {
+
+    // ブルームを載せる最終パス
+    bloom_->SetGamePassIndex(renderPassController_->GetSrvIndex(renderPassController_->GetSceneFinalPass()));
 
     for (uint32_t i = 0; i < passExecuteOrder_.size(); ++i) {
         // 設定する

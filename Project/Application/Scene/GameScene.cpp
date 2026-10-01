@@ -96,6 +96,10 @@ GameScene::GameScene() {
 	// シーンフェーズを管理
 	gameObjectManager_->AddObject<GamePhaseManager>(inputCommand_, player, bossEnemy, titleUIManager, playUIManager, gameOverUIManager, clearUIManager,
 		pauseUIManager, cameraController_, dissolve);
+
+	// ライトを設定
+	auto* light = renderQueue_->GetLightManager();
+	light->directionalLight_->directionalLightData_.intensity = 0.9f;
 }
 
 void GameScene::Initialize() {
