@@ -11,6 +11,10 @@ void ResourceSubsystem::Initialize() {
 	textureManager_ = std::make_unique<TextureManager>();
 	textureManager_->Initialize(cmdList, srvManager);
 
+	// フォントの初期化
+	fontManager_ = std::make_unique<FontManager>();
+	fontManager_->Initialize(cmdList);
+
 	// モデルを管理するクラスを生成
 	modelManager_ = std::make_unique<ModelManager>();
 	modelManager_->Initialize(cmdList, textureManager_.get(), srvManager);
@@ -40,6 +44,9 @@ void ResourceSubsystem::LoadAllResources() {
 
 	// 画像データを全てロードする
 	textureManager_->LoadAllTexture();
+
+	// フォントデータを全てロードする
+	fontManager_->LoadAllFont();
 
 	// モデルデータを全てロードする
 	modelManager_->RegisterGridPlaneModel("Grid", { 200.0f, 200.0f });
@@ -74,6 +81,7 @@ void ResourceSubsystem::LoadAllResources() {
 
 void ResourceSubsystem::Finalize() {
 	AudioManager::GetInstance().Finalize();
+	fontManager_->Finalize();
 	textureManager_->Finalize();
 }
 

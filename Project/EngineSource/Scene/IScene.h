@@ -4,6 +4,7 @@
 #include "Input.h"
 #include "InputCommand.h"
 #include "TextureManager.h"
+#include "FontManager.h"
 #include "ModelManager.h"
 #include "AnimationManager.h"
 #include "GameObjectManager.h"
@@ -28,12 +29,13 @@ namespace GameEngine {
 
 		// リソース管理機能を取得
 		static void SetResourceManager(TextureManager* textureManager,ModelManager* modelManager,
-			AnimationManager* animationManager, GameObjectManager* gameObjectManager, EffectsManager* effectsManager) {
+			AnimationManager* animationManager, GameObjectManager* gameObjectManager, EffectsManager* effectsManager, FontManager* fontManager) {
 			textureManager_ = textureManager;
 			modelManager_ = modelManager;
 			animationManager_ = animationManager;
 			gameObjectManager_ = gameObjectManager;
 			effectsManager_ = effectsManager;
+			fontManager_ = fontManager;
 		}
 
 		// 描画機能を取得
@@ -98,6 +100,7 @@ namespace GameEngine {
 		static InputCommand* inputCommand_; // 登録した入力処理を取得可能
 
 		static TextureManager* textureManager_; // 画像を取得可能
+		static FontManager* fontManager_; // フォントを取得可能
 		static ModelManager* modelManager_; // モデルを取得可能
 		static AnimationManager* animationManager_; // アニメーションデータを取得可能
 		static GameObjectManager* gameObjectManager_; // ゲームオブジェクト監理

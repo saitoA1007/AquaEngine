@@ -109,6 +109,8 @@ TestScene::TestScene() {
 	gameObjectManager_->AddObject<IceDemo>("IceDemo", iceMiddleModel_);
 	// 破片のデモ
 	//gameObjectManager_->AddObject<FructureDemo>("FructureDemo", inputCommand_, testModel_);
+
+	text_ = std::make_unique<Text>(fontManager_->GetFont("源直ゴシック EMG 2 - Medium"), "こんにちは");
 }
 
 void TestScene::Initialize() {
@@ -131,6 +133,8 @@ void TestScene::Update() {
 	// アニメーションの更新処理
 	walkAnimator_->ComputeUpdate();
 
+	text_->Update();
+
 	DebugUpdate();
 }
 
@@ -147,6 +151,12 @@ void TestScene::DebugUpdate() {
 	ImGui::DragFloat3("lightDir", &dir_.x, 0.1f);
 	ImGui::DragFloat("lightIntensity", &intensity_, 0.1f);
 	ImGui::ColorEdit4("lightColor", &lightColor_.x);
+
+	ImGui::DragFloat2("tPos", &text_->position_.x, 0.1f);
+	ImGui::DragFloat2("tScale", &text_->scale_.x, 0.1f);
+	ImGui::DragFloat("tRot", &text_->rotate_, 0.1f);
+	ImGui::DragFloat2("tAnchor", &text_->anchorPoint_.x, 0.1f);
+	ImGui::ColorEdit4("tColor", &text_->color_.x);
 
 	dir_.Normalize();
 
@@ -191,6 +201,8 @@ void TestScene::Draw() {
 
 	// 地面を描画
 	renderQueue_->SubmitRaytracingModel(terrainModel_, terrainWorld_);
+
+	renderQueue_->SubmitText(text_.get());
 
 	// 破片を1つに集約していない
 	//renderQueue_->SubmitModel(noFractureModel_, noFractureWorld_);

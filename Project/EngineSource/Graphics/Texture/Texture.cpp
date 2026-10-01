@@ -13,7 +13,7 @@ Texture::~Texture() {
 	}
 }
 
-void Texture::Create(const std::string& filePath, ID3D12GraphicsCommandList* cmdList) {
+void Texture::Create(const std::string& filePath, ID3D12GraphicsCommandList* cmdList, bool isSRGB) {
 	// テクスチャ名を記録
 	fileName_ = filePath;
 
@@ -23,7 +23,7 @@ void Texture::Create(const std::string& filePath, ID3D12GraphicsCommandList* cmd
 	/// ファイルから画像データを読み込む
 
 	// テクスチャを読み込む
-	mipImage_ = TextureLoader::LoadFromFile(fileName_);
+	mipImage_ = TextureLoader::LoadFromFile(fileName_, isSRGB);
 	if (!mipImage_.GetImages()) {
 		LogManager::GetInstance().Log("Failed to load texture: " + fileName_);
 		assert(false);

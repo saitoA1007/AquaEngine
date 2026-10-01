@@ -16,9 +16,10 @@ namespace GameEngine {
 		/// ファイルから画像を読み込んでミップマップを生成する
 		/// </summary>
 		/// <param name="filePath">ファイルパス</param>
+		/// <param name="isSRGB">sRGBとして読み込むか</param>
 		/// <returns>読み込んだ画像データ</returns>
 		[[nodiscard]]
-		static DirectX::ScratchImage LoadFromFile(const std::string& filePath);
+		static DirectX::ScratchImage LoadFromFile(const std::string& filePath, bool isSRGB = true);
 
 		/// <summary>
 		/// メタデータにより、DirectX12のテクスチャリソースを作成する

@@ -13,6 +13,7 @@
 #include "IceMaterial.h"
 #include "Collider.h"
 #include "DestructibleObject.h"
+#include "Text.h"
 
 #include "Application/Scene/Transition/Fade.h"
 
@@ -75,6 +76,9 @@ private: // シーン機能
 	Vector4 lightColor_ = { 1.0f,1.0f,1.0f,1.0f };
 
 	Vector4 playerColor_ = { 1.0f,1.0f,1.0f,1.0f };
+
+	// テキストのテスト
+	std::unique_ptr<GameEngine::Text> text_;
 
 	// 氷で共通のマテリアル
 	GameEngine::IceMaterial iceMaterial_;

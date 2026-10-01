@@ -180,7 +180,16 @@
     <ClCompile Include="EngineSource\2D\ImGuiManager.cpp">
       <Filter>EngineSource\2D</Filter>
     </ClCompile>
+    <ClCompile Include="EngineSource\2D\Font.cpp">
+      <Filter>EngineSource\2D</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\2D\FontManager.cpp">
+      <Filter>EngineSource\2D</Filter>
+    </ClCompile>
     <ClCompile Include="EngineSource\2D\Sprite.cpp">
+      <Filter>EngineSource\2D</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\2D\Text.cpp">
       <Filter>EngineSource\2D</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\2D\SpriteRenderer.cpp">
@@ -603,7 +612,16 @@
     <ClInclude Include="EngineSource\2D\ImGuiManager.h">
       <Filter>EngineSource\2D</Filter>
     </ClInclude>
+    <ClInclude Include="EngineSource\2D\Font.h">
+      <Filter>EngineSource\2D</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\2D\FontManager.h">
+      <Filter>EngineSource\2D</Filter>
+    </ClInclude>
     <ClInclude Include="EngineSource\2D\Sprite.h">
+      <Filter>EngineSource\2D</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\2D\Text.h">
       <Filter>EngineSource\2D</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\2D\SpriteRenderer.h">

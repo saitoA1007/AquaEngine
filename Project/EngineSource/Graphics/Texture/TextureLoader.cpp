@@ -4,7 +4,7 @@
 using namespace GameEngine;
 
 [[nodiscard]]
-DirectX::ScratchImage TextureLoader::LoadFromFile(const std::string& filePath) {
+DirectX::ScratchImage TextureLoader::LoadFromFile(const std::string& filePath, bool isSRGB) {
 	// テクスチャファイルを読み込んでプログラムを扱えるようにする
 	DirectX::ScratchImage image{};
 	std::wstring filePathW = ConvertString(filePath);
@@ -13,7 +13,9 @@ DirectX::ScratchImage TextureLoader::LoadFromFile(const std::string& filePath) {
 		// .ddsの場合
 		hr = DirectX::LoadFromDDSFile(filePathW.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, image);
 	} else {
-		hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
+		// データテクスチャはガンマ補正をかけずにそのまま読み込む
+		DirectX::WIC_FLAGS wicFlags = isSRGB ? DirectX::WIC_FLAGS_FORCE_SRGB : DirectX::WIC_FLAGS_IGNORE_SRGB;
+		hr = DirectX::LoadFromWICFile(filePathW.c_str(), wicFlags, nullptr, image);
 	}
 	assert(SUCCEEDED(hr));
 
@@ -24,7 +26,7 @@ DirectX::ScratchImage TextureLoader::LoadFromFile(const std::string& filePath) {
 		// 圧縮フォーマットならそのまま使用する
 		mipImages = std::move(image);
 	} else {
-		hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_SRGB, 0, mipImages);
+		hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), isSRGB ? DirectX::TEX_FILTER_SRGB : DirectX::TEX_FILTER_DEFAULT, 0, mipImages);
 	}
 	assert(SUCCEEDED(hr));
 

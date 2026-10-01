@@ -3,6 +3,7 @@
 #include "EngineContext.h"
 
 #include "TextureManager.h"
+#include "FontManager.h"
 #include "ModelManager.h"
 #include "AnimationManager.h"
 #include "AudioManager.h"
@@ -25,6 +26,7 @@ namespace GameEngine {
         void LoadAllResources();
 
         TextureManager* GetTextureManager()   const { return textureManager_.get(); }
+        FontManager* GetFontManager()         const { return fontManager_.get(); }
         ModelManager* GetModelManager()     const { return modelManager_.get(); }
         AnimationManager* GetAnimationManager() const { return animationManager_.get(); }
         GameParamEditor* GetGameParamEditor() const { return gameParamEditor_.get(); }
@@ -34,6 +36,8 @@ namespace GameEngine {
 
         // 画像データ管理
         std::unique_ptr<TextureManager> textureManager_;
+        // フォントデータ管理
+        std::unique_ptr<FontManager> fontManager_;
         // モデルデータ管理
         std::unique_ptr<ModelManager> modelManager_;
         // アニメーションデータ管理

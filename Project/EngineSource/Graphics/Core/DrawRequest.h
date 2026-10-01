@@ -5,6 +5,7 @@ namespace GameEngine {
 
     class Model;
     class Sprite;
+    class Text;
     class WorldTransform;
     class WorldTransforms;
     class GpuResource;
@@ -45,6 +46,7 @@ namespace GameEngine {
     enum class Draw2dType {
         Normal,
         Add,
+        Text,
     };
 
     // 描画に使用するリソース
@@ -79,6 +81,7 @@ namespace GameEngine {
         std::string passName = "DefaultPass";
 
         const Sprite* sprite = nullptr;
+        const Text* text = nullptr;
     };
 }
 

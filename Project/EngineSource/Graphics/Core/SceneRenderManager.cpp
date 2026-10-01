@@ -88,6 +88,9 @@ void SceneRenderManager::RegisterPSOs(PSOManager* psoManager) {
         "DefaultSprite",
         "AdditiveSprite",
 
+        // テキスト描画用
+        "Text",
+
         // 半透明描画用
         "wboit3D",
         "wboitResolve",
@@ -237,6 +240,10 @@ void SceneRenderManager::Execute2dRequest(const Draw2dRequest& request) {
 
     case Draw2dType::Add:
         SpriteRenderer::Draw(request.sprite);
+        break;
+
+    case Draw2dType::Text:
+        SpriteRenderer::Draw(request.text);
         break;
 
     default:

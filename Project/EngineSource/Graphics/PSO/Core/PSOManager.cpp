@@ -470,6 +470,26 @@ void PSOManager::DefaultLoadPSO() {
     instancing3D.depthMask = D3D12_DEPTH_WRITE_MASK::D3D12_DEPTH_WRITE_MASK_ZERO; // 書き込みだけ無効化
     RegisterPSO("AdditiveInstancing3D", instancing3D, &instancingRootSigBuilder, &inputLayoutBuilder);
 
+    // テキスト描画用PSO
+    CreatePSOData text;
+    text.rootSigName = "Text";
+    text.vsPath = L"Resources/Shaders/Rasterize/Text.VS.hlsl";
+    text.psPath = L"Resources/Shaders/Rasterize/Text.PS.hlsl";
+    text.drawMode = DrawModel::None;
+    text.blendMode = { BlendMode::kBlendModeNormalAndSaveObjectAlpha };
+    text.isDepthEnable = false;
+    RootSignatureBuilder TextRootSigBuilder;
+    TextRootSigBuilder.Initialize(device_);
+    TextRootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_ALL); // テキストの定数
+    TextRootSigBuilder.AddSRVDescriptorTable(0, 1, 0, D3D12_SHADER_VISIBILITY_VERTEX); // 文字データ
+    TextRootSigBuilder.AddSRVDescriptorTable(0, static_cast<uint32_t>(SrvHeapTypeCount::TextureMaxCount), 0, D3D12_SHADER_VISIBILITY_PIXEL); // フォントアトラス
+    TextRootSigBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_CLAMP, D3D12_SHADER_VISIBILITY_PIXEL);
+    TextRootSigBuilder.CreateRootSignature();
+    // 頂点はVSで生成するので入力は無し
+    InputLayoutBuilder textInput;
+    textInput.CreateNone();
+    RegisterPSO("Text", text, &TextRootSigBuilder, &textInput);
+
     // グリッド描画用のPSO
     CreatePSOData grid;
     grid.rootSigName = "Grid";

@@ -21,3 +21,15 @@ void SpriteRenderer::Draw(const Sprite* sprite) {
 	// 描画
 	commandList_->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
+
+void SpriteRenderer::Draw(const Text* text) {
+	if (text->GetGlyphCount() == 0) { return; }
+
+	// 頂点はVSでSV_VertexIDから生成するので頂点バッファは使わない
+	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList_->SetGraphicsRootConstantBufferView(0, text->GetResource()->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootDescriptorTable(1, text->GetGlyphSrvHandle());
+	commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+	// 描画
+	commandList_->DrawInstanced(6, text->GetGlyphCount(), 0, 0);
+}

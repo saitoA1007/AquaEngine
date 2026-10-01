@@ -4,6 +4,7 @@
 
 #include "SrvManager.h"
 #include "Sprite.h"
+#include "Text.h"
 
 namespace GameEngine {
 
@@ -20,11 +21,17 @@ namespace GameEngine {
 		static void StaticInitialize(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager);
 
 		/// <summary>
-		/// 描画処理
+		/// スプライトの描画処理
 		/// </summary>
 		/// <param name="sprite"></param>
 		/// <param name="textureHandle"></param>
 		static void Draw(const Sprite* sprite);
+
+		/// <summary>
+		/// テキストの描画処理
+		/// </summary>
+		/// <param name="text"></param>
+		static void Draw(const Text* text);
 
 	private:
 

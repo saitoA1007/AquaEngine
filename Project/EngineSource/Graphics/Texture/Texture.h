@@ -15,7 +15,7 @@ namespace GameEngine {
         ~Texture();
 
         // テクスチャの作成
-        void Create(const std::string& filePath, ID3D12GraphicsCommandList* cmdList);
+        void Create(const std::string& filePath, ID3D12GraphicsCommandList* cmdList, bool isSRGB = true);
        
         // ゲッター
         uint32_t GetSrvIndex() const { return srvIndex_; }

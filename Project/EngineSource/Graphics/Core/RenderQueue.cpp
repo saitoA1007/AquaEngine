@@ -79,6 +79,16 @@ void RenderQueue::SubmitSprite(const Sprite* sprite, const std::string& passName
     draw2dQueueList_[passName][request.layer][Get2dPsoName(request.type)].push_back(request);
 }
 
+void RenderQueue::SubmitText(const Text* text, const std::string& passName) {
+
+    Draw2dRequest request;
+    request.type = Draw2dType::Text;
+    request.layer = RenderLayer::Sprite;
+    request.text = text;
+    // 登録
+    draw2dQueueList_[passName][request.layer][Get2dPsoName(request.type)].push_back(request);
+}
+
 void RenderQueue::SubmitModel(const Model* model, WorldTransform& worldTransform, const float& alpha, const GpuResource* material, const std::string& passName) {
     Draw3dRequest request;
     request.type = Draw3dType::Default;
@@ -460,6 +470,7 @@ const char* RenderQueue::Get2dPsoName(Draw2dType type) {
     {
     case GameEngine::Draw2dType::Normal: { return "DefaultSprite"; }
     case GameEngine::Draw2dType::Add: { return "AdditiveSprite"; }
+    case GameEngine::Draw2dType::Text: { return "Text"; }
     default: { return "DefaultSprite"; }
     }
 }
