@@ -117,6 +117,34 @@ void VortexModule::Update(ParticleData& particleData, float time) {
 }
 
 //==================================================
+// 重力場モジュール
+//==================================================
+
+void GravityFieldModule::Update(ParticleData& particleData, float time) {
+	// 方向が設定されていない時は何もしない
+	if (direction_.LengthSquared() <= 0.0001f) {
+		return;
+	}
+
+	// 強さがマイナスなら逆方向に働かせる
+	Vector3 direction = direction_.Normalize();
+	if (strength_ < 0.0f) {
+		direction = direction * -1.0f;
+	}
+
+	// 重力方向に加速させる
+	particleData.velocity += direction * std::fabs(strength_) * time;
+
+	// 重力方向の速度を上限で抑える
+	if (maxSpeed_ > 0.0f) {
+		float speed = Math::Dot(particleData.velocity, direction);
+		if (speed > maxSpeed_) {
+			particleData.velocity -= direction * (speed - maxSpeed_);
+		}
+	}
+}
+
+//==================================================
 // 速度方向に回転させるモジュール
 //==================================================
 

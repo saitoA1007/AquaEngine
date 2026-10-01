@@ -38,7 +38,7 @@ namespace GameEngine{
 		/// <summary>
 		/// 経過時間を指定して更新する
 		/// </summary>
-		/// <param name="deltaTime">経過時間（秒）</param>
+		/// <param name="deltaTime">経過時間</param>
 		void Update(float deltaTime);
 
 		// 描画処理
@@ -81,6 +81,13 @@ namespace GameEngine{
 
 			if (auto* Vortex = modulesControl_->GetModule<VortexModule>("Vortex")) {
 				Vortex->SetCenterPosition(targetPos);
+			}
+		}
+
+		// 重力場の方向を設定
+		void SetGravityFieldDirection(const Vector3& direction) {
+			if (auto* gravityField = modulesControl_->GetModule<GravityFieldModule>("GravityField")) {
+				gravityField->SetDirection(direction);
 			}
 		}
 

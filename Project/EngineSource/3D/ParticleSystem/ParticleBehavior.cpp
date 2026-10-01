@@ -174,18 +174,19 @@ ParticleData ParticleBehavior::MakeNewParticle() {
     tmpParticleData.transform.rotate = main_.rotate;
     tmpParticleData.velocity = { 0.0f,0.0f,0.0f };
     tmpParticleData.color = main_.color;
-    tmpParticleData.startColor = tmpParticleData.color;
-    tmpParticleData.startSize =  main_.scale;
-    tmpParticleData.startSpeed = tmpParticleData.velocity;
     tmpParticleData.rotateVelocity = { 0.0f,0.0f,0.0f };
     tmpParticleData.dir = { 0.0f,0.0f,0.0f };
-
     // 生存時間
     tmpParticleData.currentTime = 0.0f;
     tmpParticleData.lifeTime = main_.lifeTime;
 
     // モジュールを適応
     modulesControl_->ParticleCreate(tmpParticleData);
+
+    // 初期値を取得する
+    tmpParticleData.startColor = tmpParticleData.color;
+    tmpParticleData.startSize = tmpParticleData.transform.scale;
+    tmpParticleData.startSpeed = tmpParticleData.velocity;
 
     if (isSetEmitPos_) {
         tmpParticleData.transform.translate += emitterPos_;

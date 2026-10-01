@@ -28,6 +28,7 @@ ModulesControl::ModulesControl(DebugParameter* param) {
     RegisterModule<VortexModule>(mainGroup, "Vortex");
     RegisterModule<RotationByVelocityModule>(mainGroup, "RotationByVelocity");
     RegisterModule<TrailModule>(mainGroup, "Trail");
+    RegisterModule<GravityFieldModule>(mainGroup, "GravityField");
 }
 
 void ModulesControl::Update() {
