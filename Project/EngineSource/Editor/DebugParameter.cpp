@@ -1,6 +1,7 @@
 #include "DebugParameter.h"
 #include "WorldTransform.h"
 #include "Sprite.h"
+#include "Text.h"
 using namespace GameEngine;
 
 GameParamEditor* DebugParameter::gameParamEditor_ = nullptr;
@@ -39,6 +40,23 @@ void DebugParameter::RegisterSprite(const std::string& spriteName, Sprite& sprit
     Register("MeshSize", sprite.size_, index++, path);
     Register("AnchorPoint", sprite.anchorPoint_, index++, path);
     Register("Color", sprite.color_, index++, path);
+}
+
+void DebugParameter::RegisterText(const std::string& textName, Text& text, const std::string subGroupName) {
+    std::string name = textName + "Text";
+    std::string path;
+    if (subGroupName.empty()) {
+        path = name;
+    } else {
+        path = subGroupName + "/" + name;
+    }
+
+    int index = 0;
+    Register("Scale", text.scale_, index++, path);
+    Register("Rotate", text.rotate_, index++, path);
+    Register("Position", text.position_, index++, path);
+    Register("AnchorPoint", text.anchorPoint_, index++, path);
+    Register("Color", text.color_, index++, path);
 }
 
 void DebugParameter::Apply() {

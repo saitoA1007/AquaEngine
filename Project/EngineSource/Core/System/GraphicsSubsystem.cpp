@@ -15,8 +15,6 @@ void GraphicsSubsystem::Initialize() {
     auto* windowsApp = context_.core->GetWindowsApp();
 
     // PIXのGPUキャプチャ機能を準備する。
-    // WinPixGpuCapturer.dll は ID3D12Device の生成より「前」にロードしないと効かないため、
-    // 必ずこの位置で呼ぶこと。
     PixCapture::GetInstance().Initialize();
 
     // DirectXの機能を生成

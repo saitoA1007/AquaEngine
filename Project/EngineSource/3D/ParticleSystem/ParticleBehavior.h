@@ -189,6 +189,12 @@ namespace GameEngine{
 		// シミュレーション空間を取得
 		ParticleSimulationSpace GetSimulationSpace() const { return simulationSpace_; }
 
+		// 発生位置の履歴を削除
+		void ResetEmitHistory() { 
+			hasPrevEmitPos_ = false;
+			distanceAccum_ = 0.0f;
+		}
+
 	private:
 		// パラメータ機能
 		std::unique_ptr<DebugParameter> debugParame_;
@@ -221,6 +227,12 @@ namespace GameEngine{
 		// 発生位置
 		Vector3 emitterPos_ = { 0.0f,0.0f,0.0f };
 
+		// 前フレームのエミッターのワールド座標
+		Vector3 prevEmitWorldPos_ = {}; 
+		bool hasPrevEmitPos_ = false;
+		// 次の発生までに溜まっている移動距離
+		float distanceAccum_ = 0.0f;     
+
 		// ループ時に連続発生させるか
 		bool isEmitting_ = true;
 
@@ -247,7 +259,10 @@ namespace GameEngine{
 		/// パーティクルを生成する
 		/// </summary>
 		/// <returns></returns>
-		ParticleData MakeNewParticle();
+		ParticleData MakeNewParticle(const Vector3& offset = Vector3{});
+		Vector3 GetEmitterWorldPos() const;
+		void UpdateDistanceEmit(bool canSpawn);
+		uint32_t SpawnParticles(uint32_t count, const Vector3& offset);
 
 		/// <summary>
 		/// パーティクルの発生管理
