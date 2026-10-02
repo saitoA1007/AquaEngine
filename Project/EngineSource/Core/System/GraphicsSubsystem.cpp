@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "GraphicsSubsystem.h"
 #include "GpuResource.h"
 #include "SrvResource.h"

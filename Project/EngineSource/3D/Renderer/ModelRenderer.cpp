@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ModelRenderer.h"
 #include <cassert>
 

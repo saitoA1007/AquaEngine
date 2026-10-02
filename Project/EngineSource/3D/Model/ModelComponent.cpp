@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ModelComponent.h"
 #include "Model.h"
 #include "RenderQueue.h"

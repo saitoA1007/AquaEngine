@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ModulesControl.h"
 #include "ParticleEmitModules.h"
 #include "ParticleUpdateModules.h"

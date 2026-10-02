@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Animator.h"
 #include <cassert>
 #include <algorithm>

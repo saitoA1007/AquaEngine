@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "PostEffectManager.h"
 #include "LogManager.h"
 using namespace GameEngine;

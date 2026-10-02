@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "MaterialNodeWindow.h"
 #include <fstream>
 #include "NodeSystem/MaterialNode.h"

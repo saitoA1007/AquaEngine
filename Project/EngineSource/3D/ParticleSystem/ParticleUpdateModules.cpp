@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ParticleUpdateModules.h"
 #include "MyMath.h"
 #include <algorithm>

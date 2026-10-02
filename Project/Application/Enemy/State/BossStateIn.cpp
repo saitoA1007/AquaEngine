@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "BossStateIn.h"
 #include <numbers>
 #include "EasingManager.h"

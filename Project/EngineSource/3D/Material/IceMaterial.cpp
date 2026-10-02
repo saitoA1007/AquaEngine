@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "IceMaterial.h"
 #include "MyMath.h"
 using namespace GameEngine;

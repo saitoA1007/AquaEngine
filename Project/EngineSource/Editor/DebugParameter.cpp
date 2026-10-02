@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "DebugParameter.h"
 #include "WorldTransform.h"
 #include "Sprite.h"

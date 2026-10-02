@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "EffectEditorWindow.h"
 #include <algorithm>
 #include <filesystem>

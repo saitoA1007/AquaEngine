@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "PauseUIManager.h"
 #include "TextureManager.h"
 #include "EasingManager.h"

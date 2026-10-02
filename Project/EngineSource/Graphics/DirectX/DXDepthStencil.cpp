@@ -1,3 +1,4 @@
+#include "pch.h"
 #include"DXDepthStencil.h"
 #include"DepthStencilTexture.h"
 #include"LogManager.h"

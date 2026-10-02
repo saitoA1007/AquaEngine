@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "EasingManager.h"
 #include <cmath>
 #include <algorithm>

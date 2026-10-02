@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ParticleEmitModules.h"
 #include "TextureManager.h"
 #include "RandomGenerator.h"

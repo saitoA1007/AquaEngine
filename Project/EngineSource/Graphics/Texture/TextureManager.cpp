@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "TextureManager.h"
 #include <format>
 #include <filesystem>

@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "MaterialNode.h"
 #include <format>
 #include "ImGuiManager.h"

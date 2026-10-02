@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "SceneSubsystem.h"
 #include "ResourceSubsystem.h"
 #include "GraphicsSubsystem.h"

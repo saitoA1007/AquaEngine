@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "EffectObject.h"
 #include <algorithm>
 #include "ModelManager.h"

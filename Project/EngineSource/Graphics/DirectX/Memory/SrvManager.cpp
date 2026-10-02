@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "SrvManager.h"
 #include "DescriptorHandle.h"
 #include "DescriptorHeap.h"

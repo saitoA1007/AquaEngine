@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "GraphicsDevice.h"
 #include <cassert>
 #include <format>

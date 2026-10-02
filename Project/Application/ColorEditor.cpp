@@ -1,5 +1,6 @@
+#include "pch.h"
 #include"ColorEditor.h"
-
+#undef RGB
 Vector3 ColorConverter::RGBtoHSV(const RGB& rgb) {
     float max = std::fmaxf(rgb.r, std::fmaxf(rgb.g, rgb.b));
     float min = std::fminf(rgb.r, std::fminf(rgb.g, rgb.b));

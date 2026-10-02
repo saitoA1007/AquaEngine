@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "EditorCore.h"
 #include "ImGuiManager.h"
 #include "SceneChangeRequest.h"

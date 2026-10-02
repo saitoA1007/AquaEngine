@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "RenderQueue.h"
 #include "DebugRenderer.h"
 #include "Sprite.h"

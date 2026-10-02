@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "PixWindow.h"
 #include "Debug/PixCapture.h"
 

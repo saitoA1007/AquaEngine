@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ScenePhase.h"
 #include "InputCommand.h"
 #include "Application/UI/Managers/TitleUIManager.h"

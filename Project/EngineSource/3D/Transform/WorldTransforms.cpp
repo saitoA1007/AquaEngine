@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "WorldTransforms.h"
 #include "MyMath.h"
 #include "CreateBufferResource.h"

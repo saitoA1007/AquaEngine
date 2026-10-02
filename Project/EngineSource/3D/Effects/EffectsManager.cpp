@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "EffectsManager.h"
 #include "JsonSerializer.h"
 #include "LogManager.h"

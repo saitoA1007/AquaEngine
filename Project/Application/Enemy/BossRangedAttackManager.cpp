@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "BossRangedAttackManager.h"
 #include <numbers>
 #include "RandomGenerator.h"

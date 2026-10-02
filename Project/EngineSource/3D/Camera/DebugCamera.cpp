@@ -1,3 +1,4 @@
+#include "pch.h"
 #include"DebugCamera.h"
 #include"EngineSource/Math/MyMath.h"
 #include"EngineSource/Common/CreateBufferResource.h"

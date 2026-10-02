@@ -1,3 +1,4 @@
+#include "pch.h"
 #include"LightManager.h"
 #include"EngineSource/Common/CreateBufferResource.h"
 #include"EngineSource/Math/MyMath.h"

@@ -1,3 +1,4 @@
+#include "pch.h"
 #define NOMINMAX
 #include "ModelLoader.h"
 #include <cassert>

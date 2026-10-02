@@ -1,3 +1,4 @@
+#include "pch.h"
 #define NOMINMAX
 #include "PlayerAction.h"
 #include <algorithm>

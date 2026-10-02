@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "LoadingWIndow.h"
 using namespace GameEngine;
 

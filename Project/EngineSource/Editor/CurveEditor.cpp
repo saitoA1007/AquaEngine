@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "CurveEditor.h"
 #include <algorithm>
 #include <cmath>

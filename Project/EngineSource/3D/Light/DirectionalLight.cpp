@@ -1,3 +1,4 @@
+#include "pch.h"
 #include"DirectionalLight.h"
 #include"EngineSource/Math/MyMath.h"
 #include<cmath>

@@ -1,3 +1,4 @@
+#include "pch.h"
 #include"FrameRateController.h"
 
 void FrameRateController::InitializeFixFPS() {

@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "SceneRenderManager.h"
 #include <cassert>
 #include "PSO/Core/PSOManager.h"

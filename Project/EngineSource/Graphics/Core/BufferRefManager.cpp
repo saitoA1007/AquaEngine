@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "BufferRefManager.h"
 #include <cassert>
 using namespace GameEngine;

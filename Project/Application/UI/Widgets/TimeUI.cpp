@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "TimeUI.h"
 #include <algorithm>
 #include "TextureManager.h"

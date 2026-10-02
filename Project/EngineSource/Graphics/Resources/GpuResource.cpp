@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "GpuResource.h"
 
 using namespace GameEngine;

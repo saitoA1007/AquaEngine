@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "PlayerEffectManager.h"
 #include "Effect/ShockWave.h"
 #include "Effect/ShockFloor.h"

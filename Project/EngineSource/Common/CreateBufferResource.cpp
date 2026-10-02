@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "CreateBufferResource.h"
 #include <cassert>
 #include <cstdlib>

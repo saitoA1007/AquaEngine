@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ViewOptionsBar.h"
 #include "ImGuiManager.h"
 #include "RenderQueue.h"

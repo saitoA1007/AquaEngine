@@ -1,3 +1,4 @@
+#include "pch.h"
 #include"WorldTransform.h"
 #include"MyMath.h"
 #include"FPSCounter.h"

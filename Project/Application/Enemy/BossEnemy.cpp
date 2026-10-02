@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "BossEnemy.h"
 
 // 各状態

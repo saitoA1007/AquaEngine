@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "InspectorWindow.h"
 
 using namespace GameEngine;

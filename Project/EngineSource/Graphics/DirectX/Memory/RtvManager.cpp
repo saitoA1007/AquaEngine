@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "RtvManager.h"
 #include "LogManager.h"
 #include "DescriptorHeap.h"

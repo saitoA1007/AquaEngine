@@ -1,3 +1,4 @@
+#include "pch.h"
 #include"DXDevice.h"
 #include<cassert>
 #include"LogManager.h"

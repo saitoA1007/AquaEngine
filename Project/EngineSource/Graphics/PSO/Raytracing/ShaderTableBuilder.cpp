@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ShaderTableBuilder.h"
 
 using namespace GameEngine;

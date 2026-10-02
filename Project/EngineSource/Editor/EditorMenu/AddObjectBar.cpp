@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "AddObjectBar.h"
 #include <filesystem>
 #include "MyMath.h"

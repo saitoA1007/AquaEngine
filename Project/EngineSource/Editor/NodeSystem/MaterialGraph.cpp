@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "MaterialGraph.h"
 using namespace GameEngine;
 

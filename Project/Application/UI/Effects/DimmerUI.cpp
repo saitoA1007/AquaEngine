@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "DimmerUI.h"
 #include "EasingManager.h"
 #include "FPSCounter.h"

@@ -591,6 +591,7 @@
     <ClCompile Include="EngineSource\3D\Effects\EffectModule.cpp" />
     <ClCompile Include="EngineSource\Math\Matrix4x4.cpp" />
     <ClCompile Include="EngineSource\Math\Quaternion.cpp" />
+    <ClCompile Include="EngineSource\Core\pch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
@@ -1164,6 +1165,7 @@
     <ClInclude Include="EngineSource\3D\Effects\EffectObject.h" />
     <ClInclude Include="EngineSource\3D\Effects\EffectAsset.h" />
     <ClInclude Include="EngineSource\3D\Effects\EffectModule.h" />
+    <ClInclude Include="EngineSource\Core\pch.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />

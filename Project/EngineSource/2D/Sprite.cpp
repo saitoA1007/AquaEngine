@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Sprite.h"
 #include "MyMath.h"
 using namespace GameEngine;

@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "CollisionManager.h"
 #include "CollisionVisitor.h"
 #include "Collider.h"
