@@ -66,7 +66,7 @@ void DirectionalLight::CreateDirectionalShadowMatrix(const Vector3& targetCenter
     float b = -shadowRange;
     float nearPlane = 0.1f;
     float farPlane = distance * 2.5f;
-    Matrix4x4 projMatrix = Math::MakeOrthographicMatrix(l, t, r, b, nearPlane, farPlane);
+    Matrix4x4 projMatrix = Matrix4x4::MakeOrthographicMatrix(l, t, r, b, nearPlane, farPlane);
    
     // シャドウマップのチラつきを補正
     Matrix4x4 vpMatrix = worldMatrix * projMatrix;
@@ -75,7 +75,7 @@ void DirectionalLight::CreateDirectionalShadowMatrix(const Vector3& targetCenter
    
     // ワールド原点をシャドウマップ空間へ変換
     Vector3 shadowOrigin = { 0.0f, 0.0f, 0.0f};
-    shadowOrigin = Math::Transforms(shadowOrigin, vpMatrix);
+    shadowOrigin = Matrix4x4::Transform(shadowOrigin, vpMatrix);
    
     // シャドウマップのサイズ
     float shadowMapSize = 2048.0f;

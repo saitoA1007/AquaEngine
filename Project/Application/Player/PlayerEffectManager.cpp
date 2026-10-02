@@ -64,7 +64,7 @@ PlayerEffectManager::PlayerEffectManager(GameEngine::GameObjectManager* objectMa
 	chargeEffect_ = objectManager_->AddObject<ParticleBehavior>("PlayerChargeParticle", 32, textureManager, waveModel);
 	chargeEffect_->SetIsLoop(false);
 	// 発生位置は親からの相対位置にする
-	chargeParentMatrix_ = Math::MakeTranslateMatrix({ 0.0f,0.0f,0.0f });
+	chargeParentMatrix_ = Matrix4x4::MakeTranslateMatrix({ 0.0f,0.0f,0.0f });
 	chargeEffect_->SetEmitterPos({ 0.0f,0.0f,0.0f });
 	chargeEffect_->SetParent(&chargeParentMatrix_, ParticleSimulationSpace::kLocal);
 }
@@ -164,7 +164,7 @@ void PlayerEffectManager::StartDownAttackEffect(Vector3 pos, bool isActive) {
 void PlayerEffectManager::StartChargeEffect(Vector3 pos, Vector4 color, bool isActive) {
 	// 停止時は親を動かさず、残っているパーティクルはその場で消えるまで表示する
 	if (isActive) {
-		chargeParentMatrix_ = Math::MakeTranslateMatrix(pos);
+		chargeParentMatrix_ = Matrix4x4::MakeTranslateMatrix(pos);
 		chargeEffect_->SetColor(color);
 	}
 	chargeEffect_->SetIsLoop(isActive);

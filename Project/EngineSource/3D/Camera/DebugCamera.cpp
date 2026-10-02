@@ -15,8 +15,8 @@ DebugCamera::~DebugCamera() {
 
 void DebugCamera::Initialize(const Vector3& translate,int width, int height) {
 	translate_ = translate;
-	viewMatrix_ = Math::InverseMatrix(Math::MakeAffineMatrix(scale_, rotate_, translate_));
-	projectionMatrix_ = Math::MakePerspectiveFovMatrix(0.45f, static_cast<float>(width) / static_cast<float>(height), 0.1f, 200.0f);
+	viewMatrix_ = Matrix4x4::Inverse(Matrix4x4::MakeAffineMatrix(scale_, rotate_, translate_));
+	projectionMatrix_ = Matrix4x4::MakePerspectiveFovMatrix(0.45f, static_cast<float>(width) / static_cast<float>(height), 0.1f, 200.0f);
 	rotateMatrix_ = LookAt(translate_, targetPos_, { 0.0f,1.0f,0.0f });
 
 	// 定数バッファの作成
@@ -45,7 +45,7 @@ void DebugCamera::Initialize(const Vector3& translate,int width, int height) {
 	//worldMatrix_ = MakeTranslateMatrix(translate_);
 	cameraForGPU_->worldPosition = GetWorldPosition();
 	// カメラの変更した内容を適用する処理
-	viewMatrix_ = Math::InverseMatrix(worldMatrix_);
+	viewMatrix_ = Matrix4x4::Inverse(worldMatrix_);
 }
 
 void DebugCamera::Update() {
@@ -101,10 +101,10 @@ void DebugCamera::Update() {
 
 	cameraForGPU_->worldPosition = GetWorldPosition();
 	// カメラの変更した内容を適用する処理
-	viewMatrix_ = Math::InverseMatrix(worldMatrix_);
+	viewMatrix_ = Matrix4x4::Inverse(worldMatrix_);
 	cameraForGPU_->vpMatrix = GetVPMatrix();
 	cameraForGPU_->mtxViewInv = worldMatrix_;
-	cameraForGPU_->mtxProjInv = Math::InverseMatrix(projectionMatrix_);
+	cameraForGPU_->mtxProjInv = Matrix4x4::Inverse(projectionMatrix_);
 	cameraForGPU_->viewMatrix = viewMatrix_;
 	cameraForGPU_->projectionMatrix = projectionMatrix_;
 

@@ -35,7 +35,7 @@ void WorldTransform::UpdateTransformMatrix() {
 		worldMatrix_ *= parent_->GetWorldMatrix();
 	}
 	transformationMatrixData_->World = worldMatrix_;
-	transformationMatrixData_->worldInverseTranspose = Math::InverseTranspose(worldMatrix_);
+	transformationMatrixData_->worldInverseTranspose = Matrix4x4::InverseTranspose(worldMatrix_);
 }
 
 void WorldTransform::UpdateWorldMatrix(const Matrix4x4 worldMatrix) {
@@ -45,12 +45,12 @@ void WorldTransform::UpdateWorldMatrix(const Matrix4x4 worldMatrix) {
 		worldMatrix_ *= parent_->GetWorldMatrix();
 	}
 	transformationMatrixData_->World = worldMatrix_;
-	transformationMatrixData_->worldInverseTranspose = Math::InverseTranspose(worldMatrix_);
+	transformationMatrixData_->worldInverseTranspose = Matrix4x4::InverseTranspose(worldMatrix_);
 }
 
 void WorldTransform::SetWVPMatrix(const Matrix4x4& localMatrix) {
 	transformationMatrixData_->World = localMatrix * worldMatrix_;
-	transformationMatrixData_->worldInverseTranspose = Math::InverseTranspose(worldMatrix_);
+	transformationMatrixData_->worldInverseTranspose = Matrix4x4::InverseTranspose(worldMatrix_);
 }
 
 Vector3 WorldTransform::GetWorldPosition() const {

@@ -61,9 +61,6 @@ namespace GameEngine {
 		// 外積
 		Vector3 Cross(const Vector3& v1, const Vector3& v2);
 
-		// ベクトル変換
-		Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
-
 		// ワールドスクリーン座標変換(ワールド->スクリーン変換)
 		Vector3 Project(const Vector3& worldPosition, const Vector2& viewport, const float& viewportWidth, const float& viewportHeight, const Matrix4x4& viewProjection);
 
@@ -90,46 +87,6 @@ namespace GameEngine {
 		// 最小値
 		Vector3 Min(Vector3 pos1, Vector3 pos2);
 		Vector4 MinVector4(Vector4 pos1, Vector4 pos2);
-
-		// 4xx4のX軸の回転行列を作成
-		Matrix4x4 MakeRotateXMatrix(const float& theta);
-
-		// 4x4のY軸の回転行列を作成
-		Matrix4x4 MakeRotateYMatrix(const float& theta);
-
-		// 4x4のZ軸の回転行列を作成
-		Matrix4x4 MakeRotateZMatrix(const float& theta);
-
-		// 4x4の拡縮行列の作成
-		Matrix4x4 MakeScaleMatrix(const Vector3& scale);
-
-		// 4x4の平行移動行列の作成
-		Matrix4x4 MakeTranslateMatrix(const Vector3& translate);
-
-		// 4x4のSRTによるアフィン変換行列の作成
-		Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& theta, const Vector3 translate);
-		Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Quaternion& quaternion, const Vector3 translate);
-
-		// 4x4逆行列の計算
-		Matrix4x4 InverseMatrix(const Matrix4x4& matrix);
-
-		// 4x4行列の転置
-		Matrix4x4 Transpose(const Matrix4x4& matrix);
-
-		// 4x4行列の逆転置行列
-		Matrix4x4 InverseTranspose(const Matrix4x4& matrix);
-
-		// 透視投影行列の作成
-		Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip);
-
-		// 平行投射行列の作成
-		Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip);
-
-		// (3+1)次元座標系をデカルト座標系に変換
-		Vector3 Transforms(const Vector3& vector, const Matrix4x4& matrix);
-
-		// ビューポート行列の作成
-		Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, float minD, float maxD);
 
 		/// <summary>
 		/// ビルボードを適応させるためのworldMatrixを作成

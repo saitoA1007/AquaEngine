@@ -11,7 +11,7 @@ Sprite::Sprite(const Vector2& position, const Vector2& size, const Vector2& anch
 	size_ = size;
 	anchorPoint_ = anchorPoint;
 	// 座標を元にワールド行列の生成
-	worldMatrix_ = Math::MakeTranslateMatrix({ position.x,position.y,0.0f });
+	worldMatrix_ = Matrix4x4::MakeTranslateMatrix({ position.x,position.y,0.0f });
 
 	// テクスチャのサイズを取得
 	textureLeftTop_ = leftTop;
@@ -31,7 +31,7 @@ Sprite::~Sprite() {
 }
 
 void Sprite::StaticInitialize(int32_t width, int32_t height) {
-	orthoMatrix_ = Matrix4x4::MakeIdentity() * Math::MakeOrthographicMatrix(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, 100.0f);
+	orthoMatrix_ = Matrix4x4::MakeIdentity() * Matrix4x4::MakeOrthographicMatrix(0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, 100.0f);
 }
 
 void Sprite::Update() {
@@ -46,7 +46,7 @@ void Sprite::Update() {
 	constBufferData_->textureHandle = textureHandle_;
 
 	// 座標を元にワールド行列の生成
-	worldMatrix_ = Math::MakeAffineMatrix(Vector3(scale_.x, scale_.y, 0.0f), Vector3(0.0f,0.0f,rotate_), Vector3(position_.x, position_.y, 0.0f));
+	worldMatrix_ = Matrix4x4::MakeAffineMatrix(Vector3(scale_.x, scale_.y, 0.0f), Vector3(0.0f,0.0f,rotate_), Vector3(position_.x, position_.y, 0.0f));
 	if (parent_) {
 		worldMatrix_ *= parent_->GetWorldMatrix();
 	}
@@ -57,7 +57,7 @@ void Sprite::Update() {
 void Sprite::SetPosition(const Vector2& position) {
 	position_ = position;
 	// 座標を元にワールド行列の生成
-	worldMatrix_ = Math::MakeTranslateMatrix({ position.x,position.y,0.0f });
+	worldMatrix_ = Matrix4x4::MakeTranslateMatrix({ position.x,position.y,0.0f });
 	if (parent_) {
 		worldMatrix_ *= parent_->GetWorldMatrix();
 	}
@@ -88,7 +88,7 @@ void Sprite::SetColor(const Vector4& color) {
 
 void Sprite::SetUvMatrix(const Transform& transform) {
 	// uv行列の設定
-	constBufferData_->uvTransform = Math::MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+	constBufferData_->uvTransform = Matrix4x4::MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 }
 
 void Sprite::CreateMesh() {

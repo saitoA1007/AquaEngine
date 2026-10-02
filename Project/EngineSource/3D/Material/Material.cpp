@@ -40,5 +40,5 @@ void Material::Initialize(const Vector4& color, const Vector3& specularColor,con
 }
 
 void Material::SetUVTransform(Transform uvTransform) {
-	materialData_->uvTransform = Math::MakeAffineMatrix(uvTransform.scale, uvTransform.rotate, uvTransform.translate);
+	materialData_->uvTransform = Matrix4x4::MakeAffineMatrix(uvTransform.scale, uvTransform.rotate, uvTransform.translate);
 }

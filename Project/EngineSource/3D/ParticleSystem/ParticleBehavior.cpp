@@ -288,7 +288,7 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix, float deltaTime) {
         } else {
             if (isFollowParent) {
                 // ローカル行列を作ってから親のワールド行列を掛ける
-                Matrix4x4 localMatrix = Math::MakeAffineMatrix(particle.transform.scale, particle.transform.rotate, particle.transform.translate);
+                Matrix4x4 localMatrix = Matrix4x4::MakeAffineMatrix(particle.transform.scale, particle.transform.rotate, particle.transform.translate);
                 worldTransforms_->transformDatas_[currentNumInstance_].worldMatrix = localMatrix * (*parentMatrix_);
                 // 後段のUpdateTransformMatrixで上書きされないように、transformも同期しておく
                 worldTransforms_->transformDatas_[currentNumInstance_].transform = particle.transform;
@@ -339,7 +339,7 @@ void ParticleBehavior::AddTrail(const ParticleData& particle, const TrailModule&
             }
         } else {
             if (isFollowParent) {
-                data.worldMatrix = Math::MakeAffineMatrix(scale, particle.transform.rotate, position) * (*parentMatrix_);
+                data.worldMatrix = Matrix4x4::MakeAffineMatrix(scale, particle.transform.rotate, position) * (*parentMatrix_);
             } else {
                 data.worldMatrix = Math::MakeWorldMatrixFromEulerRotation(position, particle.transform.rotate, scale);
             }

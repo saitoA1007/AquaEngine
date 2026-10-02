@@ -55,7 +55,7 @@ void RenderQueue::Update() {
             perViewData->viewProjection = mainCamera_.GetVPMatrix();
 
             // ビルボードの回転行列を作成
-            Matrix4x4 backToFrontMatrix = Math::MakeRotateYMatrix(0.0f);
+            Matrix4x4 backToFrontMatrix = Matrix4x4::MakeRotateYMatrix(0.0f);
             Matrix4x4 billboardMatrix = backToFrontMatrix * mainCamera_.GetWorldMatrix();
             billboardMatrix.m[3][0] = 0.0f;
             billboardMatrix.m[3][1] = 0.0f;
@@ -347,7 +347,7 @@ void RenderQueue::SubmitRaytracingModel(Model* model, WorldTransform& worldTrans
         data.instanceID = refIndex;
 
         // 座標を設定
-        Matrix4x4 matrix = Math::Transpose(worldTransform.GetWorldMatrix());
+        Matrix4x4 matrix = Matrix4x4::Transpose(worldTransform.GetWorldMatrix());
         std::memcpy(&data.transform, &matrix, sizeof(float) * 12);
 
         // データを登録
@@ -400,7 +400,7 @@ void RenderQueue::SubmitRaytracingFracture(Model* model, FractureInstance& fract
             data.instanceID = buffer->GetChunkRefIndex(chunkId);
             // 座標
             Matrix4x4 finalMatrix = fractureInstance.GetChunkWorldMatrix(i) * worldTransform.GetWorldMatrix();
-            Matrix4x4 matrix = Math::Transpose(finalMatrix);
+            Matrix4x4 matrix = Matrix4x4::Transpose(finalMatrix);
             std::memcpy(&data.transform, &matrix, sizeof(float) * 12);
 
             // データを登録

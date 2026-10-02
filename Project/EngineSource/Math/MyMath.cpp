@@ -242,24 +242,14 @@ namespace GameEngine {
 			return Vector3(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x);
 		}
 
-		Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m) {
-			Vector3 result{
-				v.x * m.m[0][0] + v.y * m.m[1][0] + v.z * m.m[2][0],
-				v.x * m.m[0][1] + v.y * m.m[1][1] + v.z * m.m[2][1],
-				v.x * m.m[0][2] + v.y * m.m[1][2] + v.z * m.m[2][2]
-			};
-
-			return result;
-		}
-
 		Vector3 Project(const Vector3& worldPosition, const Vector2& viewport, const float& viewportWidth, const float& viewportHeight, const Matrix4x4& viewProjection) {
 
 			// ビューポート行列
-			Matrix4x4 viewportMatrix = Math::MakeViewportMatrix(viewport.x, viewport.y, viewportWidth, viewportHeight, 0, 1);
+			Matrix4x4 viewportMatrix = Matrix4x4::MakeViewportMatrix(viewport.x, viewport.y, viewportWidth, viewportHeight, 0, 1);
 			// ビュー行列とプロジェクション行列、ビューポート行列を合成する
 			Matrix4x4 viewProjectionViewportMatrix = viewProjection * viewportMatrix;
 			// ワールド->スクリーン座標変換(3Dから2Dへ)
-			Vector3 screenPos = Math::Transforms(worldPosition, viewProjectionViewportMatrix);
+			Vector3 screenPos = Matrix4x4::Transform(worldPosition, viewProjectionViewportMatrix);
 			return  screenPos;
 		}
 
@@ -323,17 +313,17 @@ namespace GameEngine {
 			float ndcY = 1.0f - (2.0f * mousePos.y) / windowHeight;
 
 			// ビュー空間へ変換
-			Matrix4x4 invProj = InverseMatrix(projectionMatrix);
-			Vector3 nearView = Transforms(Vector3(ndcX, ndcY, 0.0f), invProj);
-			Vector3 farView = Transforms(Vector3(ndcX, ndcY, 1.0f), invProj);
+			Matrix4x4 invProj = Matrix4x4::Inverse(projectionMatrix);
+			Vector3 nearView = Matrix4x4::Transform(Vector3(ndcX, ndcY, 0.0f), invProj);
+			Vector3 farView = Matrix4x4::Transform(Vector3(ndcX, ndcY, 1.0f), invProj);
 
 			// ビュー空間でのレイ方向
 			Vector3 rayView = farView - nearView;
 			rayView.Normalize();
 
 			// ビュー行列の逆行列を掛けて、ワールド空間へ変換
-			Matrix4x4 invView = InverseMatrix(viewMatrix);
-			Vector3 rayWorld = TransformNormal(rayView, invView);
+			Matrix4x4 invView = Matrix4x4::Inverse(viewMatrix);
+			Vector3 rayWorld = Matrix4x4::TransformNormal(rayView, invView);
 
 			return rayWorld.Normalize();
 		}
@@ -367,211 +357,17 @@ namespace GameEngine {
 			return result;
 		}
 
-		Matrix4x4 MakeRotateXMatrix(const float& theta) {
-			Matrix4x4 result = {
-				1, 0, 0, 0,
-				0, std::cosf(theta), std::sinf(theta), 0,
-				0, -std::sinf(theta), std::cosf(theta), 0,
-				0, 0, 0, 1
-			};
-			return result;
-		}
-
-		Matrix4x4 MakeRotateYMatrix(const float& theta) {
-			Matrix4x4 result = {
-				std::cosf(theta), 0, -std::sinf(theta), 0,
-				0, 1, 0, 0,
-				std::sinf(theta), 0, std::cosf(theta), 0,
-				0, 0, 0, 1
-			};
-			return result;
-		}
-
-		Matrix4x4 MakeRotateZMatrix(const float& theta) {
-			Matrix4x4 result = {
-				std::cosf(theta), std::sinf(theta), 0, 0,
-				-std::sinf(theta), std::cosf(theta), 0, 0,
-				0, 0, 1, 0,
-				0, 0, 0, 1
-			};
-			return result;
-		}
-
-		Matrix4x4 MakeScaleMatrix(const Vector3& scale) {
-			Matrix4x4 result = {
-				scale.x, 0, 0, 0,
-				0, scale.y, 0, 0,
-				0, 0, scale.z, 0,
-				0, 0, 0, 1
-			};
-			return result;
-		}
-
-		Matrix4x4 MakeTranslateMatrix(const Vector3& translate) {
-			Matrix4x4 result = {
-				1, 0, 0, 0,
-				0, 1, 0, 0,
-				0, 0, 1, 0,
-				translate.x, translate.y, translate.z, 1
-			};
-			return result;
-		}
-
-		Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3 translate) {
-			Matrix4x4 scaleMatrix = Math::MakeScaleMatrix(scale);
-			Matrix4x4 rotateMatrix = Math::Multiply(Math::MakeRotateXMatrix(rotate.x), Math::Multiply(Math::MakeRotateYMatrix(rotate.y), Math::MakeRotateZMatrix(rotate.z)));
-			Matrix4x4 transformMatrix = Math::Multiply(scaleMatrix, rotateMatrix);
-			Matrix4x4 result = transformMatrix;
-			result.m[3][0] = translate.x;
-			result.m[3][1] = translate.y;
-			result.m[3][2] = translate.z;
-			result.m[3][3] = 1;
-			return result;
-		}
-
-		Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Quaternion& quaternion, const Vector3 translate) {
-
-			// 回転行列
-			Matrix4x4 rotateMatrix = Math::MakeRotateMatrix(quaternion);
-
-			// 拡縮行列
-			Matrix4x4 scaleMatrix = {
-				scale.x, 0.0f,   0.0f,   0.0f,
-				0.0f,   scale.y, 0.0f,   0.0f,
-				0.0f,   0.0f,   scale.z, 0.0f,
-				0.0f,   0.0f,   0.0f,    1.0f
-			};
-
-			// 平行移動行列
-			Matrix4x4 translateMatrix = {
-				1.0f, 0.0f, 0.0f, 0.0f,
-				0.0f, 1.0f, 0.0f, 0.0f,
-				0.0f, 0.0f, 1.0f, 0.0f,
-				translate.x, translate.y, translate.z, 1.0f
-			};
-
-			// SRT行列
-			Matrix4x4 worldMatrix = Math::Multiply(Math::Multiply(scaleMatrix, rotateMatrix), translateMatrix);
-			return worldMatrix;
-		}
-
-		Matrix4x4 InverseMatrix(const Matrix4x4& matrix) {
-			Matrix4x4 result;
-			float det = matrix.m[0][0] * matrix.m[1][1] * matrix.m[2][2] * matrix.m[3][3] +
-				matrix.m[0][0] * matrix.m[1][2] * matrix.m[2][3] * matrix.m[3][1] +
-				matrix.m[0][0] * matrix.m[1][3] * matrix.m[2][1] * matrix.m[3][2] +
-				matrix.m[0][1] * matrix.m[1][0] * matrix.m[2][3] * matrix.m[3][2] +
-				matrix.m[0][1] * matrix.m[1][2] * matrix.m[2][0] * matrix.m[3][3] +
-				matrix.m[0][1] * matrix.m[1][3] * matrix.m[2][2] * matrix.m[3][0] +
-				matrix.m[0][2] * matrix.m[1][0] * matrix.m[2][1] * matrix.m[3][3] +
-				matrix.m[0][2] * matrix.m[1][1] * matrix.m[2][3] * matrix.m[3][0] +
-				matrix.m[0][2] * matrix.m[1][3] * matrix.m[2][0] * matrix.m[3][1] +
-				matrix.m[0][3] * matrix.m[1][0] * matrix.m[2][2] * matrix.m[3][1] +
-				matrix.m[0][3] * matrix.m[1][1] * matrix.m[2][0] * matrix.m[3][2] +
-				matrix.m[0][3] * matrix.m[1][2] * matrix.m[2][1] * matrix.m[3][0] -
-				matrix.m[0][0] * matrix.m[1][1] * matrix.m[2][3] * matrix.m[3][2] -
-				matrix.m[0][0] * matrix.m[1][2] * matrix.m[2][1] * matrix.m[3][3] -
-				matrix.m[0][0] * matrix.m[1][3] * matrix.m[2][2] * matrix.m[3][1] -
-				matrix.m[0][1] * matrix.m[1][0] * matrix.m[2][2] * matrix.m[3][3] -
-				matrix.m[0][1] * matrix.m[1][2] * matrix.m[2][3] * matrix.m[3][0] -
-				matrix.m[0][1] * matrix.m[1][3] * matrix.m[2][0] * matrix.m[3][2] -
-				matrix.m[0][2] * matrix.m[1][0] * matrix.m[2][3] * matrix.m[3][1] -
-				matrix.m[0][2] * matrix.m[1][1] * matrix.m[2][0] * matrix.m[3][3] -
-				matrix.m[0][2] * matrix.m[1][3] * matrix.m[2][1] * matrix.m[3][0] -
-				matrix.m[0][3] * matrix.m[1][0] * matrix.m[2][1] * matrix.m[3][2] -
-				matrix.m[0][3] * matrix.m[1][1] * matrix.m[2][2] * matrix.m[3][0] -
-				matrix.m[0][3] * matrix.m[1][2] * matrix.m[2][0] * matrix.m[3][1];
-			result.m[0][0] = (matrix.m[1][1] * matrix.m[2][2] * matrix.m[3][3] + matrix.m[1][2] * matrix.m[2][3] * matrix.m[3][1] + matrix.m[1][3] * matrix.m[2][1] * matrix.m[3][2] - matrix.m[1][1] * matrix.m[2][3] * matrix.m[3][2] - matrix.m[1][2] * matrix.m[2][1] * matrix.m[3][3] - matrix.m[1][3] * matrix.m[2][2] * matrix.m[3][1]) / det;
-			result.m[0][1] = (matrix.m[0][1] * matrix.m[2][3] * matrix.m[3][2] + matrix.m[0][2] * matrix.m[2][1] * matrix.m[3][3] + matrix.m[0][3] * matrix.m[2][2] * matrix.m[3][1] - matrix.m[0][1] * matrix.m[2][2] * matrix.m[3][3] - matrix.m[0][2] * matrix.m[2][3] * matrix.m[3][1] - matrix.m[0][3] * matrix.m[2][1] * matrix.m[3][2]) / det;
-			result.m[0][2] = (matrix.m[0][1] * matrix.m[1][2] * matrix.m[3][3] + matrix.m[0][2] * matrix.m[1][3] * matrix.m[3][1] + matrix.m[0][3] * matrix.m[1][1] * matrix.m[3][2] - matrix.m[0][1] * matrix.m[1][3] * matrix.m[3][2] - matrix.m[0][2] * matrix.m[1][1] * matrix.m[3][3] - matrix.m[0][3] * matrix.m[1][2] * matrix.m[3][1]) / det;
-			result.m[0][3] = (matrix.m[0][1] * matrix.m[1][3] * matrix.m[2][2] + matrix.m[0][2] * matrix.m[1][1] * matrix.m[2][3] + matrix.m[0][3] * matrix.m[1][2] * matrix.m[2][1] - matrix.m[0][1] * matrix.m[1][2] * matrix.m[2][3] - matrix.m[0][2] * matrix.m[1][3] * matrix.m[2][1] - matrix.m[0][3] * matrix.m[1][1] * matrix.m[2][2]) / det;
-			result.m[1][0] = (matrix.m[1][0] * matrix.m[2][3] * matrix.m[3][2] + matrix.m[1][2] * matrix.m[2][0] * matrix.m[3][3] + matrix.m[1][3] * matrix.m[2][2] * matrix.m[3][0] - matrix.m[1][0] * matrix.m[2][2] * matrix.m[3][3] - matrix.m[1][2] * matrix.m[2][3] * matrix.m[3][0] - matrix.m[1][3] * matrix.m[2][0] * matrix.m[3][2]) / det;
-			result.m[1][1] = (matrix.m[0][0] * matrix.m[2][2] * matrix.m[3][3] + matrix.m[0][2] * matrix.m[2][3] * matrix.m[3][0] + matrix.m[0][3] * matrix.m[2][0] * matrix.m[3][2] - matrix.m[0][0] * matrix.m[2][3] * matrix.m[3][2] - matrix.m[0][2] * matrix.m[2][0] * matrix.m[3][3] - matrix.m[0][3] * matrix.m[2][2] * matrix.m[3][0]) / det;
-			result.m[1][2] = (matrix.m[0][0] * matrix.m[1][3] * matrix.m[3][2] + matrix.m[0][2] * matrix.m[1][0] * matrix.m[3][3] + matrix.m[0][3] * matrix.m[1][2] * matrix.m[3][0] - matrix.m[0][0] * matrix.m[1][2] * matrix.m[3][3] - matrix.m[0][2] * matrix.m[1][3] * matrix.m[3][0] - matrix.m[0][3] * matrix.m[1][0] * matrix.m[3][2]) / det;
-			result.m[1][3] = (matrix.m[0][0] * matrix.m[1][2] * matrix.m[2][3] + matrix.m[0][2] * matrix.m[1][3] * matrix.m[2][0] + matrix.m[0][3] * matrix.m[1][0] * matrix.m[2][2] - matrix.m[0][0] * matrix.m[1][3] * matrix.m[2][2] - matrix.m[0][2] * matrix.m[1][0] * matrix.m[2][3] - matrix.m[0][3] * matrix.m[1][2] * matrix.m[2][0]) / det;
-			result.m[2][0] = (matrix.m[1][0] * matrix.m[2][1] * matrix.m[3][3] + matrix.m[1][1] * matrix.m[2][3] * matrix.m[3][0] + matrix.m[1][3] * matrix.m[2][0] * matrix.m[3][1] - matrix.m[1][0] * matrix.m[2][3] * matrix.m[3][1] - matrix.m[1][1] * matrix.m[2][0] * matrix.m[3][3] - matrix.m[1][3] * matrix.m[2][1] * matrix.m[3][0]) / det;
-			result.m[2][1] = (matrix.m[0][0] * matrix.m[2][3] * matrix.m[3][1] + matrix.m[0][1] * matrix.m[2][0] * matrix.m[3][3] + matrix.m[0][3] * matrix.m[2][1] * matrix.m[3][0] - matrix.m[0][0] * matrix.m[2][1] * matrix.m[3][3] - matrix.m[0][1] * matrix.m[2][3] * matrix.m[3][0] - matrix.m[0][3] * matrix.m[2][0] * matrix.m[3][1]) / det;
-			result.m[2][2] = (matrix.m[0][0] * matrix.m[1][1] * matrix.m[3][3] + matrix.m[0][1] * matrix.m[1][3] * matrix.m[3][0] + matrix.m[0][3] * matrix.m[1][0] * matrix.m[3][1] - matrix.m[0][0] * matrix.m[1][3] * matrix.m[3][1] - matrix.m[0][1] * matrix.m[1][0] * matrix.m[3][3] - matrix.m[0][3] * matrix.m[1][1] * matrix.m[3][0]) / det;
-			result.m[2][3] = (matrix.m[0][0] * matrix.m[1][3] * matrix.m[2][1] + matrix.m[0][1] * matrix.m[1][0] * matrix.m[2][3] + matrix.m[0][3] * matrix.m[1][1] * matrix.m[2][0] - matrix.m[0][0] * matrix.m[1][1] * matrix.m[2][3] - matrix.m[0][1] * matrix.m[1][3] * matrix.m[2][0] - matrix.m[0][3] * matrix.m[1][0] * matrix.m[2][1]) / det;
-			result.m[3][0] = (matrix.m[1][0] * matrix.m[2][2] * matrix.m[3][1] + matrix.m[1][1] * matrix.m[2][0] * matrix.m[3][2] + matrix.m[1][2] * matrix.m[2][1] * matrix.m[3][0] - matrix.m[1][0] * matrix.m[2][1] * matrix.m[3][2] - matrix.m[1][1] * matrix.m[2][2] * matrix.m[3][0] - matrix.m[1][2] * matrix.m[2][0] * matrix.m[3][1]) / det;
-			result.m[3][1] = (matrix.m[0][0] * matrix.m[2][1] * matrix.m[3][2] + matrix.m[0][1] * matrix.m[2][2] * matrix.m[3][0] + matrix.m[0][2] * matrix.m[2][0] * matrix.m[3][1] - matrix.m[0][0] * matrix.m[2][2] * matrix.m[3][1] - matrix.m[0][1] * matrix.m[2][0] * matrix.m[3][2] - matrix.m[0][2] * matrix.m[2][1] * matrix.m[3][0]) / det;
-			result.m[3][2] = (matrix.m[0][0] * matrix.m[1][2] * matrix.m[3][1] + matrix.m[0][1] * matrix.m[1][0] * matrix.m[3][2] + matrix.m[0][2] * matrix.m[1][1] * matrix.m[3][0] - matrix.m[0][0] * matrix.m[1][1] * matrix.m[3][2] - matrix.m[0][1] * matrix.m[1][2] * matrix.m[3][0] - matrix.m[0][2] * matrix.m[1][0] * matrix.m[3][1]) / det;
-			result.m[3][3] = (matrix.m[0][0] * matrix.m[1][1] * matrix.m[2][2] + matrix.m[0][1] * matrix.m[1][2] * matrix.m[2][0] + matrix.m[0][2] * matrix.m[1][0] * matrix.m[2][1] - matrix.m[0][0] * matrix.m[1][2] * matrix.m[2][1] - matrix.m[0][1] * matrix.m[1][0] * matrix.m[2][2] - matrix.m[0][2] * matrix.m[1][1] * matrix.m[2][0]) / det;
-			return result;
-		}
-
-		Matrix4x4 Transpose(const Matrix4x4& matrix) {
-			Matrix4x4 result;
-			for (int y = 0; y < 4; ++y) {
-				for (int x = 0; x < 4; ++x) {
-					result.m[y][x] = matrix.m[x][y];
-				}
-			}
-			return result;
-		}
-
-		Matrix4x4 InverseTranspose(const Matrix4x4& matrix) {
-			Matrix4x4 result = Math::InverseMatrix(matrix);
-			return Math::Transpose(result);
-		}
-
-		Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip) {
-			float h = 1 / std::tanf(fovY / 2);
-			float w = h / aspectRatio;
-			Matrix4x4 result = {
-				w, 0, 0, 0,
-				0, h, 0, 0,
-				0, 0, farClip / (farClip - nearClip), 1,
-				0, 0, -nearClip * farClip / (farClip - nearClip), 0
-			};
-			return result;
-		}
-
-		Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip) {
-			Matrix4x4 result = {
-				2.0f / (right - left), 0.0f, 0.0f, 0.0f,
-				0.0f, 2.0f / (top - bottom), 0.0f, 0.0f,
-				0.0f, 0.0f, 1.0f / (nearClip - farClip), 0.0f,
-				(left + right) / (left - right), (top + bottom) / (bottom - top), nearClip / (nearClip - farClip), 1.0f
-			};
-			return result;
-		}
-
-		Vector3 Transforms(const Vector3& vector, const Matrix4x4& matrix) {
-			Vector3 result;
-			result.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0] + vector.z * matrix.m[2][0] + matrix.m[3][0];
-			result.y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1] + vector.z * matrix.m[2][1] + matrix.m[3][1];
-			result.z = vector.x * matrix.m[0][2] + vector.y * matrix.m[1][2] + vector.z * matrix.m[2][2] + matrix.m[3][2];
-			// 同次座標に変換するために 4D ベクトルを使う
-			float w = vector.x * matrix.m[0][3] + vector.y * matrix.m[1][3] + vector.z * matrix.m[2][3] + matrix.m[3][3];
-			assert(w != 0.0f);
-			result.x /= w;
-			result.y /= w;
-			result.z /= w;
-			return result;
-		}
-
-		Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, float minD, float maxD) {
-			Matrix4x4 result = {
-				width / 2, 0, 0, 0,
-				0, -height / 2, 0, 0,
-				0, 0, maxD - minD, 0,
-				left + width / 2, top + height / 2, minD, 1
-			};
-			return result;
-		}
-
 		Matrix4x4 MakeBillboardMatrix(const Vector3& scale, const Vector3& translate, const Matrix4x4& cameraMatrix) {
 
 			// ビルボードの回転行列を作成
-			Matrix4x4 backToFrontMatrix = Math::MakeRotateYMatrix(0.0f);
+			Matrix4x4 backToFrontMatrix = Matrix4x4::MakeRotateYMatrix(0.0f);
 			Matrix4x4 billboardMatrix = Math::Multiply(backToFrontMatrix, cameraMatrix);
 			billboardMatrix.m[3][0] = 0.0f;
 			billboardMatrix.m[3][1] = 0.0f;
 			billboardMatrix.m[3][2] = 0.0f;
 			// ST行列を作成
-			Matrix4x4 scaleMatrix = Math::MakeScaleMatrix(scale);
-			Matrix4x4 translateMatrix = Math::MakeTranslateMatrix(translate);
+			Matrix4x4 scaleMatrix = Matrix4x4::MakeScaleMatrix(scale);
+			Matrix4x4 translateMatrix = Matrix4x4::MakeTranslateMatrix(translate);
 			// 行列の更新
 			return scaleMatrix * billboardMatrix * translateMatrix;
 		}
@@ -579,20 +375,20 @@ namespace GameEngine {
 		Matrix4x4 MakeBillboardMatrix(const Vector3& scale, const Vector3& translate, float rotateZ, const Matrix4x4& cameraMatrix) {
 
 			// スケール行列
-			Matrix4x4 scaleMatrix = Math::MakeScaleMatrix(scale);
+			Matrix4x4 scaleMatrix = Matrix4x4::MakeScaleMatrix(scale);
 
 			// パーティクル自体のローカル回転行列を作成
-			Matrix4x4 localRotateMatrix = Math::MakeRotateZMatrix(rotateZ);
+			Matrix4x4 localRotateMatrix = Matrix4x4::MakeRotateZMatrix(rotateZ);
 
 			// ビルボードの回転行列を作成
-			Matrix4x4 backToFrontMatrix = Math::MakeRotateYMatrix(0.0f);
+			Matrix4x4 backToFrontMatrix = Matrix4x4::MakeRotateYMatrix(0.0f);
 			Matrix4x4 billboardMatrix = Math::Multiply(backToFrontMatrix, cameraMatrix);
 			billboardMatrix.m[3][0] = 0.0f;
 			billboardMatrix.m[3][1] = 0.0f;
 			billboardMatrix.m[3][2] = 0.0f;
 
 			// 平行移動行列の作成
-			Matrix4x4 translateMatrix = Math::MakeTranslateMatrix(translate);
+			Matrix4x4 translateMatrix = Matrix4x4::MakeTranslateMatrix(translate);
 
 			// 行列の更新
 			return scaleMatrix * localRotateMatrix * billboardMatrix * translateMatrix;
@@ -600,7 +396,7 @@ namespace GameEngine {
 
 		Matrix4x4 MakeDirectionalBillboardMatrix(const Vector3& scale, const Vector3& translate, const Matrix4x4& cameraMatrix, const Matrix4x4& viewMatrix, const Vector3& velocity, float rotateZ) {
 			// 1. ビルボード行列（カメラの回転をコピーしてZ軸回転などをリセット）
-			Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(0.0f);
+			Matrix4x4 backToFrontMatrix = Matrix4x4::MakeRotateYMatrix(0.0f);
 			Matrix4x4 billboardMatrix = Multiply(backToFrontMatrix, cameraMatrix);
 			billboardMatrix.m[3][0] = 0.0f;
 			billboardMatrix.m[3][1] = 0.0f;
@@ -632,10 +428,10 @@ namespace GameEngine {
 			}
 
 			// 最初に設定されたZ回転を維持するためのローカル回転
-			Matrix4x4 localRotateMatrix = MakeRotateZMatrix(rotateZ);
+			Matrix4x4 localRotateMatrix = Matrix4x4::MakeRotateZMatrix(rotateZ);
 
-			Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
-			Matrix4x4 translateMatrix = MakeTranslateMatrix(translate);
+			Matrix4x4 scaleMatrix = Matrix4x4::MakeScaleMatrix(scale);
+			Matrix4x4 translateMatrix = Matrix4x4::MakeTranslateMatrix(translate);
 
 			return scaleMatrix * localRotateMatrix * rotateMatrix * billboardMatrix * translateMatrix;
 		}

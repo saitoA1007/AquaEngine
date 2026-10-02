@@ -122,9 +122,9 @@ void DestructibleObject::Draw() {
 
 void DestructibleObject::OnCollisionEnter(const GameEngine::CollisionResult& result) {
 	// ワールド座標で渡ってくる衝突情報をローカル座標へ変換してから渡す
-	Matrix4x4 inverseWorld = Math::InverseMatrix(worldTransform_.GetWorldMatrix());
-	Vector3 localImpactPos = Math::Transforms(result.contactPosition, inverseWorld);
-	Vector3 localImpactDirection = Math::TransformNormal(result.contactNormal, inverseWorld);
+	Matrix4x4 inverseWorld = Matrix4x4::Inverse(worldTransform_.GetWorldMatrix());
+	Vector3 localImpactPos = Matrix4x4::Transform(result.contactPosition, inverseWorld);
+	Vector3 localImpactDirection = Matrix4x4::TransformNormal(result.contactNormal, inverseWorld);
 
 	damageController_.ApplyChipDamage(localImpactPos, damageAmount_, craterRadius_, planeCount_,
 		localImpactDirection, result.penetrationDepth);

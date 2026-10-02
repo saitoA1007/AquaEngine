@@ -66,8 +66,8 @@ void Text::Update() {
 	constBufferData_->textureHandle = font_->GetTextureHandle();
 
 	// 更新
-	Matrix4x4 anchorMatrix = Math::MakeTranslateMatrix({ -anchorPoint_.x * boundsEm_.x, -anchorPoint_.y * boundsEm_.y, 0.0f });
-	Matrix4x4 worldMatrix = anchorMatrix * Math::MakeAffineMatrix(
+	Matrix4x4 anchorMatrix = Matrix4x4::MakeTranslateMatrix({ -anchorPoint_.x * boundsEm_.x, -anchorPoint_.y * boundsEm_.y, 0.0f });
+	Matrix4x4 worldMatrix = anchorMatrix * Matrix4x4::MakeAffineMatrix(
 		Vector3(scale_.x, scale_.y, 1.0f), Vector3(0.0f, 0.0f, rotate_), Vector3(position_.x, position_.y, 0.0f));
 	if (parent_) {
 		worldMatrix *= parent_->GetWorldMatrix();

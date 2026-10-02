@@ -151,7 +151,7 @@ void Animator::NodeHierarchyUpdate(Model* model) {
 	auto& rootNode = model->GetNodes();
 
 	// 親行列
-	rootNode.localMatrix = Math::MakeAffineMatrix(rootNode.transform.scale, rootNode.transform.rotate, rootNode.transform.translate);
+	rootNode.localMatrix = Matrix4x4::MakeAffineMatrix(rootNode.transform.scale, rootNode.transform.rotate, rootNode.transform.translate);
 
 	// 子ノードに対して再帰的に行列計算を行う
 	for (auto& child : rootNode.children) {
@@ -161,7 +161,7 @@ void Animator::NodeHierarchyUpdate(Model* model) {
 
 void Animator::NodeHierarchyUpdate(Node& node, const Matrix4x4& parentMatrix) {
 	// 自身のローカル行列を計算
-	Matrix4x4 local = Math::MakeAffineMatrix(node.transform.scale, node.transform.rotate, node.transform.translate);
+	Matrix4x4 local = Matrix4x4::MakeAffineMatrix(node.transform.scale, node.transform.rotate, node.transform.translate);
 
 	// 親の行列を掛け合わせて、自身のグローバルな累積行列を計算
 	node.localMatrix = local * parentMatrix;
@@ -187,7 +187,7 @@ void Animator::ApplyAnimation(SkeletonData& skeleton, const AnimationData& anima
 void Animator::SkeletonUpdate(SkeletonData& skeleton) {
 	// すべてのJointを更新。
 	for (Joint& joint : skeleton.joints) {
-		joint.localMatrix = Math::MakeAffineMatrix(joint.transform.scale, joint.transform.rotate, joint.transform.translate);
+		joint.localMatrix = Matrix4x4::MakeAffineMatrix(joint.transform.scale, joint.transform.rotate, joint.transform.translate);
 		if (joint.parent) {
 			joint.skeletonSpaceMatrix = joint.localMatrix * skeleton.joints[*joint.parent].skeletonSpaceMatrix;
 		} else {
@@ -200,7 +200,7 @@ void Animator::SkinClusterUpdate(SkinCluster& skinCluster, const SkeletonData& s
 	for (size_t jointIndex = 0; jointIndex < skeleton.joints.size(); ++jointIndex) {
 		assert(jointIndex < skinCluster.inverseBindPoseMatrices.size());
 		skinCluster.mappedPalette[jointIndex].skeletonSpaceMatrix = skinCluster.inverseBindPoseMatrices[jointIndex] * skeleton.joints[jointIndex].skeletonSpaceMatrix;
-		skinCluster.mappedPalette[jointIndex].skeletonSpaceInverseTransposeMatrix = Math::InverseTranspose(skinCluster.mappedPalette[jointIndex].skeletonSpaceMatrix);
+		skinCluster.mappedPalette[jointIndex].skeletonSpaceInverseTransposeMatrix = Matrix4x4::InverseTranspose(skinCluster.mappedPalette[jointIndex].skeletonSpaceMatrix);
 	}
 }
 
