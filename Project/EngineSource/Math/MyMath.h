@@ -14,35 +14,6 @@ namespace GameEngine {
 
 	namespace Math {
 
-		// Quaternionの積
-		Quaternion Multiply(const Quaternion& lhs, const Quaternion& rhs);
-		// 共役Quaternionを返す
-		Quaternion Conjugate(const Quaternion& quaternion);
-		// Quaernionのnormを返す
-		float Norm(const Quaternion& quaternion);
-		// 正規化したQuaternionを返す
-		Quaternion Normalize(const Quaternion& quaternion);
-		// 逆Quaternionを返す
-		Quaternion Inverse(const Quaternion& quaternion);
-		// 任意軸回転行列を表すQuaternionの生成
-		Quaternion MakeRotateAxisAngleQuaternion(const Vector3& axis, float angle);
-		// ベクトルをQuaternionで回転させた結果のベクトルを求める
-		Vector3 RotateVector(const Vector3& vector, const Quaternion& quaternion);
-		// Quaternionから回転行列を求める
-		Matrix4x4 MakeRotateMatrix(const Quaternion& q);
-		// 内積
-		float Dot(const Quaternion& a, const Quaternion& b);
-		// 4x4行列の任意軸回転行列の作成
-		Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle);
-
-		Quaternion MakeEulerQuaternion(float pitch, float yaw, float roll);
-
-		// クウォータニオンによる回転行列を作成
-		Matrix4x4 MakeWorldMatrixFromEulerRotation(const Vector3 position, const Vector3& rotateEuler, const Vector3& scale);
-
-		// 目標ベクトルへへ最短回転
-		Quaternion DirectionToQuaternion(const Vector3& direction, const Vector3& up = { 0.0f, 1.0f, 0.0f });
-
 		// 方向からオイラー回転を求める
 		Vector3 DirectionToEuler(const Vector3& direction);
 
@@ -99,6 +70,9 @@ namespace GameEngine {
 		Matrix4x4 MakeBillboardMatrix(const Vector3& scale, const Vector3& translate, float rotateZ, const Matrix4x4& cameraMatrix);
 
 		Matrix4x4 MakeDirectionalBillboardMatrix(const Vector3& scale, const Vector3& translate, const Matrix4x4& cameraMatrix, const Matrix4x4& viewMatrix, const Vector3& velocity, float rotateZ = 0.0f);
+
+		// クウォータニオンによる回転行列を作成
+		Matrix4x4 MakeWorldMatrixFromEulerRotation(const Vector3 position, const Vector3& rotateEuler, const Vector3& scale);
 
 		/// <summary>
 		/// カメラをターゲットの方向に向かせる

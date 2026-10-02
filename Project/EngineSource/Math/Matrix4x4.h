@@ -77,6 +77,12 @@ struct Matrix4x4 {
 	static Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& theta, const Vector3 translate);
 	static Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Quaternion& quaternion, const Vector3 translate);
 
+	// 4x4行列の任意軸回転行列の作成
+	static Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle);
+
+	// Quaternionから回転行列を求める
+	static Matrix4x4 MakeRotateMatrix(const Quaternion& q);
+
 	// 透視投影行列の作成
 	static Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip);
 

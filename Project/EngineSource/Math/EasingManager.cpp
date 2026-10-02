@@ -14,7 +14,7 @@ namespace GameEngine {
 		float easedT = Apply(t, type);
 
 		Quaternion q1Copy = q1;
-		float dot = Math::Dot(q0, q1);
+		float dot = q0.Dot(q1);
 		// 四元数の符号が逆だと最短経路で補間されないので反転
 		if (dot < 0.0f) {
 			dot = -dot;

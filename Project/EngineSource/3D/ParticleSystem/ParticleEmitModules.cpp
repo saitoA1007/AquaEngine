@@ -47,13 +47,13 @@ void DirectionEmitModule::Create(ParticleData& particleData) {
 
 		// 基準方向を軸に回転させ、広がりの方向を決める
 		float spinAngle = RandomGenerator::Get(0.0f, 2.0f * std::numbers::pi_v<float>);
-		Quaternion spin = Math::MakeRotateAxisAngleQuaternion(baseDir, spinAngle);
-		Vector3 spreadAxis = Math::RotateVector(perpendicular, spin);
+		Quaternion spin = Quaternion::MakeRotateAxisAngleQuaternion(baseDir, spinAngle);
+		Vector3 spreadAxis = Quaternion::RotateVector(perpendicular, spin);
 
 		// spreadAxisを軸に基準方向をばらつき角の範囲で傾ける
 		float tiltAngle = RandomGenerator::Get(0.0f, spreadAngle_ * (std::numbers::pi_v<float> / 180.0f));
-		Quaternion tilt = Math::MakeRotateAxisAngleQuaternion(spreadAxis, tiltAngle);
-		baseDir = Math::RotateVector(baseDir, tilt);
+		Quaternion tilt = Quaternion::MakeRotateAxisAngleQuaternion(spreadAxis, tiltAngle);
+		baseDir = Quaternion::RotateVector(baseDir, tilt);
 	}
 
 	// レンジ対策

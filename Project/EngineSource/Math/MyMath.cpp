@@ -6,166 +6,6 @@
 namespace GameEngine {
 	namespace Math {
 
-		Quaternion Multiply(const Quaternion& lhs, const Quaternion& rhs) {
-
-			Quaternion result;
-			result.w = lhs.w * rhs.w - lhs.x * rhs.x - lhs.y * rhs.y - lhs.z * rhs.z;
-			result.x = lhs.w * rhs.x + lhs.x * rhs.w + lhs.y * rhs.z - lhs.z * rhs.y;
-			result.y = lhs.w * rhs.y - lhs.x * rhs.z + lhs.y * rhs.w + lhs.z * rhs.x;
-			result.z = lhs.w * rhs.z + lhs.x * rhs.y - lhs.y * rhs.x + lhs.z * rhs.w;
-			return result;
-		}
-
-		Quaternion Conjugate(const Quaternion& quaternion) {
-			return { -quaternion.x, -quaternion.y, -quaternion.z, quaternion.w };
-		}
-
-		float Norm(const Quaternion& quaternion) {
-			return std::sqrt(quaternion.x * quaternion.x + quaternion.y * quaternion.y + quaternion.z * quaternion.z + quaternion.w * quaternion.w);
-		}
-
-		Quaternion Normalize(const Quaternion& quaternion) {
-			float norm = Math::Norm(quaternion);
-			// 0除算を避けるため単位Quaternionを返す
-			if (norm == 0.0f) {
-				return Quaternion::Identity();
-			}
-			return { quaternion.x / norm, quaternion.y / norm, quaternion.z / norm, quaternion.w / norm };
-		}
-
-		Quaternion Inverse(const Quaternion& quaternion) {
-			float norm = Math::Norm(quaternion);
-			// 0除算を避けるため単位Quaternionを返す
-			if (norm == 0.0f) {
-				return Quaternion::Identity();
-			}
-			Quaternion conjugate = Math::Conjugate(quaternion);
-			float invNorm = 1.0f / (norm * norm);
-			return { conjugate.x * invNorm, conjugate.y * invNorm,conjugate.z * invNorm,conjugate.w * invNorm };
-		}
-
-		Quaternion MakeRotateAxisAngleQuaternion(const Vector3& axis, float angle) {
-			float halfAngle = angle / 2.0f;
-			float sin = std::sin(halfAngle);
-			float cos = std::cos(halfAngle);
-			return { axis.x * sin, axis.y * sin, axis.z * sin, cos };
-		}
-
-		Vector3 RotateVector(const Vector3& vector, const Quaternion& quaternion) {
-			// 四元数とベクトルの回転（q * v * q^-1）
-			Quaternion r = { vector.x, vector.y, vector.z,0.0f };
-			// quaternionの共役を求める
-			Quaternion qConj = Math::Conjugate(quaternion);
-			Quaternion rotated = Math::Multiply(Math::Multiply(quaternion, r), qConj);
-			return { rotated.x, rotated.y, rotated.z };
-		}
-
-		Matrix4x4 MakeRotateMatrix(const Quaternion& q) {
-			Matrix4x4 result = {
-				q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z, 2.0f * (q.x * q.y + q.w * q.z), 2.0f * (q.x * q.z - q.w * q.y), 0.0f,
-				2.0f * (q.x * q.y - q.w * q.z), q.w * q.w - q.x * q.x + q.y * q.y - q.z * q.z, 2.0f * (q.y * q.z + q.w * q.x), 0.0f,
-				2.0f * (q.x * q.z + q.w * q.y), 2.0f * (q.y * q.z - q.w * q.x), q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z, 0.0f,
-				0.0f,0.0f,0.0f,1.0f,
-			};
-			return result;
-		}
-
-		float Dot(const Quaternion& a, const Quaternion& b) {
-			return  a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
-		}
-
-		Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle) {
-
-			float cos = std::cosf(angle);
-			float sin = std::sinf(angle);
-			float t = 1.0f - cos;
-
-			Matrix4x4 result = {
-				axis.x * axis.x * t + cos, axis.x * axis.y * t + axis.z * sin, axis.x * axis.z * t - axis.y * sin, 0.0f,
-				axis.x * axis.y * t - axis.z * sin, axis.y * axis.y * t + cos, axis.y * axis.z * t + axis.x * sin, 0.0f,
-				axis.x * axis.z * t + axis.y * sin, axis.y * axis.z * t - axis.x * sin, axis.z * axis.z * t + cos, 0.0f,
-				0.0f,0.0f,0.0f,1.0f,
-			};
-			return result;
-		}
-
-		Quaternion MakeEulerQuaternion(float pitch, float yaw, float roll) {
-			// pitch==x, yaw==y, roll==z
-			Quaternion qx = Math::MakeRotateAxisAngleQuaternion({ 1,0,0 }, pitch);
-			Quaternion qy = Math::MakeRotateAxisAngleQuaternion({ 0,1,0 }, yaw);
-			Quaternion qz = Math::MakeRotateAxisAngleQuaternion({ 0,0,1 }, roll);
-
-			// 回転順序ZYX
-			return Math::Multiply(qy, Math::Multiply(qx, qz));
-		}
-
-		Matrix4x4 MakeWorldMatrixFromEulerRotation(const Vector3 position, const Vector3& rotateEuler, const Vector3& scale) {
-
-			// 回転行列を作成
-			Quaternion rotate = Math::MakeEulerQuaternion(rotateEuler.x, rotateEuler.y, rotateEuler.z);
-			Matrix4x4 rotateMatrix = Math::MakeRotateMatrix(rotate);
-
-			// 拡縮行列
-			Matrix4x4 scaleMatrix = {
-				scale.x, 0.0f,   0.0f,   0.0f,
-				0.0f,   scale.y, 0.0f,   0.0f,
-				0.0f,   0.0f,   scale.z, 0.0f,
-				0.0f,   0.0f,   0.0f,    1.0f
-			};
-
-			// 平行移動行列
-			Matrix4x4 translateMatrix = {
-				1.0f, 0.0f, 0.0f, 0.0f,
-				0.0f, 1.0f, 0.0f, 0.0f,
-				0.0f, 0.0f, 1.0f, 0.0f,
-				position.x, position.y, position.z, 1.0f
-			};
-
-			// SRT行列
-			Matrix4x4 worldMatrix = (scaleMatrix * rotateMatrix) * translateMatrix;
-			return worldMatrix;
-		}
-
-		Quaternion DirectionToQuaternion(const Vector3& direction, const Vector3& up) {
-			// 基準となる前方向ベクトル
-			const Vector3 kForward = { 0.0f, 0.0f, 1.0f };
-
-			// 方向ベクトルを正規化
-			float len = direction.Length();
-			// 0ベクトル確認
-			if (len < 1e-6f) {
-				return Quaternion::Identity();
-			}
-			Vector3 dir = {
-				direction.x / len,
-				direction.y / len,
-				direction.z / len
-			};
-
-			float dot = Math::Dot(kForward, dir);
-
-			// 既に同じ方向を向いている場合単位Quaternionを返す
-			if (dot >= 1.0f - 1e-6f) {
-				return Quaternion::Identity();
-			}
-
-			// ほぼ逆方向の場合upベクトルを軸に180度回転させる
-			if (dot <= -1.0f + 1e-6f) {
-				Vector3 axis = Math::Cross(up, kForward);
-				// upも平行な場合はX軸を代替軸にする
-				if (Math::Length(axis) < 1e-6f) {
-					axis = Math::Cross({ 1.0f, 0.0f, 0.0f }, kForward);
-				}
-				axis = Math::Normalize(axis);
-				return Math::MakeRotateAxisAngleQuaternion(axis, static_cast<float>(M_PI));
-			}
-
-			// kForwardからdirへの回転軸と角度を求める
-			Vector3 axis = Math::Normalize(Math::Cross(kForward, dir));
-			float angle = std::acos(dot);
-			return Math::MakeRotateAxisAngleQuaternion(axis, angle);
-		}
-
 		Vector3 DirectionToEuler(const Vector3& direction) {
 			// 方向ベクトルを正規化
 			float len = Math::Length(direction);
@@ -434,6 +274,33 @@ namespace GameEngine {
 			Matrix4x4 translateMatrix = Matrix4x4::MakeTranslateMatrix(translate);
 
 			return scaleMatrix * localRotateMatrix * rotateMatrix * billboardMatrix * translateMatrix;
+		}
+
+		Matrix4x4 MakeWorldMatrixFromEulerRotation(const Vector3 position, const Vector3& rotateEuler, const Vector3& scale) {
+
+			// 回転行列を作成
+			Quaternion rotate = Quaternion::MakeEulerQuaternion(rotateEuler.x, rotateEuler.y, rotateEuler.z);
+			Matrix4x4 rotateMatrix = Matrix4x4::MakeRotateMatrix(rotate);
+
+			// 拡縮行列
+			Matrix4x4 scaleMatrix = {
+				scale.x, 0.0f,   0.0f,   0.0f,
+				0.0f,   scale.y, 0.0f,   0.0f,
+				0.0f,   0.0f,   scale.z, 0.0f,
+				0.0f,   0.0f,   0.0f,    1.0f
+			};
+
+			// 平行移動行列
+			Matrix4x4 translateMatrix = {
+				1.0f, 0.0f, 0.0f, 0.0f,
+				0.0f, 1.0f, 0.0f, 0.0f,
+				0.0f, 0.0f, 1.0f, 0.0f,
+				position.x, position.y, position.z, 1.0f
+			};
+
+			// SRT行列
+			Matrix4x4 worldMatrix = (scaleMatrix * rotateMatrix) * translateMatrix;
+			return worldMatrix;
 		}
 
 		Matrix4x4 LookAt(const Vector3& eye, const Vector3& center, const Vector3& up) {

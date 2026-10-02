@@ -69,7 +69,7 @@ Matrix4x4 Matrix4x4::MakeAffineMatrix(const Vector3& scale, const Vector3& rotat
 Matrix4x4 Matrix4x4::MakeAffineMatrix(const Vector3& scale, const Quaternion& quaternion, const Vector3 translate) {
 
 	// 回転行列
-	Matrix4x4 rotateMatrix = Math::MakeRotateMatrix(quaternion);
+	Matrix4x4 rotateMatrix = MakeRotateMatrix(quaternion);
 
 	// 拡縮行列
 	Matrix4x4 scaleMatrix = {
@@ -91,6 +91,32 @@ Matrix4x4 Matrix4x4::MakeAffineMatrix(const Vector3& scale, const Quaternion& qu
 	Matrix4x4 worldMatrix = scaleMatrix * rotateMatrix * translateMatrix;
 	return worldMatrix;
 }
+
+Matrix4x4 Matrix4x4::MakeRotateAxisAngle(const Vector3& axis, float angle) {
+
+	float cos = std::cosf(angle);
+	float sin = std::sinf(angle);
+	float t = 1.0f - cos;
+
+	Matrix4x4 result = {
+		axis.x * axis.x * t + cos, axis.x * axis.y * t + axis.z * sin, axis.x * axis.z * t - axis.y * sin, 0.0f,
+		axis.x * axis.y * t - axis.z * sin, axis.y * axis.y * t + cos, axis.y * axis.z * t + axis.x * sin, 0.0f,
+		axis.x * axis.z * t + axis.y * sin, axis.y * axis.z * t - axis.x * sin, axis.z * axis.z * t + cos, 0.0f,
+		0.0f,0.0f,0.0f,1.0f,
+	};
+	return result;
+}
+
+Matrix4x4 Matrix4x4::MakeRotateMatrix(const Quaternion& q) {
+	Matrix4x4 result = {
+		q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z, 2.0f * (q.x * q.y + q.w * q.z), 2.0f * (q.x * q.z - q.w * q.y), 0.0f,
+		2.0f * (q.x * q.y - q.w * q.z), q.w * q.w - q.x * q.x + q.y * q.y - q.z * q.z, 2.0f * (q.y * q.z + q.w * q.x), 0.0f,
+		2.0f * (q.x * q.z + q.w * q.y), 2.0f * (q.y * q.z - q.w * q.x), q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z, 0.0f,
+		0.0f,0.0f,0.0f,1.0f,
+	};
+	return result;
+}
+
 
 Matrix4x4 Matrix4x4::MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip) {
 	float h = 1 / std::tanf(fovY / 2);

@@ -590,6 +590,7 @@
     <ClCompile Include="EngineSource\3D\Effects\EffectAsset.cpp" />
     <ClCompile Include="EngineSource\3D\Effects\EffectModule.cpp" />
     <ClCompile Include="EngineSource\Math\Matrix4x4.cpp" />
+    <ClCompile Include="EngineSource\Math\Quaternion.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\ColorEditor.h">
