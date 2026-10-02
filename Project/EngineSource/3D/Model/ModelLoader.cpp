@@ -487,7 +487,7 @@ ModelData ModelLoader::LoadModelFile(const std::string& directoryPath, const std
 					Vector3 b = { -aiBitangent.x, aiBitangent.y, aiBitangent.z };
 					Vector3 t = { -aiTangent.x, aiTangent.y, aiTangent.z };
 					// ハンドネスの判定
-					float handedness = Math::Dot(Math::Cross(vertex.normal, t), b) < 0.0f ? -1.0f : 1.0f;
+					float handedness = Vector3::Dot(vertex.normal.Cross(t), b) < 0.0f ? -1.0f : 1.0f;
 					// 右手->左手に変換する
 					vertex.tangent = { -aiTangent.x, aiTangent.y, aiTangent.z , handedness };
 				} else {

@@ -162,9 +162,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Application\ColorEditor.cpp">
-      <Filter>Application</Filter>
-    </ClCompile>
     <ClCompile Include="Application\Camera\CameraController.cpp">
       <Filter>Application\Camera</Filter>
     </ClCompile>
@@ -594,9 +591,6 @@
     <ClCompile Include="EngineSource\Core\pch.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Application\ColorEditor.h">
-      <Filter>Application</Filter>
-    </ClInclude>
     <ClInclude Include="Application\Camera\CameraController.h">
       <Filter>Application\Camera</Filter>
     </ClInclude>

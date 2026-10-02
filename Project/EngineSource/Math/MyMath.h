@@ -20,18 +20,6 @@ namespace GameEngine {
 		// 2つのベクトルからなす角を求める
 		float AngleBetweenRadians(Vector3 v1, Vector3 v2);
 
-		// ベクトルの長さを求める
-		float Length(const Vector4& v);
-		float Length(const Vector3& v);
-		float Length(const Vector2& v);
-		// ベクトルの正規化
-		Vector3 Normalize(const Vector3& v);
-		Vector2 Normalize(const Vector2& v);
-		// 内積
-		float Dot(const Vector3& v1, const Vector3& v2);
-		// 外積
-		Vector3 Cross(const Vector3& v1, const Vector3& v2);
-
 		// ワールドスクリーン座標変換(ワールド->スクリーン変換)
 		Vector3 Project(const Vector3& worldPosition, const Vector2& viewport, const float& viewportWidth, const float& viewportHeight, const Matrix4x4& viewProjection);
 
@@ -53,11 +41,11 @@ namespace GameEngine {
 		Vector3 CalculateRayDirection(Vector2 mousePos, const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix, float windowWidth = 1280.0f, float windowHeight = 720.0f);
 
 		// 最大値
-		Vector3 Max(Vector3 pos1, Vector3 pos2);
-		Vector4 MaxVector4(Vector4 pos1, Vector4 pos2);
+		Vector3 Max(Vector3 v1, Vector3 v2);
+		Vector4 Max(Vector4 v1, Vector4 v2);
 		// 最小値
-		Vector3 Min(Vector3 pos1, Vector3 pos2);
-		Vector4 MinVector4(Vector4 pos1, Vector4 pos2);
+		Vector3 Min(Vector3 v1, Vector3 v2);
+		Vector4 Min(Vector4 v1, Vector4 v2);
 
 		/// <summary>
 		/// ビルボードを適応させるためのworldMatrixを作成

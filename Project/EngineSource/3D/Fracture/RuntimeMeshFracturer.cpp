@@ -30,7 +30,7 @@ namespace {
 		auto Lerp = [](const VertexData& a, const VertexData& b, float t) {
 			VertexData r;
 			r.position = a.position + (b.position - a.position) * t;
-			r.normal = Math::Normalize(a.normal + (b.normal - a.normal) * t);
+			r.normal = Vector3::Normalize(a.normal + (b.normal - a.normal) * t);
 			r.texcoord = a.texcoord + (b.texcoord - a.texcoord) * t;
 			return r;
 			};
@@ -93,13 +93,14 @@ namespace {
 			loop.push_back(current);
 			bool found = false;
 			for (size_t i = 0; i < remaining.size(); ++i) {
-				if (Math::Length(remaining[i].first.position - current.position) < kEps) {
+				if (Vector4::Distance(remaining[i].first.position, current.position) < kEps) {
+
 					current = remaining[i].second;
 					remaining.erase(remaining.begin() + i);
 					found = true;
 					break;
 				}
-				if (Math::Length(remaining[i].second.position - current.position) < kEps) {
+				if (Vector4::Distance(remaining[i].second.position, current.position) < kEps) {
 					current = remaining[i].first;
 					remaining.erase(remaining.begin() + i);
 					found = true;
@@ -138,7 +139,7 @@ namespace {
 		std::vector<std::pair<VertexData, VertexData>> cutEdges;
 
 		auto SignedDist = [&](const Vector3& p) {
-			return Math::Dot(planeNormal, p) - planeDist;
+			return planeNormal.Dot(p) - planeDist;
 			};
 
 		for (size_t i = 0; i < indices.size(); i += 3) {
@@ -190,7 +191,7 @@ namespace {
 		sites.reserve(numSites);
 
 		Vector3 extent = bounds.max - bounds.min;
-		float maxRadius = Math::Length(extent) * 0.5f;
+		float maxRadius = extent.Length() * 0.5f;
 
 		for (int i = 0; i < numSites; ++i) {
 			// tが0に近いほど衝撃点の近くに配置される
@@ -231,13 +232,13 @@ namespace {
 				if (i == j) { continue; }
 
 				Vector3 normal = sites[j] - sites[i];
-				float len = Math::Length(normal);
+				float len = normal.Length();
 				// ほぼ同位置のサイトは飛ばす
 				if (len < 1e-5f) { continue; }
 				normal = normal / len;
 
 				Vector3 midpoint = (sites[i] + sites[j]) * 0.5f;
-				float planeDist = Math::Dot(normal, midpoint);
+				float planeDist = normal.Dot(midpoint);
 
 				ClipResult clipped = ClipMeshByPlane(cellVerts, cellIndices, normal, planeDist);
 				cellVerts = clipped.backVerts;
@@ -305,7 +306,7 @@ namespace {
 
 			// 球面上の接点を通り、外向き法線nを持つ平面
 			Vector3 planePoint = impactPos + n * craterRadius;
-			float planeDist = Math::Dot(n, planePoint);
+			float planeDist = n.Dot(planePoint);
 
 			ClipResult clipped = ClipMeshByPlane(remainderVerts, remainderIndices, n, planeDist);
 

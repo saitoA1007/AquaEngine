@@ -41,7 +41,7 @@ CollisionResult GameEngine::IsSpherePlaneCollision(const Sphere& sphere, const P
 	CollisionResult result;
 
 	// 球の半径より短ければ衝突
-	if (std::fabs(Math::Dot(plane.normal, sphere.center) - plane.distance) <= sphere.radius) {
+	if (std::fabs(plane.normal.Dot(sphere.center) - plane.distance) <= sphere.radius) {
 		result.isHit = true;
 	}
 
@@ -52,7 +52,7 @@ CollisionResult GameEngine::IsSegmentPlaneCollision(const Segment& segment, cons
 	CollisionResult result;
 
 	// 垂直判定を行うために、法線と線の内積を求める
-	float dot = Math::Dot(plane.normal, segment.diff);
+	float dot = plane.normal.Dot(segment.diff);
 
 	// 垂直の時は衝突していないのでfalseを返す
 	if (dot == 0.0f) {
@@ -60,7 +60,7 @@ CollisionResult GameEngine::IsSegmentPlaneCollision(const Segment& segment, cons
 	}
 
 	// tを求める
-	float t = (plane.distance - Math::Dot(plane.normal, segment.origin)) / dot;
+	float t = (plane.distance - plane.normal.Dot(segment.origin)) / dot;
 
 	if (t >= 0.0f && t <= 1.0f) {
 		result.isHit = true;
@@ -74,15 +74,15 @@ CollisionResult GameEngine::IsSegmentTriangleCollision(const Triangle& triangle,
 
 	// 三角形の3つの頂点を使って平面を求める
 	Plane plane;
-	plane.normal = Math::Cross(triangle.vertices[1] - triangle.vertices[0], triangle.vertices[2] - triangle.vertices[1]);
-	plane.distance = Math::Dot(plane.normal, triangle.vertices[0]);
+	plane.normal = Vector3::Cross(triangle.vertices[1] - triangle.vertices[0], triangle.vertices[2] - triangle.vertices[1]);
+	plane.distance = plane.normal.Dot(triangle.vertices[0]);
 	// 法線を正規化
-	plane.normal = Math::Normalize(plane.normal);
+	plane.normal = Vector3::Normalize(plane.normal);
 	// 垂直判定を行うために、法線と線の内積を求める
-	float dot = Math::Dot(plane.normal, segment.diff);
+	float dot = plane.normal.Dot(segment.diff);
 
 	// tを求める
-	float t = (plane.distance - Math::Dot(plane.normal, segment.origin)) / dot;
+	float t = (plane.distance - plane.normal.Dot(segment.origin)) / dot;
 	// 衝突点pを求める
 	Vector3 p = Vector3(segment.origin) + Vector3(segment.diff.x * t, segment.diff.y * t, segment.diff.z * t);
 
@@ -95,14 +95,14 @@ CollisionResult GameEngine::IsSegmentTriangleCollision(const Triangle& triangle,
 	Vector3 v0p = p - triangle.vertices[0];
 
 	// 各辺を結んだベクトルと、頂点と衝突点pを結んだベクトルのクロス積を取る
-	Vector3 cross01 = Math::Cross(v01, v1p);
-	Vector3 cross12 = Math::Cross(v12, v2p);
-	Vector3 cross20 = Math::Cross(v20, v0p);
+	Vector3 cross01 = v01.Cross(v1p);
+	Vector3 cross12 = v12.Cross(v2p);
+	Vector3 cross20 = v20.Cross(v0p);
 
 	// すべての小三角形のクロス積と法線が同じ方向を向いていたら衝突
-	if (Math::Dot(cross01, plane.normal) >= 0.0f &&
-		Math::Dot(cross12, plane.normal) >= 0.0f &&
-		Math::Dot(cross20, plane.normal) >= 0.0f) {
+	if (cross01.Dot(plane.normal) >= 0.0f &&
+		cross12.Dot(plane.normal) >= 0.0f &&
+		cross20.Dot(plane.normal) >= 0.0f) {
 		result.isHit = true;
 	}
 
@@ -237,9 +237,9 @@ CollisionResult GameEngine::IsOBBSphereCollision(const OBB& obb, const Sphere& s
 
 	// ベクトルをOBBのローカル座標系に変換
 	Vector3 centerInOBBLocalSpace = {
-		Math::Dot(v, obb.orientations[0]),
-		Math::Dot(v, obb.orientations[1]),
-		Math::Dot(v, obb.orientations[2])
+		v.Dot(obb.orientations[0]),
+		v.Dot(obb.orientations[1]),
+		v.Dot(obb.orientations[2])
 	};
 
 	// obbのローカル空間の球の位置を求める
@@ -261,7 +261,7 @@ CollisionResult GameEngine::IsOBBSphereCollision(const OBB& obb, const Sphere& s
 
 	// ローカル空間での距離を計算
 	Vector3 diffLocal = centerInOBBLocalSpace - closestPointLocal;
-	float distanceSquared = Math::Dot(diffLocal, diffLocal);
+	float distanceSquared = diffLocal.Dot(diffLocal);
 	float radiusSquared = sphere.radius * sphere.radius;
 
 	if (distanceSquared <= radiusSquared) {
@@ -304,17 +304,17 @@ CollisionResult GameEngine::IsOBBSegmentCollision(const OBB& obb, const Segment&
 	// 線の始点をOBBのローカル座標系に変換
 	Vector3 vOrigin = segment.origin - obb.center;
 	Vector3 localOrigin = {
-		Math::Dot(vOrigin, obb.orientations[0]),
-		Math::Dot(vOrigin, obb.orientations[1]),
-		Math::Dot(vOrigin, obb.orientations[2])
+		vOrigin.Dot(obb.orientations[0]),
+		vOrigin.Dot(obb.orientations[1]),
+		vOrigin.Dot(obb.orientations[2])
 	};
 
 	// 線の終点をOBBのローカル座標系に変換
 	Vector3 vEnd = segmentEnd - obb.center;
 	Vector3 localEnd = {
-		Math::Dot(vEnd, obb.orientations[0]),
-		Math::Dot(vEnd, obb.orientations[1]),
-		Math::Dot(vEnd, obb.orientations[2])
+		vEnd.Dot(obb.orientations[0]),
+		vEnd.Dot(obb.orientations[1]),
+		vEnd.Dot(obb.orientations[2])
 	};
 
 	// ローカル空間での線を求める

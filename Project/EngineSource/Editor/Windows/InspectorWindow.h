@@ -90,8 +90,8 @@ namespace GameEngine {
 				bool isChangeMax = ImGui::ColorEdit4("Max", reinterpret_cast<float*>(&value.max));
 
 				if (isChangeMin || isChangeMax) {
-					value.min = Math::MinVector4(value.min, value.max);
-					value.max = Math::MaxVector4(value.min, value.max);
+					value.min = Math::Min(value.min, value.max);
+					value.max = Math::Max(value.min, value.max);
 					isDirty = true;
 				}
 				ImGui::TreePop();

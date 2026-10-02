@@ -42,9 +42,9 @@ void DirectionEmitModule::Create(ParticleData& particleData) {
 
 	if (spreadAngle_ > 0.0f) {
 		// 基準方向と平行にならないup軸を選ぶ
-		Vector3 up = (std::fabs(Math::Dot(baseDir, Vector3(0.0f, 1.0f, 0.0f))) > 0.99f) ?
+		Vector3 up = (std::fabs(baseDir.Dot(Vector3(0.0f, 1.0f, 0.0f))) > 0.99f) ?
 			Vector3(1.0f, 0.0f, 0.0f) : Vector3(0.0f, 1.0f, 0.0f);
-		Vector3 perpendicular = Math::Normalize(Math::Cross(baseDir, up));
+		Vector3 perpendicular = Vector3::Normalize(baseDir.Cross(up));
 
 		// 基準方向を軸に回転させ、広がりの方向を決める
 		float spinAngle = RandomGenerator::Get(0.0f, 2.0f * std::numbers::pi_v<float>);

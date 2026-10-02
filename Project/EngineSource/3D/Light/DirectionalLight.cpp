@@ -14,7 +14,7 @@ void DirectionalLight::Initialize(const Vector4& color,const Vector3& direction,
 }
 
 void DirectionalLight::SetLightDir(const Vector3& lightdir) {
-	directionalLightData_.direction = Math::Normalize(lightdir);
+	directionalLightData_.direction = Vector3::Normalize(lightdir);
 }
 
 void DirectionalLight::CreateDirectionalShadowMatrix(const Vector3& targetCenter,float shadowRange) {
@@ -46,7 +46,7 @@ void DirectionalLight::CreateDirectionalShadowMatrix(const Vector3& targetCenter
 
     // ライト方向と最も垂直に近い軸を選択
     for (int i = 0; i < 3; ++i) {
-        float dotProduct = std::abs(Math::Dot(lightDir, candidateUps[i]));
+        float dotProduct = std::abs(lightDir.Dot(candidateUps[i]));
         if (dotProduct < minDot) {
             minDot = dotProduct;
             worldUp = candidateUps[i];
@@ -54,9 +54,9 @@ void DirectionalLight::CreateDirectionalShadowMatrix(const Vector3& targetCenter
     }
 
     // 右ベクトルを計算
-    Vector3 right = Math::Normalize(Math::Cross(worldUp, lightDir));
+    Vector3 right = Vector3::Normalize(worldUp.Cross(lightDir));
     // ライトと右ベクトル直交ベクトルを求める
-    Vector3 up = Math::Normalize(Math::Cross(lightDir, right));
+    Vector3 up = Vector3::Normalize(lightDir.Cross(right));
    
     Matrix4x4 worldMatrix = Math::LookAt(lightPos, targetCenter, up);
 

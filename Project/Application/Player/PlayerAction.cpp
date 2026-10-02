@@ -363,7 +363,7 @@ void PlayerBounceAction::WallBounce(Vector3& pos, const Vector3& bounceDirection
 
 		// 速度と方向を変更する
 		Vector3 velocityXZ = { commonData_->velocity.x, 0.0f, commonData_->velocity.z };
-		float dot = Math::Dot(velocityXZ, dirXZ);
+		float dot = velocityXZ.Dot(dirXZ);
 		if (dot < 0.0f) {
 			Vector3 reflected = {
 				velocityXZ.x - 2.0f * dot * dirXZ.x,
@@ -373,9 +373,9 @@ void PlayerBounceAction::WallBounce(Vector3& pos, const Vector3& bounceDirection
 			commonData_->velocity.x = reflected.x * kWallHitReflectFactor_;
 			commonData_->velocity.z = reflected.z * kWallHitReflectFactor_;
 			Vector3 newDir = { reflected.x, 0.0f, reflected.z };
-			float len = Math::Length(newDir);
+			float len = newDir.Length();
 			if (len > 0.00001f) {
-				commonData_->targetDir = Math::Normalize(newDir);
+				commonData_->targetDir = Vector3::Normalize(newDir);
 			}
 		}
 	}

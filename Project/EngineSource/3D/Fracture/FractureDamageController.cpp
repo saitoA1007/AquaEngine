@@ -123,10 +123,10 @@ bool FractureDamageController::SimulateReassemblySpring(FractureInstance& instan
 		state.crackAngularVelocity += rotAccel * deltaTime;
 		state.transform.rotate += state.crackAngularVelocity * deltaTime;
 
-		bool settled = Math::Length(displacement) < kReassemblySettleThreshold_
-			&& Math::Length(state.crackVelocity) < kReassemblySettleThreshold_
-			&& Math::Length(state.transform.rotate) < kReassemblySettleThreshold_
-			&& Math::Length(state.crackAngularVelocity) < kReassemblySettleThreshold_;
+		bool settled = displacement.Length() < kReassemblySettleThreshold_
+			&& state.crackVelocity.Length() < kReassemblySettleThreshold_
+			&& state.transform.rotate.Length() < kReassemblySettleThreshold_
+			&& state.crackAngularVelocity.Length() < kReassemblySettleThreshold_;
 		if (settled) {
 			// 収束済みなら完全に原点へスナップして、揺れ戻りを防ぐ
 			state.transform.translate = { 0.0f, 0.0f, 0.0f };
@@ -208,7 +208,7 @@ void FractureDamageController::CarveAttachedDent(uint32_t chunkId, const Vector3
 
 	// チャンク自身のAABBから半径の上限を求めてクランプする
 	Vector3 chunkExtent = chunkIt->second->info.aabb.max - chunkIt->second->info.aabb.min;
-	float chunkRadius = Math::Length(chunkExtent) * 0.5f;
+	float chunkRadius = chunkExtent.Length() * 0.5f;
 	if (chunkRadius > 1e-4f) {
 		dentRadius = std::min(dentRadius, chunkRadius * kMaxDentRadiusToChunkRatio_);
 	}
@@ -236,7 +236,7 @@ void FractureDamageController::CarveAttachedDent(uint32_t chunkId, const Vector3
 
 Vector3 FractureDamageController::ComputeDentCenter(const Vector3& impactPos, const Vector3& impactDirection, float dentRadius) const {
 	Vector3 dentCenter = impactPos;
-	float dirLength = Math::Length(impactDirection);
+	float dirLength = impactDirection.Length();
 	if (dirLength > 1e-4f) {
 		Vector3 dir = impactDirection / dirLength;
 		// 衝突方向と逆側へ球の中心を押し込み、攻撃側の表面が開いた噛み跡のような形にする
@@ -450,7 +450,7 @@ std::vector<uint32_t> FractureDamageController::SelectDetachedChunks(uint32_t se
 				continue;
 			}
 			// ダメージ半径の外
-			float dist = Math::Length(neighborIt->second->info.centroid - impactPos);
+			float dist = Vector3::Distance(neighborIt->second->info.centroid, impactPos);
 			if (dist > damageRadius) {
 				continue;
 			}
@@ -472,7 +472,7 @@ std::optional<uint32_t> FractureDamageController::FindNearestChunk(const Vector3
 			continue;
 		}
 		Vector3 diff = entry->info.centroid - impactPos;
-		float distSq = Math::Dot(diff, diff);
+		float distSq = diff.Dot(diff);
 		if (distSq < nearestDistSq) {
 			nearestDistSq = distSq;
 			nearestId = chunkId;
@@ -499,7 +499,7 @@ void FractureDamageController::ApplyExplosionImpulse(FractureInstance& instance,
 	for (size_t i = 0; i < chunkIds.size(); ++i) {
 		const auto& entry = chunksById_.at(chunkIds[i]);
 		Vector3 dir = entry->info.centroid - impactPos;
-		float dist = Math::Length(dir);
+		float dist = dir.Length();
 		if (dist < 1e-4f) {
 			// 中心とほぼ同じ位置なら上方向にフォールバック
 			dir = Vector3(0.0f, 1.0f, 0.0f);
@@ -547,7 +547,7 @@ void FractureDamageController::UpdateCrackVisual(uint32_t chunkId, float ratio, 
 	}
 
 	Vector3 dir = chunkIt->second->info.centroid - modelCenter_;
-	float len = Math::Length(dir);
+	float len = dir.Length();
 	if (len < 1e-4f) {
 		dir = Vector3(0.0f, 1.0f, 0.0f);
 	} else {
@@ -612,10 +612,10 @@ void FractureDamageController::SimulateCrackPhysics() {
 		state.transform.rotate += state.crackAngularVelocity * FpsCounter::gameDeltaTime;
 
 		// 十分収まったらアクティブリストから外す
-		bool settled = Math::Length(displacement) < kSettleThreshold
-			&& Math::Length(state.crackVelocity) < kSettleThreshold
-			&& Math::Length(state.transform.rotate) < kSettleThreshold
-			&& Math::Length(state.crackAngularVelocity) < kSettleThreshold;
+		bool settled = displacement.Length() < kSettleThreshold
+			&& state.crackVelocity.Length() < kSettleThreshold
+			&& state.transform.rotate.Length() < kSettleThreshold
+			&& state.crackAngularVelocity.Length() < kSettleThreshold;
 		if (settled) {
 			settledIds.push_back(chunkId);
 		}

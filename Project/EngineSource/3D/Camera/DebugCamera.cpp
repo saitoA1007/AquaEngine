@@ -65,11 +65,11 @@ void DebugCamera::Update() {
 		if (input_->GetMouseDelta().y > 0.0f) { targetMove.y = 1.0f; }
 
 		// カメラの向き
-		Vector3 forward = Math::Normalize(targetPos_ - translate_);  
+		Vector3 forward = Vector3::Normalize(targetPos_ - translate_);
 		// 上方向
 		Vector3 up = { 0.0f, 1.0f, 0.0f };
 		// 横方向
-		Vector3 right = Math::Normalize(Math::Cross(up, forward));
+		Vector3 right = Vector3::Normalize(up.Cross(forward));
 		// カメラから見てx,y軸に移動量を求める
 		Vector3 moveVec = right * targetMove.x + up * targetMove.y;
 		// ターゲットに加算
@@ -136,9 +136,9 @@ Vector3 DebugCamera::GetWorldPosition() {
 }
 
 Matrix4x4 DebugCamera::LookAt(const Vector3& eye, const Vector3& center, const Vector3& up) {
-	Vector3 f = Math::Normalize(center - eye); // 前方向ベクトル
-	Vector3 s = Math::Normalize(Math::Cross(up,f)); // 右方向ベクトル
-	Vector3 u = Math::Cross(f,s); // 上方向ベクトル
+	Vector3 f = Vector3::Normalize(center - eye); // 前方向ベクトル
+	Vector3 s = Vector3::Normalize(up.Cross(f)); // 右方向ベクトル
+	Vector3 u = f.Cross(s); // 上方向ベクトル
 
 	Matrix4x4 result = { {
 		{ s.x,  s.y, s.z, 0 },

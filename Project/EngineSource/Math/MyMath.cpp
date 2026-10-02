@@ -9,7 +9,7 @@ namespace GameEngine {
 
 		Vector3 DirectionToEuler(const Vector3& direction) {
 			// 方向ベクトルを正規化
-			float len = Math::Length(direction);
+			float len = direction.Length();
 			// 0ベクトル確認
 			if (len < 1e-6f) {
 				return { 0.0f, 0.0f, 0.0f };
@@ -38,49 +38,11 @@ namespace GameEngine {
 			v2.Normalize();
 
 			// 内積を求める
-			float dot = Math::Dot(v1, v2);
+			float dot = v1.Dot(v2);;
 			dot = std::clamp(dot, -1.0f, 1.0f);
 
 			// 内積から角度を求める
 			return std::acos(dot);
-		}
-
-		float Length(const Vector4& v) {
-			return std::sqrtf(v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w);
-		}
-
-		float Length(const Vector3& v) {
-			return std::sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
-		}
-
-		float Length(const Vector2& v) {
-			return std::sqrtf(v.x * v.x + v.y * v.y);
-		}
-
-		Vector3 Normalize(const Vector3& v) {
-			float length = Math::Length(v);
-			if (length == 0.0f) {
-				return Vector3(0.0f, 0.0f, 0.0f);
-			} else {
-				return Vector3(v.x / length, v.y / length, v.z / length);
-			}
-		}
-
-		Vector2 Normalize(const Vector2& v) {
-			float length = Math::Length(v);
-			if (length == 0.0f) {
-				return Vector2(0.0f, 0.0f);
-			} else {
-				return Vector2(v.x / length, v.y / length);
-			}
-		}
-
-		float Dot(const Vector3& v1, const Vector3& v2) {
-			return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
-		}
-
-		Vector3 Cross(const Vector3& v1, const Vector3& v2) {
-			return Vector3(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x);
 		}
 
 		Vector3 Project(const Vector3& worldPosition, const Vector2& viewport, const float& viewportWidth, const float& viewportHeight, const Matrix4x4& viewProjection) {
@@ -169,20 +131,20 @@ namespace GameEngine {
 			return rayWorld.Normalize();
 		}
 
-		Vector3 Max(Vector3 pos1, Vector3 pos2) {
-			return Vector3(std::max(pos1.x, pos2.x), std::max(pos1.y, pos2.y), std::max(pos1.z, pos2.z));
+		Vector3 Max(Vector3 v1, Vector3 v2) {
+			return Vector3(std::max(v1.x, v2.x), std::max(v1.y, v2.y), std::max(v1.z, v2.z));
 		}
 
-		Vector4 MaxVector4(Vector4 pos1, Vector4 pos2) {
-			return Vector4(std::max(pos1.x, pos2.x), std::max(pos1.y, pos2.y), std::max(pos1.z, pos2.z), std::max(pos1.w, pos2.w));
+		Vector4 Max(Vector4 v1, Vector4 v2) {
+			return Vector4(std::max(v1.x, v2.x), std::max(v1.y, v2.y), std::max(v1.z, v2.z), std::max(v1.w, v2.w));
 		}
 
-		Vector3 Min(Vector3 pos1, Vector3 pos2) {
-			return Vector3(std::min(pos1.x, pos2.x), std::min(pos1.y, pos2.y), std::min(pos1.z, pos2.z));
+		Vector3 Min(Vector3 v1, Vector3 v2) {
+			return Vector3(std::min(v1.x, v2.x), std::min(v1.y, v2.y), std::min(v1.z, v2.z));
 		}
 
-		Vector4 MinVector4(Vector4 pos1, Vector4 pos2) {
-			return Vector4(std::min(pos1.x, pos2.x), std::min(pos1.y, pos2.y), std::min(pos1.z, pos2.z), std::min(pos1.w, pos2.w));
+		Vector4 Min(Vector4 v1, Vector4 v2) {
+			return Vector4(std::min(v1.x, v2.x), std::min(v1.y, v2.y), std::min(v1.z, v2.z), std::min(v1.w, v2.w));
 		}
 
 		Matrix4x4 Multiply(const Matrix4x4& matrix1, const Matrix4x4& matrix2) {
@@ -307,13 +269,13 @@ namespace GameEngine {
 		Matrix4x4 LookAt(const Vector3& eye, const Vector3& center, const Vector3& up) {
 
 			// カメラの方向ベクトル
-			Vector3 z = Math::Normalize(center - eye); // 前方向ベクトル
-			Vector3 x = Math::Normalize(Math::Cross(up, z)); // 右方向ベクトル
-			Vector3 y = Math::Cross(z, x);             // 上方向ベクトル
+			Vector3 z = Vector3::Normalize(center - eye); // 前方向ベクトル
+			Vector3 x = Vector3::Normalize(up.Cross(z)); // 右方向ベクトル
+			Vector3 y = z.Cross(x);             // 上方向ベクトル
 
-			float tx = Math::Dot(x, eye);
-			float ty = Math::Dot(y, eye);
-			float tz = Math::Dot(z, eye);
+			float tx = x.Dot(eye);
+			float ty = y.Dot(eye);
+			float tz = z.Dot(eye);
 
 			Matrix4x4 result = { {
 				{ x.x,  x.y,  x.z,  0.0f },

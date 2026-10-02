@@ -138,7 +138,7 @@ void GravityFieldModule::Update(ParticleData& particleData, float time) {
 
 	// 重力方向の速度を上限で抑える
 	if (maxSpeed_ > 0.0f) {
-		float speed = Math::Dot(particleData.velocity, direction);
+		float speed = particleData.velocity.Dot(direction);
 		if (speed > maxSpeed_) {
 			particleData.velocity -= direction * (speed - maxSpeed_);
 		}

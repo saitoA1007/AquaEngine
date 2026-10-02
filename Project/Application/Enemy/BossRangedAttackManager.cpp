@@ -53,7 +53,7 @@ void BossRangedAttackManager::StartIceFall(float rangeRadius, float minDistance,
 
         for (const auto& p : points) {
             // 近すぎる点があれば即座に却下
-            if (Vector2::GetDistance(candidate, p) < minDistSq) {
+            if (Vector2::DistanceSquared(candidate, p) < minDistSq) {
                 isValid = false;
                 break; 
             }

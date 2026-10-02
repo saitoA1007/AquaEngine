@@ -78,7 +78,7 @@ Quaternion Quaternion::DirectionToQuaternion(const Vector3& direction, const Vec
 		direction.z / len
 	};
 
-	float dot = Math::Dot(kForward, dir);
+	float dot = kForward.Dot(dir);
 
 	// 既に同じ方向を向いている場合単位Quaternionを返す
 	if (dot >= 1.0f - 1e-6f) {
@@ -87,17 +87,20 @@ Quaternion Quaternion::DirectionToQuaternion(const Vector3& direction, const Vec
 
 	// ほぼ逆方向の場合upベクトルを軸に180度回転させる
 	if (dot <= -1.0f + 1e-6f) {
-		Vector3 axis = Math::Cross(up, kForward);
+		Vector3 axis = up.Cross(kForward);
+
 		// upも平行な場合はX軸を代替軸にする
-		if (Math::Length(axis) < 1e-6f) {
-			axis = Math::Cross({ 1.0f, 0.0f, 0.0f }, kForward);
+		if (axis.Length() < 1e-6f) {
+			Vector3 xAxis = { 1.0f, 0.0f, 0.0f };
+			axis = xAxis.Cross(kForward);
 		}
-		axis = Math::Normalize(axis);
+		axis.Normalize();
 		return MakeRotateAxisAngleQuaternion(axis, static_cast<float>(M_PI));
 	}
 
 	// kForwardからdirへの回転軸と角度を求める
-	Vector3 axis = Math::Normalize(Math::Cross(kForward, dir));
+	Vector3 axis = Vector3::Normalize(kForward.Cross(dir));
+
 	float angle = std::acos(dot);
 	return MakeRotateAxisAngleQuaternion(axis, angle);
 }

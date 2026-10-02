@@ -247,7 +247,7 @@ void BossCrossMoveAction::Initialize() {
 	startCurrentRotDir_ = Math::YawToDirection(commonData_.transform.rotate.y);
 	startCurrentRotDir_.Normalize();
 	// 最初の内の最後に向く方向
-	endRotDir_ = Math::Normalize(endPos_);
+	endRotDir_ = Vector3::Normalize(endPos_);
 
 	// 最終的に向く方向
 	finalRotDir_ = endRotDir_ * -1.0f;
@@ -359,11 +359,11 @@ void RotateMoveAction::Initialize() {
 	// 最初の内の最後に向く方向
 	float angle = Lerp(startAngle_, endAngle_, 0.2f);
 	Vector3 prePos = GetXZFromAngle(angle, radius, defaultPosY_);
-	endRotDir_ = Math::Normalize(prePos - commonData_.transform.translate);
+	endRotDir_ = Vector3::Normalize(prePos - commonData_.transform.translate);
 	// 最終的に向く方向
 	angle = Lerp(startAngle_, endAngle_, 1.0f);
 	prePos = GetXZFromAngle(angle, radius, defaultPosY_);
-	finalRotDir_ = Math::Normalize(prePos * -1.0f);
+	finalRotDir_ = Vector3::Normalize(prePos * -1.0f);
 
 	commonData_.animator->StartAnimation(BossAnimationType::kMove, "基本移動");
 }
