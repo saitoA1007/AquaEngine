@@ -3,6 +3,7 @@
 #include "LogManager.h"
 #include "PostProcess/PostEffectManager.h"
 #include "TextureManager.h"
+#include "RenderPassController.h"
 
 using namespace GameEngine;
 namespace ed = ax::NodeEditor;
@@ -79,6 +80,7 @@ PostEffectWindow::PostEffectWindow(PostEffectManager* postEffectManager, Texture
     textureManager_ = textureManager;
     renderPassController_ = renderPassController;
 
+    // ノードに使用するテクスチャをロード
     textureManager_->RegisterTexture("EngineSource/Resources/Textures/BlueprintBackground.png");
     textureManager_->RegisterTexture("EngineSource/Resources/Textures/ic_restore_white_24dp.png");
     textureManager_->RegisterTexture("EngineSource/Resources/Textures/ic_save_white_24dp.png");
@@ -145,6 +147,8 @@ void PostEffectWindow::Draw() {
         // 保存処理(後でグラフをJSONに書き出すなど)
     }
     if (ImGui::IsItemHovered()) { ImGui::SetTooltip("Save"); }
+    ImGui::SameLine();
+    ImGui::Checkbox("Preview", &showPreview_);
 
     ed::SetCurrentEditor(context_);
     ed::Begin("PostEffectGraph");
@@ -223,7 +227,27 @@ void PostEffectWindow::Draw() {
             ImGui::PopItemWidth();
             ImGui::EndDisabled();
         }
+        // ポストエフェクトの描画結果を表示
+        if (showPreview_) {
+            ImGui::Spacing();
+            const std::string previewPass = GetPreviewPassName(graph, *node);
+            const ImVec2 size(kNodeWidth, kNodeWidth * 9.0f / 16.0f);
 
+            ImVec2 p = ImGui::GetCursorScreenPos();
+            ImGui::Dummy(size);
+            ImDrawList* dl = ImGui::GetWindowDrawList();
+
+            if (!previewPass.empty()) {
+                CD3DX12_GPU_DESCRIPTOR_HANDLE h = renderPassController_->GetSrvHandle(previewPass);
+                // 無効なエフェクトはこのフレーム描画されないので暗く表示する
+                ImU32 tint = active ? IM_COL32(255, 255, 255, 255) : IM_COL32(255, 255, 255, 60);
+                dl->AddImageRounded((ImTextureID)h.ptr, p, ImVec2(p.x + size.x, p.y + size.y),
+                    ImVec2(0, 0), ImVec2(1, 1), tint, 4.0f);
+            } else {
+                dl->AddRectFilled(p, ImVec2(p.x + size.x, p.y + size.y), IM_COL32(20, 20, 22, 255), 4.0f);
+            }
+            dl->AddRect(p, ImVec2(p.x + size.x, p.y + size.y), IM_COL32(255, 255, 255, 40), 4.0f);
+        }
         ImGui::PopID();
         ed::EndNode();
 
@@ -368,4 +392,27 @@ void PostEffectWindow::Draw() {
     ed::End();
     ed::SetCurrentEditor(nullptr);
     ImGui::End();
+}
+
+std::string PostEffectWindow::GetPreviewPassName(const PostEffectGraph& graph, const PostEffectNode& node) const {
+    switch (node.kind) {
+        // 元のシーン画像
+    case PostEffectNodeKind::kScene:
+        return renderPassController_->GetSceneFinalPass();
+
+        // 各エフェクトのパス
+    case PostEffectNodeKind::kEffect:
+        return node.passName;    
+
+    case PostEffectNodeKind::kOutput: {
+        // Outputは自前の画像を持たないので、つながっている上流ノードを表示する
+        if (node.inputs.empty()) { return {}; }
+        const Link* l = graph.FindLinkToPin(node.inputs[0].id);
+        if (!l) { return {}; }
+        const Pin* s = graph.FindPin(l->startPinId);
+        const PostEffectNode* up = s ? graph.FindNode(s->parentNodeId) : nullptr;
+        return up ? GetPreviewPassName(graph, *up) : std::string{};
+    }
+    }
+    return {};
 }

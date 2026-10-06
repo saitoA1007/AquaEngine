@@ -1,6 +1,7 @@
 #pragma once
 #include "IEditorWindow.h"
 #include "ImGuiManager.h"
+#include "NodeSystem/PostEffectGraph.h"
 
 namespace GameEngine {
 
@@ -32,9 +33,15 @@ namespace GameEngine {
 		// 右クリックしたキャンバス座標
 		ImVec2 popupCanvasPos_{};
 
+		bool showPreview_ = true;
+
 		// 画像
 		uint32_t headerBgHandle_ = 0;
 		uint32_t iconRestoreHandle_ = 0;
 		uint32_t iconSaveHandle_ = 0;
+
+	private:
+
+		std::string GetPreviewPassName(const PostEffectGraph& graph, const PostEffectNode& node) const;
 	};
 }
