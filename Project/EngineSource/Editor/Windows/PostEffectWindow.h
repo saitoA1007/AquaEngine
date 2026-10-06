@@ -2,6 +2,7 @@
 #include "IEditorWindow.h"
 #include "ImGuiManager.h"
 #include "NodeSystem/PostEffectGraph.h"
+#include "NodeSystem/NodeBuilder.h"
 
 namespace GameEngine {
 
@@ -28,6 +29,9 @@ namespace GameEngine {
 
 		ax::NodeEditor::EditorContext* context_ = nullptr;
 
+		// ノードの描画スタイル
+		NodeUI::NodeStyle nodeStyle_;
+
 		// 初回とリセット後にノード位置をエディタへ反映する
 		bool applyPositions_ = true;
 		// 右クリックしたキャンバス座標
@@ -41,6 +45,8 @@ namespace GameEngine {
 		uint32_t iconSaveHandle_ = 0;
 
 	private:
+
+		void DrawNode(PostEffectGraph& graph, PostEffectNode& node);
 
 		std::string GetPreviewPassName(const PostEffectGraph& graph, const PostEffectNode& node) const;
 	};

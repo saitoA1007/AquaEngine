@@ -589,6 +589,8 @@
     <ClCompile Include="EngineSource\Editor\Windows\PostEffectWindow.cpp" />
     <ClCompile Include="EngineSource\Editor\NodeSystem\PostEffectGraph.cpp" />
     <ClCompile Include="Application\Demo\PBRDemo.cpp" />
+    <ClCompile Include="EngineSource\Editor\NodeSystem\NodePinIcon.cpp" />
+    <ClCompile Include="EngineSource\Editor\NodeSystem\NodeBuilder.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Camera\CameraController.h">
@@ -1160,6 +1162,8 @@
     <ClInclude Include="EngineSource\Editor\Windows\PostEffectWindow.h" />
     <ClInclude Include="EngineSource\Editor\NodeSystem\PostEffectGraph.h" />
     <ClInclude Include="Application\Demo\PBRDemo.h" />
+    <ClInclude Include="EngineSource\Editor\NodeSystem\NodePinIcon.h" />
+    <ClInclude Include="EngineSource\Editor\NodeSystem\NodeBuilder.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />

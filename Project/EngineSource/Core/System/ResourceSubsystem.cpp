@@ -48,6 +48,12 @@ void ResourceSubsystem::LoadAllResources() {
 
 	// 画像データを全てロードする
 	textureManager_->LoadAllTexture();
+#ifdef USE_IMGUI
+	// エディターのみで使用する画像をロード
+	textureManager_->RegisterTexture("EngineSource/Resources/Textures/BlueprintBackground.png");
+	textureManager_->RegisterTexture("EngineSource/Resources/Textures/ic_restore_white_24dp.png");
+	textureManager_->RegisterTexture("EngineSource/Resources/Textures/ic_save_white_24dp.png");
+#endif
 
 	// フォントデータを全てロードする
 	fontManager_->LoadAllFont();

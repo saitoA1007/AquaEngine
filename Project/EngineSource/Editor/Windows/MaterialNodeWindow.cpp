@@ -4,16 +4,88 @@
 #include "NodeSystem/MaterialNode.h"
 #include "PSOManager.h"
 #include "JsonSerializer.h"
+#include "TextureManager.h"
 using namespace GameEngine;
 
-MaterialNodeWindow::MaterialNodeWindow(PSOManager* psoManager) {
+namespace {
+    static ImTextureID ToImTex(TextureManager* tm, uint32_t handle) {
+        D3D12_GPU_DESCRIPTOR_HANDLE h = tm->GetTextureSrvHandlesGPU(handle);
+        return (ImTextureID)h.ptr;
+    }
+
+    static ImU32 HeaderTint(IMaterialNode& node) {
+        if (uint32_t c = node.GetHeaderColor()) { return c; }
+        if (node.GetOutputs().empty()) { return IM_COL32(248, 140, 120, 255); }  // 出力ノード
+        if (node.GetInputs().empty()) { return IM_COL32(130, 220, 150, 255); }   // 入力ノード
+        return IM_COL32(128, 195, 248, 255);                                     // 演算ノード
+    }
+
+    // 接続の判定をする
+    bool CanConnect(const MaterialGraph& graph, int startPinId, int endPinId) {
+        const Pin* startPin = graph.FindPin(startPinId);
+        const Pin* endPin = graph.FindPin(endPinId);
+
+        // どちらかのピンが見つからなければ接続不可
+        if (!startPin || !endPin) { return false; }
+        // 同じノード内のピン同士は接続不可
+        if (startPin->parentNodeId == endPin->parentNodeId) { return false; }
+        // Input同士、Output同士は接続不可
+        if (startPin->pinKind == endPin->pinKind) { return false; }
+
+        // 型のチェック
+        if (startPin->pinType != endPin->pinType) {
+            IMaterialNode* startNode = graph.FindNode(startPin->parentNodeId);
+            IMaterialNode* endNode = graph.FindNode(endPin->parentNodeId);
+
+            // 数値型かどうかを判定するラムダ
+            auto isNumeric = [](PinType t) {
+                return t == PinType::kFloat || t == PinType::kFloat2 ||
+                    t == PinType::kFloat3 || t == PinType::kFloat4;
+                };
+
+            // どちらかのノードが可変型であり、かつお互いが数値型であれば接続を許可
+            bool startDynamic = startNode && startNode->IsVariableType() && isNumeric(endPin->pinType);
+            bool endDynamic = endNode && endNode->IsVariableType() && isNumeric(startPin->pinType);
+
+            if (!startDynamic && !endDynamic) {
+                return false;
+            }
+        }
+
+        // 入力ピン側に対して、すでに別のリンクが存在している場合は接続不可にする
+        int inputPinId = (startPin->pinKind == PinKind::kInput) ? startPinId : endPinId;
+        for (const auto& link : graph.links) {
+            if (link.endPinId == inputPinId || link.startPinId == inputPinId) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
+
+MaterialNodeWindow::MaterialNodeWindow(PSOManager* psoManager, TextureManager* textureManager) {
+    assert(psoManager != nullptr);
+    assert(textureManager != nullptr);
+
     // pso管理を取得
     psoManager_ = psoManager;
+    textureManager_ = textureManager;
 
     // マテリアルノードレイアウト設定
     ned::Config cfg;
     cfg.SettingsFile = "MaterialEditor.json";
     context_ = ned::CreateEditor(&cfg);
+
+    ned::SetCurrentEditor(context_);
+    NodeUI::ApplyEditorStyle();
+    ned::SetCurrentEditor(nullptr);
+
+    // ノードの見た目
+    nodeStyle_.width = 220.0f;
+    nodeStyle_.iconSize = 24.0f;
+    nodeStyle_.headerTexSize = ImVec2(64.0f, 64.0f);
+    headerBgHandle_ = textureManager_->GetHandleByName("BlueprintBackground.png");
 
     // 各ノードを登録
     RegisterNode<MathNode>("Math");
@@ -111,38 +183,19 @@ void MaterialNodeWindow::Render(MaterialGraph& graph) {
     ned::SetCurrentEditor(context_);
     ned::Begin("MaterialEditor", ImVec2(0, 0));
 
+    // ヘッダー画像
+    nodeStyle_.headerTexture = (textureManager_ && headerBgHandle_) ? ToImTex(textureManager_, headerBgHandle_) : ImTextureID{};
+
     // ノード描画
     for (auto& node : graph.nodes) {
-        ned::BeginNode(node->GetId());
-        ImGui::Text("%s", node->GetLabel().c_str());
-        ImGui::Dummy(ImVec2(8, 4));
-
-        // 入力ピン
-        for (auto& pin : node->GetInputs()) {
-            ned::BeginPin(pin.id, ned::PinKind::Input);
-            ImGui::Text("→ %s", pin.name.c_str());
-            ned::EndPin();
-        }
-
-        ImGui::SameLine(120);
-
-        // 出力ピン
-        ImGui::BeginGroup();
-        for (auto& pin : node->GetOutputs()) {
-            ned::BeginPin(pin.id, ned::PinKind::Output);
-            ImGui::Text("%s →", pin.name.c_str());
-            ned::EndPin();
-        }
-        ImGui::EndGroup();
-
-        node->DrawNodeUI();
-
-        ned::EndNode();
+        DrawNode(graph, *node);
     }
 
     // リンク描画
     for (const auto& link : graph.links) {
-        ned::Link(link.id, link.startPinId, link.endPinId);
+        const Pin* s = graph.FindPin(link.startPinId);
+        const ImColor color = s ? ImColor(NodeUI::PinTypeColor(s->pinType)) : ImColor(200, 200, 200, 255);
+        ned::Link(link.id, link.startPinId, link.endPinId, color, 2.0f);
     }
 
     HandleLinkCreation(graph);
@@ -222,6 +275,40 @@ void MaterialNodeWindow::HandleContextMenu(MaterialGraph& graph) {
         ImGui::EndPopup();
     }
     ned::Resume();
+}
+
+void MaterialNodeWindow::DrawNode(MaterialGraph& graph, IMaterialNode& node) {
+
+    NodeUI::NodeBuilder nb(nodeStyle_);
+    nb.Begin(node.GetId());
+    nb.Header(node.GetLabel(), HeaderTint(node));
+
+    // 入力は左、出力は右。同じ行に並べる
+    auto& ins = node.GetInputs();
+    auto& outs = node.GetOutputs();
+    const size_t rows = std::max(ins.size(), outs.size());
+    for (size_t i = 0; i < rows; ++i) {
+        const Pin* in = i < ins.size() ? &ins[i] : nullptr;
+        const Pin* out = i < outs.size() ? &outs[i] : nullptr;
+
+        if (in && out) {
+            nb.PinPair(ned::PinId(in->id), in->name, NodeUI::PinIconType::Data, NodeUI::PinTypeColor(in->pinType), graph.IsPinLinked(in->id),
+                ned::PinId(out->id), out->name, NodeUI::PinIconType::Data, NodeUI::PinTypeColor(out->pinType), graph.IsPinLinked(out->id));
+        } else if (in) {
+            nb.InputPin(ned::PinId(in->id), in->name, NodeUI::PinIconType::Data, NodeUI::PinTypeColor(in->pinType), graph.IsPinLinked(in->id));
+        } else if (out) {
+            nb.OutputPin(ned::PinId(out->id), out->name, NodeUI::PinIconType::Data, NodeUI::PinTypeColor(out->pinType), graph.IsPinLinked(out->id));
+        }
+    }
+
+    // ノード固有のUI
+    nb.BeginContent();
+    ImGui::PushItemWidth(120.0f);
+    node.DrawNodeUI();
+    ImGui::PopItemWidth();
+    nb.EndContent();
+
+    nb.End();
 }
 
 void MaterialNodeWindow::DrawMaterialToolbar() {
@@ -360,56 +447,4 @@ void MaterialNodeWindow::SaveCurrentMaterial() {
     JsonSerializer::SaveToFile(filePath, root);
 
     dirtyFlag_ = false;
-}
-
-//===========================================
-// ヘルパー関数
-//===========================================
-
-namespace GameEngine {
-
-    namespace {
-
-        bool CanConnect(const MaterialGraph& graph, int startPinId, int endPinId) {
-            const Pin* startPin = graph.FindPin(startPinId);
-            const Pin* endPin = graph.FindPin(endPinId);
-
-            // どちらかのピンが見つからなければ接続不可
-            if (!startPin || !endPin) { return false; }
-            // 同じノード内のピン同士は接続不可
-            if (startPin->parentNodeId == endPin->parentNodeId) { return false; }
-            // Input同士、Output同士は接続不可
-            if (startPin->pinKind == endPin->pinKind) { return false; }
-
-            // 型のチェック
-            if (startPin->pinType != endPin->pinType) {
-                IMaterialNode* startNode = graph.FindNode(startPin->parentNodeId);
-                IMaterialNode* endNode = graph.FindNode(endPin->parentNodeId);
-
-                // 数値型かどうかを判定するラムダ
-                auto isNumeric = [](PinType t) {
-                    return t == PinType::kFloat || t == PinType::kFloat2 ||
-                        t == PinType::kFloat3 || t == PinType::kFloat4;
-                };
-
-                // どちらかのノードが可変型であり、かつお互いが数値型であれば接続を許可
-                bool startDynamic = startNode && startNode->IsVariableType() && isNumeric(endPin->pinType);
-                bool endDynamic = endNode && endNode->IsVariableType() && isNumeric(startPin->pinType);
-
-                if (!startDynamic && !endDynamic) {
-                    return false;
-                }
-            }
-
-            // 入力ピン側に対して、すでに別のリンクが存在している場合は接続不可にする
-            int inputPinId = (startPin->pinKind == PinKind::kInput) ? startPinId : endPinId;
-            for (const auto& link : graph.links) {
-                if (link.endPinId == inputPinId || link.startPinId == inputPinId) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-    }
 }

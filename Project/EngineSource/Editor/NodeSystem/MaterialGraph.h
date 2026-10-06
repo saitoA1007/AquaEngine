@@ -56,6 +56,9 @@ namespace GameEngine {
 		// リンクが接続された時に、相手の型に合わせて自分のピンを書き換えるコールバック
 		virtual void OnConnectTypePropagate(PinType newType) {}
 
+		// ノードヘッダーの色
+		virtual uint32_t GetHeaderColor() const { return 0; }
+
 	public:
 
 		int GetId() const { return id_; }
@@ -86,6 +89,8 @@ namespace GameEngine {
 
 		// ノードIDからノードを検索
 		IMaterialNode* FindNode(int nodeId) const;
+
+		bool IsPinLinked(int pinId) const;
 	};
 }
 

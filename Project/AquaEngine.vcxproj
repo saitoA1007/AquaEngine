@@ -286,6 +286,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Editor\NodeSystem\MaterialShaderGenerator.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="EngineSource\Editor\NodeSystem\NodeBuilder.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Editor\NodeSystem\NodePinIcon.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="EngineSource\Editor\NodeSystem\PostEffectGraph.cpp">
       <SubType>
       </SubType>
@@ -707,6 +715,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Editor\NodeSystem\MaterialShaderGenerator.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="EngineSource\Editor\NodeSystem\NodeBuilder.h" />
+    <ClInclude Include="EngineSource\Editor\NodeSystem\NodePinIcon.h" />
     <ClInclude Include="EngineSource\Editor\NodeSystem\PostEffectGraph.h" />
     <ClInclude Include="EngineSource\Editor\Windows\EffectEditorWindow.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>

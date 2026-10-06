@@ -22,3 +22,8 @@ IMaterialNode* MaterialGraph::FindNode(int nodeId) const {
     }
     return nullptr;
 }
+
+bool MaterialGraph::IsPinLinked(int pinId) const {
+    for (auto& l : links) { if (l.startPinId == pinId || l.endPinId == pinId) return true; }
+    return false;
+}

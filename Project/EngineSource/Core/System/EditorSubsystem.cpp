@@ -57,7 +57,7 @@ void EditorSubsystem::Initialize() {
     windowManager_->RegisterWindow(std::make_unique<InspectorWindow>(resource->GetGameParamEditor(), resource->GetTextureManager()));
     windowManager_->RegisterWindow(std::make_unique<ConsoleWindow>());
     windowManager_->RegisterWindow(std::make_unique<PerformanceWindow>());
-    windowManager_->RegisterWindow(std::make_unique<MaterialNodeWindow>(graphics->GetPSOManager()));
+    windowManager_->RegisterWindow(std::make_unique<MaterialNodeWindow>(graphics->GetPSOManager(), resource->GetTextureManager()));
     windowManager_->RegisterWindow(std::make_unique<PixWindow>());
     windowManager_->RegisterWindow(std::make_unique<EffectEditorWindow>(resource->GetTextureManager(), 
         resource->GetModelManager(), resource->GetGameParamEditor(), resource->GetEffectsManager()));
