@@ -25,6 +25,10 @@ ViewOptionsBar::ViewOptionsBar(Input* input, RenderQueue* renderQueue, DebugRend
 	debugRenderer_ = debugRenderer;
 }
 
+ViewOptionsBar::~ViewOptionsBar() {
+
+}
+
 void ViewOptionsBar::Run() {
 
 	// メインメニュー

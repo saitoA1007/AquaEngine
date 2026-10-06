@@ -294,9 +294,6 @@
     <ClCompile Include="EngineSource\Editor\DebugParameter.cpp">
       <Filter>EngineSource\Editor</Filter>
     </ClCompile>
-    <ClCompile Include="EngineSource\Editor\EditorCore.cpp">
-      <Filter>EngineSource\Editor</Filter>
-    </ClCompile>
     <ClCompile Include="EngineSource\Editor\GameParamEditor.cpp">
       <Filter>EngineSource\Editor</Filter>
     </ClCompile>
@@ -775,9 +772,6 @@
       <Filter>EngineSource\Core\System</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Editor\DebugParameter.h">
-      <Filter>EngineSource\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineSource\Editor\EditorCore.h">
       <Filter>EngineSource\Editor</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Editor\GameParamEditor.h">

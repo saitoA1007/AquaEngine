@@ -15,6 +15,10 @@ AddObjectBar::AddObjectBar(StaticGameObjectManager* staticObjectManager, RenderQ
     paramEditor_ = paramEditor;  
 }
 
+AddObjectBar::~AddObjectBar() {
+
+}
+
 void AddObjectBar::Run() {
 
 	if (ImGui::BeginMainMenuBar()) {

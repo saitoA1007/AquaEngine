@@ -12,6 +12,7 @@ namespace GameEngine {
 	class ViewOptionsBar {
 	public:
 		ViewOptionsBar(Input* input, RenderQueue* renderQueue, DebugRenderer* debugRenderer, Model* gridModel);
+		~ViewOptionsBar();
 
 		void Run();
 

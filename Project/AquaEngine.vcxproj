@@ -337,10 +337,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Graphics\Texture\TextureLoader.cpp" />
     <ClCompile Include="EngineSource\Graphics\Texture\TextureManager.cpp" />
     <ClCompile Include="EngineSource\Core\WindowsApp.cpp" />
-    <ClCompile Include="EngineSource\Editor\EditorCore.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">false</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="EngineSource\Editor\EditorMenu\EditorLayout.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">false</ExcludedFromBuild>
@@ -775,9 +771,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Graphics\Texture\TextureLoader.h" />
     <ClInclude Include="EngineSource\Graphics\Texture\TextureManager.h" />
     <ClInclude Include="EngineSource\Core\WindowsApp.h" />
-    <ClInclude Include="EngineSource\Editor\EditorCore.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="EngineSource\Editor\EditorMenu\EditorLayout.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">false</ExcludedFromBuild>
