@@ -589,6 +589,9 @@
     <ClCompile Include="EngineSource\Math\Matrix4x4.cpp" />
     <ClCompile Include="EngineSource\Math\Quaternion.cpp" />
     <ClCompile Include="EngineSource\Core\pch.cpp" />
+    <ClCompile Include="EngineSource\Editor\Windows\PostEffectWindow.cpp" />
+    <ClCompile Include="EngineSource\Editor\NodeSystem\PostEffectGraph.cpp" />
+    <ClCompile Include="Application\Demo\PBRDemo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Camera\CameraController.h">
@@ -1160,6 +1163,9 @@
     <ClInclude Include="EngineSource\3D\Effects\EffectAsset.h" />
     <ClInclude Include="EngineSource\3D\Effects\EffectModule.h" />
     <ClInclude Include="EngineSource\Core\pch.h" />
+    <ClInclude Include="EngineSource\Editor\Windows\PostEffectWindow.h" />
+    <ClInclude Include="EngineSource\Editor\NodeSystem\PostEffectGraph.h" />
+    <ClInclude Include="Application\Demo\PBRDemo.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />

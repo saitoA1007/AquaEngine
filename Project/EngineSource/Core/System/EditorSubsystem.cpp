@@ -28,7 +28,8 @@ void EditorSubsystem::Initialize() {
         scene->GetStaticObjectManager(),
         graphics->GetPSOManager(),
         resource->GetModelManager(),
-        resource->GetEffectsManager());
+        resource->GetEffectsManager(),
+        graphics->GetPostEffectManager());
 }
 
 void EditorSubsystem::Update() {

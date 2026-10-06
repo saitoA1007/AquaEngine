@@ -39,6 +39,8 @@ void PostEffectManager::Initialize(ID3D12GraphicsCommandList* commandList, SrvMa
     bloom_ = AddPostEffect<Bloom>("BloomPass", "Bloom");
     bloom_->SetGamePassIndex(renderPassController_->GetSrvIndex(renderPassController_->GetSceneFinalPass()));
     AddPostEffect<Dissolve>("DissolvePass", "Dissolve");
+
+    BuildDefaultGraph();
 }
 
 void PostEffectManager::Execute() {
@@ -89,4 +91,42 @@ void PostEffectManager::PreDraw(const std::string& psoName) {
 
     commandList_->SetGraphicsRootSignature(it->second.rootSignature);
     commandList_->SetPipelineState(it->second.graphicsPipelineState);
+}
+
+void PostEffectManager::BuildDefaultGraph() {
+    graph_ = PostEffectGraph{};  
+
+    auto* scene = graph_.AddSceneNode();
+    auto* output = graph_.AddOutputNode();
+
+    auto add = [&](const char* passName) {
+        return graph_.AddEffectNode(passName, effects_.at(passName).get());
+        };
+    auto* highLum = add("HighLumMaskPass");
+    auto* gaussV = add("GaussVerticalPass");
+    auto* gaussH = add("GaussHorizontalPass");
+    auto* bloom = add("BloomPass");
+    auto* grading = add("ColorGradingPass");
+    auto* dissolve = add("DissolvePass");
+
+    // Scene → HighLum → GaussV → GaussH → Bloom(Blur) → Grading → Dissolve → Output
+    graph_.AddLink(scene->output.id, highLum->inputs[0].id);
+    graph_.AddLink(highLum->output.id, gaussV->inputs[0].id);
+    graph_.AddLink(gaussV->output.id, gaussH->inputs[0].id);
+    graph_.AddLink(gaussH->output.id, bloom->inputs[0].id);   // Blur
+    graph_.AddLink(scene->output.id, bloom->inputs[1].id);   // 元の画像
+    graph_.AddLink(bloom->output.id, grading->inputs[0].id);
+    graph_.AddLink(grading->output.id, dissolve->inputs[0].id);
+    graph_.AddLink(dissolve->output.id, output->inputs[0].id);
+}
+
+void PostEffectManager::RebuildOrder() {
+    std::vector<int> order;
+    if (graph_.BuildOrder(order)) {
+        executeOrder_ = std::move(order);
+    } else {
+        // 循環など。前回の有効な順序を使い続ける
+        LogManager::GetInstance().Log("PostEffectGraph: 実行順の構築に失敗しました\n");
+    }
+    graph_.dirty = false;
 }

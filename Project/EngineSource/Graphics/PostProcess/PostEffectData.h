@@ -154,6 +154,13 @@ namespace GameEngine {
             buffer_.GetData()->gameTextureHandle = index;
         }
 
+        uint32_t GetInputCount() const override { return 2; }
+        const char* GetInputName(uint32_t slot) const override { return slot == 0 ? "Blur" : "Scene"; }
+        void SetInputIndex(uint32_t slot, uint32_t srvIndex) override {
+            if (slot == 0) { buffer_.GetData()->blurTextureHandle = srvIndex; } else { buffer_.GetData()->gameTextureHandle = srvIndex; }
+        }
+        const char* GetDisplayName() const override { return "Bloom"; }
+
     private:
         ConstantBuffer<BloomData> buffer_;
     };

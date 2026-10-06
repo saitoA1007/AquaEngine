@@ -7,6 +7,7 @@
 #include "Application/CollisionConfig.h"
 #include "Application/Demo/IceDemo.h"
 #include "Application/Demo/FructureDemo.h"
+#include "Application/Demo/PBRDemo.h"
 using namespace GameEngine;
 
 TestScene::~TestScene() {}
@@ -108,8 +109,13 @@ TestScene::TestScene() {
 
 	// 氷のデモ
 	gameObjectManager_->AddObject<IceDemo>("IceDemo", iceMiddleModel_);
+
 	// 破片のデモ
 	//gameObjectManager_->AddObject<FructureDemo>("FructureDemo", inputCommand_, testModel_);
+
+	// PBRのデモ
+	auto* sphereModel = modelManager_->GetNameByModel("sphereShade.obj");
+	gameObjectManager_->AddObject<PBRDemo>(sphereModel);
 
 	text_ = std::make_unique<Text>(fontManager_->GetFont("源直ゴシック EMG 2 - Medium"), "こんにちは");
 }
@@ -203,7 +209,7 @@ void TestScene::Draw() {
 	// 地面を描画
 	renderQueue_->SubmitRaytracingModel(terrainModel_, terrainWorld_);
 
-	renderQueue_->SubmitText(text_.get());
+	//renderQueue_->SubmitText(text_.get());
 
 	// 破片を1つに集約していない
 	//renderQueue_->SubmitModel(noFractureModel_, noFractureWorld_);

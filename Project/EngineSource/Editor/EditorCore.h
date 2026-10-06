@@ -26,6 +26,7 @@ namespace GameEngine {
 	class PSOManager;
 	class ModelManager;
 	class EffectsManager;
+	class PostEffectManager;
 
 	class EditorCore {
 	public:
@@ -36,7 +37,7 @@ namespace GameEngine {
 		void Initialize(TextureManager* textureManager, SceneChangeRequest* sceneChangeRequest, RenderPassController* renderPassController,
 			Input* input, RenderQueue* renderQueue, DebugRenderer* debugRenderer, Model* gridModel, GameParamEditor* gameParamEditor,
 			StaticGameObjectManager* staticObjectManager, PSOManager* psoManager, ModelManager* modelManager,
-			EffectsManager* effectsManager);
+			EffectsManager* effectsManager, PostEffectManager* postEffectManager);
 
 		// 実行
 		void Run();

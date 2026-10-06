@@ -5,6 +5,7 @@
 #include "RenderPass/RenderPassController.h"
 #include "IPostEffect.h"
 #include "PostEffectData.h"
+#include "NodeSystem/PostEffectGraph.h"
 
 namespace GameEngine {
 
@@ -51,6 +52,11 @@ namespace GameEngine {
 			return nullptr;
 		}
 
+		PostEffectGraph& GetGraph() { return graph_; }
+
+		const std::unordered_map<std::string, std::unique_ptr<IPostEffect>>& GetEffects() const { return effects_; }
+		void ResetGraph() { BuildDefaultGraph(); }
+
 	private:
 		ID3D12GraphicsCommandList* commandList_ = nullptr;
 		SrvManager* srvManager_ = nullptr;
@@ -74,6 +80,10 @@ namespace GameEngine {
 		// ブルーム
 		Bloom* bloom_ = nullptr;
 
+		PostEffectGraph graph_;
+		// ノードIDの実行順
+		std::vector<int> executeOrder_;
+
 	private:
 
 		// psoを登録する
@@ -88,5 +98,8 @@ namespace GameEngine {
 
 		// 文字列キーでPSOをセット
 		void PreDraw(const std::string& psoName);
+
+		void BuildDefaultGraph();
+		void RebuildOrder();
 	};
 }

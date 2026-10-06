@@ -176,6 +176,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Camera\State\CameraState.cpp" />
     <ClCompile Include="Application\Demo\FructureDemo.cpp" />
     <ClCompile Include="Application\Demo\IceDemo.cpp" />
+    <ClCompile Include="Application\Demo\PBRDemo.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Application\Enemy\BattleAction\BossBattleAction.cpp" />
     <ClCompile Include="Application\Enemy\BossAnimator.cpp" />
     <ClCompile Include="Application\Enemy\BossEnemy.cpp" />
@@ -282,6 +286,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Editor\NodeSystem\MaterialShaderGenerator.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="EngineSource\Editor\NodeSystem\PostEffectGraph.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="EngineSource\Editor\Windows\EffectEditorWindow.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -291,6 +299,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ClCompile>
     <ClCompile Include="EngineSource\Editor\Windows\PixWindow.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Editor\Windows\PostEffectWindow.cpp">
+      <SubType>
+      </SubType>
     </ClCompile>
     <ClCompile Include="EngineSource\Graphics\Buffers\BLAS.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\BufferRefManager.cpp" />
@@ -583,6 +595,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Camera\State\CameraState.h" />
     <ClInclude Include="Application\Demo\FructureDemo.h" />
     <ClInclude Include="Application\Demo\IceDemo.h" />
+    <ClInclude Include="Application\Demo\PBRDemo.h" />
     <ClInclude Include="Application\Enemy\BattleAction\BossBattleAction.h" />
     <ClInclude Include="Application\Enemy\BattleAction\IBossBattleAction.h" />
     <ClInclude Include="Application\Enemy\BossAnimator.h" />
@@ -698,6 +711,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Editor\NodeSystem\MaterialShaderGenerator.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="EngineSource\Editor\NodeSystem\PostEffectGraph.h" />
     <ClInclude Include="EngineSource\Editor\Windows\EffectEditorWindow.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
@@ -707,6 +721,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Editor\Windows\PixWindow.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="EngineSource\Editor\Windows\PostEffectWindow.h" />
     <ClInclude Include="EngineSource\Graphics\Buffers\BLAS.h" />
     <ClInclude Include="EngineSource\Graphics\Buffers\PackedGeometryBuffer.h" />
     <ClInclude Include="EngineSource\Graphics\Buffers\RefBuffer.h" />
