@@ -3,6 +3,9 @@
 #include "CoreSubsystem.h"
 using namespace GameEngine;
 
+InputSubsystem::InputSubsystem() = default;
+InputSubsystem::~InputSubsystem() = default;
+
 void InputSubsystem::Initialize() {
     auto* windowsApp = context_.core->GetWindowsApp();
 

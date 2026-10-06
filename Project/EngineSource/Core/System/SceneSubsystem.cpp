@@ -6,6 +6,9 @@
 #include "IGameObject.h"
 using namespace GameEngine;
 
+SceneSubsystem::SceneSubsystem() = default;
+SceneSubsystem::~SceneSubsystem() = default;
+
 void SceneSubsystem::Initialize() {
     auto* renderQueue = context_.graphics->GetRenderQueue();
     auto* modelManager = context_.resource->GetModelManager();

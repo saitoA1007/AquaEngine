@@ -7,6 +7,8 @@ CoreSubsystem::CoreSubsystem(const CoreSubsystemDesc& desc)
     : desc_(desc) {
 }
 
+CoreSubsystem::~CoreSubsystem() = default;
+
 void CoreSubsystem::Initialize() {
     // ウィンドウ生成
     windowsApp_ = std::make_unique<WindowsApp>();

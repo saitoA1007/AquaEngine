@@ -1,6 +1,5 @@
 #pragma once
 #include "IEngineSubsystem.h"
-#include "EngineContext.h"
 
 #include "ImGuiManager.h"
 
@@ -24,6 +23,9 @@ namespace GameEngine {
     /// </summary>
     class GraphicsSubsystem : public IEngineSubsystem {
     public:
+        GraphicsSubsystem();
+        ~GraphicsSubsystem();
+
         void Initialize() override;
         void Finalize()   override;
 
@@ -47,9 +49,8 @@ namespace GameEngine {
         ImGuiManager* GetImGuiManager() const { return imGuiManager_.get(); }
         PostEffectManager* GetPostEffectManager() const { return postEffectManager_.get(); }
         RaytracingPipeline* GetRaytracingPipeline() const { return raytracingPipeline_.get(); }
-    private:
-        EngineContext context_;
 
+    private:
         // imGui機能
         std::unique_ptr<ImGuiManager> imGuiManager_;
 

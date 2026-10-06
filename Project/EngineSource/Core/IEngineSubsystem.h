@@ -1,4 +1,6 @@
 #pragma once
+#include "EngineContext.h"
+
 namespace GameEngine {
 
     /// <summary>
@@ -11,5 +13,8 @@ namespace GameEngine {
         virtual void Initialize() = 0;
         virtual void Update() {}
         virtual void Finalize() {}
+
+    protected:
+        EngineContext context_;
     };
 }

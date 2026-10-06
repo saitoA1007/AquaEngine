@@ -1,6 +1,5 @@
 #pragma once
 #include "IEngineSubsystem.h"
-#include "EngineContext.h"
 
 #include "TextureManager.h"
 #include "FontManager.h"
@@ -17,6 +16,9 @@ namespace GameEngine {
     /// </summary>
     class ResourceSubsystem : public IEngineSubsystem {
     public:
+        ResourceSubsystem();
+        ~ResourceSubsystem();
+
         void Initialize() override;
         void Finalize()   override;
 
@@ -32,7 +34,6 @@ namespace GameEngine {
         GameParamEditor* GetGameParamEditor() const { return gameParamEditor_.get(); }
         EffectsManager* GetEffectsManager() const { return effectsManager_.get(); }
     private:
-        EngineContext context_;
 
         // 画像データ管理
         std::unique_ptr<TextureManager> textureManager_;

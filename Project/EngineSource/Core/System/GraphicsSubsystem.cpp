@@ -12,6 +12,9 @@
 #include "Debug/PixCapture.h"
 using namespace GameEngine;
 
+GraphicsSubsystem::GraphicsSubsystem() = default;
+GraphicsSubsystem::~GraphicsSubsystem() = default;
+
 void GraphicsSubsystem::Initialize() {
     auto* windowsApp = context_.core->GetWindowsApp();
 

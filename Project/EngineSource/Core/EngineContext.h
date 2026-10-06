@@ -2,6 +2,7 @@
 
 namespace GameEngine {
 
+    // システムの前方宣言
     class GraphicsSubsystem;
     class ResourceSubsystem;
     class InputSubsystem;

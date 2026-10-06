@@ -4,6 +4,9 @@
 #include "GraphicsSubsystem.h"
 using namespace GameEngine;
 
+ResourceSubsystem::ResourceSubsystem() = default;
+ResourceSubsystem::~ResourceSubsystem() = default;
+
 void ResourceSubsystem::Initialize() {
 	auto* cmdList = context_.graphics->GetGraphicsDevice()->GetCommandList();
 	auto* srvManager = context_.graphics->GetGraphicsDevice()->GetSrvManager();

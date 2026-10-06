@@ -1,7 +1,6 @@
 #pragma once
 #ifdef USE_IMGUI
 #include "IEngineSubsystem.h"
-#include "EngineContext.h"
 
 namespace GameEngine {
 
@@ -35,8 +34,6 @@ namespace GameEngine {
         void SceneReset();
 
     private:
-        EngineContext context_;
-
         // 各ウィンドウ
         std::unique_ptr<EditorWindowManager> windowManager_;
 
