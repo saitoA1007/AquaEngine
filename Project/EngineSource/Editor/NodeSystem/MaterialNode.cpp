@@ -2,7 +2,20 @@
 #include "MaterialNode.h"
 #include <format>
 #include "ImGuiManager.h"
+#include "TextureManager.h"
+#include "NodeBuilder.h"
 using namespace GameEngine;
+
+namespace {
+    constexpr float kTexPreviewSize = 128.0f;
+
+    // テクスチャのファイルか判断
+    bool IsTextureFile(const std::filesystem::path& path) {
+        std::string ext = path.extension().string();
+        for (char& c : ext) { c = static_cast<char>(std::tolower(static_cast<unsigned char>(c))); }
+        return ext == ".png" || ext == ".jpg" || ext == ".jpeg";
+    }
+}
 
 //=======================================================
 // 数式ノード
@@ -158,7 +171,50 @@ std::string TextureSampleNode::GenerateHLSL(const std::unordered_map<int, std::s
 }
 
 void TextureSampleNode::DrawNodeUI() {
+    // テクスチャ名の入力
+    ImGui::SetNextItemWidth(kTexPreviewSize);
+    if (ImGui::InputTextWithHint("##texFile", "texture.png", texFile_.data(), sizeof(texFile_), ImGuiInputTextFlags_EnterReturnsTrue)) {
+        ResolveTexture();
+    }
 
+    // サムネイル
+    ImTextureID tex{};
+    if (hasTexture_ && textureManager_) {
+        tex = (ImTextureID)textureManager_->GetTextureSrvHandlesGPU(textureHandle_).ptr;
+    }
+    NodeUI::DrawImagePreview(tex, ImVec2(kTexPreviewSize, kTexPreviewSize));
+
+    // サムネイルをドロップ先にする
+    if (ImGui::BeginDragDropTarget()) {
+        // 配信前に中身を確認し、画像でなければ強調も受け取りもしない
+        const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(
+            "CONTENT_PATH",
+            ImGuiDragDropFlags_AcceptBeforeDelivery | ImGuiDragDropFlags_AcceptNoDrawDefaultRect);
+        if (payload && payload->DataSize > 0) {
+            const std::filesystem::path path(static_cast<const char*>(payload->Data));
+            if (IsTextureFile(path)) {
+                ImGui::GetWindowDrawList()->AddRect(
+                    ImGui::GetItemRectMin(), ImGui::GetItemRectMax(),
+                    IM_COL32(255, 200, 60, 255), 4.0f, 0, 2.0f);
+                if (payload->IsDelivery()) { SetTexture(path.filename().string()); }
+            }
+        }
+        ImGui::EndDragDropTarget();
+    }
+}
+
+void TextureSampleNode::ResolveTexture() {
+    if (!textureManager_ || texFile_.empty()) {
+        hasTexture_ = false; 
+        return; 
+    }
+    textureHandle_ = textureManager_->GetHandleByName(texFile_);
+    hasTexture_ = true;
+}
+
+void TextureSampleNode::SetTexture(const std::string& fileName) {
+    texFile_ = fileName;
+    ResolveTexture();
 }
 
 //=============================================================

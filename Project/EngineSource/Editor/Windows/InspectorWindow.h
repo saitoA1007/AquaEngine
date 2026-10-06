@@ -35,6 +35,15 @@ namespace GameEngine {
 		explicit DebugParameterVisitor(const std::string& name,bool& dirty, TextureManager* textureManager)
 			: itemName(name), isDirty(dirty), textureManager_(textureManager) {}
 
+		// 画像ファイルかどうか判定する
+		static bool IsTextureFile(const char* pathStr) {
+			std::string ext = std::filesystem::path(pathStr).extension().string();
+			for (char& c : ext) {
+				c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+			}
+			return ext == ".png" || ext == ".jpg";
+		}
+
 		// ## 付きのIDを生成するヘルパー
 		std::string HiddenLabel() const {
 			return "##" + itemName;
@@ -164,6 +173,29 @@ namespace GameEngine {
 			if (textureManager_ && !value.name.empty()) {
 				D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = textureManager_->GetTextureSrvHandlesGPU(value.handle);
 				ImGui::Image((ImTextureID)gpuHandle.ptr, ImVec2(64, 64));
+			}
+
+			// ドラック&ドロップの受け取り
+			if (const ImGuiPayload* peek = ImGui::GetDragDropPayload()) {
+				if (peek->IsDataType("CONTENT_PATH") && IsTextureFile(static_cast<const char*>(peek->Data))) {
+					if (ImGui::BeginDragDropTarget()) {
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_PATH")) {
+							std::filesystem::path path(static_cast<const char*>(payload->Data));
+							std::string fileName = path.filename().string();
+
+							// 登録済みテクスチャのみ受け付ける
+							if (textureManager_) {
+								const auto& names = textureManager_->GetRegisteredTextureNames();
+								if (std::find(names.begin(), names.end(), fileName) != names.end()) {
+									value.name = fileName;
+									value.handle = textureManager_->GetHandleByName(fileName);
+									isDirty = true;
+								}
+							}
+						}
+						ImGui::EndDragDropTarget();
+					}
+				}
 			}
 		}
 

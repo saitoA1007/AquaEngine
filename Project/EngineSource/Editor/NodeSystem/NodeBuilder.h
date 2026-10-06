@@ -16,6 +16,9 @@ namespace GameEngine::NodeUI {
     // ノードエディタの共有レイアウト
     void ApplyEditorStyle();
 
+    // 画像を描画
+    void DrawImagePreview(ImTextureID tex, ImVec2 size, bool dim = false);
+
     class NodeBuilder {
     public:
         explicit NodeBuilder(const NodeStyle& style = {});

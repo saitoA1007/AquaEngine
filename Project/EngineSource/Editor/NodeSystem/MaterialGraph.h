@@ -7,6 +7,9 @@
 
 namespace GameEngine {
 
+	// 前方宣言
+	class TextureManager;
+
 	enum class PinType {
 		kFloat,
 		kFloat2,
@@ -59,6 +62,9 @@ namespace GameEngine {
 		// ノードヘッダーの色
 		virtual uint32_t GetHeaderColor() const { return 0; }
 
+		// テクスチャ
+		void SetTextureManager(TextureManager* textureManager) { textureManager_ = textureManager; }
+
 	public:
 
 		int GetId() const { return id_; }
@@ -69,6 +75,7 @@ namespace GameEngine {
 		std::vector<Pin>& GetOutputs() { return outputs_; }
 
 	protected:
+		TextureManager* textureManager_ = nullptr;
 		int id_;
 		std::string label_;
 		std::vector<Pin> inputs_;

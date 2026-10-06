@@ -74,6 +74,15 @@ namespace GameEngine {
         std::string textureName;
         // テクスチャハンドル
         uint32_t textureHandle_ = 0;
+        // 入力されたテクスチャ名
+        std::string texFile_ = "";
+        // 有効なテクスチャを選択済みか
+        bool hasTexture_ = false; 
+
+    private:
+
+        void ResolveTexture();
+        void SetTexture(const std::string& fileName);
     };
 
     // マスターサーフェスノード

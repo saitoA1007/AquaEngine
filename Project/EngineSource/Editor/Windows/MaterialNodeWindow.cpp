@@ -86,6 +86,7 @@ MaterialNodeWindow::MaterialNodeWindow(PSOManager* psoManager, TextureManager* t
     nodeStyle_.iconSize = 24.0f;
     nodeStyle_.headerTexSize = ImVec2(64.0f, 64.0f);
     headerBgHandle_ = textureManager_->GetHandleByName("BlueprintBackground.png");
+    nodeStyle_.headerTexture = headerBgHandle_ ? ToImTex(textureManager_, headerBgHandle_) : ImTextureID{};
 
     // 各ノードを登録
     RegisterNode<MathNode>("Math");
@@ -183,9 +184,6 @@ void MaterialNodeWindow::Render(MaterialGraph& graph) {
     ned::SetCurrentEditor(context_);
     ned::Begin("MaterialEditor", ImVec2(0, 0));
 
-    // ヘッダー画像
-    nodeStyle_.headerTexture = (textureManager_ && headerBgHandle_) ? ToImTex(textureManager_, headerBgHandle_) : ImTextureID{};
-
     // ノード描画
     for (auto& node : graph.nodes) {
         DrawNode(graph, *node);
@@ -278,6 +276,7 @@ void MaterialNodeWindow::HandleContextMenu(MaterialGraph& graph) {
 }
 
 void MaterialNodeWindow::DrawNode(MaterialGraph& graph, IMaterialNode& node) {
+    node.SetTextureManager(textureManager_);
 
     NodeUI::NodeBuilder nb(nodeStyle_);
     nb.Begin(node.GetId());

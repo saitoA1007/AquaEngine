@@ -93,19 +93,20 @@ namespace GameEngine::NodeUI {
 
     void NodeBuilder::Preview(ImTextureID tex, bool dim, float aspect) {
         ImGui::Spacing();
-        const ImVec2 size(style_.width, style_.width / aspect);
-        const ImVec2 p = ImGui::GetCursorScreenPos();
-        const ImVec2 q(p.x + size.x, p.y + size.y);
-        ImGui::Dummy(size);
-
-        ImDrawList* dl = ImGui::GetWindowDrawList();
-        if (tex != ImTextureID{}) {
-            const ImU32 tint = dim ? IM_COL32(255, 255, 255, 60) : IM_COL32_WHITE;
-            dl->AddImageRounded(tex, p, q, ImVec2(0, 0), ImVec2(1, 1), tint, 4.0f);
-        } else {
-            dl->AddRectFilled(p, q, IM_COL32(20, 20, 22, 255), 4.0f);
-        }
-        dl->AddRect(p, q, IM_COL32(255, 255, 255, 40), 4.0f);
+       //const ImVec2 size(style_.width, style_.width / aspect);
+       //const ImVec2 p = ImGui::GetCursorScreenPos();
+       //const ImVec2 q(p.x + size.x, p.y + size.y);
+       //ImGui::Dummy(size);
+       //
+       //ImDrawList* dl = ImGui::GetWindowDrawList();
+       //if (tex != ImTextureID{}) {
+       //    const ImU32 tint = dim ? IM_COL32(255, 255, 255, 60) : IM_COL32_WHITE;
+       //    dl->AddImageRounded(tex, p, q, ImVec2(0, 0), ImVec2(1, 1), tint, 4.0f);
+       //} else {
+       //    dl->AddRectFilled(p, q, IM_COL32(20, 20, 22, 255), 4.0f);
+       //}
+       // dl->AddRect(p, q, IM_COL32(255, 255, 255, 40), 4.0f);
+        DrawImagePreview(tex, ImVec2(style_.width, style_.width / aspect), dim);
     }
 
     void NodeBuilder::End() {
@@ -162,4 +163,24 @@ namespace GameEngine::NodeUI {
         style.Colors[ned::StyleColor_PinRect] = ImColor(0, 0, 0, 0);
         style.Colors[ned::StyleColor_PinRectBorder] = ImColor(0, 0, 0, 0);
     }
+
+    void DrawImagePreview(ImTextureID tex, ImVec2 size, bool dim) {
+        const ImVec2 p = ImGui::GetCursorScreenPos();
+        const ImVec2 q(p.x + size.x, p.y + size.y);
+        ImGui::Dummy(size);   // 固定サイズなので、ノードが伸縮しない
+
+        ImDrawList* dl = ImGui::GetWindowDrawList();
+        if (tex != ImTextureID{}) {
+            const ImU32 tint = dim ? IM_COL32(255, 255, 255, 60) : IM_COL32_WHITE;
+            dl->AddImageRounded(tex, p, q, ImVec2(0, 0), ImVec2(1, 1), tint, 4.0f);
+        } else {
+            dl->AddRectFilled(p, q, IM_COL32(20, 20, 22, 255), 4.0f);
+            const char* label = "No Image";
+            const ImVec2 ts = ImGui::CalcTextSize(label);
+            dl->AddText(ImVec2(p.x + (size.x - ts.x) * 0.5f, p.y + (size.y - ts.y) * 0.5f),
+                IM_COL32(120, 120, 125, 255), label);
+        }
+        dl->AddRect(p, q, IM_COL32(255, 255, 255, 40), 4.0f);
+    }
+
 }
