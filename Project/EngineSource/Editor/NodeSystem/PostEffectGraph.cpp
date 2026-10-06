@@ -172,3 +172,8 @@ bool PostEffectGraph::BuildOrder(std::vector<int>& order) const {
     std::unordered_set<int> visited, visiting;
     return TopoSort(out->id, visited, visiting, order);
 }
+
+bool PostEffectGraph::IsPinLinked(int pinId) const {
+    for (auto& l : links) { if (l.startPinId == pinId || l.endPinId == pinId) return true; }
+    return false;
+}

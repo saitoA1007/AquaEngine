@@ -40,6 +40,7 @@ void PostEffectManager::Initialize(ID3D12GraphicsCommandList* commandList, SrvMa
     bloom_->SetGamePassIndex(renderPassController_->GetSrvIndex(renderPassController_->GetSceneFinalPass()));
     AddPostEffect<Dissolve>("DissolvePass", "Dissolve");
 
+    // デフォルトのノードが繋がっている状態
     BuildDefaultGraph();
 }
 

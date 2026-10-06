@@ -61,7 +61,7 @@ void EditorSubsystem::Initialize() {
     windowManager_->RegisterWindow(std::make_unique<PixWindow>());
     windowManager_->RegisterWindow(std::make_unique<EffectEditorWindow>(resource->GetTextureManager(), 
         resource->GetModelManager(), resource->GetGameParamEditor(), resource->GetEffectsManager()));
-    windowManager_->RegisterWindow(std::make_unique<PostEffectWindow>(graphics->GetPostEffectManager()));
+    windowManager_->RegisterWindow(std::make_unique<PostEffectWindow>(graphics->GetPostEffectManager(), resource->GetTextureManager(), graphics->GetRenderPassCtrl()));
 
     // レイアウトのデータを取得する
     editorLayout_->LoadLayout(windowManager_->GetWindows());  

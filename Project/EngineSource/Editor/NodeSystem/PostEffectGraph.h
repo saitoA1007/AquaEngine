@@ -52,6 +52,8 @@ namespace GameEngine {
         // Outputノードから辿れるノードの実行順。循環があればfalse
         bool BuildOrder(std::vector<int>& order) const;
 
+        bool IsPinLinked(int pinId) const;
+
     private:
         bool DependsOn(int nodeId, int targetId) const;
         bool TopoSort(int nodeId, std::unordered_set<int>& visited,
