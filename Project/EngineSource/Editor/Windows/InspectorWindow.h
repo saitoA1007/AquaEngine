@@ -66,12 +66,12 @@ namespace GameEngine {
 
 		void operator()(Vector2& value) const {
 			ImGui::Text("%s", itemName.c_str());
-			if(ImGui::DragFloat2(HiddenLabel().c_str(), reinterpret_cast<float*>(&value), 0.01f)){ isDirty = true; }
+			if (GameEngine::DrawFloat2Control(HiddenLabel().c_str(), reinterpret_cast<float*>(&value))) { isDirty = true; }
 		}
 
 		void operator()(Vector3& value) const {
 			ImGui::Text("%s", itemName.c_str());
-			if(ImGui::DragFloat3(HiddenLabel().c_str(), reinterpret_cast<float*>(&value), 0.01f)){ isDirty = true; }
+			if (GameEngine::DrawFloat3Control(HiddenLabel().c_str(), reinterpret_cast<float*>(&value))) { isDirty = true; }
 		}
 
 		void operator()(Vector4& value) const {
@@ -81,8 +81,8 @@ namespace GameEngine {
 
 		void operator()(Range3& value) const {
 			if (ImGui::TreeNode(itemName.c_str())) {
-				bool isChangeMin = ImGui::DragFloat3("Min", reinterpret_cast<float*>(&value.min), 0.01f);
-				bool isChangeMax = ImGui::DragFloat3("Max", reinterpret_cast<float*>(&value.max), 0.01f);
+				bool isChangeMin = GameEngine::DrawFloat3Control("Min", reinterpret_cast<float*>(&value.min));
+				bool isChangeMax = GameEngine::DrawFloat3Control("Max", reinterpret_cast<float*>(&value.max));
 
 				if (isChangeMin || isChangeMax) {
 					value.min = Math::Min(value.min, value.max);
@@ -126,17 +126,22 @@ namespace GameEngine {
 				case EmitShapeType::Sphere:
 				case EmitShapeType::Hemisphere:
 				case EmitShapeType::Circle:
-					if (ImGui::DragFloat("Radius", &value.radius, 0.01f, 0.0f, FLT_MAX))
+					if (ImGui::DragFloat("Radius", &value.radius, 0.01f, 0.0f, FLT_MAX)) {
 						isDirty = true;
-					if (ImGui::Checkbox("EmitFromShell", &value.emitFromShell))
+					}
+					if (ImGui::Checkbox("EmitFromShell", &value.emitFromShell)) {
 						isDirty = true;
+					}
 					break;
 
 				case EmitShapeType::Box:
-					if (ImGui::DragFloat3("BoxSize", &value.boxSize.x, 0.01f, 0.0f, FLT_MAX))
+					if (GameEngine::DrawFloat3Control("BoxSize", reinterpret_cast<float*>(&value.boxSize))) {
 						isDirty = true;
+					}
 					break;
 				}
+
+				
 
 				ImGui::TreePop();
 			}
@@ -218,22 +223,22 @@ namespace GameEngine {
 					break;
 
 				case ShapeType::kAABB:
-					if (ImGui::DragFloat3("BoxSize", &value.boxSize.x, 0.01f, 0.0f, FLT_MAX)) {
+					if (GameEngine::DrawFloat3Control("BoxSize", reinterpret_cast<float*>(&value.boxSize), 100.0f)) {
 						isDirty = true;
 					}
-					if (ImGui::DragFloat3("AnchorPoint", &value.anchorPoint.x, 0.01f, 0.0f, FLT_MAX)) {
+					if (GameEngine::DrawFloat3Control("AnchorPoint", reinterpret_cast<float*>(&value.anchorPoint), 100.0f)) {
 						isDirty = true;
 					}
 					break;
 
 				case ShapeType::kOBB:
-					if (ImGui::DragFloat3("BoxSize", &value.boxSize.x, 0.01f, 0.0f, FLT_MAX)) {
+					if (GameEngine::DrawFloat3Control("BoxSize", reinterpret_cast<float*>(&value.boxSize), 100.0f)) {
 						isDirty = true;
 					}
-					if (ImGui::DragFloat3("AnchorPoint", &value.anchorPoint.x, 0.01f, 0.0f, FLT_MAX)) {
+					if (GameEngine::DrawFloat3Control("AnchorPoint", reinterpret_cast<float*>(&value.anchorPoint),100.0f)) {
 						isDirty = true;
 					}
-					if (ImGui::DragFloat3("Rotate", &value.rotate.x, 0.01f, 0.0f, FLT_MAX)) {
+					if (GameEngine::DrawFloat3Control("Rotate", reinterpret_cast<float*>(&value.rotate), 100.0f)) {
 						isDirty = true;
 					}
 					break;
