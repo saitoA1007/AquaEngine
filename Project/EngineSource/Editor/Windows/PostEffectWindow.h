@@ -44,6 +44,10 @@ namespace GameEngine {
 		uint32_t iconRestoreHandle_ = 0;
 		uint32_t iconSaveHandle_ = 0;
 
+		// 削除予約
+		std::vector<int> pendingNodeDeletes_;
+		std::vector<int> pendingLinkDeletes_;
+
 	private:
 
 		void DrawToolbar();
@@ -54,6 +58,9 @@ namespace GameEngine {
 		void HandleLinkCreation(PostEffectGraph& graph);
 		void HandleDeletion(PostEffectGraph& graph);
 		void DrawContextMenu();
+
+		void ApplyPendingDeletes(PostEffectGraph& graph);
+		bool IsDeletePending(const PostEffectGraph& graph, const Link& link) const;
 
 		std::string GetPreviewPassName(const PostEffectGraph& graph, const PostEffectNode& node) const;
 	};

@@ -75,6 +75,9 @@ void PostEffectWindow::Draw() {
 
     PostEffectGraph& graph = postEffectManager_->GetGraph();
 
+    // 前フレームで予約された削除を実行
+    ApplyPendingDeletes(graph);
+
     // ツールバー表示
     DrawToolbar();
 
@@ -213,7 +216,8 @@ void PostEffectWindow::DrawLinks(const PostEffectGraph& graph) {
         // 両端のノードが経路上にあり、有効なエフェクトなら流す
         const bool flowing = s && e
             && livePath.contains(s->parentNodeId) && livePath.contains(e->parentNodeId)
-            && IsNodeOn(graph.FindNode(s->parentNodeId)) && IsNodeOn(graph.FindNode(e->parentNodeId));
+            && IsNodeOn(graph.FindNode(s->parentNodeId)) && IsNodeOn(graph.FindNode(e->parentNodeId)) 
+            && !IsDeletePending(graph, link);
 
         const ImColor color = flowing ? ImColor(120, 200, 255, 230) : ImColor(110, 110, 120, 160);
         ned::Link(link.id, link.startPinId, link.endPinId, color, flowing ? 2.5f : 1.5f);
@@ -247,18 +251,18 @@ void PostEffectWindow::HandleDeletion(PostEffectGraph& graph) {
     if (ned::BeginDelete()) {
         ned::LinkId linkId;
         while (ned::QueryDeletedLink(&linkId)) {
-            if (ned::AcceptDeletedItem()) { graph.RemoveLink(static_cast<int>(linkId.Get())); }
+            pendingLinkDeletes_.push_back(static_cast<int>(linkId.Get()));
+            ned::RejectDeletedItem();
         }
 
         ned::NodeId nodeId;
         while (ned::QueryDeletedNode(&nodeId)) {
             const PostEffectNode* n = graph.FindNode(static_cast<int>(nodeId.Get()));
             // Scene、Outputは消せない
-            if (n && n->kind == PostEffectNodeKind::kEffect && ned::AcceptDeletedItem()) {
-                postEffectManager_->DestroyEffectNode(n->id);
-            } else {
-                ned::RejectDeletedItem();
+            if (n && n->kind == PostEffectNodeKind::kEffect) {
+                pendingNodeDeletes_.push_back(n->id);
             }
+            ned::RejectDeletedItem();
         }
     }
     ned::EndDelete();
@@ -290,6 +294,33 @@ void PostEffectWindow::DrawContextMenu() {
     }
 
     ned::Resume();
+}
+
+void PostEffectWindow::ApplyPendingDeletes(PostEffectGraph& graph) {
+    if (pendingNodeDeletes_.empty() && pendingLinkDeletes_.empty()) { return; }
+
+    // 消えるノードが選択されたままにならないようにする
+    ned::SetCurrentEditor(context_);
+    ned::ClearSelection();
+    ned::SetCurrentEditor(nullptr);
+
+    for (int id : pendingNodeDeletes_) { postEffectManager_->DestroyEffectNode(id); }
+    for (int id : pendingLinkDeletes_) { graph.RemoveLink(id); }
+    pendingNodeDeletes_.clear();
+    pendingLinkDeletes_.clear();
+}
+
+bool PostEffectWindow::IsDeletePending(const PostEffectGraph& graph, const Link& link) const {
+    auto has = [](const std::vector<int>& v, int id) {
+        return std::find(v.begin(), v.end(), id) != v.end();
+        };
+    if (has(pendingLinkDeletes_, link.id)) { return true; }
+
+    // 削除予約のノードにつながるリンクも対象
+    const Pin* s = graph.FindPin(link.startPinId);
+    const Pin* e = graph.FindPin(link.endPinId);
+    return (s && has(pendingNodeDeletes_, s->parentNodeId))
+        || (e && has(pendingNodeDeletes_, e->parentNodeId));
 }
 
 std::string PostEffectWindow::GetPreviewPassName(const PostEffectGraph& graph, const PostEffectNode& node) const {
