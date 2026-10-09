@@ -13,15 +13,8 @@ PostEffectNode* PostEffectGraph::FindNode(int nodeId) const {
 }
 
 PostEffectNode* PostEffectGraph::FindNodeByPin(int pinId) const {
-    for (auto& n : nodes) {
-        if (n->kind != PostEffectNodeKind::kOutput && n->output.id == pinId) { return n.get(); }
-        for (auto& p : n->inputs) {
-            if (p.id == pinId) {
-                return n.get(); 
-            } 
-        }
-    }
-    return nullptr;
+    const Pin* pin = FindPin(pinId);
+    return pin ? FindNode(pin->parentNodeId) : nullptr;
 }
 
 PostEffectNode* PostEffectGraph::FindOutputNode() const {
@@ -54,41 +47,30 @@ const Link* PostEffectGraph::FindLinkToPin(int endPinId) const {
 }
 
 PostEffectNode* PostEffectGraph::AddSceneNode() {
-    auto n = std::make_unique<PostEffectNode>();
-    n->id = GetNextId();
-    n->kind = PostEffectNodeKind::kScene;
-    n->label = "Scene";
-    n->output = { GetNextId(), "Scene", PinType::kTexture2D, PinKind::kOutput, n->id };
-    nodes.push_back(std::move(n));
-    dirty = true;
-    return nodes.back().get();
+    PostEffectNode& n = EmplaceNode(PostEffectNodeKind::kScene, "Scene");
+    n.output = MakePin("Scene", PinKind::kOutput, n.id);
+    return  &n;
 }
 
 PostEffectNode* PostEffectGraph::AddOutputNode() {
-    auto n = std::make_unique<PostEffectNode>();
-    n->id = GetNextId();
-    n->kind = PostEffectNodeKind::kOutput;
-    n->label = "Output";
-    n->inputs.push_back({ GetNextId(), "Result", PinType::kTexture2D, PinKind::kInput, n->id });
-    nodes.push_back(std::move(n));
-    dirty = true;
-    return nodes.back().get();
+    PostEffectNode& n = EmplaceNode(PostEffectNodeKind::kOutput, "Output");
+    n.inputs.push_back(MakePin("Result", PinKind::kInput, n.id));
+    return &n;
 }
 
-PostEffectNode* PostEffectGraph::AddEffectNode(const std::string& passName, IPostEffect* effect) {
-    auto n = std::make_unique<PostEffectNode>();
-    n->id = GetNextId();
-    n->kind = PostEffectNodeKind::kEffect;
-    n->label = effect->GetDisplayName();
-    n->passName = passName;
-    n->effect = effect;
+PostEffectNode* PostEffectGraph::AddEffectNode(const std::string& typeName, const std::string& name,
+    const std::string& passName, IPostEffect* effect) {
+    assert(effect != nullptr);
+    PostEffectNode& n = EmplaceNode(PostEffectNodeKind::kEffect, name);
+    n.typeName = typeName;
+    n.name = name;
+    n.passName = passName;
+    n.effect = effect;
     for (uint32_t i = 0; i < effect->GetInputCount(); ++i) {
-        n->inputs.push_back({ GetNextId(), effect->GetInputName(i), PinType::kTexture2D, PinKind::kInput, n->id });
+        n.inputs.push_back(MakePin(effect->GetInputName(i), PinKind::kInput, n.id));
     }
-    n->output = { GetNextId(), "Out", PinType::kTexture2D, PinKind::kOutput, n->id };
-    nodes.push_back(std::move(n));
-    dirty = true;
-    return nodes.back().get();
+    n.output = MakePin("Out", PinKind::kOutput, n.id);
+    return &n;
 }
 
 int PostEffectGraph::AddLink(int startPinId, int endPinId) {
@@ -119,28 +101,31 @@ void PostEffectGraph::RemoveNode(int nodeId) {
     dirty = true;
 }
 
-bool PostEffectGraph::DependsOn(int nodeId, int targetId) const {
+bool PostEffectGraph::DependsOn(int nodeId, int targetId, std::unordered_set<int>& visited) const {
     // nodeId の上流を辿って targetId に到達するか
     if (nodeId == targetId) { return true; }
+    // 合流のあるグラフで同じノードを何度も辿らないようにする
+    if (!visited.insert(nodeId).second) { return false; }
+
     const PostEffectNode* node = FindNode(nodeId);
     if (!node) { return false; }
-    for (auto& pin : node->inputs) {
-        const Link* link = FindLinkToPin(pin.id);
-        if (!link) { continue; }
-        const Pin* start = FindPin(link->startPinId);
-        if (start && DependsOn(start->parentNodeId, targetId)) { return true; }
+    for (const Pin& pin : node->inputs) {
+        const PostEffectNode* upstream = FindUpstreamNode(pin);
+        if (upstream && DependsOn(upstream->id, targetId, visited)) { return true; }
     }
     return false;
 }
 
 bool PostEffectGraph::CanConnect(int startPinId, int endPinId) const {
-    const Pin* s = FindPin(startPinId);
-    const Pin* e = FindPin(endPinId);
-    if (!s || !e) { return false; }
-    if (s->pinKind != PinKind::kOutput || e->pinKind != PinKind::kInput) { return false; }
-    if (s->parentNodeId == e->parentNodeId) { return false; }
+    const Pin* start = FindPin(startPinId);
+    const Pin* end = FindPin(endPinId);
+    if (!start || !end) { return false; }
+    if (start->pinKind != PinKind::kOutput || end->pinKind != PinKind::kInput) { return false; }
+    if (start->parentNodeId == end->parentNodeId) { return false; }
+
     // start側のノードがすでにend側のノードに依存していたら、繋ぐと循環する
-    return !DependsOn(s->parentNodeId, e->parentNodeId);
+    std::unordered_set<int> visited;
+    return !DependsOn(start->parentNodeId, end->parentNodeId, visited);
 }
 
 bool PostEffectGraph::TopoSort(int nodeId, std::unordered_set<int>& visited,
@@ -152,14 +137,13 @@ bool PostEffectGraph::TopoSort(int nodeId, std::unordered_set<int>& visited,
     const PostEffectNode* node = FindNode(nodeId);
     if (!node) { return false; }
 
-    for (auto& pin : node->inputs) {
-        const Link* link = FindLinkToPin(pin.id);
-        if (!link) { continue; }
-        const Pin* start = FindPin(link->startPinId);
-        if (start && !TopoSort(start->parentNodeId, visited, visiting, order)) { return false; }
+    visiting.insert(nodeId);
+    for (const Pin& pin : node->inputs) {
+        const PostEffectNode* upstream = FindUpstreamNode(pin);
+        if (upstream && !TopoSort(upstream->id, visited, visiting, order)) { return false; }
     }
-
     visiting.erase(nodeId);
+
     visited.insert(nodeId);
     order.push_back(nodeId);
     return true;
@@ -174,6 +158,30 @@ bool PostEffectGraph::BuildOrder(std::vector<int>& order) const {
 }
 
 bool PostEffectGraph::IsPinLinked(int pinId) const {
-    for (auto& l : links) { if (l.startPinId == pinId || l.endPinId == pinId) return true; }
+    for (auto& l : links) {
+        if (l.startPinId == pinId || l.endPinId == pinId) {
+            return true; 
+        }
+    }
     return false;
+}
+
+PostEffectNode& PostEffectGraph::EmplaceNode(PostEffectNodeKind kind, std::string label) {
+    PostEffectNode& n = *nodes.emplace_back(std::make_unique<PostEffectNode>());
+    n.id = GetNextId();
+    n.kind = kind;
+    n.label = std::move(label);
+    dirty = true;
+    return n;
+}
+
+Pin PostEffectGraph::MakePin(const char* name, PinKind kind, int parentNodeId) {
+    return { GetNextId(), name, PinType::kTexture2D, kind, parentNodeId };
+}
+
+const PostEffectNode* PostEffectGraph::FindUpstreamNode(const Pin& inputPin) const {
+    const Link* link = FindLinkToPin(inputPin.id);
+    if (!link) { return nullptr; }
+    const Pin* start = FindPin(link->startPinId);
+    return start ? FindNode(start->parentNodeId) : nullptr;
 }

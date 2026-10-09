@@ -591,6 +591,7 @@
     <ClCompile Include="Application\Demo\PBRDemo.cpp" />
     <ClCompile Include="EngineSource\Editor\NodeSystem\NodePinIcon.cpp" />
     <ClCompile Include="EngineSource\Editor\NodeSystem\NodeBuilder.cpp" />
+    <ClCompile Include="Application\Scene\DemoScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Camera\CameraController.h">
@@ -1164,6 +1165,7 @@
     <ClInclude Include="Application\Demo\PBRDemo.h" />
     <ClInclude Include="EngineSource\Editor\NodeSystem\NodePinIcon.h" />
     <ClInclude Include="EngineSource\Editor\NodeSystem\NodeBuilder.h" />
+    <ClInclude Include="Application\Scene\DemoScene.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />

@@ -15,7 +15,9 @@ namespace GameEngine {
         int id = 0;
         PostEffectNodeKind kind = PostEffectNodeKind::kEffect;
         std::string label;
-        std::string passName;          // effects_ のキー（kEffectのみ）
+        std::string typeName;          // エフェクトの種類
+        std::string name;              // インスタンス名
+        std::string passName;          // 保存する描画パスの名前。空だと使い回し用のパスを使用
         IPostEffect* effect = nullptr; // kEffectのみ
         std::vector<Pin> inputs;
         Pin output{};                  // kOutputでは未使用
@@ -39,7 +41,8 @@ namespace GameEngine {
         // ノード生成
         PostEffectNode* AddSceneNode();
         PostEffectNode* AddOutputNode();
-        PostEffectNode* AddEffectNode(const std::string& passName, IPostEffect* effect);
+        PostEffectNode* AddEffectNode(const std::string& typeName, const std::string& name,
+            const std::string& passName, IPostEffect* effect);
 
         // start=出力ピン, end=入力ピン。入力ピンは1リンクのみなので既存を置き換える
         int AddLink(int startPinId, int endPinId);
@@ -55,8 +58,15 @@ namespace GameEngine {
         bool IsPinLinked(int pinId) const;
 
     private:
-        bool DependsOn(int nodeId, int targetId) const;
+        bool DependsOn(int nodeId, int targetId, std::unordered_set<int>& visited) const;
         bool TopoSort(int nodeId, std::unordered_set<int>& visited,
             std::unordered_set<int>& visiting, std::vector<int>& order) const;
+
+        // ノードの共通初期化
+        PostEffectNode& EmplaceNode(PostEffectNodeKind kind, std::string label);
+        // ピン生成
+        Pin MakePin(const char* name, PinKind kind, int parentNodeId);
+        // 入力ピンにつながっている上流ノード。未接続ならnullptr
+        const PostEffectNode* FindUpstreamNode(const Pin& inputPin) const;
     };
 }

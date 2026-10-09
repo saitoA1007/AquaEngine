@@ -12,14 +12,15 @@
 #include "IceMaterial.h"
 #include "Collider.h"
 #include "DestructibleObject.h"
+
 #include "Text.h"
 
 #include "Application/Scene/Transition/Fade.h"
 
-class TestScene : public GameEngine::IScene {
+class DemoScene : public GameEngine::IScene {
 public:
-	TestScene();
-	~TestScene();
+	DemoScene();
+	~DemoScene();
 
 	/// <summary>
 	/// 初期化
@@ -60,47 +61,19 @@ private: // シーン機能
 	std::unique_ptr<GameEngine::Camera> mainCamera_;
 
 	// プリミティブのエフェクト
-	GameEngine::ParticleBehavior* primitiveEffect_;
-	GameEngine::Model* effectModel_ = nullptr;
-
-	GameEngine::Model* model_;
-	GameEngine::WorldTransform world_;
-	// アニメーションデータ
-	std::map<std::string, AnimationData> walkAnimationData_;
-	// アニメーションを再生するクラス
-	std::unique_ptr<GameEngine::Animator> walkAnimator_;
-
+	GameEngine::ParticleBehavior* testEffect_;
+	
 	float intensity_ = 0.8f;
 	Vector3 dir_ = { 0.0f,-1.0f,0.0f };
 	Vector4 lightColor_ = { 1.0f,1.0f,1.0f,1.0f };
-
-	Vector4 playerColor_ = { 1.0f,1.0f,1.0f,1.0f };
-
+	
 	// テキストのテスト
 	std::unique_ptr<GameEngine::Text> text_;
+	std::string textName_;
+	static inline char buf[128] = "";
 
-	// 氷で共通のマテリアル
-	GameEngine::IceMaterial iceMaterial_;
-	
-	Vector4 color_ = {1.0f,1.0f,1.0f,1.0f};
+	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 	float roughness_ = 0.5f;
 	// 屈折
 	float ior_ = 1.31f;
-
-	// 地面
-	GameEngine::Model* terrainModel_;
-	GameEngine::WorldTransform terrainWorld_;
-
-	// 中ポリゴン氷
-	GameEngine::Model* iceMiddleModel_;
-	GameEngine::WorldTransform iceMiddleWorld_;
-	// キューブ
-	GameEngine::Model* iceCubeModel_;
-	GameEngine::WorldTransform iceCubeWorld_;
-
-	GameEngine::Model* testModel_;
-
-	// 1つに集約していない破片モデルを描画
-	GameEngine::Model* noFractureModel_;
-	GameEngine::WorldTransform noFractureWorld_;
 };

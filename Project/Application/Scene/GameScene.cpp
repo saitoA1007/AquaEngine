@@ -91,7 +91,7 @@ GameScene::GameScene() {
 	auto* pauseUIManager = gameObjectManager_->AddObject<PauseUIManager>(textureManager_);
 
 	// 遷移する用のテクスチャを設定
-	Dissolve* dissolve = postEffectManager_->GetPostEffect<Dissolve>("DissolvePass");
+	Dissolve* dissolve = postEffectManager_->GetPostEffect<Dissolve>("Dissolve");
 	dissolve->SetNoiseTextureIndex(textureManager_->GetHandleByName("noise0.png"));
 
 	// シーンフェーズを管理

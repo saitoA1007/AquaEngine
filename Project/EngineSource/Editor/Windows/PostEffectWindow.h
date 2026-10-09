@@ -46,7 +46,14 @@ namespace GameEngine {
 
 	private:
 
+		void DrawToolbar();
+
+		void DrawNodes(PostEffectGraph& graph);
 		void DrawNode(PostEffectGraph& graph, PostEffectNode& node);
+		void DrawLinks(const PostEffectGraph& graph);
+		void HandleLinkCreation(PostEffectGraph& graph);
+		void HandleDeletion(PostEffectGraph& graph);
+		void DrawContextMenu();
 
 		std::string GetPreviewPassName(const PostEffectGraph& graph, const PostEffectNode& node) const;
 	};

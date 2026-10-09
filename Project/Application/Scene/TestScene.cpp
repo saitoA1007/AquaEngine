@@ -117,7 +117,7 @@ TestScene::TestScene() {
 	auto* sphereModel = modelManager_->GetNameByModel("sphereShade.obj");
 	gameObjectManager_->AddObject<PBRDemo>(sphereModel);
 
-	text_ = std::make_unique<Text>(fontManager_->GetFont("源直ゴシック EMG 2 - Medium"), "こんにちは");
+	text_ = std::make_unique<Text>(fontManager_->GetFont("源直ゴシック EMG 2 - Medium"), "馬力強い馬にマタガーリ");
 }
 
 void TestScene::Initialize() {

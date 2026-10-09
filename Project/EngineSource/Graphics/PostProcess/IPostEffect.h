@@ -26,6 +26,11 @@ namespace GameEngine {
 			psoName_ = psoName;
 		}
 
+		// 使用する描画パス
+		void SetPersistentPass(const std::string& passName) { persistentPass_ = passName; }
+		const std::string& GetPersistentPass() const { return persistentPass_; }
+		bool IsPersistent() const { return !persistentPass_.empty(); }
+
 		// グラフ用
 		// 入力ピンの数
 		virtual uint32_t GetInputCount() const { return 1; }
@@ -35,6 +40,8 @@ namespace GameEngine {
 		virtual void SetInputIndex(uint32_t slot, uint32_t srvIndex) {
 			if (slot == 0) { SetPassIndex(srvIndex); }
 		}
+		// 無効時にどの入力スロットを素通しするか
+		virtual uint32_t GetPassThroughSlot() const { return 0; }
 		// ノードのタイトル
 		virtual const char* GetDisplayName() const { return psoName_.c_str(); }
 		// ノード内に出すパラメータUI
@@ -52,6 +59,8 @@ namespace GameEngine {
 		uint32_t passIndex_ = 0;
 		// 使用するpso
 		std::string psoName_;
+		// 使用する描画パス
+		std::string persistentPass_ = "";
 
 		// 有効状態
 		bool isActive_ = false;

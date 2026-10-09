@@ -23,6 +23,18 @@ namespace {
         default:                          return IM_COL32(128, 195, 248, 255);
         }
     }
+
+    // ツールバー用のアイコンボタン
+    bool IconButton(const char* id, ImTextureID tex, const char* tooltip) {
+        const bool pressed = ImGui::ImageButton(id, tex, ImVec2(16, 16));
+        if (ImGui::IsItemHovered()) { ImGui::SetTooltip("%s", tooltip); }
+        return pressed;
+    }
+
+    // エフェクトノードが有効か
+    bool IsNodeOn(const PostEffectNode* n) {
+        return n && (n->kind != PostEffectNodeKind::kEffect || n->effect->IsActive());
+    }
 }
 
 PostEffectWindow::PostEffectWindow(PostEffectManager* postEffectManager, TextureManager* textureManager, RenderPassController* renderPassController) {
@@ -63,12 +75,28 @@ void PostEffectWindow::Draw() {
 
     PostEffectGraph& graph = postEffectManager_->GetGraph();
 
-    // ツールバー
-    if (ImGui::ImageButton("##reset", ToImTex(textureManager_, iconRestoreHandle_), ImVec2(16, 16))) {
+    // ツールバー表示
+    DrawToolbar();
+
+    ned::SetCurrentEditor(context_);
+    ned::Begin("PostEffectGraph");
+
+    DrawNodes(graph);
+    DrawLinks(graph);
+    HandleLinkCreation(graph);
+    HandleDeletion(graph);
+    DrawContextMenu();
+
+    ned::End();
+    ned::SetCurrentEditor(nullptr);
+    ImGui::End();
+}
+
+void PostEffectWindow::DrawToolbar() {
+    if (IconButton("##reset", ToImTex(textureManager_, iconRestoreHandle_), "Reset")) {
         postEffectManager_->ResetGraph();
         applyPositions_ = true;
     }
-    if (ImGui::IsItemHovered()) { ImGui::SetTooltip("Reset"); }
 
     ImGui::SameLine();
     if (ImGui::Button("Fit")) {
@@ -78,132 +106,34 @@ void PostEffectWindow::Draw() {
     }
 
     ImGui::SameLine();
-    if (ImGui::ImageButton("##save", ToImTex(textureManager_, iconSaveHandle_), ImVec2(16, 16))) {
-        // 保存処理(後でグラフをJSONに書き出すなど)
+    if (IconButton("##save", ToImTex(textureManager_, iconSaveHandle_), "Save")) {
+        postEffectManager_->SaveGraph();
     }
-    if (ImGui::IsItemHovered()) { ImGui::SetTooltip("Save"); }
+
+    ImGui::SameLine();
+    if (ImGui::Button("Load")) {
+        if (postEffectManager_->LoadGraph()) {
+            applyPositions_ = true;
+        }
+    }
+
     ImGui::SameLine();
     ImGui::Checkbox("Preview", &showPreview_);
+}
 
-    ned::SetCurrentEditor(context_);
-    ned::Begin("PostEffectGraph");
-
-    // ノード描画
+void PostEffectWindow::DrawNodes(PostEffectGraph& graph) {
     for (auto& node : graph.nodes) {
+        // 初回とリセット後は保存位置をエディタへ、それ以外はエディタの位置を保存側へ
         if (applyPositions_) { ned::SetNodePosition(node->id, ImVec2(node->pos.x, node->pos.y)); }
 
         DrawNode(graph, *node);
 
         if (!applyPositions_) {
-            ImVec2 p = ned::GetNodePosition(node->id);
+            const ImVec2 p = ned::GetNodePosition(node->id);
             node->pos = { p.x, p.y };
         }
     }
     applyPositions_ = false;
-
-    // リンク描画
-    {
-        // Outputに到達する経路上のノードを集める
-        std::unordered_set<int> livePath;
-        std::vector<int> order;
-        if (graph.BuildOrder(order)) { livePath.insert(order.begin(), order.end()); }
-
-        for (const Link& link : graph.links) {
-            const Pin* s = graph.FindPin(link.startPinId);
-            const Pin* e = graph.FindPin(link.endPinId);
-
-            // 両端のノードが経路上にあり、有効なエフェクトなら流す
-            bool flowing = false;
-            if (s && e && livePath.contains(s->parentNodeId) && livePath.contains(e->parentNodeId)) {
-                const PostEffectNode* from = graph.FindNode(s->parentNodeId);
-                const PostEffectNode* to = graph.FindNode(e->parentNodeId);
-                auto isOn = [](const PostEffectNode* n) {
-                    return n && (n->kind != PostEffectNodeKind::kEffect || n->effect->IsActive());
-                    };
-                flowing = isOn(from) && isOn(to);
-            }
-
-            ImColor color = flowing ? ImColor(120, 200, 255, 230) : ImColor(110, 110, 120, 160);
-            ned::Link(link.id, link.startPinId, link.endPinId, color, flowing ? 2.5f : 1.5f);
-
-            if (flowing) { ned::Flow(link.id, ned::FlowDirection::Forward); }
-        }
-    }
-
-    // リンク作成
-    if (ned::BeginCreate()) {
-        ned::PinId a, b;
-        if (ned::QueryNewLink(&a, &b) && a && b) {
-            int startId = static_cast<int>(a.Get());
-            int endId = static_cast<int>(b.Get());
-
-            // 入力→出力の順でドラッグされた場合は入れ替えて正規化する
-            const Pin* pa = graph.FindPin(startId);
-            if (pa && pa->pinKind == PinKind::kInput) { std::swap(startId, endId); }
-
-            if (graph.CanConnect(startId, endId)) {
-                if (ned::AcceptNewItem()) { graph.AddLink(startId, endId); }
-            } else {
-                ned::RejectNewItem(ImColor(255, 80, 80), 2.0f);   // 繋げない場合は赤
-            }
-        }
-    }
-    ned::EndCreate();
-
-    // 削除
-    if (ned::BeginDelete()) {
-        ned::LinkId linkId;
-        while (ned::QueryDeletedLink(&linkId)) {
-            if (ned::AcceptDeletedItem()) { graph.RemoveLink(static_cast<int>(linkId.Get())); }
-        }
-        ned::NodeId nodeId;
-        while (ned::QueryDeletedNode(&nodeId)) {
-            PostEffectNode* n = graph.FindNode(static_cast<int>(nodeId.Get()));
-            // Scene、Outputは消せない
-            if (n && n->kind == PostEffectNodeKind::kEffect && ned::AcceptDeletedItem()) {
-                graph.RemoveNode(n->id);
-            } else {
-                ned::RejectDeletedItem();
-            }
-        }
-    }
-    ned::EndDelete();
-
-    // 右クリックメニュー
-    ImVec2 openPos = ImGui::GetMousePos();
-    ned::Suspend();
-    if (ned::ShowBackgroundContextMenu()) {
-        popupCanvasPos_ = ned::ScreenToCanvas(openPos);
-        ImGui::OpenPopup("AddPostEffectNode");
-    }
-    if (ImGui::BeginPopup("AddPostEffectNode")) {
-        ImGui::TextUnformatted("Add Effect");
-        ImGui::Separator();
-
-        bool any = false;
-        for (const auto& [passName, effect] : postEffectManager_->GetEffects()) {
-            // すでにグラフ上にあるエフェクトは追加できないように
-            bool exists = false;
-            for (auto& n : graph.nodes) {
-                if (n->effect == effect.get()) { exists = true; break; }
-            }
-            if (exists) { continue; }
-
-            any = true;
-            if (ImGui::MenuItem(effect->GetDisplayName())) {
-                PostEffectNode* added = graph.AddEffectNode(passName, effect.get());
-                added->pos = { popupCanvasPos_.x, popupCanvasPos_.y };
-                ned::SetNodePosition(added->id, popupCanvasPos_);
-            }
-        }
-        if (!any) { ImGui::TextDisabled("(no effects available)"); }
-        ImGui::EndPopup();
-    }
-    ned::Resume();
-
-    ned::End();
-    ned::SetCurrentEditor(nullptr);
-    ImGui::End();
 }
 
 void PostEffectWindow::DrawNode(PostEffectGraph& graph, PostEffectNode& node) {
@@ -245,6 +175,13 @@ void PostEffectWindow::DrawNode(PostEffectGraph& graph, PostEffectNode& node) {
     // パラメータ
     if (isEffect) {
         nb.BeginContent();
+
+        // 保存パスに記入するか
+        bool keep = !node.passName.empty();
+        if (ImGui::Checkbox("Keep pass", &keep)) {
+            postEffectManager_->SetPersistent(node.id, keep);
+        }
+
         ImGui::BeginDisabled(!active);
         ImGui::PushItemWidth(120.0f);
         node.effect->DrawParamUI();
@@ -263,6 +200,98 @@ void PostEffectWindow::DrawNode(PostEffectGraph& graph, PostEffectNode& node) {
     nb.End();
 }
 
+void PostEffectWindow::DrawLinks(const PostEffectGraph& graph) {
+    // Outputに到達する経路上のノードを集める
+    std::unordered_set<int> livePath;
+    std::vector<int> order;
+    if (graph.BuildOrder(order)) { livePath.insert(order.begin(), order.end()); }
+
+    for (const Link& link : graph.links) {
+        const Pin* s = graph.FindPin(link.startPinId);
+        const Pin* e = graph.FindPin(link.endPinId);
+
+        // 両端のノードが経路上にあり、有効なエフェクトなら流す
+        const bool flowing = s && e
+            && livePath.contains(s->parentNodeId) && livePath.contains(e->parentNodeId)
+            && IsNodeOn(graph.FindNode(s->parentNodeId)) && IsNodeOn(graph.FindNode(e->parentNodeId));
+
+        const ImColor color = flowing ? ImColor(120, 200, 255, 230) : ImColor(110, 110, 120, 160);
+        ned::Link(link.id, link.startPinId, link.endPinId, color, flowing ? 2.5f : 1.5f);
+
+        if (flowing) { ned::Flow(link.id, ned::FlowDirection::Forward); }
+    }
+}
+
+void PostEffectWindow::HandleLinkCreation(PostEffectGraph& graph) {
+    if (ned::BeginCreate()) {
+        ned::PinId a, b;
+        if (ned::QueryNewLink(&a, &b) && a && b) {
+            int startId = static_cast<int>(a.Get());
+            int endId = static_cast<int>(b.Get());
+
+            // 入力→出力の順でドラッグされた場合は入れ替えて正規化する
+            const Pin* pa = graph.FindPin(startId);
+            if (pa && pa->pinKind == PinKind::kInput) { std::swap(startId, endId); }
+
+            if (graph.CanConnect(startId, endId)) {
+                if (ned::AcceptNewItem()) { graph.AddLink(startId, endId); }
+            } else {
+                ned::RejectNewItem(ImColor(255, 80, 80), 2.0f);   // 繋げない場合は赤
+            }
+        }
+    }
+    ned::EndCreate();
+}
+
+void PostEffectWindow::HandleDeletion(PostEffectGraph& graph) {
+    if (ned::BeginDelete()) {
+        ned::LinkId linkId;
+        while (ned::QueryDeletedLink(&linkId)) {
+            if (ned::AcceptDeletedItem()) { graph.RemoveLink(static_cast<int>(linkId.Get())); }
+        }
+
+        ned::NodeId nodeId;
+        while (ned::QueryDeletedNode(&nodeId)) {
+            const PostEffectNode* n = graph.FindNode(static_cast<int>(nodeId.Get()));
+            // Scene、Outputは消せない
+            if (n && n->kind == PostEffectNodeKind::kEffect && ned::AcceptDeletedItem()) {
+                postEffectManager_->DestroyEffectNode(n->id);
+            } else {
+                ned::RejectDeletedItem();
+            }
+        }
+    }
+    ned::EndDelete();
+}
+
+void PostEffectWindow::DrawContextMenu() {
+    const ImVec2 openPos = ImGui::GetMousePos();
+    ned::Suspend();
+
+    if (ned::ShowBackgroundContextMenu()) {
+        popupCanvasPos_ = ned::ScreenToCanvas(openPos);
+        ImGui::OpenPopup("AddPostEffectNode");
+    }
+
+    if (ImGui::BeginPopup("AddPostEffectNode")) {
+        ImGui::TextUnformatted("Add Effect");
+        ImGui::Separator();
+
+        const std::vector<std::string> types = postEffectManager_->GetEffectTypeNames();
+        for (const std::string& type : types) {
+            if (!ImGui::MenuItem(type.c_str())) { continue; }
+            if (PostEffectNode* added = postEffectManager_->CreateEffectNode(type)) {
+                added->pos = { popupCanvasPos_.x, popupCanvasPos_.y };
+                ned::SetNodePosition(added->id, popupCanvasPos_);
+            }
+        }
+        if (types.empty()) { ImGui::TextDisabled("(no effect types)"); }
+        ImGui::EndPopup();
+    }
+
+    ned::Resume();
+}
+
 std::string PostEffectWindow::GetPreviewPassName(const PostEffectGraph& graph, const PostEffectNode& node) const {
     switch (node.kind) {
         // 元のシーン画像
@@ -274,13 +303,7 @@ std::string PostEffectWindow::GetPreviewPassName(const PostEffectGraph& graph, c
         return node.passName;    
 
     case PostEffectNodeKind::kOutput: {
-        // Outputは自前の画像を持たないので、つながっている上流ノードを表示する
-        if (node.inputs.empty()) { return {}; }
-        const Link* l = graph.FindLinkToPin(node.inputs[0].id);
-        if (!l) { return {}; }
-        const Pin* s = graph.FindPin(l->startPinId);
-        const PostEffectNode* up = s ? graph.FindNode(s->parentNodeId) : nullptr;
-        return up ? GetPreviewPassName(graph, *up) : std::string{};
+        return postEffectManager_->GetFinalPassName();
     }
     }
     return {};

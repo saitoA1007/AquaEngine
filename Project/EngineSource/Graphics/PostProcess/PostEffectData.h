@@ -160,6 +160,7 @@ namespace GameEngine {
             if (slot == 0) { buffer_.GetData()->blurTextureHandle = srvIndex; } else { buffer_.GetData()->gameTextureHandle = srvIndex; }
         }
         const char* GetDisplayName() const override { return "Bloom"; }
+        uint32_t GetPassThroughSlot() const override { return 1; }
 
     private:
         ConstantBuffer<BloomData> buffer_;
