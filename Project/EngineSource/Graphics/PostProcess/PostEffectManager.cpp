@@ -229,7 +229,7 @@ bool PostEffectManager::SaveGraph(const std::string& filePath) {
             n["active"] = node->effect->IsActive();
             n["passName"] = node->passName;
             nlohmann::json params = nlohmann::json::object();
-            //node->effect->SaveParams(params);
+            node->effect->SaveParams(params);
             n["params"] = std::move(params);
             break;
         }
@@ -380,7 +380,7 @@ bool PostEffectManager::LoadGraph(const std::string& filePath) {
     // ここまで成功したら反映する
     for (auto& p : pending) {
         p.fx->SetIsActive(p.active);
-        //try { p.fx->LoadParams(p.params); }
+        p.fx->LoadParams(p.params);
     }
     for (auto& pass : passesToCreate) { EnsurePass(pass); }
 
@@ -422,10 +422,12 @@ void PostEffectManager::SetPersistent(int nodeId, bool enable) {
     PostEffectNode* node = graph_.FindNode(nodeId);
     if (!node || node->kind != PostEffectNodeKind::kEffect) { return; }
     if (enable) {
-        node->passName = node->name + "Pass";   // インスタンス名ごとに専用パス
+        // インスタンス名ごとに専用パス
+        node->passName = node->name + "Pass";
         EnsurePass(node->passName);
     } else {
-        node->passName.clear();                 // プールに戻す
+        // プールに戻す
+        node->passName.clear();
     }
 }
 

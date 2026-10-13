@@ -155,7 +155,7 @@ void PostEffectWindow::UpdateSelection() {
 void PostEffectWindow::DrawInspector(PostEffectGraph& graph) {
     PostEffectNode* node = (selectedNodeId_ >= 0) ? graph.FindNode(selectedNodeId_) : nullptr;
     if (!node) {
-        ImGui::TextDisabled("ノードを選択してください");
+        ImGui::TextDisabled("Not selected");
         return;
     }
 
@@ -163,7 +163,7 @@ void PostEffectWindow::DrawInspector(PostEffectGraph& graph) {
     ImGui::Separator();
 
     if (node->kind != PostEffectNodeKind::kEffect) {
-        ImGui::TextDisabled("調整できるパラメータはありません");
+        ImGui::TextDisabled("No parameter");
         return;
     }
 
@@ -244,12 +244,6 @@ void PostEffectWindow::DrawNode(PostEffectGraph& graph, PostEffectNode& node) {
         if (ImGui::Checkbox("Keep pass", &keep)) {
             postEffectManager_->SetPersistent(node.id, keep);
         }
-
-        //ImGui::BeginDisabled(!active);
-        //ImGui::PushItemWidth(120.0f);
-        //node.effect->DrawParamUI();
-        //ImGui::PopItemWidth();
-        //ImGui::EndDisabled();
     }
 
     // 中間描画結果のプレビュー

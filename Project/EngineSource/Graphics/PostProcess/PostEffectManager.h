@@ -94,7 +94,7 @@ namespace GameEngine {
 	private:
 
 		// 保存先
-		static constexpr const char* kGraphFilePath = "EngineSource/Resources/Json/PostEffectGraph.json";
+		static constexpr const char* kGraphFilePath = "Resources/Json/PostEffect/PostEffectGraph.json";
 
 		// 使い回し用のパス
 		static constexpr const uint32_t kPoolSize = 3;

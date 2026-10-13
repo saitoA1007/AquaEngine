@@ -9,13 +9,15 @@ using namespace GameEngine;
 AssetWindow::AssetWindow(TextureManager* textureManager) {
     textureManager_ = textureManager;
 
-    // 使用するアイコンを登録する
-    textureManager_->RegisterTexture("EngineSource/Resources/Textures/errorIcon.png");
-    textureManager_->RegisterTexture("EngineSource/Resources/Textures/meshIcon.png");
-    textureManager_->RegisterTexture("EngineSource/Resources/Textures/folderIcon.png");
-
     uint32_t texHandle = textureManager_->GetHandleByName("errorIcon.png");
     errorTextureHandle_ = textureManager_->GetTextureSrvHandlesGPU(texHandle);
+
+    uint32_t folderIconGH = textureManager_->GetHandleByName("folderIcon.png");
+    uint32_t meshIconGH = textureManager_->GetHandleByName("meshIcon.png");
+    uint32_t jsonIconGH = textureManager_->GetHandleByName("jsonIcon.png");
+    folderIconTextureHandle_ = textureManager_->GetTextureSrvHandlesGPU(folderIconGH);
+    meshIconTextureHandle_ = textureManager_->GetTextureSrvHandlesGPU(meshIconGH);
+    jsonIconTextureHandle_ = textureManager_->GetTextureSrvHandlesGPU(jsonIconGH);
 
     // Resourceフォルダがなければ自動生成
     if (!std::filesystem::exists(resourcesPath)) {
@@ -117,7 +119,7 @@ void AssetWindow::RenderContentArea() {
             }
 
             // 特定の拡張子は飛ばす
-            if (ext == ".mtl" || ext == ".bin" || ext == ".dds" || ext == ".json" || ext == ".wav" || ext == ".mp3") {
+            if (ext == ".mtl" || ext == ".bin" || ext == ".dds" || ext == ".wav" || ext == ".mp3") {
                 continue;
             }
 
@@ -126,15 +128,16 @@ void AssetWindow::RenderContentArea() {
 
             if (entry.is_directory()) {
                 // フォルダアイコン
-                uint32_t texHandle = textureManager_->GetHandleByName("folderIcon.png");
-                currentGpuHandle = textureManager_->GetTextureSrvHandlesGPU(texHandle);
+                currentGpuHandle = folderIconTextureHandle_;
             } else if (ext == ".png" || ext == ".jpg") {
                 uint32_t textureIndex = textureManager_->GetHandleByName(filename);
                 currentGpuHandle = textureManager_->GetTextureSrvHandlesGPU(textureIndex);
             } else if (ext == ".obj" || ext == ".gltf") {
                // メッシュアイコン
-                uint32_t texHandle = textureManager_->GetHandleByName("meshIcon.png");
-                currentGpuHandle = textureManager_->GetTextureSrvHandlesGPU(texHandle);
+                currentGpuHandle = meshIconTextureHandle_;
+            } else if (ext == ".json") {
+                // jsonデータ
+                currentGpuHandle = jsonIconTextureHandle_;
             }
 
             // ハンドルがNullの場合はエラー画像

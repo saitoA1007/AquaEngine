@@ -53,6 +53,11 @@ void ResourceSubsystem::LoadAllResources() {
 	textureManager_->RegisterTexture("EngineSource/Resources/Textures/BlueprintBackground.png");
 	textureManager_->RegisterTexture("EngineSource/Resources/Textures/ic_restore_white_24dp.png");
 	textureManager_->RegisterTexture("EngineSource/Resources/Textures/ic_save_white_24dp.png");
+	// 使用するアイコンを登録する
+	textureManager_->RegisterTexture("EngineSource/Resources/Textures/errorIcon.png");
+	textureManager_->RegisterTexture("EngineSource/Resources/Textures/meshIcon.png");
+	textureManager_->RegisterTexture("EngineSource/Resources/Textures/jsonIcon.png");
+	textureManager_->RegisterTexture("EngineSource/Resources/Textures/folderIcon.png");
 #endif
 
 	// フォントデータを全てロードする
