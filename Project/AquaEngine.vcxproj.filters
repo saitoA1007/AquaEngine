@@ -592,6 +592,10 @@
     <ClCompile Include="EngineSource\Editor\NodeSystem\NodePinIcon.cpp" />
     <ClCompile Include="EngineSource\Editor\NodeSystem\NodeBuilder.cpp" />
     <ClCompile Include="Application\Scene\DemoScene.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectGraphSerializer.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectRegistry.cpp" />
+    <ClCompile Include="Application\Demo\Test.cpp" />
+    <ClCompile Include="Application\Demo\TestFructure.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\Camera\CameraController.h">
@@ -1166,6 +1170,10 @@
     <ClInclude Include="EngineSource\Editor\NodeSystem\NodePinIcon.h" />
     <ClInclude Include="EngineSource\Editor\NodeSystem\NodeBuilder.h" />
     <ClInclude Include="Application\Scene\DemoScene.h" />
+    <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectGraphSerializer.h" />
+    <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectRegistry.h" />
+    <ClInclude Include="Application\Demo\Test.h" />
+    <ClInclude Include="Application\Demo\TestFructure.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />

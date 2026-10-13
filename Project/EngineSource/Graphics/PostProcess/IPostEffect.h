@@ -2,6 +2,7 @@
 #include <string>
 #include "SrvManager.h"
 #include "ConstantBuffer.h"
+#include "JsonSerializer.h"
 
 namespace GameEngine {
 
@@ -46,6 +47,10 @@ namespace GameEngine {
 		virtual const char* GetDisplayName() const { return psoName_.c_str(); }
 		// ノード内に出すパラメータUI
 		virtual void DrawParamUI() {}
+
+		// パラメータの保存/読み込み
+		virtual void SaveParams(nlohmann::json& j) {}
+		virtual void LoadParams(const nlohmann::json& j) {}
 
 		// 使用するpassのインデックス
 		const uint32_t& GetPassIndex() const { return passIndex_; }

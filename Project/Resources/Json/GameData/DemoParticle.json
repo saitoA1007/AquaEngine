@@ -12,9 +12,9 @@
                     1.0
                 ],
                 "EmittePos": [
+                    -10.0,
                     0.0,
-                    0.0,
-                    0.0
+                    10.0
                 ],
                 "LifeTime": 1.0,
                 "Rotate": [
@@ -151,9 +151,9 @@
                 "AttractionSpeed": 100.0,
                 "AxisSpeed": 16.389999389648438,
                 "CenterPos": [
+                    -10.0,
                     0.0,
-                    0.0,
-                    0.0
+                    10.0
                 ],
                 "Enable": true,
                 "RotationSpeed": 100.0

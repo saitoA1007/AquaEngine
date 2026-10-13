@@ -180,6 +180,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Application\Demo\Test.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Application\Demo\TestFructure.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Application\Enemy\BattleAction\BossBattleAction.cpp" />
     <ClCompile Include="Application\Enemy\BossAnimator.cpp" />
     <ClCompile Include="Application\Enemy\BossEnemy.cpp" />
@@ -336,6 +344,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Graphics\Core\ResourceGarbageCollector.cpp" />
     <ClCompile Include="EngineSource\Graphics\Debug\PixCapture.cpp" />
     <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectData.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectGraphSerializer.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectRegistry.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\RayLibShaderCompiler.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Core\RaytracingPipeline.cpp" />
@@ -604,6 +620,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Demo\FructureDemo.h" />
     <ClInclude Include="Application\Demo\IceDemo.h" />
     <ClInclude Include="Application\Demo\PBRDemo.h" />
+    <ClInclude Include="Application\Demo\Test.h" />
+    <ClInclude Include="Application\Demo\TestFructure.h" />
     <ClInclude Include="Application\Enemy\BattleAction\BossBattleAction.h" />
     <ClInclude Include="Application\Enemy\BattleAction\IBossBattleAction.h" />
     <ClInclude Include="Application\Enemy\BossAnimator.h" />
@@ -773,6 +791,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Graphics\Debug\PixCapture.h" />
     <ClInclude Include="EngineSource\Graphics\Debug\PixMarker.h" />
     <ClInclude Include="EngineSource\Graphics\PostProcess\IPostEffect.h" />
+    <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectGraphSerializer.h" />
+    <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectRegistry.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\RayLibShaderCompiler.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Core\RaytracingPipeline.h" />

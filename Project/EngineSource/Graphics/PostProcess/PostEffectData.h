@@ -40,6 +40,14 @@ namespace GameEngine {
             buffer_.GetData()->enableGrayscale = isActive;
         }
 
+        // パラメータを操作
+        void DrawParamUI() override;
+
+        // パラメータの保存
+        void SaveParams(nlohmann::json& j) override;
+        // パラメータの読み込み
+        void LoadParams(const nlohmann::json& j) override;
+
     private:
         ConstantBuffer<ColorGradingData> buffer_;
     };
@@ -86,6 +94,14 @@ namespace GameEngine {
             buffer_.GetData()->textureHandle = index;
         }
 
+        // パラメータを操作
+        void DrawParamUI() override;
+
+        // パラメータの保存
+        void SaveParams(nlohmann::json& j) override;
+        // パラメータの読み込み
+        void LoadParams(const nlohmann::json& j) override;
+
     private:
         ConstantBuffer<HighLumMaskData> buffer_;
     };
@@ -107,6 +123,14 @@ namespace GameEngine {
             buffer_.GetData()->textureHandle = index;
         }
 
+        // パラメータを操作
+        void DrawParamUI() override;
+
+        // パラメータの保存
+        void SaveParams(nlohmann::json& j) override;
+        // パラメータの読み込み
+        void LoadParams(const nlohmann::json& j) override;
+
     private:
         ConstantBuffer<GaussianBlurData> buffer_;
     };
@@ -127,6 +151,14 @@ namespace GameEngine {
         void SetPassIndex(const uint32_t& index) override {
             buffer_.GetData()->textureHandle = index;
         }
+
+        // パラメータを操作
+        void DrawParamUI() override;
+
+        // パラメータの保存
+        void SaveParams(nlohmann::json& j) override;
+        // パラメータの読み込み
+        void LoadParams(const nlohmann::json& j) override;
 
     private:
         ConstantBuffer<GaussianBlurData> buffer_;
@@ -162,6 +194,14 @@ namespace GameEngine {
         const char* GetDisplayName() const override { return "Bloom"; }
         uint32_t GetPassThroughSlot() const override { return 1; }
 
+        // パラメータを操作
+        void DrawParamUI() override;
+
+        // パラメータの保存
+        void SaveParams(nlohmann::json& j) override;
+        // パラメータの読み込み
+        void LoadParams(const nlohmann::json& j) override;
+
     private:
         ConstantBuffer<BloomData> buffer_;
     };
@@ -191,6 +231,14 @@ namespace GameEngine {
         void SetThreshold(float threshold) {
             buffer_.GetData()->threshold = threshold;
         }
+
+        // パラメータを操作
+        void DrawParamUI() override;
+
+        // パラメータの保存
+        void SaveParams(nlohmann::json& j) override;
+        // パラメータの読み込み
+        void LoadParams(const nlohmann::json& j) override;
 
     private:
         ConstantBuffer<DissolveData> buffer_;

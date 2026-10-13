@@ -195,6 +195,11 @@ ParticleData ParticleBehavior::MakeNewParticle(const Vector3& offset) {
     tmpParticleData.startSize = tmpParticleData.transform.scale;
     tmpParticleData.startSpeed = tmpParticleData.velocity;
 
+    ColorOverLifeTimeModule* module = modulesControl_->GetModule<ColorOverLifeTimeModule>("ColorOverLifeTime");
+    if (module != nullptr) {
+        module->Create(tmpParticleData);
+    }
+
     if (isSetEmitPos_) {
         tmpParticleData.transform.translate += emitterPos_;
     }

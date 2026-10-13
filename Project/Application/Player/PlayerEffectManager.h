@@ -65,8 +65,8 @@ private:
 	uint32_t crackGH_ = 0;
 	uint32_t dissolveCrackGH_ = 0;
 
-	GameEngine::ParticleBehavior* blastEffect_;
-	GameEngine::ParticleBehavior* afterEffect_;
+	GameEngine::ParticleBehavior* blastEffect_ = nullptr;
+	GameEngine::ParticleBehavior* afterEffect_ = nullptr;
 
 	float timer_ = 1.0f;
 	float afterTimer_ = 1.0f;

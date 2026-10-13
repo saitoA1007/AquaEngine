@@ -57,6 +57,9 @@ public:
 
 private: // シーン機能
 
+	// パラメータ機能
+	GameEngine::DebugParameter debugParame_{ "DemoScene" };
+
 	// メインカメラ
 	std::unique_ptr<GameEngine::Camera> mainCamera_;
 
@@ -76,4 +79,8 @@ private: // シーン機能
 	float roughness_ = 0.5f;
 	// 屈折
 	float ior_ = 1.31f;
+
+	float timer_ = 0.0f;
+	float maxTime_ = 1.0f;
+	GameEngine::EaseCurve easeCurve_;
 };

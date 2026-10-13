@@ -48,7 +48,7 @@ namespace GameEngine {
 		Vector4 baseColor_ = { 0.95f, 0.64f, 0.54f, 1.0f };
 		float spacing_ = 2.5f;
 		float sphereScale_ = 1.0f;
-		Vector3 origin_ = { 0.0f, 0.0f, 0.0f };
+		Vector3 origin_ = { 16.0f, 0.0f, 0.0f };
 
 		// roughness=0はGGXが破綻するので下限を設ける
 		float minRoughness_ = 0.05f;

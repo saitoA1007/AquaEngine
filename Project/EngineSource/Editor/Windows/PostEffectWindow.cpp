@@ -81,6 +81,23 @@ void PostEffectWindow::Draw() {
     // ツールバー表示
     DrawToolbar();
 
+    // 左側はインスペクタ
+    ImGui::BeginChild("PostEffectInspector", ImVec2(inspectorWidth_, 0), ImGuiChildFlags_Borders);
+    DrawInspector(graph);
+    ImGui::EndChild();
+
+    // 幅を変えるスプリッター
+    ImGui::SameLine();
+    ImGui::InvisibleButton("##splitter", ImVec2(4.0f, ImGui::GetContentRegionAvail().y));
+    if (ImGui::IsItemHovered() || ImGui::IsItemActive()) { ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW); }
+    if (ImGui::IsItemActive()) {
+        inspectorWidth_ = std::clamp(inspectorWidth_ + ImGui::GetIO().MouseDelta.x, 160.0f, 600.0f);
+    }
+    ImGui::SameLine();
+
+    // 右側はノードエディタ
+    ImGui::BeginChild("PostEffectCanvas", ImVec2(0, 0), false,
+        ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
     ned::SetCurrentEditor(context_);
     ned::Begin("PostEffectGraph");
 
@@ -88,10 +105,13 @@ void PostEffectWindow::Draw() {
     DrawLinks(graph);
     HandleLinkCreation(graph);
     HandleDeletion(graph);
+    UpdateSelection();
     DrawContextMenu();
 
     ned::End();
     ned::SetCurrentEditor(nullptr);
+    ImGui::EndChild();
+
     ImGui::End();
 }
 
@@ -99,6 +119,7 @@ void PostEffectWindow::DrawToolbar() {
     if (IconButton("##reset", ToImTex(textureManager_, iconRestoreHandle_), "Reset")) {
         postEffectManager_->ResetGraph();
         applyPositions_ = true;
+        selectedNodeId_ = -1;
     }
 
     ImGui::SameLine();
@@ -117,11 +138,50 @@ void PostEffectWindow::DrawToolbar() {
     if (ImGui::Button("Load")) {
         if (postEffectManager_->LoadGraph()) {
             applyPositions_ = true;
+            selectedNodeId_ = -1;
         }
     }
 
     ImGui::SameLine();
     ImGui::Checkbox("Preview", &showPreview_);
+}
+
+void PostEffectWindow::UpdateSelection() {
+    ned::NodeId sel[1];
+    const int count = ned::GetSelectedNodes(sel, 1);
+    selectedNodeId_ = (count > 0) ? static_cast<int>(sel[0].Get()) : -1;
+}
+
+void PostEffectWindow::DrawInspector(PostEffectGraph& graph) {
+    PostEffectNode* node = (selectedNodeId_ >= 0) ? graph.FindNode(selectedNodeId_) : nullptr;
+    if (!node) {
+        ImGui::TextDisabled("ノードを選択してください");
+        return;
+    }
+
+    ImGui::Text("%s", node->name.c_str());
+    ImGui::Separator();
+
+    if (node->kind != PostEffectNodeKind::kEffect) {
+        ImGui::TextDisabled("調整できるパラメータはありません");
+        return;
+    }
+
+    ImGui::TextDisabled("Type: %s", node->typeName.c_str());
+
+    bool active = node->effect->IsActive();
+    if (ImGui::Checkbox("Active", &active)) { node->effect->SetIsActive(active); }
+
+    bool keep = !node->passName.empty();
+    if (ImGui::Checkbox("Keep pass", &keep)) { postEffectManager_->SetPersistent(node->id, keep); }
+
+    ImGui::Separator();
+
+    ImGui::BeginDisabled(!active);
+    ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.6f);
+    node->effect->DrawParamUI();
+    ImGui::PopItemWidth();
+    ImGui::EndDisabled();
 }
 
 void PostEffectWindow::DrawNodes(PostEffectGraph& graph) {
@@ -185,11 +245,11 @@ void PostEffectWindow::DrawNode(PostEffectGraph& graph, PostEffectNode& node) {
             postEffectManager_->SetPersistent(node.id, keep);
         }
 
-        ImGui::BeginDisabled(!active);
-        ImGui::PushItemWidth(120.0f);
-        node.effect->DrawParamUI();
-        ImGui::PopItemWidth();
-        ImGui::EndDisabled();
+        //ImGui::BeginDisabled(!active);
+        //ImGui::PushItemWidth(120.0f);
+        //node.effect->DrawParamUI();
+        //ImGui::PopItemWidth();
+        //ImGui::EndDisabled();
     }
 
     // 中間描画結果のプレビュー
@@ -303,6 +363,7 @@ void PostEffectWindow::ApplyPendingDeletes(PostEffectGraph& graph) {
     ned::SetCurrentEditor(context_);
     ned::ClearSelection();
     ned::SetCurrentEditor(nullptr);
+    selectedNodeId_ = -1;
 
     for (int id : pendingNodeDeletes_) { postEffectManager_->DestroyEffectNode(id); }
     for (int id : pendingLinkDeletes_) { graph.RemoveLink(id); }

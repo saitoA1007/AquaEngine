@@ -48,9 +48,17 @@ namespace GameEngine {
 		std::vector<int> pendingNodeDeletes_;
 		std::vector<int> pendingLinkDeletes_;
 
+		// 選択中のノード
+		int selectedNodeId_ = -1;         
+		// 左パネルの幅
+		float inspectorWidth_ = 180.0f;   
+
 	private:
 
 		void DrawToolbar();
+
+		void DrawInspector(PostEffectGraph& graph);
+		void UpdateSelection();
 
 		void DrawNodes(PostEffectGraph& graph);
 		void DrawNode(PostEffectGraph& graph, PostEffectNode& node);
