@@ -35,15 +35,6 @@ void GraphicsSubsystem::Initialize() {
     dxc_ = std::make_unique<DXC>();
     dxc_->Initialize();
 
-    // PSO作成
-    InitializePSO();
-
-    // PSO管理機能の作成
-    psoManager_ = std::make_unique<PSOManager>();
-    psoManager_->Initialize(graphicsDevice_->GetDevice(), dxc_.get());
-    psoManager_->DefaultLoadPSO();
-    psoManager_->DefaultLoadPostEffectPSO();
-
     // GPUリソースの静的初期化
     GpuResource::StaticInitialize(graphicsDevice_->GetDevice());
     SrvResource::StaticInitialize(graphicsDevice_->GetSrvManager());
@@ -55,6 +46,19 @@ void GraphicsSubsystem::Initialize() {
     // アクセスデータ管理機能を登録する
     BufferRefResource::StaticInitialize(bufferRefManager_.get(), graphicsDevice_->GetSrvManager()->GetStartSrvIndex(SrvHeapType::Buffer));
 
+    // PSO作成
+    InitializePSO();
+
+    // PSO管理機能の作成
+    psoManager_ = std::make_unique<PSOManager>();
+    psoManager_->Initialize(graphicsDevice_->GetDevice(), dxc_.get());
+    psoManager_->DefaultLoadPSO();
+    psoManager_->DefaultLoadPostEffectPSO();
+
+    // レイトレーシング用のパイプライン
+    raytracingPipeline_ = std::make_unique<RaytracingPipeline>();
+    raytracingPipeline_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetSrvManager(), dxc_.get());
+
     // レンダーテクスチャ機能を生成
     renderTextureManager_ = std::make_unique<RenderTextureManager>();
     renderTextureManager_->Initialize(graphicsDevice_->GetRtvManager(), graphicsDevice_->GetDsvManager(), graphicsDevice_->GetDevice());
@@ -62,10 +66,6 @@ void GraphicsSubsystem::Initialize() {
     // レンダーパスの管理機能
     renderPassController_ = std::make_unique<RenderPassController>();
     renderPassController_->Initialize(renderTextureManager_.get(), graphicsDevice_->GetCommandList());
-
-    // レイトレーシング用のパイプライン
-    raytracingPipeline_ = std::make_unique<RaytracingPipeline>();
-    raytracingPipeline_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetSrvManager(), dxc_.get());
 
     // 描画コマンド発行機能
     renderQueue_ = std::make_unique<RenderQueue>();

@@ -34,8 +34,8 @@ DemoScene::DemoScene() {
 	gameObjectManager_->AddObject<ParticleBehavior>("DemoParticle", 64, textureManager_, effectModel);
 	gameObjectManager_->AddObject<ParticleBehavior>("Demo2Particle", 64, textureManager_, effectModel);
 	gameObjectManager_->AddObject<ParticleBehavior>("Demo3Particle", 64, textureManager_, effectModel);
-	//gameObjectManager_->AddObject<ParticleBehavior>("Demo4Particle", 64, textureManager_, effectModel);
-
+	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerHitRingParticle", 8, textureManager_, effectModel);
+	
 	// オブジェクトのテスト
 	//auto* testModel = modelManager_->GetNameByModel("sphereShade.obj");
 	//gameObjectManager_->AddObject<Test>(testModel);

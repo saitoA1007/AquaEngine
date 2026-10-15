@@ -336,3 +336,8 @@ windowLayout.json
 docs/_build/
 docs/_doxygen/
 docs/api/
+
+# テクスチャのddsファイル化したものを除外
+Resources/Textures/Cache/
+**/Textures/**/Cache/
+**/Textures/Cache/

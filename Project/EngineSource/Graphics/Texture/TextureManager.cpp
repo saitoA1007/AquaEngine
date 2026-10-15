@@ -68,17 +68,16 @@ void TextureManager::LoadAllTexture() {
 	LogManager::GetInstance().Log("Start Loading All Textures from: " + kDirectoryPath);
 
 	// Texturesのフォルダになる画像ファイルとフォルダを検索
-	for (const auto& entry : fs::recursive_directory_iterator(kDirectoryPath)) {
-
-		// 現在のファイル/ディレクトリの絶対パスを取得
-		fs::path currentPath = fs::absolute(entry.path());
-
+	for (auto it = fs::recursive_directory_iterator(kDirectoryPath); it != fs::recursive_directory_iterator(); ++it) {
+		// Cacheフォルダは対象外
+		if (it->is_directory() && it->path().filename() == "Cache") {
+			it.disable_recursion_pending();
+			continue;
+		}
 		// 画像を登録、ロードする
-		if (entry.is_regular_file()) {
-			// ファイルパスを取得する
-			std::string filePath = entry.path().string();
+		if (it->is_regular_file()) {
 			// 登録
-			RegisterTexture(filePath);
+			RegisterTexture(it->path().string());
 		}
 	}
 

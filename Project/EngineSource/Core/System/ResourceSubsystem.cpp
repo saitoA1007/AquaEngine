@@ -36,7 +36,6 @@ void ResourceSubsystem::Initialize() {
 	// エフェクトの管理
 	effectsManager_ = std::make_unique<EffectsManager>(textureManager_.get(), modelManager_.get());
 
-
 	// 全てのリソースをロードする
 	LoadAllResources();
 }
@@ -71,7 +70,6 @@ void ResourceSubsystem::LoadAllResources() {
 
 	// アニメーションデータをロード
 	animationManager_->RegisterAnimation("Walk", "walk.gltf", "Resources/Models/Walk");
-	animationManager_->RegisterAnimation("AnimatedCube", "AnimatedCube.gltf", "Resources/Models/AnimatedCube");
 
 	// プレイヤーのアニメーションデータを読み込む
 	animationManager_->RegisterAnimation("PlayerWalk", "PlayerWalk.gltf", "Resources/Animations/Player/PlayerWalk");

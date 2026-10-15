@@ -4,6 +4,13 @@
 #include "CreateBufferResource.h"
 using namespace GameEngine;
 
+namespace {
+
+	DXGI_FORMAT SelectCompressFormat(const DirectX::TexMetadata& meta, bool isSRGB) {
+		return isSRGB ? DXGI_FORMAT_BC7_UNORM_SRGB : DXGI_FORMAT_BC7_UNORM;
+	}
+}
+
 [[nodiscard]]
 DirectX::ScratchImage TextureLoader::LoadFromFile(const std::string& filePath, bool isSRGB) {
 	// テクスチャファイルを読み込んでプログラムを扱えるようにする
@@ -23,7 +30,7 @@ DirectX::ScratchImage TextureLoader::LoadFromFile(const std::string& filePath, b
 	// ミップマップの作成
 	DirectX::ScratchImage mipImages{};
 
-	if (DirectX::IsCompressed(image.GetMetadata().format)) {
+	if (DirectX::IsCompressed(image.GetMetadata().format) || image.GetMetadata().mipLevels > 1) {
 		// 圧縮フォーマットならそのまま使用する
 		mipImages = std::move(image);
 	} else {
@@ -33,6 +40,66 @@ DirectX::ScratchImage TextureLoader::LoadFromFile(const std::string& filePath, b
 
 	// ミップマップ付きのデータを返す
 	return mipImages;
+}
+
+DirectX::ScratchImage TextureLoader::LoadFromFileCached(const std::string& filePath, bool isSRGB) {
+	namespace fs = std::filesystem;
+	fs::path src(filePath);
+
+	// 既にddsならそのまま
+	if (src.extension() == ".dds") {
+		return LoadFromFile(filePath, isSRGB);
+	}
+
+	// キャッシュ先を設定Resources/Textures/Cache/xxx.dds
+	fs::path cacheDir = src.parent_path() / "Cache";
+	// sRGB有無で名前を分ける
+	fs::path cachePath = cacheDir / (src.stem().string() + (isSRGB ? "_srgb" : "_lin") + ".dds");
+
+	// キャッシュが存在し、元画像より新しければDDSを読む
+	if (fs::exists(cachePath) &&
+		fs::last_write_time(cachePath) >= fs::last_write_time(src)) {
+		return LoadFromFile(cachePath.string(), isSRGB);
+	}
+
+	// 変換処理
+	DirectX::ScratchImage image{};
+	HRESULT hr = DirectX::LoadFromWICFile(
+		ConvertString(filePath).c_str(),
+		isSRGB ? DirectX::WIC_FLAGS_FORCE_SRGB : DirectX::WIC_FLAGS_IGNORE_SRGB,
+		nullptr, image);
+	if (FAILED(hr)) { 
+		assert(false);
+		return {}; 
+	}
+
+	// ミップ生成
+	DirectX::ScratchImage mip{};
+	hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(),
+		isSRGB ? DirectX::TEX_FILTER_SRGB : DirectX::TEX_FILTER_DEFAULT, 0, mip);
+	if (FAILED(hr)) {
+		assert(false);
+		return {}; 
+	}
+
+	// BC圧縮
+	DirectX::ScratchImage out{};
+	const auto& m = mip.GetMetadata();
+	if (m.width % 4 == 0 && m.height % 4 == 0) {
+		hr = DirectX::Compress(mip.GetImages(), mip.GetImageCount(), m, SelectCompressFormat(m, isSRGB),
+			DirectX::TEX_COMPRESS_PARALLEL, 1.0f, out);
+		if (FAILED(hr)) {
+			out = std::move(mip);
+		}
+	} else {
+		out = std::move(mip);
+	}
+
+	// 保存
+	fs::create_directories(cacheDir);
+	DirectX::SaveToDDSFile(out.GetImages(), out.GetImageCount(), out.GetMetadata(), DirectX::DDS_FLAGS_NONE, cachePath.wstring().c_str());
+
+	return out;
 }
 
 [[nodiscard]]

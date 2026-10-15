@@ -22,6 +22,14 @@ namespace GameEngine {
 		static DirectX::ScratchImage LoadFromFile(const std::string& filePath, bool isSRGB = true);
 
 		/// <summary>
+		/// pngやjpgを読み込んでBC圧縮＋ミップ生成してddsとして保存、読み込みをおこなう
+		/// </summary>
+		/// <param name="filePath"></param>
+		/// <param name="isSRGB"></param>
+		/// <returns></returns>
+		static DirectX::ScratchImage LoadFromFileCached(const std::string& filePath, bool isSRGB = true);
+
+		/// <summary>
 		/// メタデータにより、DirectX12のテクスチャリソースを作成する
 		/// </summary>
 		/// <param name="metadata">画像メタデータ</param>

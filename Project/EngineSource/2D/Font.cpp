@@ -84,7 +84,7 @@ bool Font::Load(const std::string& jsonPath, const std::string& imagePath, ID3D1
 
 	// アトラス画像はSDFの距離値なのでリニアとして読み込む
 	texture_ = std::make_unique<Texture>();
-	texture_->Create(imagePath, cmdList, false);
+	texture_->Create(imagePath, cmdList, false, false);
 
 	LogManager::GetInstance().Log("End LoadFont : " + jsonPath + "\n");
 	return true;
