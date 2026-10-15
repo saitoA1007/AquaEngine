@@ -1,3 +1,4 @@
+#include "pch.h"
 #include"CopyPSO.h"
 #include"ConvertString.h"
 #include"CreateBufferResource.h"

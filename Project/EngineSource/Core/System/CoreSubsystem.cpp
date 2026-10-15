@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "CoreSubsystem.h"
 #include "RandomGenerator.h"
 using namespace GameEngine;
@@ -5,6 +6,8 @@ using namespace GameEngine;
 CoreSubsystem::CoreSubsystem(const CoreSubsystemDesc& desc)
     : desc_(desc) {
 }
+
+CoreSubsystem::~CoreSubsystem() = default;
 
 void CoreSubsystem::Initialize() {
     // ウィンドウ生成

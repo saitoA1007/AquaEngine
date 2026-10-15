@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "GraphicsSubsystem.h"
 #include "GpuResource.h"
 #include "SrvResource.h"
@@ -9,44 +10,33 @@
 #include "Animator.h"
 #include "ParticleBehaviorGPU.h"
 #include "Debug/PixCapture.h"
+#include "ScopedTimer.h"
 using namespace GameEngine;
 
+GraphicsSubsystem::GraphicsSubsystem() = default;
+GraphicsSubsystem::~GraphicsSubsystem() = default;
+
 void GraphicsSubsystem::Initialize() {
+    ScopedTimer total("LoadAllGraphics (Total)");
+
     auto* windowsApp = context_.core->GetWindowsApp();
 
     // PIXのGPUキャプチャ機能を準備する。
-    // WinPixGpuCapturer.dll は ID3D12Device の生成より「前」にロードしないと効かないため、
-    // 必ずこの位置で呼ぶこと。
     PixCapture::GetInstance().Initialize();
 
     // DirectXの機能を生成
     graphicsDevice_ = std::make_unique<GraphicsDevice>();
     graphicsDevice_->Initialize(
         windowsApp->GetHwnd(),
-        windowsApp->kWindowWidth,
-        windowsApp->kWindowHeight);
+        windowsApp->GetClientWidth(),
+        windowsApp->GetClientHeight());
 
     // HUD表示の設定は、スワップチェーン生成後に行う。
-    // （生成前に呼ぶと左上のオーバーレイ設定が反映されない）
     PixCapture::GetInstance().SetHudVisible(false);
-
-    // PIXSetTargetWindow を設定すると、そのHWNDのPresent以外ではキャプチャが
-    // 開始/終了されなくなる。HWNDが想定と違うとキャプチャが一切取れなくなるため、
-    // 既定では設定しない。複数ウィンドウで対象を絞りたい場合だけ有効化する。
-    //PixCapture::GetInstance().SetTargetWindow(windowsApp->GetHwnd());
 
     // dxcCompilerの初期化
     dxc_ = std::make_unique<DXC>();
     dxc_->Initialize();
-
-    // PSO作成
-    InitializePSO();
-
-    // PSO管理機能の作成
-    psoManager_ = std::make_unique<PSOManager>();
-    psoManager_->Initialize(graphicsDevice_->GetDevice(), dxc_.get());
-    psoManager_->DefaultLoadPSO();
-    psoManager_->DefaultLoadPostEffectPSO();
 
     // GPUリソースの静的初期化
     GpuResource::StaticInitialize(graphicsDevice_->GetDevice());
@@ -59,6 +49,23 @@ void GraphicsSubsystem::Initialize() {
     // アクセスデータ管理機能を登録する
     BufferRefResource::StaticInitialize(bufferRefManager_.get(), graphicsDevice_->GetSrvManager()->GetStartSrvIndex(SrvHeapType::Buffer));
 
+    {
+        ScopedTimer t("PsoManager");
+
+        // PSO作成
+        InitializePSO();
+
+        // PSO管理機能の作成
+        psoManager_ = std::make_unique<PSOManager>();
+        psoManager_->Initialize(graphicsDevice_->GetDevice(), dxc_.get());
+        psoManager_->DefaultLoadPSO();
+        psoManager_->DefaultLoadPostEffectPSO();
+
+        // レイトレーシング用のパイプライン
+        raytracingPipeline_ = std::make_unique<RaytracingPipeline>();
+        raytracingPipeline_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetSrvManager(), dxc_.get());
+    }
+
     // レンダーテクスチャ機能を生成
     renderTextureManager_ = std::make_unique<RenderTextureManager>();
     renderTextureManager_->Initialize(graphicsDevice_->GetRtvManager(), graphicsDevice_->GetDsvManager(), graphicsDevice_->GetDevice());
@@ -66,10 +73,6 @@ void GraphicsSubsystem::Initialize() {
     // レンダーパスの管理機能
     renderPassController_ = std::make_unique<RenderPassController>();
     renderPassController_->Initialize(renderTextureManager_.get(), graphicsDevice_->GetCommandList());
-
-    // レイトレーシング用のパイプライン
-    raytracingPipeline_ = std::make_unique<RaytracingPipeline>();
-    raytracingPipeline_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetSrvManager(), dxc_.get());
 
     // 描画コマンド発行機能
     renderQueue_ = std::make_unique<RenderQueue>();

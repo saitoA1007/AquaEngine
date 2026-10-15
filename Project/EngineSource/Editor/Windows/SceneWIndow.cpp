@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "SceneWIndow.h"
 #include "ImGuiManager.h"
 #include "EditorMenu/AddObjectBar.h"

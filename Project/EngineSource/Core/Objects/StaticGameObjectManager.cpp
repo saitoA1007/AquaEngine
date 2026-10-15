@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "StaticGameObjectManager.h"
 #include "CollisionUtils.h"
 #include "MyMath.h"

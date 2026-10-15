@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "HpBarUI.h"
 #include "FPSCounter.h"
 #include "EasingManager.h"

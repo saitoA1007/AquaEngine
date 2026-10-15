@@ -1,3 +1,4 @@
+#include "pch.h"
 #include"DXFence.h"
 #include<cassert>
 #include"LogManager.h"

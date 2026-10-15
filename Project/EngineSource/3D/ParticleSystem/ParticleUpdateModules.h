@@ -195,6 +195,43 @@ namespace GameEngine {
 		float axisSpeed_ = 2.0f;
 	};
 
+	// 重力場モジュール
+	class GravityFieldModule : public IParticleModule {
+	public:
+		~GravityFieldModule() = default;
+
+		void Register(DebugParameter* param) override {
+			int index = 1;
+			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
+			param->Register("Direction", direction_, index++, subGroup);
+			param->Register("Strength", strength_, index++, subGroup);
+			param->Register("MaxSpeed", maxSpeed_, index++, subGroup);
+		}
+
+		void Remove(DebugParameter* param) override {
+			std::string subGroup = groupName_ + "/" + mainSubGroupName_;
+			param->RemoveItem("Direction", subGroup);
+			param->RemoveItem("Strength", subGroup);
+			param->RemoveItem("MaxSpeed", subGroup);
+		}
+
+		void Update(ParticleData& particleData, float time) override;
+
+		// 外部から重力の方向を設定する
+		void SetDirection(const Vector3& direction) { direction_ = direction; }
+
+		// 外部から重力の強さを設定する
+		void SetStrength(float strength) { strength_ = strength; }
+
+	private:
+		// 重力の方向
+		Vector3 direction_ = { 0.0f, -1.0f, 0.0f };
+		// 重力の強さ
+		float strength_ = 9.8f;
+		// 重力方向の速度の上限。0以下なら制限しない
+		float maxSpeed_ = 0.0f;
+	};
+
 	// 速度方向に回転を向けさせる
 	class RotationByVelocityModule : public IParticleModule {
 	public:

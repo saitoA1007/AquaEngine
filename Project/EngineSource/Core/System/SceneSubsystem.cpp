@@ -1,9 +1,13 @@
+#include "pch.h"
 #include "SceneSubsystem.h"
 #include "ResourceSubsystem.h"
 #include "GraphicsSubsystem.h"
 #include "Collider.h"
 #include "IGameObject.h"
 using namespace GameEngine;
+
+SceneSubsystem::SceneSubsystem() = default;
+SceneSubsystem::~SceneSubsystem() = default;
 
 void SceneSubsystem::Initialize() {
     auto* renderQueue = context_.graphics->GetRenderQueue();

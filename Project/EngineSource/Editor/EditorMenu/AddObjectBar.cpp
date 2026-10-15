@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "AddObjectBar.h"
 #include <filesystem>
 #include "MyMath.h"
@@ -12,6 +13,10 @@ AddObjectBar::AddObjectBar(StaticGameObjectManager* staticObjectManager, RenderQ
 	renderQueue_ = renderQueue;
     debugCamera_ = debugCamera;
     paramEditor_ = paramEditor;  
+}
+
+AddObjectBar::~AddObjectBar() {
+
 }
 
 void AddObjectBar::Run() {

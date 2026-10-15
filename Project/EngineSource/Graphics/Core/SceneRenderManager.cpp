@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "SceneRenderManager.h"
 #include <cassert>
 #include "PSO/Core/PSOManager.h"
@@ -87,6 +88,9 @@ void SceneRenderManager::RegisterPSOs(PSOManager* psoManager) {
         // 2D描画用
         "DefaultSprite",
         "AdditiveSprite",
+
+        // テキスト描画用
+        "Text",
 
         // 半透明描画用
         "wboit3D",
@@ -237,6 +241,10 @@ void SceneRenderManager::Execute2dRequest(const Draw2dRequest& request) {
 
     case Draw2dType::Add:
         SpriteRenderer::Draw(request.sprite);
+        break;
+
+    case Draw2dType::Text:
+        SpriteRenderer::Draw(request.text);
         break;
 
     default:

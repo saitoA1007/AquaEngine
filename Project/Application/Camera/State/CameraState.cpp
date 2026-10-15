@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "CameraState.h"
 #include "Application/Camera/CameraController.h"
 #include "EasingManager.h"

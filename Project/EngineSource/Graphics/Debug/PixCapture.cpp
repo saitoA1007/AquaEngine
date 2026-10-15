@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "PixCapture.h"
 #include "PixMarker.h"
 #include "ConvertString.h"

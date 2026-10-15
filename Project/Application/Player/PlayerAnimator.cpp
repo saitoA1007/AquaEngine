@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "PlayerAnimator.h"
 #include "FPSCounter.h"
 using namespace GameEngine;

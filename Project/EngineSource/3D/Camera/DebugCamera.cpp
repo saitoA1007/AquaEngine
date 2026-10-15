@@ -1,3 +1,4 @@
+#include "pch.h"
 #include"DebugCamera.h"
 #include"EngineSource/Math/MyMath.h"
 #include"EngineSource/Common/CreateBufferResource.h"
@@ -15,8 +16,8 @@ DebugCamera::~DebugCamera() {
 
 void DebugCamera::Initialize(const Vector3& translate,int width, int height) {
 	translate_ = translate;
-	viewMatrix_ = Math::InverseMatrix(Math::MakeAffineMatrix(scale_, rotate_, translate_));
-	projectionMatrix_ = Math::MakePerspectiveFovMatrix(0.45f, static_cast<float>(width) / static_cast<float>(height), 0.1f, 200.0f);
+	viewMatrix_ = Matrix4x4::Inverse(Matrix4x4::MakeAffineMatrix(scale_, rotate_, translate_));
+	projectionMatrix_ = Matrix4x4::MakePerspectiveFovMatrix(0.45f, static_cast<float>(width) / static_cast<float>(height), 0.1f, 200.0f);
 	rotateMatrix_ = LookAt(translate_, targetPos_, { 0.0f,1.0f,0.0f });
 
 	// 定数バッファの作成
@@ -45,7 +46,7 @@ void DebugCamera::Initialize(const Vector3& translate,int width, int height) {
 	//worldMatrix_ = MakeTranslateMatrix(translate_);
 	cameraForGPU_->worldPosition = GetWorldPosition();
 	// カメラの変更した内容を適用する処理
-	viewMatrix_ = Math::InverseMatrix(worldMatrix_);
+	viewMatrix_ = Matrix4x4::Inverse(worldMatrix_);
 }
 
 void DebugCamera::Update() {
@@ -64,11 +65,11 @@ void DebugCamera::Update() {
 		if (input_->GetMouseDelta().y > 0.0f) { targetMove.y = 1.0f; }
 
 		// カメラの向き
-		Vector3 forward = Math::Normalize(targetPos_ - translate_);  
+		Vector3 forward = Vector3::Normalize(targetPos_ - translate_);
 		// 上方向
 		Vector3 up = { 0.0f, 1.0f, 0.0f };
 		// 横方向
-		Vector3 right = Math::Normalize(Math::Cross(up, forward));
+		Vector3 right = Vector3::Normalize(up.Cross(forward));
 		// カメラから見てx,y軸に移動量を求める
 		Vector3 moveVec = right * targetMove.x + up * targetMove.y;
 		// ターゲットに加算
@@ -101,10 +102,10 @@ void DebugCamera::Update() {
 
 	cameraForGPU_->worldPosition = GetWorldPosition();
 	// カメラの変更した内容を適用する処理
-	viewMatrix_ = Math::InverseMatrix(worldMatrix_);
+	viewMatrix_ = Matrix4x4::Inverse(worldMatrix_);
 	cameraForGPU_->vpMatrix = GetVPMatrix();
 	cameraForGPU_->mtxViewInv = worldMatrix_;
-	cameraForGPU_->mtxProjInv = Math::InverseMatrix(projectionMatrix_);
+	cameraForGPU_->mtxProjInv = Matrix4x4::Inverse(projectionMatrix_);
 	cameraForGPU_->viewMatrix = viewMatrix_;
 	cameraForGPU_->projectionMatrix = projectionMatrix_;
 
@@ -135,9 +136,9 @@ Vector3 DebugCamera::GetWorldPosition() {
 }
 
 Matrix4x4 DebugCamera::LookAt(const Vector3& eye, const Vector3& center, const Vector3& up) {
-	Vector3 f = Math::Normalize(center - eye); // 前方向ベクトル
-	Vector3 s = Math::Normalize(Math::Cross(up,f)); // 右方向ベクトル
-	Vector3 u = Math::Cross(f,s); // 上方向ベクトル
+	Vector3 f = Vector3::Normalize(center - eye); // 前方向ベクトル
+	Vector3 s = Vector3::Normalize(up.Cross(f)); // 右方向ベクトル
+	Vector3 u = f.Cross(s); // 上方向ベクトル
 
 	Matrix4x4 result = { {
 		{ s.x,  s.y, s.z, 0 },

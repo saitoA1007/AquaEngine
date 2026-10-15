@@ -1,3 +1,4 @@
+#include "pch.h"
 #include"InputLayoutBuilder.h"
 #include <d3d12shader.h>
 #include<cassert>

@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "RaytracingPipeline.h"
 #include "EngineSource/Graphics/PSO/Core/RootSignatureBuilder.h"
 using namespace GameEngine;

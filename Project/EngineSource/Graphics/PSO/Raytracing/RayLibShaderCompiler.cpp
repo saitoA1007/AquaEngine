@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "RayLibShaderCompiler.h"
 #include <cassert>
 #include <d3dcompiler.h>

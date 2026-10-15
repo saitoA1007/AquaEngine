@@ -1,6 +1,5 @@
 #pragma once
 #include "IEngineSubsystem.h"
-#include "EngineContext.h"
 #include "WindowsApp.h"
 #include "FPSCounter.h"
 
@@ -19,6 +18,7 @@ namespace GameEngine {
     class CoreSubsystem : public IEngineSubsystem {
     public:
         explicit CoreSubsystem(const CoreSubsystemDesc& desc);
+        ~CoreSubsystem();
 
         void Initialize() override;
         void Update()     override;

@@ -23,6 +23,11 @@ namespace GameEngine {
 		// 現在開いているフォルダ
 		std::filesystem::path selectedPath = "Resources";
 
+		// 画像ハンドル
+		D3D12_GPU_DESCRIPTOR_HANDLE folderIconTextureHandle_{};
+		D3D12_GPU_DESCRIPTOR_HANDLE meshIconTextureHandle_{};
+		D3D12_GPU_DESCRIPTOR_HANDLE jsonIconTextureHandle_{};
+
 		// エラーハンドル
 		D3D12_GPU_DESCRIPTOR_HANDLE errorTextureHandle_{};
 

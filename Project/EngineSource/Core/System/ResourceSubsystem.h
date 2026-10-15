@@ -1,8 +1,8 @@
 #pragma once
 #include "IEngineSubsystem.h"
-#include "EngineContext.h"
 
 #include "TextureManager.h"
+#include "FontManager.h"
 #include "ModelManager.h"
 #include "AnimationManager.h"
 #include "AudioManager.h"
@@ -16,6 +16,9 @@ namespace GameEngine {
     /// </summary>
     class ResourceSubsystem : public IEngineSubsystem {
     public:
+        ResourceSubsystem();
+        ~ResourceSubsystem();
+
         void Initialize() override;
         void Finalize()   override;
 
@@ -25,15 +28,17 @@ namespace GameEngine {
         void LoadAllResources();
 
         TextureManager* GetTextureManager()   const { return textureManager_.get(); }
+        FontManager* GetFontManager()         const { return fontManager_.get(); }
         ModelManager* GetModelManager()     const { return modelManager_.get(); }
         AnimationManager* GetAnimationManager() const { return animationManager_.get(); }
         GameParamEditor* GetGameParamEditor() const { return gameParamEditor_.get(); }
         EffectsManager* GetEffectsManager() const { return effectsManager_.get(); }
     private:
-        EngineContext context_;
 
         // 画像データ管理
         std::unique_ptr<TextureManager> textureManager_;
+        // フォントデータ管理
+        std::unique_ptr<FontManager> fontManager_;
         // モデルデータ管理
         std::unique_ptr<ModelManager> modelManager_;
         // アニメーションデータ管理

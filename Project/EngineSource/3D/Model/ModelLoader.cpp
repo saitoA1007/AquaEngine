@@ -1,3 +1,4 @@
+#include "pch.h"
 #define NOMINMAX
 #include "ModelLoader.h"
 #include <cassert>
@@ -486,7 +487,7 @@ ModelData ModelLoader::LoadModelFile(const std::string& directoryPath, const std
 					Vector3 b = { -aiBitangent.x, aiBitangent.y, aiBitangent.z };
 					Vector3 t = { -aiTangent.x, aiTangent.y, aiTangent.z };
 					// ハンドネスの判定
-					float handedness = Math::Dot(Math::Cross(vertex.normal, t), b) < 0.0f ? -1.0f : 1.0f;
+					float handedness = Vector3::Dot(vertex.normal.Cross(t), b) < 0.0f ? -1.0f : 1.0f;
 					// 右手->左手に変換する
 					vertex.tangent = { -aiTangent.x, aiTangent.y, aiTangent.z , handedness };
 				} else {
@@ -522,8 +523,8 @@ ModelData ModelLoader::LoadModelFile(const std::string& directoryPath, const std
 			aiVector3D scale, translate;
 			aiQuaternion rotate;
 			bindPoseMatrixAssimp.Decompose(scale, rotate, translate);
-			Matrix4x4 bindPoseMatrix = Math::MakeAffineMatrix({ scale.x,scale.y,scale.z }, { rotate.x,-rotate.y,-rotate.z,rotate.w }, { -translate.x,translate.y,translate.z });
-			jointWeightData.inverseBindPoseMatrix = Math::InverseMatrix(bindPoseMatrix);
+			Matrix4x4 bindPoseMatrix = Matrix4x4::MakeAffineMatrix({ scale.x,scale.y,scale.z }, { rotate.x,-rotate.y,-rotate.z,rotate.w }, { -translate.x,translate.y,translate.z });
+			jointWeightData.inverseBindPoseMatrix = Matrix4x4::Inverse(bindPoseMatrix);
 
 			for (uint32_t weightIndex = 0; weightIndex < bone->mNumWeights; ++weightIndex) {
 				jointWeightData.vertexWeights.push_back({ bone->mWeights[weightIndex].mWeight,bone->mWeights[weightIndex].mVertexId });
@@ -560,7 +561,7 @@ Node ModelLoader::ReadNode(aiNode* node) {
 	result.transform.scale = { scale.x,scale.y,scale.z };
 	result.transform.rotate = { rotate.x,-rotate.y,-rotate.z,rotate.w }; // x軸を反転、さらに回転方向が逆なので軸を反転する
 	result.transform.translate = { -translate.x,translate.y,translate.z }; // x軸を反転
-	result.localMatrix = Math::MakeAffineMatrix(result.transform.scale, result.transform.rotate, result.transform.translate);
+	result.localMatrix = Matrix4x4::MakeAffineMatrix(result.transform.scale, result.transform.rotate, result.transform.translate);
 
 	result.name = node->mName.C_Str(); // Node名を格納
 	result.children.resize(node->mNumChildren); // 子供の数だけ確保

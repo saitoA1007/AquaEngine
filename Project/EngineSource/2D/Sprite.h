@@ -41,6 +41,9 @@ namespace GameEngine {
 		/// <param name="window_height">画面高さ</param>
 		static void StaticInitialize(int32_t width, int32_t height);
 
+		// 2D描画用の射影行列を取得
+		static const Matrix4x4& GetOrthoMatrix() { return orthoMatrix_; }
+
 	public:
 
 		/// <summary>

@@ -1,3 +1,4 @@
+#include "pch.h"
 #include"DXSwapChain.h"
 #include<cassert>
 #include"LogManager.h"

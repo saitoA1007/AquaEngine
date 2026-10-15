@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "WorldTransforms.h"
 #include "MyMath.h"
 #include "CreateBufferResource.h"
@@ -13,7 +14,7 @@ void WorldTransforms::Initialize(const uint32_t& kNumInstance, const Transform& 
 	TransformData transformData;
 	for (uint32_t i = 0; i < kNumInstance; ++i) {
 		transformData.transform = transform;
-		transformData.worldMatrix = Math::MakeAffineMatrix(transformData.transform.scale, transformData.transform.rotate, transformData.transform.translate);
+		transformData.worldMatrix = Matrix4x4::MakeAffineMatrix(transformData.transform.scale, transformData.transform.rotate, transformData.transform.translate);
 		transformData.color = { 1.0f,1.0f,1.0f,1.0f };
 		transformData.textureHandle = 0;
 		transformDatas_.push_back(transformData);

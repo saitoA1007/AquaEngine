@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "RandomGenerator.h"
 
 std::mt19937 RandomGenerator::randomEngine_;

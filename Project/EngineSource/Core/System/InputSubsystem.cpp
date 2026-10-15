@@ -1,6 +1,10 @@
+#include "pch.h"
 #include "InputSubsystem.h"
 #include "CoreSubsystem.h"
 using namespace GameEngine;
+
+InputSubsystem::InputSubsystem() = default;
+InputSubsystem::~InputSubsystem() = default;
 
 void InputSubsystem::Initialize() {
     auto* windowsApp = context_.core->GetWindowsApp();

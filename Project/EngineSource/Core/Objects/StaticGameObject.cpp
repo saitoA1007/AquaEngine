@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "StaticGameObject.h"
 
 using namespace GameEngine;

@@ -117,6 +117,9 @@ namespace GameEngine {
         // 画像描画
         void SubmitSprite(const Sprite* sprite, const std::string& passName = "DefaultPass");
 
+        // テキスト描画
+        void SubmitText(const Text* text, const std::string& passName = "DefaultPass");
+
         /// 通常モデル（ライトあり）
         void SubmitModel(const Model* model,WorldTransform& worldTransform,const float& alpha = 1.0f, const GpuResource* material = nullptr, const std::string& passName = "DefaultPass");
         void SubmitAddModel(const Model* model,WorldTransform& worldTransform,const float& alpha = 1.0f, const GpuResource* material = nullptr, const std::string& passName = "DefaultPass");

@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "JsonSerializer.h"
 #include <cassert>
 #include <sstream>

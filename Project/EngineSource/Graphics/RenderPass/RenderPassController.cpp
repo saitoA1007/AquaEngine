@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "RenderPassController.h"
 #include <cassert>
 using namespace GameEngine;

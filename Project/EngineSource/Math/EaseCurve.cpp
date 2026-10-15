@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "EaseCurve.h"
 #include <algorithm>
 

@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "EffectModule.h"
 using namespace GameEngine;
 

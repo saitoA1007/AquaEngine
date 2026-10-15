@@ -83,6 +83,10 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Externals\assimp\include;$(ProjectDir)EngineSource\2D;$(ProjectDir)EngineSource\3D;$(ProjectDir)EngineSource\Core;$(ProjectDir)EngineSource\Audio;$(ProjectDir)EngineSource\Collision;$(ProjectDir)EngineSource\Common;$(ProjectDir)EngineSource\Input;$(ProjectDir)EngineSource\Math;$(ProjectDir)EngineSource\Graphics\PSO;$(ProjectDir)EngineSource\3D\Camera;$(ProjectDir)EngineSource\3D\Light;$(ProjectDir)EngineSource\Scene;$(ProjectDir)EngineSource\3D\Model;$(ProjectDir)EngineSource\Graphics\DirectX;$(ProjectDir)EngineSource\Editor;$(ProjectDir)EngineSource\Graphics;$(ProjectDir)EngineSource\Graphics\DirectX\Memory;$(ProjectDir)EngineSource\3D\Transform;$(ProjectDir)EngineSource\3D\Renderer;$(ProjectDir)EngineSource\3D\Material;$(ProjectDir)EngineSource\3D\Animation;$(ProjectDir)EngineSource\Graphics\Core;$(ProjectDir)EngineSource\Graphics\Buffers;$(ProjectDir)EngineSource\Graphics\Resources;$(ProjectDir)EngineSource\Graphics\Texture;$(ProjectDir)EngineSource\Graphics\RenderPass;$(ProjectDir)EngineSource\Core\System;$(ProjectDir)EngineSource\Graphics\PSO\Raytracing;$(ProjectDir)EngineSource\Graphics\PSO\Rasterize;$(ProjectDir)EngineSource\Graphics\PSO\Core;$(ProjectDir)EngineSource\3D\ParticleSystem;$(ProjectDir)EngineSource\3D\Effects;$(ProjectDir)EngineSource\3D\Fracture;$(ProjectDir)EngineSource\Core\Objects;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -113,6 +117,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Externals\assimp\include;$(ProjectDir)EngineSource\2D;$(ProjectDir)EngineSource\3D;$(ProjectDir)EngineSource\Core;$(ProjectDir)EngineSource\Audio;$(ProjectDir)EngineSource\Collision;$(ProjectDir)EngineSource\Common;$(ProjectDir)EngineSource\Input;$(ProjectDir)EngineSource\Math;$(ProjectDir)EngineSource\Graphics\PSO;$(ProjectDir)EngineSource\3D\Camera;$(ProjectDir)EngineSource\3D\Light;$(ProjectDir)EngineSource\Scene;$(ProjectDir)EngineSource\3D\Model;$(ProjectDir)EngineSource\Graphics\DirectX;$(ProjectDir)EngineSource\Editor;$(ProjectDir)EngineSource\Graphics;$(ProjectDir)EngineSource\Graphics\DirectX\Memory;$(ProjectDir)EngineSource\3D\Transform;$(ProjectDir)EngineSource\3D\Renderer;$(ProjectDir)EngineSource\3D\Material;$(ProjectDir)EngineSource\3D\Animation;$(ProjectDir)EngineSource\Graphics\Core;$(ProjectDir)EngineSource\Graphics\Buffers;$(ProjectDir)EngineSource\Graphics\Resources;$(ProjectDir)EngineSource\Graphics\Texture;$(ProjectDir)EngineSource\Graphics\RenderPass;$(ProjectDir)EngineSource\Core\System;$(ProjectDir)EngineSource\Graphics\PSO\Raytracing;$(ProjectDir)EngineSource\Graphics\PSO\Rasterize;$(ProjectDir)EngineSource\Graphics\PSO\Core;$(ProjectDir)EngineSource\3D\ParticleSystem;$(ProjectDir)EngineSource\3D\Effects;$(ProjectDir)EngineSource\3D\Fracture;$(ProjectDir)EngineSource\Core\Objects;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -143,6 +151,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Externals\assimp\include;$(ProjectDir)EngineSource\2D;$(ProjectDir)EngineSource\3D;$(ProjectDir)EngineSource\Core;$(ProjectDir)EngineSource\Audio;$(ProjectDir)EngineSource\Collision;$(ProjectDir)EngineSource\Common;$(ProjectDir)EngineSource\Input;$(ProjectDir)EngineSource\Math;$(ProjectDir)EngineSource\Graphics\PSO;$(ProjectDir)EngineSource\3D\Camera;$(ProjectDir)EngineSource\3D\Light;$(ProjectDir)EngineSource\Scene;$(ProjectDir)EngineSource\3D\Model;$(ProjectDir)EngineSource\Graphics\DirectX;$(ProjectDir)EngineSource\Editor;$(ProjectDir)EngineSource\Graphics;$(ProjectDir)EngineSource\Graphics\DirectX\Memory;$(ProjectDir)EngineSource\3D\Transform;$(ProjectDir)EngineSource\3D\Renderer;$(ProjectDir)EngineSource\3D\Material;$(ProjectDir)EngineSource\3D\Animation;$(ProjectDir)EngineSource\Graphics\Core;$(ProjectDir)EngineSource\Graphics\Buffers;$(ProjectDir)EngineSource\Graphics\Resources;$(ProjectDir)EngineSource\Graphics\Texture;$(ProjectDir)EngineSource\Graphics\RenderPass;$(ProjectDir)EngineSource\Core\System;$(ProjectDir)EngineSource\Graphics\PSO\Raytracing;$(ProjectDir)EngineSource\Graphics\PSO\Rasterize;$(ProjectDir)EngineSource\Graphics\PSO\Core;$(ProjectDir)EngineSource\3D\ParticleSystem;$(ProjectDir)EngineSource\3D\Effects;$(ProjectDir)EngineSource\3D\Fracture;$(ProjectDir)EngineSource\Core\Objects;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -162,9 +174,20 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClCompile Include="Application\Camera\CameraController.cpp" />
     <ClCompile Include="Application\Camera\State\CameraState.cpp" />
-    <ClCompile Include="Application\ColorEditor.cpp" />
     <ClCompile Include="Application\Demo\FructureDemo.cpp" />
     <ClCompile Include="Application\Demo\IceDemo.cpp" />
+    <ClCompile Include="Application\Demo\PBRDemo.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Application\Demo\Test.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Application\Demo\TestFructure.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Application\Enemy\BattleAction\BossBattleAction.cpp" />
     <ClCompile Include="Application\Enemy\BossAnimator.cpp" />
     <ClCompile Include="Application\Enemy\BossEnemy.cpp" />
@@ -185,6 +208,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Player\PlayerEffectManager.cpp" />
     <ClCompile Include="Application\Scene\GameScene.cpp" />
     <ClCompile Include="Application\Scene\TestScene.cpp" />
+    <ClCompile Include="Application\Scene\DemoScene.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Application\Scene\Transition\Fade.cpp" />
     <ClCompile Include="Application\Stage\BgIceRock.cpp" />
     <ClCompile Include="Application\Stage\Floor.cpp" />
@@ -203,9 +230,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\UI\Managers\TitleUIManager.cpp" />
     <ClCompile Include="Application\Utils\TimeController.cpp" />
     <ClCompile Include="Application\Utils\Timer.cpp" />
+    <ClCompile Include="EngineSource\2D\Font.cpp" />
+    <ClCompile Include="EngineSource\2D\FontManager.cpp" />
     <ClCompile Include="EngineSource\2D\ImGuiManager.cpp" />
     <ClCompile Include="EngineSource\2D\Sprite.cpp" />
     <ClCompile Include="EngineSource\2D\SpriteRenderer.cpp" />
+    <ClCompile Include="EngineSource\2D\Text.cpp" />
     <ClCompile Include="EngineSource\3D\Camera\Camera.cpp" />
     <ClCompile Include="EngineSource\3D\Camera\DebugCamera.cpp" />
     <ClCompile Include="EngineSource\3D\Effects\EffectAsset.cpp" />
@@ -244,6 +274,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Core\Objects\IGameObject.cpp" />
     <ClCompile Include="EngineSource\Core\Objects\StaticGameObject.cpp" />
     <ClCompile Include="EngineSource\Core\Objects\StaticGameObjectManager.cpp" />
+    <ClCompile Include="EngineSource\Core\pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="EngineSource\Core\System\CoreSubsystem.cpp" />
     <ClCompile Include="EngineSource\Core\System\EditorSubsystem.cpp" />
     <ClCompile Include="EngineSource\Core\System\GraphicsSubsystem.cpp" />
@@ -263,6 +298,24 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Editor\NodeSystem\MaterialShaderGenerator.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="EngineSource\Editor\NodeSystem\NodeBuilder.cpp">
+      <SubType>
+      </SubType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Editor\NodeSystem\NodePinIcon.cpp">
+      <SubType>
+      </SubType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Editor\NodeSystem\PostEffectGraph.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="EngineSource\Editor\Windows\EffectEditorWindow.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -271,6 +324,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="EngineSource\Editor\Windows\PixWindow.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Editor\Windows\PostEffectWindow.cpp">
+      <SubType>
+      </SubType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="EngineSource\Graphics\Buffers\BLAS.cpp" />
@@ -293,21 +353,27 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Graphics\Core\ResourceGarbageCollector.cpp" />
     <ClCompile Include="EngineSource\Graphics\Debug\PixCapture.cpp" />
     <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectData.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectGraphSerializer.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectRegistry.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\RayLibShaderCompiler.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Core\RaytracingPipeline.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\ShaderTableBuilder.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\StateObjectBuilder.cpp" />
     <ClCompile Include="EngineSource\Graphics\Resources\BufferRefResource.cpp" />
+    <ClCompile Include="EngineSource\Math\Matrix4x4.cpp" />
+    <ClCompile Include="EngineSource\Math\Quaternion.cpp" />
     <ClCompile Include="EngineSource\Math\RandomGenerator.cpp" />
     <ClCompile Include="EngineSource\Graphics\Texture\Texture.cpp" />
     <ClCompile Include="EngineSource\Graphics\Texture\TextureLoader.cpp" />
     <ClCompile Include="EngineSource\Graphics\Texture\TextureManager.cpp" />
     <ClCompile Include="EngineSource\Core\WindowsApp.cpp" />
-    <ClCompile Include="EngineSource\Editor\EditorCore.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">false</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="EngineSource\Editor\EditorMenu\EditorLayout.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">false</ExcludedFromBuild>
@@ -394,50 +460,158 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Externals\imgui\crude_json.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">false</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Development|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="Externals\imgui\imgui.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">false</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Development|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="Externals\imgui\ImGuizmo.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">false</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Development|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="Externals\imgui\imgui_canvas.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">false</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Development|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="Externals\imgui\imgui_demo.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">false</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Development|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="Externals\imgui\imgui_draw.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">false</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Development|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="Externals\imgui\imgui_impl_dx12.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">false</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Development|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="Externals\imgui\imgui_impl_win32.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">false</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Development|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="Externals\imgui\imgui_node_editor.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">false</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Development|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="Externals\imgui\imgui_node_editor_api.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">false</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Development|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="Externals\imgui\imgui_tables.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">false</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Development|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="Externals\imgui\imgui_widgets.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">false</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Development|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
@@ -452,9 +626,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Camera\CameraController.h" />
     <ClInclude Include="Application\Camera\ICameraState.h" />
     <ClInclude Include="Application\Camera\State\CameraState.h" />
-    <ClInclude Include="Application\ColorEditor.h" />
     <ClInclude Include="Application\Demo\FructureDemo.h" />
     <ClInclude Include="Application\Demo\IceDemo.h" />
+    <ClInclude Include="Application\Demo\PBRDemo.h" />
+    <ClInclude Include="Application\Demo\Test.h" />
+    <ClInclude Include="Application\Demo\TestFructure.h" />
     <ClInclude Include="Application\Enemy\BattleAction\BossBattleAction.h" />
     <ClInclude Include="Application\Enemy\BattleAction\IBossBattleAction.h" />
     <ClInclude Include="Application\Enemy\BossAnimator.h" />
@@ -480,6 +656,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Scene\GameScene.h" />
     <ClInclude Include="Application\Scene\Register\SetUpScenes.h" />
     <ClInclude Include="Application\Scene\TestScene.h" />
+    <ClInclude Include="Application\Scene\DemoScene.h" />
     <ClInclude Include="Application\Scene\Transition\Fade.h" />
     <ClInclude Include="Application\Stage\BgIceRock.h" />
     <ClInclude Include="Application\Stage\Floor.h" />
@@ -498,9 +675,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\UI\Managers\TitleUIManager.h" />
     <ClInclude Include="Application\Utils\TimeController.h" />
     <ClInclude Include="Application\Utils\Timer.h" />
+    <ClInclude Include="EngineSource\2D\Font.h" />
+    <ClInclude Include="EngineSource\2D\FontManager.h" />
     <ClInclude Include="EngineSource\2D\ImGuiManager.h" />
     <ClInclude Include="EngineSource\2D\Sprite.h" />
     <ClInclude Include="EngineSource\2D\SpriteRenderer.h" />
+    <ClInclude Include="EngineSource\2D\Text.h" />
     <ClInclude Include="EngineSource\3D\Camera\Camera.h" />
     <ClInclude Include="EngineSource\3D\Camera\DebugCamera.h" />
     <ClInclude Include="EngineSource\3D\Effects\EffectAsset.h" />
@@ -536,6 +716,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\3D\Model\ModelLoader.h" />
     <ClInclude Include="EngineSource\3D\Model\ModelManager.h" />
     <ClInclude Include="EngineSource\3D\Fracture\FractureInstance.h" />
+    <ClInclude Include="EngineSource\Common\ScopedTimer.h" />
     <ClInclude Include="EngineSource\Core\Engine.h" />
     <ClInclude Include="EngineSource\Core\EngineContext.h" />
     <ClInclude Include="EngineSource\Core\IEngineSubsystem.h" />
@@ -544,6 +725,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Core\Objects\IGameObject.h" />
     <ClInclude Include="EngineSource\Core\Objects\StaticGameObject.h" />
     <ClInclude Include="EngineSource\Core\Objects\StaticGameObjectManager.h" />
+    <ClInclude Include="EngineSource\Core\pch.h" />
     <ClInclude Include="EngineSource\Core\SubsystemRegistry.h" />
     <ClInclude Include="EngineSource\Core\System\CoreSubsystem.h" />
     <ClInclude Include="EngineSource\Core\System\EditorSubsystem.h" />
@@ -566,6 +748,17 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Editor\NodeSystem\MaterialShaderGenerator.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="EngineSource\Editor\NodeSystem\NodeBuilder.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Editor\NodeSystem\NodePinIcon.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Editor\NodeSystem\PostEffectGraph.h" />
     <ClInclude Include="EngineSource\Editor\Windows\EffectEditorWindow.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
@@ -573,6 +766,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="EngineSource\Editor\Windows\PixWindow.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Editor\Windows\PostEffectWindow.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="EngineSource\Graphics\Buffers\BLAS.h" />
@@ -615,6 +813,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Graphics\Debug\PixCapture.h" />
     <ClInclude Include="EngineSource\Graphics\Debug\PixMarker.h" />
     <ClInclude Include="EngineSource\Graphics\PostProcess\IPostEffect.h" />
+    <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectGraphSerializer.h" />
+    <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectRegistry.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\RayLibShaderCompiler.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Core\RaytracingPipeline.h" />
@@ -628,9 +828,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Graphics\Texture\TextureLoader.h" />
     <ClInclude Include="EngineSource\Graphics\Texture\TextureManager.h" />
     <ClInclude Include="EngineSource\Core\WindowsApp.h" />
-    <ClInclude Include="EngineSource\Editor\EditorCore.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="EngineSource\Editor\EditorMenu\EditorLayout.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">false</ExcludedFromBuild>

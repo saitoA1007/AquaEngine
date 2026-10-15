@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "MaterialShaderGenerator.h"
 #include <cassert>
 #include <format>

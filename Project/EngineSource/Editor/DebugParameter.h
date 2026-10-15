@@ -9,6 +9,7 @@ namespace GameEngine {
     // 前方宣言
     class WorldTransform;
     class Sprite;
+    class Text;
 
 	class DebugParameter {
 	public:
@@ -50,6 +51,7 @@ namespace GameEngine {
 
         void RegisterWorld(const std::string& worldName, WorldTransform& world, const std::string subGroupName = "");
         void RegisterSprite(const std::string& spriteName, Sprite& sprite,const std::string subGroupName = "");
+        void RegisterText(const std::string& textName, Text& text, const std::string subGroupName = "");
 
         // 値を適応する
         void Apply();

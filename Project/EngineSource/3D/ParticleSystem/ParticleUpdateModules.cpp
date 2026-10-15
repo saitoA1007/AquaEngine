@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ParticleUpdateModules.h"
 #include "MyMath.h"
 #include <algorithm>
@@ -113,6 +114,34 @@ void VortexModule::Update(ParticleData& particleData, float time) {
 
 		// 現在の速度から目標の渦速度へ徐々に近づける
 		particleData.velocity += targetVelocity * time;
+	}
+}
+
+//==================================================
+// 重力場モジュール
+//==================================================
+
+void GravityFieldModule::Update(ParticleData& particleData, float time) {
+	// 方向が設定されていない時は何もしない
+	if (direction_.LengthSquared() <= 0.0001f) {
+		return;
+	}
+
+	// 強さがマイナスなら逆方向に働かせる
+	Vector3 direction = direction_.Normalize();
+	if (strength_ < 0.0f) {
+		direction = direction * -1.0f;
+	}
+
+	// 重力方向に加速させる
+	particleData.velocity += direction * std::fabs(strength_) * time;
+
+	// 重力方向の速度を上限で抑える
+	if (maxSpeed_ > 0.0f) {
+		float speed = particleData.velocity.Dot(direction);
+		if (speed > maxSpeed_) {
+			particleData.velocity -= direction * (speed - maxSpeed_);
+		}
 	}
 }
 

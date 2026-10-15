@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "RenderTextureManager.h"
 
 using namespace GameEngine;

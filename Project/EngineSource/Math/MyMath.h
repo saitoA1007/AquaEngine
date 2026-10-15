@@ -14,55 +14,11 @@ namespace GameEngine {
 
 	namespace Math {
 
-		// Quaternionの積
-		Quaternion Multiply(const Quaternion& lhs, const Quaternion& rhs);
-		// 共役Quaternionを返す
-		Quaternion Conjugate(const Quaternion& quaternion);
-		// Quaernionのnormを返す
-		float Norm(const Quaternion& quaternion);
-		// 正規化したQuaternionを返す
-		Quaternion Normalize(const Quaternion& quaternion);
-		// 逆Quaternionを返す
-		Quaternion Inverse(const Quaternion& quaternion);
-		// 任意軸回転行列を表すQuaternionの生成
-		Quaternion MakeRotateAxisAngleQuaternion(const Vector3& axis, float angle);
-		// ベクトルをQuaternionで回転させた結果のベクトルを求める
-		Vector3 RotateVector(const Vector3& vector, const Quaternion& quaternion);
-		// Quaternionから回転行列を求める
-		Matrix4x4 MakeRotateMatrix(const Quaternion& q);
-		// 内積
-		float Dot(const Quaternion& a, const Quaternion& b);
-		// 4x4行列の任意軸回転行列の作成
-		Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle);
-
-		Quaternion MakeEulerQuaternion(float pitch, float yaw, float roll);
-
-		// クウォータニオンによる回転行列を作成
-		Matrix4x4 MakeWorldMatrixFromEulerRotation(const Vector3 position, const Vector3& rotateEuler, const Vector3& scale);
-
-		// 目標ベクトルへへ最短回転
-		Quaternion DirectionToQuaternion(const Vector3& direction, const Vector3& up = { 0.0f, 1.0f, 0.0f });
-
 		// 方向からオイラー回転を求める
 		Vector3 DirectionToEuler(const Vector3& direction);
 
 		// 2つのベクトルからなす角を求める
 		float AngleBetweenRadians(Vector3 v1, Vector3 v2);
-
-		// ベクトルの長さを求める
-		float Length(const Vector4& v);
-		float Length(const Vector3& v);
-		float Length(const Vector2& v);
-		// ベクトルの正規化
-		Vector3 Normalize(const Vector3& v);
-		Vector2 Normalize(const Vector2& v);
-		// 内積
-		float Dot(const Vector3& v1, const Vector3& v2);
-		// 外積
-		Vector3 Cross(const Vector3& v1, const Vector3& v2);
-
-		// ベクトル変換
-		Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
 
 		// ワールドスクリーン座標変換(ワールド->スクリーン変換)
 		Vector3 Project(const Vector3& worldPosition, const Vector2& viewport, const float& viewportWidth, const float& viewportHeight, const Matrix4x4& viewProjection);
@@ -85,51 +41,11 @@ namespace GameEngine {
 		Vector3 CalculateRayDirection(Vector2 mousePos, const Matrix4x4& viewMatrix, const Matrix4x4& projectionMatrix, float windowWidth = 1280.0f, float windowHeight = 720.0f);
 
 		// 最大値
-		Vector3 Max(Vector3 pos1, Vector3 pos2);
-		Vector4 MaxVector4(Vector4 pos1, Vector4 pos2);
+		Vector3 Max(Vector3 v1, Vector3 v2);
+		Vector4 Max(Vector4 v1, Vector4 v2);
 		// 最小値
-		Vector3 Min(Vector3 pos1, Vector3 pos2);
-		Vector4 MinVector4(Vector4 pos1, Vector4 pos2);
-
-		// 4xx4のX軸の回転行列を作成
-		Matrix4x4 MakeRotateXMatrix(const float& theta);
-
-		// 4x4のY軸の回転行列を作成
-		Matrix4x4 MakeRotateYMatrix(const float& theta);
-
-		// 4x4のZ軸の回転行列を作成
-		Matrix4x4 MakeRotateZMatrix(const float& theta);
-
-		// 4x4の拡縮行列の作成
-		Matrix4x4 MakeScaleMatrix(const Vector3& scale);
-
-		// 4x4の平行移動行列の作成
-		Matrix4x4 MakeTranslateMatrix(const Vector3& translate);
-
-		// 4x4のSRTによるアフィン変換行列の作成
-		Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Vector3& theta, const Vector3 translate);
-		Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Quaternion& quaternion, const Vector3 translate);
-
-		// 4x4逆行列の計算
-		Matrix4x4 InverseMatrix(const Matrix4x4& matrix);
-
-		// 4x4行列の転置
-		Matrix4x4 Transpose(const Matrix4x4& matrix);
-
-		// 4x4行列の逆転置行列
-		Matrix4x4 InverseTranspose(const Matrix4x4& matrix);
-
-		// 透視投影行列の作成
-		Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip);
-
-		// 平行投射行列の作成
-		Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip);
-
-		// (3+1)次元座標系をデカルト座標系に変換
-		Vector3 Transforms(const Vector3& vector, const Matrix4x4& matrix);
-
-		// ビューポート行列の作成
-		Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, float minD, float maxD);
+		Vector3 Min(Vector3 v1, Vector3 v2);
+		Vector4 Min(Vector4 v1, Vector4 v2);
 
 		/// <summary>
 		/// ビルボードを適応させるためのworldMatrixを作成
@@ -142,6 +58,9 @@ namespace GameEngine {
 		Matrix4x4 MakeBillboardMatrix(const Vector3& scale, const Vector3& translate, float rotateZ, const Matrix4x4& cameraMatrix);
 
 		Matrix4x4 MakeDirectionalBillboardMatrix(const Vector3& scale, const Vector3& translate, const Matrix4x4& cameraMatrix, const Matrix4x4& viewMatrix, const Vector3& velocity, float rotateZ = 0.0f);
+
+		// クウォータニオンによる回転行列を作成
+		Matrix4x4 MakeWorldMatrixFromEulerRotation(const Vector3 position, const Vector3& rotateEuler, const Vector3& scale);
 
 		/// <summary>
 		/// カメラをターゲットの方向に向かせる

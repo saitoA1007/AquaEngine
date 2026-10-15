@@ -1,3 +1,4 @@
+#include "pch.h"
 #include"Fade.h"
 #include"EasingManager.h"
 #include"SpriteRenderer.h"

@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ViewOptionsBar.h"
 #include "ImGuiManager.h"
 #include "RenderQueue.h"
@@ -22,6 +23,10 @@ ViewOptionsBar::ViewOptionsBar(Input* input, RenderQueue* renderQueue, DebugRend
 	renderQueue_->SetDebugCamera(debugCamera_->GetConstantBuffer());
 	// デバック描画機能
 	debugRenderer_ = debugRenderer;
+}
+
+ViewOptionsBar::~ViewOptionsBar() {
+
 }
 
 void ViewOptionsBar::Run() {

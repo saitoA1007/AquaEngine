@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ParticleBehavior.h"
 #include "FPSCounter.h"
 #include "MyMath.h"
@@ -67,6 +68,8 @@ ParticleBehavior::ParticleBehavior(const std::string& name, uint32_t maxNum, Tex
     debugParame_->Register("IsLoop", main_.isLoop, index++, subGroup);
     debugParame_->Register("IsBillBoard", main_.isBillBoard, index++, subGroup);
     debugParame_->Register("IsActiveBlendAdd", main_.isActiveBlendAdd_, index++, subGroup);
+    debugParame_->Register("IsEmitByDistance", main_.isEmitByDistance, index++, subGroup);
+    debugParame_->Register("SpawnDistance", main_.spawnDistance, index++, subGroup);
     subGroup += "/Defalut";
     debugParame_->Register("LifeTime", main_.lifeTime, index++, subGroup);
     debugParame_->Register("EmittePos", main_.emitterPos, index++, subGroup);
@@ -113,7 +116,10 @@ void ParticleBehavior::Update(float deltaTime) {
     }
 
     // パーティクルの発生を管理する
-    if (main_.isLoop && isEmitting_) {
+    const bool canSpawn = main_.isLoop && isEmitting_;
+    if (main_.isEmitByDistance) {
+        UpdateDistanceEmit(canSpawn);
+    } else if (canSpawn) {
         Create(deltaTime);
     }
 
@@ -164,9 +170,10 @@ void ParticleBehavior::Clear() {
     currentNumInstance_ = 0;
     trailNumInstance_ = 0;
     spawnTimer_ = 0.0f;
+    ResetEmitHistory();
 }
 
-ParticleData ParticleBehavior::MakeNewParticle() {
+ParticleData ParticleBehavior::MakeNewParticle(const Vector3& offset) {
 
     ParticleData tmpParticleData;
     tmpParticleData.transform.translate = main_.emitterPos;
@@ -174,12 +181,8 @@ ParticleData ParticleBehavior::MakeNewParticle() {
     tmpParticleData.transform.rotate = main_.rotate;
     tmpParticleData.velocity = { 0.0f,0.0f,0.0f };
     tmpParticleData.color = main_.color;
-    tmpParticleData.startColor = tmpParticleData.color;
-    tmpParticleData.startSize =  main_.scale;
-    tmpParticleData.startSpeed = tmpParticleData.velocity;
     tmpParticleData.rotateVelocity = { 0.0f,0.0f,0.0f };
     tmpParticleData.dir = { 0.0f,0.0f,0.0f };
-
     // 生存時間
     tmpParticleData.currentTime = 0.0f;
     tmpParticleData.lifeTime = main_.lifeTime;
@@ -187,9 +190,21 @@ ParticleData ParticleBehavior::MakeNewParticle() {
     // モジュールを適応
     modulesControl_->ParticleCreate(tmpParticleData);
 
+    // 初期値を取得する
+    tmpParticleData.startColor = tmpParticleData.color;
+    tmpParticleData.startSize = tmpParticleData.transform.scale;
+    tmpParticleData.startSpeed = tmpParticleData.velocity;
+
+    ColorOverLifeTimeModule* module = modulesControl_->GetModule<ColorOverLifeTimeModule>("ColorOverLifeTime");
+    if (module != nullptr) {
+        module->Create(tmpParticleData);
+    }
+
     if (isSetEmitPos_) {
         tmpParticleData.transform.translate += emitterPos_;
     }
+    // 距離発生時の補間位置ぶんずらす
+    tmpParticleData.transform.translate += offset;
 
     return tmpParticleData;
 }
@@ -279,7 +294,7 @@ void ParticleBehavior::Move(const Matrix4x4& cameraMatrix, float deltaTime) {
         } else {
             if (isFollowParent) {
                 // ローカル行列を作ってから親のワールド行列を掛ける
-                Matrix4x4 localMatrix = Math::MakeAffineMatrix(particle.transform.scale, particle.transform.rotate, particle.transform.translate);
+                Matrix4x4 localMatrix = Matrix4x4::MakeAffineMatrix(particle.transform.scale, particle.transform.rotate, particle.transform.translate);
                 worldTransforms_->transformDatas_[currentNumInstance_].worldMatrix = localMatrix * (*parentMatrix_);
                 // 後段のUpdateTransformMatrixで上書きされないように、transformも同期しておく
                 worldTransforms_->transformDatas_[currentNumInstance_].transform = particle.transform;
@@ -330,7 +345,7 @@ void ParticleBehavior::AddTrail(const ParticleData& particle, const TrailModule&
             }
         } else {
             if (isFollowParent) {
-                data.worldMatrix = Math::MakeAffineMatrix(scale, particle.transform.rotate, position) * (*parentMatrix_);
+                data.worldMatrix = Matrix4x4::MakeAffineMatrix(scale, particle.transform.rotate, position) * (*parentMatrix_);
             } else {
                 data.worldMatrix = Math::MakeWorldMatrixFromEulerRotation(position, particle.transform.rotate, scale);
             }
@@ -341,4 +356,66 @@ void ParticleBehavior::AddTrail(const ParticleData& particle, const TrailModule&
         data.textureHandle = particle.textureHandle;
         trailNumInstance_++;
     }
+}
+
+Vector3 ParticleBehavior::GetEmitterWorldPos() const {
+    Vector3 pos = main_.emitterPos;
+    if (isSetEmitPos_) {
+        pos += emitterPos_;
+    }
+    // 親がいる場合は、親の動きもエミッターとしてカウントする
+    if (parentMatrix_ != nullptr) {
+        pos = TransformPosition(pos, *parentMatrix_);
+    }
+    return pos;
+}
+
+uint32_t ParticleBehavior::SpawnParticles(uint32_t count, const Vector3& offset) {
+    uint32_t spawned = 0;
+    for (uint32_t i = 0; i < maxNumInstance_ && spawned < count; ++i) {
+        if (1.0f <= particles_[i].currentTime) {
+            particles_[i] = MakeNewParticle(offset);
+            ++spawned;
+        }
+    }
+    return spawned;
+}
+
+void ParticleBehavior::UpdateDistanceEmit(bool canSpawn) {
+    const Vector3 current = GetEmitterWorldPos();
+
+    // 初回、または発生停止中は位置だけ追従する
+    if (!hasPrevEmitPos_ || !canSpawn) {
+        prevEmitWorldPos_ = current;
+        hasPrevEmitPos_ = true;
+        return;
+    }
+
+    const float interval = (std::max)(main_.spawnDistance, 0.001f);
+    const Vector3 delta = current - prevEmitWorldPos_;
+    const float moved = delta.Length();
+    if (moved <= 0.0f) {
+        return;
+    }
+
+    const float travelled = distanceAccum_ + moved;
+    uint32_t count = static_cast<uint32_t>(travelled / interval);
+
+    // 瞬間移動などで大量発生しないように上限をかける
+    count = (std::min)(count, maxNumInstance_);
+
+    for (uint32_t k = 1; k <= count; ++k) {
+        // 前回位置から数えて、この発生点が経路上のどこにあるか
+        const float t = (static_cast<float>(k) * interval - distanceAccum_) / moved;
+        // 親に追従する場合、粒は親と一緒に動くので補間は不要
+        Vector3 offset{};
+        if (!IsFollowParent()) {
+            // 現在位置から経路を遡った分
+            offset = delta * (t - 1.0f); 
+        }
+        SpawnParticles(main_.spawnMaxCount, offset);
+    }
+
+    distanceAccum_ = travelled - static_cast<float>(count) * interval;
+    prevEmitWorldPos_ = current;
 }

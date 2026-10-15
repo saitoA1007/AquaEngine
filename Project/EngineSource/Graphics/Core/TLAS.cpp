@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "TLAS.h"
 #include <algorithm>
 #include "CreateBufferResource.h"

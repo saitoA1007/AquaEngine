@@ -1,6 +1,5 @@
 #pragma once
 #include "IEngineSubsystem.h"
-#include "EngineContext.h"
 
 #include "SceneManager.h"
 #include "SceneRegistry.h"
@@ -17,6 +16,9 @@ namespace GameEngine {
     /// </summary>
     class SceneSubsystem : public IEngineSubsystem {
     public:
+        SceneSubsystem();
+        ~SceneSubsystem();
+
         void Initialize() override;
         void Finalize() override;
 
@@ -49,8 +51,7 @@ namespace GameEngine {
         CollisionManager* GetCollisionManager() const { return collisionManager_.get(); }
         StaticGameObjectManager* GetStaticObjectManager() const { return staticObjectManager_.get(); }
     private:
-        EngineContext context_;
-
+ 
         std::unique_ptr<SceneManager> sceneManager_;
         std::unique_ptr<SceneRegistry> sceneRegistry_;
         std::unique_ptr<SceneChangeRequest> sceneChangeRequest_;

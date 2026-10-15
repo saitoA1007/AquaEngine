@@ -13,6 +13,9 @@ namespace GameEngine {
 		float spawnCoolTime = 1.0f; // 発生する間隔
 		float lifeTime = 1.0f; // 生存時間
 
+		bool isEmitByDistance = false; // 距離間隔で発生の有効化フラグ
+		float spawnDistance = 0.5f;    // 何m動くごとに発生するか
+
 		Vector3 emitterPos = {0.0f,0.0f,0.0f}; // 発生位置
 		Vector3 rotate = { 0.0f,0.0f,0.0f };
 		Vector3 scale = { 1.0f,1.0f,1.0f };

@@ -331,3 +331,13 @@ Project/imgui.ini
 # DirectXTex Compiled Shaders
 **/DirectXTex/Shaders/Compiled/
 windowLayout.json
+
+# Sphinx / Doxygen ドキュメント生成物
+docs/_build/
+docs/_doxygen/
+docs/api/
+
+# テクスチャのddsファイル化したものを除外
+Resources/Textures/Cache/
+**/Textures/**/Cache/
+**/Textures/Cache/

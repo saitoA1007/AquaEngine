@@ -7,12 +7,12 @@
 #include "WorldTransform.h"
 #include "Animator.h"
 #include "ParticleBehavior.h"
-#include "ParticleBehaviorGPU.h"
 #include "Material.h"
 #include "RefBuffer.h"
 #include "IceMaterial.h"
 #include "Collider.h"
 #include "DestructibleObject.h"
+#include "Text.h"
 
 #include "Application/Scene/Transition/Fade.h"
 
@@ -70,11 +70,14 @@ private: // シーン機能
 	// アニメーションを再生するクラス
 	std::unique_ptr<GameEngine::Animator> walkAnimator_;
 
-	float intensity_ = 1.0f;
+	float intensity_ = 0.8f;
 	Vector3 dir_ = { 0.0f,-1.0f,0.0f };
 	Vector4 lightColor_ = { 1.0f,1.0f,1.0f,1.0f };
 
 	Vector4 playerColor_ = { 1.0f,1.0f,1.0f,1.0f };
+
+	// テキストのテスト
+	std::unique_ptr<GameEngine::Text> text_;
 
 	// 氷で共通のマテリアル
 	GameEngine::IceMaterial iceMaterial_;

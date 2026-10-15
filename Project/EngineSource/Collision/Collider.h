@@ -205,7 +205,7 @@ namespace GameEngine {
 
 		// オイラー角から座標軸を取得する
 		void UpdateOrientationsFromRotate(const Vector3& rotate) {
-			Matrix4x4 rotationMatrix = Math::MakeRotateXMatrix(rotate.x) * (Math::MakeRotateYMatrix(rotate.y) * Math::MakeRotateZMatrix(rotate.z));
+			Matrix4x4 rotationMatrix = Matrix4x4::MakeRotateXMatrix(rotate.x) * (Matrix4x4::MakeRotateYMatrix(rotate.y) * Matrix4x4::MakeRotateZMatrix(rotate.z));
 			orientations_[0] = { rotationMatrix.m[0][0], rotationMatrix.m[0][1], rotationMatrix.m[0][2] };
 			orientations_[1] = { rotationMatrix.m[1][0], rotationMatrix.m[1][1], rotationMatrix.m[1][2] };
 			orientations_[2] = { rotationMatrix.m[2][0], rotationMatrix.m[2][1], rotationMatrix.m[2][2] };

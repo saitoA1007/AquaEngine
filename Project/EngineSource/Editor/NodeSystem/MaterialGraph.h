@@ -7,6 +7,9 @@
 
 namespace GameEngine {
 
+	// 前方宣言
+	class TextureManager;
+
 	enum class PinType {
 		kFloat,
 		kFloat2,
@@ -56,6 +59,12 @@ namespace GameEngine {
 		// リンクが接続された時に、相手の型に合わせて自分のピンを書き換えるコールバック
 		virtual void OnConnectTypePropagate(PinType newType) {}
 
+		// ノードヘッダーの色
+		virtual uint32_t GetHeaderColor() const { return 0; }
+
+		// テクスチャ
+		void SetTextureManager(TextureManager* textureManager) { textureManager_ = textureManager; }
+
 	public:
 
 		int GetId() const { return id_; }
@@ -66,6 +75,7 @@ namespace GameEngine {
 		std::vector<Pin>& GetOutputs() { return outputs_; }
 
 	protected:
+		TextureManager* textureManager_ = nullptr;
 		int id_;
 		std::string label_;
 		std::vector<Pin> inputs_;
@@ -86,6 +96,8 @@ namespace GameEngine {
 
 		// ノードIDからノードを検索
 		IMaterialNode* FindNode(int nodeId) const;
+
+		bool IsPinLinked(int pinId) const;
 	};
 }
 

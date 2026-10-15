@@ -3,6 +3,7 @@
 #include <filesystem>
 #include "IEditorWindow.h"
 #include "NodeSystem/MaterialGraph.h"
+#include "NodeSystem/NodeBuilder.h" 
 #include "ImGuiManager.h"
 namespace ned = ax::NodeEditor;
 
@@ -10,10 +11,11 @@ namespace GameEngine {
 
 	// 前方宣言
 	class PSOManager;
+	class TextureManager;
 
 	class MaterialNodeWindow : public IEditorWindow {
 	public:
-		MaterialNodeWindow(PSOManager* psoManager);
+		MaterialNodeWindow(PSOManager* psoManager, TextureManager* textureManager);
 		~MaterialNodeWindow() = default;
 
 		void Draw() override;
@@ -23,7 +25,11 @@ namespace GameEngine {
 
 	private:
 		PSOManager* psoManager_ = nullptr;
+		TextureManager* textureManager_ = nullptr;
 		ned::EditorContext* context_ = nullptr;
+
+		NodeUI::NodeStyle nodeStyle_;
+		uint32_t headerBgHandle_ = 0;
 
 		MaterialGraph* currentGraph_ = nullptr;
 		std::string currentMaterialName_ = "";
@@ -59,6 +65,9 @@ namespace GameEngine {
 
 		void HandleContextMenu(MaterialGraph& graph);
 
+		// ノードを描画
+		void DrawNode(MaterialGraph& graph, IMaterialNode& node);
+
 		// マテリアルノード用のツールバー
 		void DrawMaterialToolbar();
 
@@ -76,12 +85,5 @@ namespace GameEngine {
 			};
 		}
 	};
-
-	// ヘルパー関数
-	namespace {
-
-		// 接続の判定をする
-		bool CanConnect(const MaterialGraph& graph, int startPinId, int endPinId);
-	}
 }
 

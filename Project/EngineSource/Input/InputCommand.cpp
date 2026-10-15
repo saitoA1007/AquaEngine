@@ -1,3 +1,4 @@
+#include "pch.h"
 #include"InputCommand.h"
 
 using namespace GameEngine;

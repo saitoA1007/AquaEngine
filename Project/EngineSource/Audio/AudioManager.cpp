@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "AudioManager.h"
 #include <cassert>
 #include <filesystem>

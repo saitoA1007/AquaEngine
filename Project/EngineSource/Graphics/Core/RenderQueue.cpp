@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "RenderQueue.h"
 #include "DebugRenderer.h"
 #include "Sprite.h"
@@ -55,7 +56,7 @@ void RenderQueue::Update() {
             perViewData->viewProjection = mainCamera_.GetVPMatrix();
 
             // ビルボードの回転行列を作成
-            Matrix4x4 backToFrontMatrix = Math::MakeRotateYMatrix(0.0f);
+            Matrix4x4 backToFrontMatrix = Matrix4x4::MakeRotateYMatrix(0.0f);
             Matrix4x4 billboardMatrix = backToFrontMatrix * mainCamera_.GetWorldMatrix();
             billboardMatrix.m[3][0] = 0.0f;
             billboardMatrix.m[3][1] = 0.0f;
@@ -75,6 +76,16 @@ void RenderQueue::SubmitSprite(const Sprite* sprite, const std::string& passName
     request.type = Draw2dType::Normal;
     request.layer = RenderLayer::Sprite;
     request.sprite = sprite;
+    // 登録
+    draw2dQueueList_[passName][request.layer][Get2dPsoName(request.type)].push_back(request);
+}
+
+void RenderQueue::SubmitText(const Text* text, const std::string& passName) {
+
+    Draw2dRequest request;
+    request.type = Draw2dType::Text;
+    request.layer = RenderLayer::Sprite;
+    request.text = text;
     // 登録
     draw2dQueueList_[passName][request.layer][Get2dPsoName(request.type)].push_back(request);
 }
@@ -337,7 +348,7 @@ void RenderQueue::SubmitRaytracingModel(Model* model, WorldTransform& worldTrans
         data.instanceID = refIndex;
 
         // 座標を設定
-        Matrix4x4 matrix = Math::Transpose(worldTransform.GetWorldMatrix());
+        Matrix4x4 matrix = Matrix4x4::Transpose(worldTransform.GetWorldMatrix());
         std::memcpy(&data.transform, &matrix, sizeof(float) * 12);
 
         // データを登録
@@ -390,7 +401,7 @@ void RenderQueue::SubmitRaytracingFracture(Model* model, FractureInstance& fract
             data.instanceID = buffer->GetChunkRefIndex(chunkId);
             // 座標
             Matrix4x4 finalMatrix = fractureInstance.GetChunkWorldMatrix(i) * worldTransform.GetWorldMatrix();
-            Matrix4x4 matrix = Math::Transpose(finalMatrix);
+            Matrix4x4 matrix = Matrix4x4::Transpose(finalMatrix);
             std::memcpy(&data.transform, &matrix, sizeof(float) * 12);
 
             // データを登録
@@ -460,6 +471,7 @@ const char* RenderQueue::Get2dPsoName(Draw2dType type) {
     {
     case GameEngine::Draw2dType::Normal: { return "DefaultSprite"; }
     case GameEngine::Draw2dType::Add: { return "AdditiveSprite"; }
+    case GameEngine::Draw2dType::Text: { return "Text"; }
     default: { return "DefaultSprite"; }
     }
 }

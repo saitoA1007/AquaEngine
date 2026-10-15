@@ -11,6 +11,7 @@ namespace GameEngine {
 	class AddObjectBar {
 	public:
 		AddObjectBar(StaticGameObjectManager* staticObjectManager, RenderQueue* renderQueue, DebugCamera* debugCamera, GameParamEditor* paramEditor);
+		~AddObjectBar();
 
 		void Run();
 

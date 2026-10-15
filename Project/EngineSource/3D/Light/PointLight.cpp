@@ -1,3 +1,4 @@
+#include "pch.h"
 #include"PointLight.h"
 #include"EngineSource/Math/MyMath.h"
 using namespace GameEngine;

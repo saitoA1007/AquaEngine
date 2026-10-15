@@ -40,6 +40,14 @@ namespace GameEngine {
             buffer_.GetData()->enableGrayscale = isActive;
         }
 
+        // パラメータを操作
+        void DrawParamUI() override;
+
+        // パラメータの保存
+        void SaveParams(nlohmann::json& j) override;
+        // パラメータの読み込み
+        void LoadParams(const nlohmann::json& j) override;
+
     private:
         ConstantBuffer<ColorGradingData> buffer_;
     };
@@ -86,6 +94,14 @@ namespace GameEngine {
             buffer_.GetData()->textureHandle = index;
         }
 
+        // パラメータを操作
+        void DrawParamUI() override;
+
+        // パラメータの保存
+        void SaveParams(nlohmann::json& j) override;
+        // パラメータの読み込み
+        void LoadParams(const nlohmann::json& j) override;
+
     private:
         ConstantBuffer<HighLumMaskData> buffer_;
     };
@@ -107,6 +123,14 @@ namespace GameEngine {
             buffer_.GetData()->textureHandle = index;
         }
 
+        // パラメータを操作
+        void DrawParamUI() override;
+
+        // パラメータの保存
+        void SaveParams(nlohmann::json& j) override;
+        // パラメータの読み込み
+        void LoadParams(const nlohmann::json& j) override;
+
     private:
         ConstantBuffer<GaussianBlurData> buffer_;
     };
@@ -127,6 +151,14 @@ namespace GameEngine {
         void SetPassIndex(const uint32_t& index) override {
             buffer_.GetData()->textureHandle = index;
         }
+
+        // パラメータを操作
+        void DrawParamUI() override;
+
+        // パラメータの保存
+        void SaveParams(nlohmann::json& j) override;
+        // パラメータの読み込み
+        void LoadParams(const nlohmann::json& j) override;
 
     private:
         ConstantBuffer<GaussianBlurData> buffer_;
@@ -153,6 +185,22 @@ namespace GameEngine {
         void SetGamePassIndex(uint32_t index) {
             buffer_.GetData()->gameTextureHandle = index;
         }
+
+        uint32_t GetInputCount() const override { return 2; }
+        const char* GetInputName(uint32_t slot) const override { return slot == 0 ? "Blur" : "Scene"; }
+        void SetInputIndex(uint32_t slot, uint32_t srvIndex) override {
+            if (slot == 0) { buffer_.GetData()->blurTextureHandle = srvIndex; } else { buffer_.GetData()->gameTextureHandle = srvIndex; }
+        }
+        const char* GetDisplayName() const override { return "Bloom"; }
+        uint32_t GetPassThroughSlot() const override { return 1; }
+
+        // パラメータを操作
+        void DrawParamUI() override;
+
+        // パラメータの保存
+        void SaveParams(nlohmann::json& j) override;
+        // パラメータの読み込み
+        void LoadParams(const nlohmann::json& j) override;
 
     private:
         ConstantBuffer<BloomData> buffer_;
@@ -183,6 +231,14 @@ namespace GameEngine {
         void SetThreshold(float threshold) {
             buffer_.GetData()->threshold = threshold;
         }
+
+        // パラメータを操作
+        void DrawParamUI() override;
+
+        // パラメータの保存
+        void SaveParams(nlohmann::json& j) override;
+        // パラメータの読み込み
+        void LoadParams(const nlohmann::json& j) override;
 
     private:
         ConstantBuffer<DissolveData> buffer_;

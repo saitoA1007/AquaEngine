@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ResourceGarbageCollector.h"
 #include "DXFence.h"
 using namespace GameEngine;

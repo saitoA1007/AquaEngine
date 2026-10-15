@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "SrvResource.h"
 
 using namespace GameEngine;

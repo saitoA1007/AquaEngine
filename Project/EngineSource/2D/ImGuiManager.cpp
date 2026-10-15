@@ -1,4 +1,5 @@
-#include"ImGuiManager.h"
+#include "pch.h"
+#include "ImGuiManager.h"
 using namespace GameEngine;
 
 void ImGuiManager::Initialize([[maybe_unused]]ID3D12Device* device, [[maybe_unused]] ID3D12GraphicsCommandList* commandList, [[maybe_unused]] DXGI_SWAP_CHAIN_DESC1 swapChainDesc,
@@ -199,4 +200,23 @@ void ImGuiManager::ApplyStyle() {
     colors[ImGuiCol_DragDropTarget] = c_active_hover;
     colors[ImGuiCol_NavHighlight] = c_active_blue;
 #endif
+}
+
+namespace GameEngine {
+
+    bool DrawFloat2Control(const char* l, float* v, float w) {
+        return DrawVectorControl<float>(l, v, 2, w, 0.01f, 0.0f, 0.0f, "%.3f");
+    }
+    bool DrawFloat3Control(const char* l, float* v, float w) {
+        return DrawVectorControl<float>(l, v, 3, w, 0.01f, 0.0f, 0.0f, "%.3f");
+    }
+    bool DrawFloat4Control(const char* l, float* v, float w) {
+        return DrawVectorControl<float>(l, v, 4, w, 0.01f, 0.0f, 0.0f, "%.3f");
+    }
+    bool DrawInt2Control(const char* l, int* v, float w) { 
+        return DrawVectorControl<int>(l, v, 2, w, 1.0f);
+    }
+    bool DrawInt3Control(const char* l, int* v, float w) { 
+        return DrawVectorControl<int>(l, v, 3, w, 1.0f);
+    }
 }

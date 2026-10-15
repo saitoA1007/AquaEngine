@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "EasingManager.h"
 #include <cmath>
 #include <algorithm>
@@ -14,7 +15,7 @@ namespace GameEngine {
 		float easedT = Apply(t, type);
 
 		Quaternion q1Copy = q1;
-		float dot = Math::Dot(q0, q1);
+		float dot = q0.Dot(q1);
 		// 四元数の符号が逆だと最短経路で補間されないので反転
 		if (dot < 0.0f) {
 			dot = -dot;
@@ -61,18 +62,18 @@ namespace GameEngine {
 		};
 
 		// 内積を求める
-		float dot = Math::Dot(startNorm, endNorm);
+		float dot = startNorm.Dot(endNorm);
 		dot = std::clamp(dot, -1.0f, 1.0f);
 
 		Vector3 interpVec;
 
 		if (dot > 0.9995f) {
 			// 線形補間して正規化
-			interpVec = Math::Normalize(Lerp(startNorm, endNorm, easedT));
+			interpVec = Vector3::Normalize(Lerp(startNorm, endNorm, easedT));
 		} else if (dot < -0.9995f) {
-			Vector3 ortho = Math::Cross(startNorm, Vector3(0.0f, 1.0f, 0.0f));
+			Vector3 ortho = startNorm.Cross(Vector3(0.0f, 1.0f, 0.0f));
 			if (ortho.Length() < 0.01f) {
-				ortho = Math::Cross(startNorm, Vector3(1.0f, 0.0f, 0.0f));
+				ortho = startNorm.Cross(Vector3(1.0f, 0.0f, 0.0f));
 			}
 			// 回転の基準となる垂直ベクトルを正規化
 			ortho.Normalize();
