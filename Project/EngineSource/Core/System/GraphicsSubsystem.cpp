@@ -10,12 +10,15 @@
 #include "Animator.h"
 #include "ParticleBehaviorGPU.h"
 #include "Debug/PixCapture.h"
+#include "ScopedTimer.h"
 using namespace GameEngine;
 
 GraphicsSubsystem::GraphicsSubsystem() = default;
 GraphicsSubsystem::~GraphicsSubsystem() = default;
 
 void GraphicsSubsystem::Initialize() {
+    ScopedTimer total("LoadAllGraphics (Total)");
+
     auto* windowsApp = context_.core->GetWindowsApp();
 
     // PIXのGPUキャプチャ機能を準備する。
@@ -46,18 +49,22 @@ void GraphicsSubsystem::Initialize() {
     // アクセスデータ管理機能を登録する
     BufferRefResource::StaticInitialize(bufferRefManager_.get(), graphicsDevice_->GetSrvManager()->GetStartSrvIndex(SrvHeapType::Buffer));
 
-    // PSO作成
-    InitializePSO();
+    {
+        ScopedTimer t("PsoManager");
 
-    // PSO管理機能の作成
-    psoManager_ = std::make_unique<PSOManager>();
-    psoManager_->Initialize(graphicsDevice_->GetDevice(), dxc_.get());
-    psoManager_->DefaultLoadPSO();
-    psoManager_->DefaultLoadPostEffectPSO();
+        // PSO作成
+        InitializePSO();
 
-    // レイトレーシング用のパイプライン
-    raytracingPipeline_ = std::make_unique<RaytracingPipeline>();
-    raytracingPipeline_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetSrvManager(), dxc_.get());
+        // PSO管理機能の作成
+        psoManager_ = std::make_unique<PSOManager>();
+        psoManager_->Initialize(graphicsDevice_->GetDevice(), dxc_.get());
+        psoManager_->DefaultLoadPSO();
+        psoManager_->DefaultLoadPostEffectPSO();
+
+        // レイトレーシング用のパイプライン
+        raytracingPipeline_ = std::make_unique<RaytracingPipeline>();
+        raytracingPipeline_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetSrvManager(), dxc_.get());
+    }
 
     // レンダーテクスチャ機能を生成
     renderTextureManager_ = std::make_unique<RenderTextureManager>();

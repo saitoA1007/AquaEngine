@@ -40,6 +40,11 @@ namespace GameEngine {
 		void LoadAllTexture();
 
 		/// <summary>
+		/// デバック時に使用する全てのテクスチャデータを読み込む
+		/// </summary>
+		void LoadDebugAllTexture();
+
+		/// <summary>
 		/// 名前からハンドルを取得
 		/// </summary>
 		/// <param name="name">登録名</param>
@@ -64,6 +69,8 @@ namespace GameEngine {
 
 		// 読み取り先のパス名
 		static inline const std::string kDirectoryPath = "Resources/Textures/";
+		// デバック時に使用する画像の読み取り先のパス名
+		static inline const std::string kDebugDirectoryPath = "EngineSource/Resources/Textures/";
 
 		// テクスチャ情報
 		std::unordered_map<std::string, std::unique_ptr<Texture>> textures_;

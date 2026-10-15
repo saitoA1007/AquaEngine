@@ -100,6 +100,21 @@ namespace GameEngine {
 
 		DragState drag_;
 
+		// アイコン画像ハンドル
+		D3D12_GPU_DESCRIPTOR_HANDLE saveIconTextureHandle_{};
+		D3D12_GPU_DESCRIPTOR_HANDLE loadIconTextureHandle_{};
+		D3D12_GPU_DESCRIPTOR_HANDLE newFileIconTextureHandle_{};
+		D3D12_GPU_DESCRIPTOR_HANDLE undoIconTextureHandle_{};
+		D3D12_GPU_DESCRIPTOR_HANDLE redoIconTextureHandle_{};
+		D3D12_GPU_DESCRIPTOR_HANDLE playIconTextureHandle_{};
+		D3D12_GPU_DESCRIPTOR_HANDLE stopIconTextureHandle_{};
+		D3D12_GPU_DESCRIPTOR_HANDLE leftSkipIconTextureHandle_{};
+		D3D12_GPU_DESCRIPTOR_HANDLE rightSkipIconTextureHandle_{};
+		D3D12_GPU_DESCRIPTOR_HANDLE addIconTextureHandle_{};
+		D3D12_GPU_DESCRIPTOR_HANDLE deleteIconTextureHandle_{};
+		D3D12_GPU_DESCRIPTOR_HANDLE copyIconTextureHandle_{};
+		D3D12_GPU_DESCRIPTOR_HANDLE clearIconTextureHandle_{};
+
 	private:
 
 		// 保存されているエフェクトの一覧を更新する

@@ -43,6 +43,7 @@ namespace GameEngine {
 		uint32_t headerBgHandle_ = 0;
 		uint32_t iconRestoreHandle_ = 0;
 		uint32_t iconSaveHandle_ = 0;
+		uint32_t iconLoadHandle_ = 0;
 
 		// 削除予約
 		std::vector<int> pendingNodeDeletes_;

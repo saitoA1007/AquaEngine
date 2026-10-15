@@ -19,6 +19,10 @@ namespace GameEngine {
 		
 		TextureManager* textureManager_ = nullptr;
 
+		// アイコン画像のハンドル
+		D3D12_GPU_DESCRIPTOR_HANDLE saveIconTextureHandle_{};
+		D3D12_GPU_DESCRIPTOR_HANDLE loadIconTextureHandle_{};
+
 	private:
 
 		void DrawGroup(GameParamEditor::Group& group);

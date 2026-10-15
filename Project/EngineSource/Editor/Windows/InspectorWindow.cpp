@@ -3,15 +3,30 @@
 
 using namespace GameEngine;
 
+namespace {
+    // ツールバー用のアイコンボタン
+    bool IconButton(const char* id, ImTextureID tex, const char* tooltip) {
+        const bool pressed = ImGui::ImageButton(id, tex, ImVec2(16, 16));
+        if (ImGui::IsItemHovered()) { ImGui::SetTooltip("%s", tooltip); }
+        return pressed;
+    }
+}
+
 InspectorWindow::InspectorWindow(GameParamEditor* gameParamEditor, TextureManager* textureManager) {
     gameParamEditor_ = gameParamEditor;
     textureManager_ = textureManager;
+
+    uint32_t saveIconGH = textureManager_->GetHandleByName("saveIcon.png");
+    uint32_t loadIconGH = textureManager_->GetHandleByName("loadIcon.png");
+
+    saveIconTextureHandle_ = textureManager_->GetTextureSrvHandlesGPU(saveIconGH);
+    loadIconTextureHandle_ = textureManager_->GetTextureSrvHandlesGPU(loadIconGH);
 }
 
 void InspectorWindow::Draw() {
     if (!isActive) return;
 
-    if (!ImGui::Begin("ParameterInspector", &isActive)) {
+    if (!ImGui::Begin("Inspector", &isActive)) {
         ImGui::End();
         return;
     }
@@ -43,7 +58,7 @@ void InspectorWindow::Draw() {
     ImGui::Separator();
 
     // 保存ボタン
-    if (ImGui::Button("Save")) {
+    if (IconButton("##save", static_cast<ImTextureID>(saveIconTextureHandle_.ptr), "Save")) {
         gameParamEditor_->SaveFile(rootGroupName);
         std::string message = std::format("{}.json saved.", rootGroupName);
         MessageBoxA(nullptr, message.c_str(), "GameParamEditor", 0);
@@ -52,7 +67,7 @@ void InspectorWindow::Draw() {
     ImGui::SameLine();
 
     // 読み込みボタン
-    if (ImGui::Button("Load")) {
+    if (IconButton("##load", static_cast<ImTextureID>(loadIconTextureHandle_.ptr), "Load")) {
         gameParamEditor_->LoadFile(rootGroupName);
     }
 

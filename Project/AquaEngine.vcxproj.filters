@@ -1174,6 +1174,7 @@
     <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectRegistry.h" />
     <ClInclude Include="Application\Demo\Test.h" />
     <ClInclude Include="Application\Demo\TestFructure.h" />
+    <ClInclude Include="EngineSource\Common\ScopedTimer.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />

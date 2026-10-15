@@ -84,6 +84,34 @@ void TextureManager::LoadAllTexture() {
 	LogManager::GetInstance().Log("End Loading All Textures");
 }
 
+void TextureManager::LoadDebugAllTexture() {
+	namespace fs = std::filesystem;
+
+	// Texturesのフォルダが存在するか確認する
+	if (!fs::exists(kDebugDirectoryPath)) {
+		LogManager::GetInstance().Log("Texture directory not found, skipping LoadAllTexture: " + kDebugDirectoryPath);
+		return;
+	}
+
+	LogManager::GetInstance().Log("Start Loading All Textures from: " + kDebugDirectoryPath);
+
+	// Texturesのフォルダになる画像ファイルとフォルダを検索
+	for (auto it = fs::recursive_directory_iterator(kDebugDirectoryPath); it != fs::recursive_directory_iterator(); ++it) {
+		// Cacheフォルダは対象外
+		if (it->is_directory() && it->path().filename() == "Cache") {
+			it.disable_recursion_pending();
+			continue;
+		}
+		// 画像を登録、ロードする
+		if (it->is_regular_file()) {
+			// 登録
+			RegisterTexture(it->path().string());
+		}
+	}
+
+	LogManager::GetInstance().Log("End Loading All Textures");
+}
+
 std::vector<std::string> TextureManager::GetRegisteredTextureNames() const {
 	std::vector<std::string> names;
 	names.reserve(textures_.size());

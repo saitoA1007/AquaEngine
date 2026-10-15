@@ -48,7 +48,8 @@ PostEffectWindow::PostEffectWindow(PostEffectManager* postEffectManager, Texture
     // 画像を取得
     headerBgHandle_ = textureManager_->GetHandleByName("BlueprintBackground.png");
     iconRestoreHandle_ = textureManager_->GetHandleByName("ic_restore_white_24dp.png");
-    iconSaveHandle_ = textureManager_->GetHandleByName("ic_save_white_24dp.png");
+    iconSaveHandle_ = textureManager_->GetHandleByName("saveIcon.png");
+    iconLoadHandle_ = textureManager_->GetHandleByName("loadIcon.png");
 
     ned::Config config;
     // 位置はPostEffectNode::posで管理する
@@ -135,7 +136,7 @@ void PostEffectWindow::DrawToolbar() {
     }
 
     ImGui::SameLine();
-    if (ImGui::Button("Load")) {
+    if (IconButton("##load", ToImTex(textureManager_, iconLoadHandle_), "Load")) {
         if (postEffectManager_->LoadGraph()) {
             applyPositions_ = true;
             selectedNodeId_ = -1;

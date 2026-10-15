@@ -67,6 +67,13 @@ namespace {
 		}
 		return changed;
 	}
+
+	// ツールバー用のアイコンボタン
+	bool IconButton(const char* id, ImTextureID tex, const char* tooltip) {
+		const bool pressed = ImGui::ImageButton(id, tex, ImVec2(16, 16));
+		if (ImGui::IsItemHovered()) { ImGui::SetTooltip("%s", tooltip); }
+		return pressed;
+	}
 }
 
 EffectEditorWindow::EffectEditorWindow(TextureManager* textureManager, ModelManager* modelManager, GameParamEditor* gameParamEditor,
@@ -75,6 +82,35 @@ EffectEditorWindow::EffectEditorWindow(TextureManager* textureManager, ModelMana
 	modelManager_ = modelManager;
 	gameParamEditor_ = gameParamEditor;
 	effectsManager_ = effectsManager;
+
+	uint32_t saveIconGH = textureManager_->GetHandleByName("saveIcon.png");
+	uint32_t loadIconGH = textureManager_->GetHandleByName("loadIcon.png");
+	uint32_t newFileIconGH = textureManager_->GetHandleByName("newFileIcon.png");
+	uint32_t undoIconGH = textureManager_->GetHandleByName("undoIcon.png");
+	uint32_t redoIconGH = textureManager_->GetHandleByName("redoIcon.png");
+	uint32_t playIconGH = textureManager_->GetHandleByName("debugPlay.png");
+	uint32_t stopIconGH = textureManager_->GetHandleByName("debugStop.png");
+	uint32_t leftSkipIconGH = textureManager_->GetHandleByName("debugLeftStep.png");
+	uint32_t rightSkipIconGH = textureManager_->GetHandleByName("debugRightStep.png");
+	uint32_t addIconGH = textureManager_->GetHandleByName("addIcon.png");
+	uint32_t deleteIconGH = textureManager_->GetHandleByName("deleteIcon.png");
+	uint32_t copyIconGH = textureManager_->GetHandleByName("copyIcon.png");
+	uint32_t clearIconGH = textureManager_->GetHandleByName("clearIcon.png");
+
+	saveIconTextureHandle_ = textureManager_->GetTextureSrvHandlesGPU(saveIconGH);
+	loadIconTextureHandle_ = textureManager_->GetTextureSrvHandlesGPU(loadIconGH);
+	newFileIconTextureHandle_ = textureManager_->GetTextureSrvHandlesGPU(newFileIconGH);
+	undoIconTextureHandle_ = textureManager_->GetTextureSrvHandlesGPU(undoIconGH);
+	redoIconTextureHandle_ = textureManager_->GetTextureSrvHandlesGPU(redoIconGH);
+	playIconTextureHandle_ = textureManager_->GetTextureSrvHandlesGPU(playIconGH);
+	stopIconTextureHandle_ = textureManager_->GetTextureSrvHandlesGPU(stopIconGH);
+	leftSkipIconTextureHandle_ = textureManager_->GetTextureSrvHandlesGPU(leftSkipIconGH);
+	rightSkipIconTextureHandle_ = textureManager_->GetTextureSrvHandlesGPU(rightSkipIconGH);
+	addIconTextureHandle_ = textureManager_->GetTextureSrvHandlesGPU(addIconGH);
+	deleteIconTextureHandle_ = textureManager_->GetTextureSrvHandlesGPU(deleteIconGH);
+	copyIconTextureHandle_ = textureManager_->GetTextureSrvHandlesGPU(copyIconGH);
+	clearIconTextureHandle_ = textureManager_->GetTextureSrvHandlesGPU(clearIconGH);
+
 	RefreshEffectList();
 }
 
@@ -192,7 +228,7 @@ void EffectEditorWindow::DrawFileBar() {
 
 	// 新規作成
 	ImGui::SameLine();
-	if (ImGui::Button("New")) {
+	if (IconButton("##new", static_cast<ImTextureID>(newFileIconTextureHandle_.ptr), "New")) {
 		newEffectName_[0] = '\0';
 		ImGui::OpenPopup("NewEffect");
 	}
@@ -222,28 +258,29 @@ void EffectEditorWindow::DrawFileBar() {
 	// 保存
 	ImGui::SameLine();
 	ImGui::BeginDisabled(!hasAsset_);
-	if (ImGui::Button("Save")) {
+	if (IconButton("##save", static_cast<ImTextureID>(saveIconTextureHandle_.ptr), "Save")) {
 		Save();
 	}
 	ImGui::EndDisabled();
 
-	// Undo / Redo
+	// Undo
 	ImGui::SameLine();
 	ImGui::BeginDisabled(!history_.CanUndo());
-	if (ImGui::Button("Undo")) {
+	if (IconButton("##undo", static_cast<ImTextureID>(undoIconTextureHandle_.ptr), "Undo")) {
 		history_.Undo();
 	}
 	ImGui::EndDisabled();
 	ImGui::SameLine();
+	// redo
 	ImGui::BeginDisabled(!history_.CanRedo());
-	if (ImGui::Button("Redo")) {
+	if (IconButton("##redo", static_cast<ImTextureID>(redoIconTextureHandle_.ptr), "Redo")) {
 		history_.Redo();
 	}
 	ImGui::EndDisabled();
 
 	// 一覧の再読み込み
 	ImGui::SameLine();
-	if (ImGui::Button("Refresh")) {
+	if (IconButton("##Refresh", static_cast<ImTextureID>(loadIconTextureHandle_.ptr), "Refresh")) {
 		RefreshEffectList();
 	}
 }
@@ -272,23 +309,26 @@ void EffectEditorWindow::DrawSplitter(float width, float height) {
 }
 
 void EffectEditorWindow::DrawPlaybackBar() {
+
 	// 再生 / 停止
-	if (ImGui::Button("Play")) {
+	D3D12_GPU_DESCRIPTOR_HANDLE  playTexId = isPlaying_ ? stopIconTextureHandle_ : playIconTextureHandle_;
+	if (IconButton("##play", static_cast<ImTextureID>(playTexId.ptr), "Play")) {
 		TogglePlay();
 	}
 	// コマ送り
 	constexpr float kFrameStep = 1.0f / 60.0f;
 	ImGui::SameLine();
-	if (ImGui::ArrowButton("##PrevFrame", ImGuiDir_Left) && preview_) {
+	if (IconButton("##prevFrame", static_cast<ImTextureID>(leftSkipIconTextureHandle_.ptr), "PrevFrame") && preview_) {
 		SeekPreview(preview_->GetTime() - kFrameStep);
 	}
 	ImGui::SameLine();
-	if (ImGui::ArrowButton("##NextFrame", ImGuiDir_Right) && preview_) {
+	if (IconButton("##NextFrame", static_cast<ImTextureID>(rightSkipIconTextureHandle_.ptr), "NextFrame") && preview_) {
 		SeekPreview(preview_->GetTime() + kFrameStep);
 	}
+
 	// 最初に戻す
 	ImGui::SameLine();
-	if (ImGui::Button("Clear")) {
+	if (IconButton("##Clear", static_cast<ImTextureID>(clearIconTextureHandle_.ptr), "Clear")) {
 		isPlaying_ = false;
 		if (preview_) {
 			preview_->StopImmediate();
@@ -341,8 +381,9 @@ void EffectEditorWindow::DrawTrackList() {
 }
 
 void EffectEditorWindow::DrawTrackButtons() {
+
 	// 追加
-	if (ImGui::Button("Add")) {
+	if (IconButton("##add", static_cast<ImTextureID>(addIconTextureHandle_.ptr), "Add")) {
 		EffectTrackData track;
 		track.name = "Track" + std::to_string(asset_.tracks.size());
 		std::vector<std::string> models = GetModelNames();
@@ -359,7 +400,7 @@ void EffectEditorWindow::DrawTrackButtons() {
 
 	// 複製
 	ImGui::SameLine();
-	if (ImGui::Button("Dup")) {
+	if (IconButton("##copy", static_cast<ImTextureID>(copyIconTextureHandle_.ptr), "Copy")) {
 		EffectTrackData track = asset_.tracks[selectedTrack_];
 		track.name += "_Copy";
 		asset_.tracks.insert(asset_.tracks.begin() + selectedTrack_ + 1, track);
@@ -369,7 +410,7 @@ void EffectEditorWindow::DrawTrackButtons() {
 
 	// 削除
 	ImGui::SameLine();
-	if (ImGui::Button("Del")) {
+	if (IconButton("##delete", static_cast<ImTextureID>(deleteIconTextureHandle_.ptr), "Delete")) {
 		asset_.tracks.erase(asset_.tracks.begin() + selectedTrack_);
 		selectedTrack_ = (std::min)(selectedTrack_, static_cast<int>(asset_.tracks.size()) - 1);
 		MarkStructureChanged();

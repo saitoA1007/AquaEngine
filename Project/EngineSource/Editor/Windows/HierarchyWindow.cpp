@@ -13,7 +13,7 @@ HierarchyWindow::HierarchyWindow(GameParamEditor* gameParamEditor) {
 void HierarchyWindow::Draw() {
     if (!isActive) return;
 
-    if (!ImGui::Begin("ParameterHierarchy", &isActive)) {
+    if (!ImGui::Begin("Hierarchy", &isActive)) {
         ImGui::End();
         return;
     }

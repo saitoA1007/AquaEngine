@@ -2,6 +2,7 @@
 #include "ResourceSubsystem.h"
 #include "DebugParameter.h"
 #include "GraphicsSubsystem.h"
+#include "ScopedTimer.h"
 using namespace GameEngine;
 
 ResourceSubsystem::ResourceSubsystem() = default;
@@ -41,55 +42,70 @@ void ResourceSubsystem::Initialize() {
 }
 
 void ResourceSubsystem::LoadAllResources() {
+	ScopedTimer total("LoadAllResources (Total)");
 
-	// 全てのパラメータファイルを読み込み
-	gameParamEditor_->LoadFiles();
+	{
+		ScopedTimer t("ParamFiles");
+		// 全てのパラメータファイルを読み込み
+		gameParamEditor_->LoadFiles();
+	}
 
-	// 画像データを全てロードする
-	textureManager_->LoadAllTexture();
+	{
+		ScopedTimer t("Texture");
+		// 画像データを全てロードする
+		textureManager_->LoadAllTexture();
 #ifdef USE_IMGUI
-	// エディターのみで使用する画像をロード
-	textureManager_->RegisterTexture("EngineSource/Resources/Textures/BlueprintBackground.png");
-	textureManager_->RegisterTexture("EngineSource/Resources/Textures/ic_restore_white_24dp.png");
-	textureManager_->RegisterTexture("EngineSource/Resources/Textures/ic_save_white_24dp.png");
-	// 使用するアイコンを登録する
-	textureManager_->RegisterTexture("EngineSource/Resources/Textures/errorIcon.png");
-	textureManager_->RegisterTexture("EngineSource/Resources/Textures/meshIcon.png");
-	textureManager_->RegisterTexture("EngineSource/Resources/Textures/jsonIcon.png");
-	textureManager_->RegisterTexture("EngineSource/Resources/Textures/folderIcon.png");
+		// エディターのみで使用する画像をロード
+		textureManager_->LoadDebugAllTexture();
 #endif
+	}
 
-	// フォントデータを全てロードする
-	fontManager_->LoadAllFont();
+	{
+		ScopedTimer t("Font");
+		// フォントデータを全てロードする
+		fontManager_->LoadAllFont();
+	}
+	
+	{
+		ScopedTimer t("Model");
+		// モデルデータを全てロードする
+		modelManager_->RegisterGridPlaneModel("Grid", { 200.0f, 200.0f });
+		modelManager_->RegisterRingModel("Ring", 32, 1.0f, 0.2f);
+		modelManager_->RegisterCylinderModel("Cylinder", 32, 1.0f, 1.0f, 3.0f);
+		modelManager_->LoadAllModel();
+	}
+	
+	{
+		ScopedTimer t("Animation");
+		// アニメーションデータをロード
+		animationManager_->RegisterAnimation("Walk", "walk.gltf", "Resources/Models/Walk");
 
-	// モデルデータを全てロードする
-	modelManager_->RegisterGridPlaneModel("Grid", { 200.0f, 200.0f });
-	modelManager_->RegisterRingModel("Ring", 32, 1.0f, 0.2f);
-	modelManager_->RegisterCylinderModel("Cylinder", 32, 1.0f, 1.0f, 3.0f);
-	modelManager_->LoadAllModel();
+		// プレイヤーのアニメーションデータを読み込む
+		animationManager_->RegisterAnimation("PlayerWalk", "PlayerWalk.gltf", "Resources/Animations/Player/PlayerWalk");
+		animationManager_->RegisterAnimation("PlayerAirMove", "PlayerAirMove.gltf", "Resources/Animations/Player/PlayerAirMove");
+		animationManager_->RegisterAnimation("PlayerRush", "PlayerRush.gltf", "Resources/Animations/Player/PlayerRush");
+		animationManager_->RegisterAnimation("PlayerDownAttack", "DownAttack.gltf", "Resources/Animations/Player/PlayerDownAttack");
 
-	// アニメーションデータをロード
-	animationManager_->RegisterAnimation("Walk", "walk.gltf", "Resources/Models/Walk");
+		// ボスのアニメーションデータを読み込む
+		animationManager_->RegisterAnimation("BossBirdBaseMove", "BossBirdBaseMove.gltf", "Resources/Animations/Boss/BossBirdBaseMove");
+		animationManager_->RegisterAnimation("BossBirdScream", "BossBird_Screamgltf.gltf", "Resources/Animations/Boss/BossBirdScream");
+		animationManager_->RegisterAnimation("BossBirdRush", "BossBirdRush.gltf", "Resources/Animations/Boss/BossBirdRush");
+		animationManager_->RegisterAnimation("BossBirdIceBreath", "BossBird_IceBreath.gltf", "Resources/Animations/Boss/BossBirdIceBreath");
+		animationManager_->RegisterAnimation("BossBirdAppearance", "BossBird_Screamgltf.gltf", "Resources/Animations/Boss/BossBirdAppearance");
+		animationManager_->RegisterAnimation("BossBirdShootDown", "ShootDown_Animation.gltf", "Resources/Animations/Boss/BossBirdShootDown");
+	}
+	
+	{
+		ScopedTimer t("Audio");
+		// 音声データを全てロードする
+		AudioManager::GetInstance().LoadAllAudio();
+	}
 
-	// プレイヤーのアニメーションデータを読み込む
-	animationManager_->RegisterAnimation("PlayerWalk", "PlayerWalk.gltf", "Resources/Animations/Player/PlayerWalk");
-	animationManager_->RegisterAnimation("PlayerAirMove", "PlayerAirMove.gltf", "Resources/Animations/Player/PlayerAirMove");
-	animationManager_->RegisterAnimation("PlayerRush", "PlayerRush.gltf", "Resources/Animations/Player/PlayerRush");
-	animationManager_->RegisterAnimation("PlayerDownAttack", "DownAttack.gltf", "Resources/Animations/Player/PlayerDownAttack");
-
-	// ボスのアニメーションデータを読み込む
-	animationManager_->RegisterAnimation("BossBirdBaseMove", "BossBirdBaseMove.gltf", "Resources/Animations/Boss/BossBirdBaseMove");
-	animationManager_->RegisterAnimation("BossBirdScream", "BossBird_Screamgltf.gltf", "Resources/Animations/Boss/BossBirdScream");
-	animationManager_->RegisterAnimation("BossBirdRush", "BossBirdRush.gltf", "Resources/Animations/Boss/BossBirdRush");
-	animationManager_->RegisterAnimation("BossBirdIceBreath", "BossBird_IceBreath.gltf", "Resources/Animations/Boss/BossBirdIceBreath");
-	animationManager_->RegisterAnimation("BossBirdAppearance", "BossBird_Screamgltf.gltf", "Resources/Animations/Boss/BossBirdAppearance");
-	animationManager_->RegisterAnimation("BossBirdShootDown", "ShootDown_Animation.gltf", "Resources/Animations/Boss/BossBirdShootDown");
-
-	// 音声データを全てロードする
-	AudioManager::GetInstance().LoadAllAudio();
-
-	// エフェクトデータを全てロードする
-	effectsManager_->Initialize();
+	{
+		ScopedTimer t("Effects");
+		// エフェクトデータを全てロードする
+		effectsManager_->Initialize();
+	}
 }
 
 void ResourceSubsystem::Finalize() {
