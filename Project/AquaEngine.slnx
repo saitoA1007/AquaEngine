@@ -6,7 +6,7 @@
     <Platform Name="x64" />
   </Configurations>
   <Folder Name="/ソリューション項目/">
-    <File Path="../setup.bat" />
+    <File Path="../FilterOrganization.bat" />
     <File Path=".editorconfig" />
   </Folder>
   <Project Path="AquaEngine.vcxproj" Id="02fe7fa0-08ec-4c82-b42f-ee759773a63c" />
