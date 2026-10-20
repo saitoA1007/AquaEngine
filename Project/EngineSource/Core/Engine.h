@@ -53,11 +53,11 @@ namespace GameEngine {
         // 計測から除外する最初のフレーム数
         const int kWarmUpIgnoreFrames = 10;
         // 安定とみなすのに必要な連続フレーム数
-        const int kRequiredStableFrames = 60;
+        const int kRequiredStableFrames = 30;
         // 安定とみなす1フレームの最大時間
-        const float kStableFrameTime = 1.0f / 60.0f;
+        const float kStableFrameTime = 1.0f / 55.0f;
         // 安定しなくても表示するまでの最大待ち時間
-        const std::chrono::seconds kWarmUpTimeout{ 2 };
+        const std::chrono::seconds kWarmUpTimeout{ 1 };
 
     private:
         void Initialize(HINSTANCE hInstance);

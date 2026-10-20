@@ -227,7 +227,8 @@ bool Engine::WarmUp() {
 
         // 安定しない環境でも一定時間で表示する
         if (now - startTime >= kWarmUpTimeout) {
-            LogManager::GetInstance().Log("WarmUp timeout");
+            //LogManager::GetInstance().Log("WarmUp timeout");
+            LogManager::GetInstance().Log("WarmUp frame " + std::to_string(frameCount) + " : " + std::to_string(frameTime * 1000.0f) + " ms");
             break;
         }
     }
