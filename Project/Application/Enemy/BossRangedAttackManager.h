@@ -4,11 +4,13 @@
 #include "Model.h"
 #include "Application/Enemy/RangedAttack/WindAttack.h"
 
+// 前方宣言
 namespace GameEngine {
 	class TextureManager;
 	class Camera;
 	class ParticleBehavior;
 }
+class IceFall;
 
 class BossRangedAttackManager : public GameEngine::IGameObject {
 public:
@@ -57,4 +59,7 @@ private:
 
 	// 突進パーティクル
 	GameEngine::ParticleBehavior* rushParticle_ = nullptr;
+
+	// 氷柱攻撃
+	std::vector<IceFall*> iceFalls_;
 };

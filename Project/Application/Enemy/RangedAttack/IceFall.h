@@ -27,6 +27,9 @@ public:
 		isBreak_ = isBreak;
 	}
 
+	// 出現させる
+	void Start(Vector3 pos);
+
 private:
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;
@@ -45,9 +48,6 @@ private:
 
 	// 現在のhp
 	int32_t currentHp_ = 1;
-
-	// 生存フラグ
-	bool isAlive_ = true;
 
 	// 球の当たり判定
 	GameEngine::SphereCollider collider_;

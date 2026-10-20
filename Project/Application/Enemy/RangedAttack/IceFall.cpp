@@ -9,12 +9,11 @@ IceFall::IceFall(GameEngine::Model* model, GameEngine::Model* fractureModel, Vec
 	iceFallCurrentNum_(iceFallCurrentNum),
 	destructibleObject_("IceFall", fractureModel, static_cast<uint32_t>(CollisionTypeID::kIceFall), kCollisionAttributeEnemy) {
 
-	// 現在数を増やす
-	iceFallCurrentNum_ += 1;
+	// 設定だけするので有効フラグはオフにする
+	isActive_ = false;
 
-	// 位置を設定
-	//modelComponent_.worldTransform_.transform_.translate = pos;
-	destructibleObject_.worldTransform_.transform_.translate = pos;
+	// 初期位置を設定
+	destructibleObject_.worldTransform_.transform_.translate = Vector3(0.0f,0.0f,0.0f);
 
 	// 当たり判定を無効
 	destructibleObject_.SetIsColliderActive(false);
@@ -71,14 +70,17 @@ void IceFall::Update() {
 	// 破片の更新処理
 	destructibleObject_.Update();
 
-	//if (isBreak_) {
-	//	timer_ += FpsCounter::gameDeltaTime / 2.0f;
-	//
-	//	// 削除する
-	//	if (timer_ >= 1.0f) {
-	//		Destroy();
-	//	}
-	//}
+	if (isBreak_) {
+		timer_ += FpsCounter::gameDeltaTime / 2.0f;
+	
+		// 削除する
+		if (timer_ >= 1.0f) {
+			isActive_ = false;
+			isBreak_ = false;
+			timer_ = 0.0f;
+			iceFallCurrentNum_ -= 1;
+		}
+	}
 }
 
 void IceFall::Draw() {
@@ -95,6 +97,13 @@ void IceFall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResul
 	//destructibleObject_.craterRadius_ = 100.0f;
 	//
 	//destructibleObject_.OnCollisionEnter(result);
+}
+
+void IceFall::Start(Vector3 pos) {
+	// 現在数を増やす
+	iceFallCurrentNum_ += 1;
+	destructibleObject_.worldTransform_.transform_.translate = pos;
+	isActive_ = true;
 }
 
 void IceFall::EnterMove() {

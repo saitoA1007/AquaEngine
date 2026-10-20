@@ -3,6 +3,7 @@
 #include "Application/Scene/Register/SetUpScenes.h"
 #include "CrashHandle.h"
 #include "LogManager.h"
+#include "ScopedTimer.h"
 #include "Debug/PixCapture.h"
 
 #pragma comment(lib,"d3d12.lib")
@@ -32,6 +33,7 @@ void Engine::RunEngine(HINSTANCE& hInstance) {
 void Engine::Initialize(HINSTANCE hInstance) {
     SetUnhandledExceptionFilter(ExportDump);
     LogManager::GetInstance().Create();
+    ScopedTimer total("AquaEngine Load Initialize (Total)");
 
     // 重い初期化の前にロードウィンドウを表示する
     loadingWindow_.Show(L"AquaEngine", L"Now_Loading");
@@ -227,7 +229,6 @@ bool Engine::WarmUp() {
 
         // 安定しない環境でも一定時間で表示する
         if (now - startTime >= kWarmUpTimeout) {
-            //LogManager::GetInstance().Log("WarmUp timeout");
             LogManager::GetInstance().Log("WarmUp frame " + std::to_string(frameCount) + " : " + std::to_string(frameTime * 1000.0f) + " ms");
             break;
         }
