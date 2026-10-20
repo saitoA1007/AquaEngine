@@ -173,6 +173,7 @@ namespace GameEngine {
 
 		const std::vector<std::unique_ptr<Mesh>>& GetMeshes() const { return meshes_; }
 		Material* GetMaterial(const std::string& name) const;
+		std::unordered_map<std::string, std::unique_ptr<Material>>& GetMaterials() { return materials_; }
 
 		// ローカル行列
 		Matrix4x4 GetLocalMatrix() const {return node_.localMatrix;}

@@ -119,6 +119,99 @@ std::unique_ptr<Model> ModelLoader::CreateCylinder(uint32_t cylinderDivide, floa
 	return model;
 }
 
+std::unique_ptr<ModelData> ModelLoader::ParseModel(const std::string& objFilename, const std::string& filename) {
+	return std::make_unique<ModelData>(LoadModelFile(kDirectoryPath_, objFilename, filename));
+}
+
+std::unique_ptr<Model> ModelLoader::BuildModel(const std::string& objFilename, std::unique_ptr<ModelData> parsed) {
+	LogManager::GetInstance().Log("Start create model");
+
+	std::unique_ptr<Model> model = std::make_unique<Model>();
+	ModelData& modelData = *parsed;   // 以降は従来の CreateModel の本体と同じ
+
+	std::unordered_map<std::string, std::vector<MeshData>> chunkMeshesByGroup;
+
+	// メッシュを作成
+	for (uint32_t index = 0; index < modelData.meshes.size(); ++index) {
+
+		// 破壊のチャンクデータであれば1つのデータに詰め込む
+		const auto& meshData = modelData.meshes[index];
+		if (meshData.fractureInfo.has_value()) {
+			chunkMeshesByGroup[meshData.fractureInfo->groupName].push_back(meshData);
+		} else {
+			// 破壊データでなければメッシュを作成
+			std::unique_ptr<Mesh> tmpMesh = std::make_unique<Mesh>();
+			tmpMesh->CreateModelMesh(modelData, index);
+
+			model->AddMesh(std::move(tmpMesh));
+		}
+	}
+
+	// Meshを元にBLASを作成する。アニメーションがあればBLASを更新用に作成
+	model->AddBLAS(cmdList_, modelData.isSkeleton);
+
+	uint32_t materialSrvIndex = 0;
+
+	// マテリアルを作成
+	for (uint32_t index = 0; index < modelData.materials.size(); ++index) {
+		std::unique_ptr<Material> tmpMaterial = std::make_unique<Material>();
+		tmpMaterial->Initialize(modelData.materials[index].color, modelData.materials[index].specularColor, modelData.materials[index].shininess, true);
+		materialSrvIndex = tmpMaterial->GetMaterialSrvIndex();
+
+		// テクスチャ情報があればを取得
+		if (!modelData.materials[index].textureFilePath.empty()) {
+			std::string texPath = std::filesystem::path(modelData.materials[index].textureFilePath).filename().string();
+			//uint32_t textureHandle = textureManager_->GetHandleByName(texPath);
+			//tmpMaterial->SetTextureHandle(textureHandle);
+			//tmpMaterial->SetDefaultTexture(textureHandle);
+			tmpMaterial->SetTextureName(texPath);
+		}
+
+		model->AddMaterial(modelData.materials[index].name, std::move(tmpMaterial));
+	}
+
+	// 破壊のチャンクデータを作成する
+	for (auto& [groupName, chunkMeshes] : chunkMeshesByGroup) {
+		auto packedBuffer = std::make_unique<PackedGeometryBuffer>();
+		packedBuffer->Build(chunkMeshes);
+		packedBuffer->BuildBLAS(cmdList_, materialSrvIndex);
+
+		std::vector<FractureChunkEntry> entries;
+		entries.reserve(chunkMeshes.size());
+		for (const auto& meshData : chunkMeshes) {
+			FractureChunkEntry entry;
+			entry.materialName = meshData.materialName;
+			entry.range = packedBuffer->GetRange(meshData.fractureInfo->chunkId);
+			entry.info = meshData.fractureInfo.value();
+			entries.push_back(std::move(entry));
+		}
+
+		model->AddFractureGroup(groupName, std::move(packedBuffer), std::move(entries));
+	}
+
+	// 外部からモデルをロードした時に必要な情報を取得
+	model->SetLoadModelData(modelData.rootNode);
+
+	// ボーンのデータが存在している場合、読み込む
+	if (modelData.isSkeleton) {
+		LogManager::GetInstance().Log(objFilename + " : Load animationData");
+		// ボーン情報を取得する
+		SkeletonData skeletonBone = CreateSkeleton(modelData.rootNode);
+
+		std::unique_ptr<Skeleton> skeleton = std::make_unique<Skeleton>();
+		skeleton->Create(cmdList_, skeletonBone, modelData);
+
+		model->SetSkeleton(std::move(skeleton));
+	}
+
+	// 参照用バッファを作成
+	model->CreateRefBuffer();
+
+	LogManager::GetInstance().Log("End create model");
+
+	return model;
+}
+
 [[nodiscard]]
 std::unique_ptr<Model> ModelLoader::CreateModel(const std::string& objFilename, const std::string& filename) {
 
@@ -171,9 +264,10 @@ std::unique_ptr<Model> ModelLoader::CreateModel(const std::string& objFilename, 
 		// テクスチャ情報があればを取得
 		if (!modelData.materials[index].textureFilePath.empty()) {
 			std::string texPath = std::filesystem::path(modelData.materials[index].textureFilePath).filename().string();
-			uint32_t textureHandle = textureManager_->GetHandleByName(texPath);
-			tmpMaterial->SetTextureHandle(textureHandle);
-			tmpMaterial->SetDefaultTexture(textureHandle);
+			//uint32_t textureHandle = textureManager_->GetHandleByName(texPath);
+			//tmpMaterial->SetTextureHandle(textureHandle);
+			//tmpMaterial->SetDefaultTexture(textureHandle);
+			tmpMaterial->SetTextureName(texPath);
 		}
 
 		model->AddMaterial(modelData.materials[index].name,std::move(tmpMaterial));

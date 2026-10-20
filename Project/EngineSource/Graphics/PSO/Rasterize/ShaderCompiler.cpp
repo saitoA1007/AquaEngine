@@ -30,7 +30,7 @@ void ShaderCompiler::Initialize(DXC* dxc) {
 Microsoft::WRL::ComPtr<IDxcBlob> ShaderCompiler::CompileShader(Type type, const std::wstring& path) {
 	std::wstring csoPath = GetCsoPath(path);
 
-#ifdef _DEBUG
+#ifdef USE_IMGUI
 	// Debug版ではHLSLが更新されていればコンパイル、なければCSOを読み込む
 	if (!fs::exists(csoPath) || IsHlslNewer(path, csoPath)) {
 		// コンパイルして保存

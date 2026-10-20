@@ -50,6 +50,9 @@ void ResourceSubsystem::LoadAllResources() {
 		gameParamEditor_->LoadFiles();
 	}
 
+	// GPUを使わない処理を先に背景で開始する
+	modelManager_->BeginLoadAllModel();
+
 	{
 		ScopedTimer t("Texture");
 		// 画像データを全てロードする
@@ -64,15 +67,6 @@ void ResourceSubsystem::LoadAllResources() {
 		ScopedTimer t("Font");
 		// フォントデータを全てロードする
 		fontManager_->LoadAllFont();
-	}
-	
-	{
-		ScopedTimer t("Model");
-		// モデルデータを全てロードする
-		modelManager_->RegisterGridPlaneModel("Grid", { 200.0f, 200.0f });
-		modelManager_->RegisterRingModel("Ring", 32, 1.0f, 0.2f);
-		modelManager_->RegisterCylinderModel("Cylinder", 32, 1.0f, 1.0f, 3.0f);
-		modelManager_->LoadAllModel();
 	}
 	
 	{
@@ -105,6 +99,18 @@ void ResourceSubsystem::LoadAllResources() {
 		ScopedTimer t("Effects");
 		// エフェクトデータを全てロードする
 		effectsManager_->Initialize();
+	}
+
+	{
+		ScopedTimer t("Model (wait + build)");
+		// モデルデータを全てロードする
+		modelManager_->FinishLoadAllModel();
+		modelManager_->RegisterGridPlaneModel("Grid", { 200.0f, 200.0f });
+		modelManager_->RegisterRingModel("Ring", 32, 1.0f, 0.2f);
+		modelManager_->RegisterCylinderModel("Cylinder", 32, 1.0f, 1.0f, 3.0f);
+
+		// モデルに実際にテクスチャを適応させる
+		modelManager_->ApplyTexutre(textureManager_.get());
 	}
 }
 

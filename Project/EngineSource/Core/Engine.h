@@ -57,7 +57,7 @@ namespace GameEngine {
         // 安定とみなす1フレームの最大時間
         const float kStableFrameTime = 1.0f / 60.0f;
         // 安定しなくても表示するまでの最大待ち時間
-        const std::chrono::seconds kWarmUpTimeout{ 5 };
+        const std::chrono::seconds kWarmUpTimeout{ 2 };
 
     private:
         void Initialize(HINSTANCE hInstance);

@@ -23,10 +23,22 @@ namespace GameEngine {
     public: // 生成処理
 
         /// <summary>
-        /// OBJファイルからモデルを生成
+        /// gltfやobjファイルからモデルを生成
         /// </summary>
         [[nodiscard]]
         std::unique_ptr<Model> CreateModel(const std::string& objFilename, const std::string& filename);
+
+        /// <summary>
+        /// ファイルを読み込んでCPU上のデータにする
+        /// </summary>
+        [[nodiscard]]
+        std::unique_ptr<ModelData> ParseModel(const std::string& objFilename, const std::string& filename);
+
+        /// <summary>
+        /// パース済みデータからGPUリソースを作ってモデルを組み立てる
+        /// </summary>
+        [[nodiscard]]
+        std::unique_ptr<Model> BuildModel(const std::string& objFilename, std::unique_ptr<ModelData> parsed);
 
         /// <summary>
         /// 球モデルを生成
