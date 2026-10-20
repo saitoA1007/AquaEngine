@@ -268,6 +268,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\3D\Fracture\RuntimeMeshFracturer.cpp" />
     <ClCompile Include="EngineSource\3D\Fracture\FractureDamageController.cpp" />
     <ClCompile Include="EngineSource\Common\CreateBufferResource.cpp" />
+    <ClCompile Include="EngineSource\Common\ParallelFor.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="EngineSource\Core\Engine.cpp" />
     <ClCompile Include="EngineSource\Core\LoadingWIndow.cpp" />
     <ClCompile Include="EngineSource\Core\Objects\GameObjectManager.cpp" />
@@ -716,6 +720,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\3D\Model\ModelLoader.h" />
     <ClInclude Include="EngineSource\3D\Model\ModelManager.h" />
     <ClInclude Include="EngineSource\3D\Fracture\FractureInstance.h" />
+    <ClInclude Include="EngineSource\Common\ParallelFor.h" />
     <ClInclude Include="EngineSource\Common\ScopedTimer.h" />
     <ClInclude Include="EngineSource\Core\Engine.h" />
     <ClInclude Include="EngineSource\Core\EngineContext.h" />

@@ -2,6 +2,7 @@
 #include "ModelManager.h"
 #include <filesystem>
 #include <iostream>
+#include "ParallelFor.h"
 #include "LogManager.h"
 
 using namespace GameEngine;
@@ -11,7 +12,6 @@ ModelManager::~ModelManager() {
 		parseFuture_.wait();
 	}
 	models_.clear();
-	//models_.clear();
 }
 
 void ModelManager::Initialize(ID3D12GraphicsCommandList4* cmdList, TextureManager* textureManager, SrvManager* srvManager) {
