@@ -86,13 +86,7 @@ std::vector<std::wstring> RayLibShaderCompiler::ReflectExportNames(IDxcBlob* blo
 }
 
 std::wstring RayLibShaderCompiler::GetCsoPath(const std::wstring& hlslPath) const {
-    // Debug(-Od)とRelease(-O3)でキャッシュを分ける
-#ifdef USE_IMGUI
-    const wchar_t* suffix = L"_debug.cso";
-#else
-    const wchar_t* suffix = L".cso";
-#endif
-    return csoDirectory_ + fs::path(hlslPath).stem().wstring() + suffix;
+    return csoDirectory_ + fs::path(hlslPath).stem().wstring() + L"_lib.cso";
 }
 
 Microsoft::WRL::ComPtr<IDxcBlob> RayLibShaderCompiler::LoadCso(const std::wstring& csoPath) {

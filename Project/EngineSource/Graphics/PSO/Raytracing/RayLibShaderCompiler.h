@@ -20,8 +20,13 @@ namespace GameEngine {
 	private:
 		DXC* dxc_ = nullptr;
 
-		const std::wstring csoDirectory_ = L"Resources/Shaders/Compiled/Raytracing/";
 		const std::wstring kLibProfile_ = L"lib_6_6";
+
+#ifdef _DEBUG
+		const std::wstring csoDirectory_ = L"Resources/Shaders/Compiled/Debug/";
+#else
+		const std::wstring csoDirectory_ = L"Resources/Shaders/Compiled/Release/";
+#endif
 
 	private:
 
