@@ -13,6 +13,15 @@ namespace GameEngine {
     class Model;
 
 	class ModelLoader final {
+    public:
+        // 1枚の三角形の判定に使う形状情報
+        struct TriangleGeometry {
+            Vector3 p[3];
+            Vector3 normal;
+            float planeDist = 0.0f;
+            bool isDegenerate = false;
+        };
+
 	public:
 		ModelLoader() = default;
 		~ModelLoader() = default;
@@ -164,6 +173,11 @@ namespace GameEngine {
         /// 各チャンクのAABBから、同じグループ内で近接、重なっているチャンク同士を隣接として登録する
         /// </summary>
         void BuildFractureAdjacency(ModelData& modelData, float threshold = kFractureAdjacencyThreshold_);
+
+        /// <summary>
+        /// 各チャンクの三角形が元の外側の表面か、どの隣接チャンクと接している内部の切断面かを判定する
+        /// </summary>
+        void ClassifyFractureFaces(ModelData& modelData, float threshold = kFractureAdjacencyThreshold_);
 
 	};
 }

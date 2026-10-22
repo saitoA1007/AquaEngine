@@ -6,6 +6,7 @@
 #include <vector>
 #include "Model.h"
 #include "FractureBreakState.h"
+#include "FractureStaticMesh.h"
 
 namespace GameEngine {
 
@@ -38,6 +39,13 @@ namespace GameEngine {
 
 		FractureBreakState& GetBreakState() { return breakState_; }
 		const FractureBreakState& GetBreakState() const { return breakState_; }
+
+		// 静的なチャンクを1つにまとめたメッシュ
+		const FractureStaticMesh& GetStaticMesh() const { return staticMesh_; }
+		// 静的なメッシュのレイトレで使用するマテリアルを設定
+		void SetStaticMeshMaterial(uint32_t materialSrvIndex, uint32_t instanceMask) { staticMesh_.SetMaterial(materialSrvIndex, instanceMask); }
+		// 静的なメッシュの変更をGPU側へ反映する。描画の登録前に呼ぶ
+		void FlushStaticMesh() { staticMesh_.FlushIfDirty(); }
 
 	public:
 
@@ -87,6 +95,12 @@ namespace GameEngine {
 		// 破片の状態
 		FractureBreakState breakState_;
 
+		// 静的なチャンクを内部の切断面を除いて1つにまとめたメッシュ
+		FractureStaticMesh staticMesh_;
+
+		// ひびで揺れている、ずれているため、静的なメッシュから外してbreakState_.Intact()で個別に描画しているチャンクのID
+		std::unordered_set<uint32_t> looseChunkIds_;
+
 		// マクロ・マイクロ破片それぞれについて、保持しておくバッチ数の上限
 		size_t kMaxDebrisBatchesPerType_ = 16;
 
@@ -96,7 +110,7 @@ namespace GameEngine {
 		// チャンクごとの蓄積ダメージ
 		std::unordered_map<uint32_t, float> chunkDamage_;
 
-		// chunkIdがbreakState_.Intact()の何番目のインスタンスか
+		// chunkIdがbreakState_.Intact()の何番目のインスタンスか。looseChunkIds_のチャンクだけを持つ
 		std::unordered_map<uint32_t, uint32_t> chunkIndexInIntact_;
 
 		// モデル全体のおおよその中心。ひびを入れるのに使用
@@ -123,8 +137,11 @@ namespace GameEngine {
 		// 衝突方向・めり込み量から、ランタイムカットする球の中心位置を計算する
 		Vector3 ComputeDentCenter(const Vector3& impactPos, const Vector3& impactDirection, float dentRadius) const;
 
-		// 凹んだチャンクを除いたレイトレ用の無傷インスタンスを作り直す
-		void RebuildIntactExcludingDented();
+		// 個別に描画するチャンクのインスタンスと、静的なメッシュを作り直す
+		void RebuildStaticState();
+
+		// 壊れておらず、凹んでもおらず、個別に描画もしていない、静的なメッシュに含めるチャンクか
+		bool IsStaticChunk(uint32_t chunkId) const;
 
 		// 隣接グラフをフラッドフィルして、切り離すチャンク群を選ぶ
 		std::vector<uint32_t> SelectDetachedChunks(uint32_t seedChunkId, float damageRadius, const Vector3& impactPos) const;

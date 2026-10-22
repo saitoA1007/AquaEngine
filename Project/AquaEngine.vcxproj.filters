@@ -423,6 +423,9 @@
     <ClCompile Include="EngineSource\3D\Fracture\FractureInstance.cpp">
       <Filter>EngineSource\3D\Fracture</Filter>
     </ClCompile>
+    <ClCompile Include="EngineSource\3D\Fracture\FractureStaticMesh.cpp">
+      <Filter>EngineSource\3D\Fracture</Filter>
+    </ClCompile>
     <ClCompile Include="EngineSource\3D\Fracture\RuntimeMeshFracturer.cpp">
       <Filter>EngineSource\3D\Fracture</Filter>
     </ClCompile>
@@ -1066,6 +1069,9 @@
       <Filter>EngineSource\3D\Fracture</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\3D\Fracture\FractureInstance.h">
+      <Filter>EngineSource\3D\Fracture</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\3D\Fracture\FractureStaticMesh.h">
       <Filter>EngineSource\3D\Fracture</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\3D\Fracture\RuntimeMeshFracturer.h">

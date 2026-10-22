@@ -7,6 +7,7 @@
 #include "WorldTransform.h"
 #include "WorldTransforms.h"
 #include "FractureInstance.h"
+#include "FractureStaticMesh.h"
 #include "DrawRequest.h"
 #include "MyMath.h"
 using namespace GameEngine;
@@ -408,6 +409,26 @@ void RenderQueue::SubmitRaytracingFracture(Model* model, FractureInstance& fract
             raytracingDrawQueueList_.push_back(std::move(data));
         }
     }
+}
+
+void RenderQueue::SubmitRaytracingFractureStaticMesh(const FractureStaticMesh& staticMesh, WorldTransform& worldTransform) {
+    if (!staticMesh.HasGeometry()) { return; }
+
+    TLASInstanceData data;
+    // blasを登録
+    data.blas = staticMesh.GetBLAS();
+    // 使用するヒットグループを設定
+    data.hitGroupIndexOffset = 1;
+    // 氷のヒットグループを使うため、影レイでも氷として扱う
+    data.instanceMask = staticMesh.GetInstanceMask();
+    // 使用するデータを設定
+    data.instanceID = staticMesh.GetRefIndex();
+    // 静的なチャンクは動かないので、オブジェクトのワールド行列をそのまま使う
+    Matrix4x4 matrix = Matrix4x4::Transpose(worldTransform.GetWorldMatrix());
+    std::memcpy(&data.transform, &matrix, sizeof(float) * 12);
+
+    // データを登録
+    raytracingDrawQueueList_.push_back(std::move(data));
 }
 
 void RenderQueue::SubmitRuntimeCutFragments(FractureInstance& fractureInstance, const GpuResource* material, const float& alpha, const std::string& passName) {

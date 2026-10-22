@@ -13,7 +13,7 @@ IceFall::IceFall(GameEngine::Model* model, GameEngine::Model* fractureModel, Vec
 	isActive_ = false;
 
 	// 初期位置を設定
-	destructibleObject_.worldTransform_.transform_.translate = Vector3(0.0f,0.0f,0.0f);
+	destructibleObject_.worldTransform_.transform_.translate = Vector3(0.0f,100.0f,0.0f);
 
 	// 当たり判定を無効
 	destructibleObject_.SetIsColliderActive(false);

@@ -37,6 +37,8 @@ DestructibleObject::DestructibleObject(std::string name, Model* model, uint32_t 
 	// 破砕状態を初期化
 	damageController_.Initialize(model_);
 	damageController_.SetWorldMatrix(worldTransform_.GetWorldMatrix());
+	// 静的なチャンクをまとめたメッシュにも氷のマテリアルを設定する
+	damageController_.SetStaticMeshMaterial(iceMaterial_.GetMaterialSrvIndex(), static_cast<uint32_t>(RayInstanceMask::kRayMaskIce));
 
 	std::string subGroup = "";
 
@@ -90,7 +92,11 @@ void DestructibleObject::Draw() {
 
 	FractureBreakState& breakState = damageController_.GetBreakState();
 
-	// 事前分割された静的な破片はレイトレで描画
+	// 静的なチャンクは内部の切断面を除いた1つのメッシュとしてレイトレで描画
+	damageController_.FlushStaticMesh();
+	renderQueue_->SubmitRaytracingFractureStaticMesh(damageController_.GetStaticMesh(), worldTransform_);
+
+	// ひびで揺れているチャンクだけ、事前分割された破片のまま個別にレイトレで描画
 	if (breakState.HasIntact()) {
 		renderQueue_->SubmitRaytracingFracture(model_, breakState.Intact(), worldTransform_);
 	}

@@ -9,6 +9,7 @@
 #include "CoreSubsystem.h"
 #include "Animator.h"
 #include "ParticleBehaviorGPU.h"
+#include "FractureStaticMesh.h"
 #include "Debug/PixCapture.h"
 #include "ScopedTimer.h"
 using namespace GameEngine;
@@ -113,6 +114,8 @@ void GraphicsSubsystem::Initialize() {
     Animator::StaticInitialize(graphicsDevice_->GetCommandList(), psoManager_.get());
     // Csパーティクル用
     ParticleBehaviorGPU::StaticInitialize(graphicsDevice_->GetCommandList(), psoManager_.get());
+    // 破壊オブジェクトの静的なメッシュのBLAS構築用
+    FractureStaticMesh::StaticInitialize(graphicsDevice_->GetCommandList());
 }
 
 void GraphicsSubsystem::InitializePSO() {
