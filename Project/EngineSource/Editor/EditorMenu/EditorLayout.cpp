@@ -20,7 +20,7 @@ void EditorLayout::SaveLayout(const std::vector<std::unique_ptr<IEditorWindow>>&
 		return;
 	}
 
-	// ファイルを書き込み用に開く（ファイルが無ければここで生成される）
+	// ファイルを書き込み用に開く
 	std::ofstream file(kFilePath);
 
 	// ファイルオープン失敗
@@ -56,7 +56,7 @@ void EditorLayout::LoadLayout(std::vector<std::unique_ptr<IEditorWindow>>& windo
 		return;
 	}
 
-	// json文字列からjsonのデータ構造に展開（失敗しても例外を投げない）
+	// json文字列からjsonのデータ構造に展開
 	json layoutJson = json::parse(ifs, nullptr, false);
 	// ファイルを閉じる
 	ifs.close();
