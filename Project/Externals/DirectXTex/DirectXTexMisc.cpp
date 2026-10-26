@@ -6,7 +6,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 //
-// http://go.microsoft.com/fwlink/?LinkId=248926
+// https://go.microsoft.com/fwlink/?LinkId=248926
 //-------------------------------------------------------------------------------------
 
 #include "DirectXTexP.h"
@@ -302,7 +302,7 @@ HRESULT DirectX::CopyRectangle(
     // Compute source bytes-per-pixel
     size_t sbpp = BitsPerPixel(srcImage.format);
     if (!sbpp)
-        return E_FAIL;
+        return E_INVALIDARG;
 
     if (sbpp < 8)
     {
@@ -340,7 +340,7 @@ HRESULT DirectX::CopyRectangle(
     // Compute destination bytes-per-pixel (not the same format as source)
     size_t dbpp = BitsPerPixel(dstImage.format);
     if (!dbpp)
-        return E_FAIL;
+        return E_INVALIDARG;
 
     if (dbpp < 8)
     {

@@ -145,12 +145,21 @@ namespace GameEngine {
 
 		const uint32_t& GetMaterialSrvIndex() const { return materialBuffer_.GetSrvIndex(); }
 
+		void SetTextureName(const std::string& name) {
+			textureName_ = name;
+		}
+
+		const std::string& GetTextureName() const { return textureName_; }
+
 	private:
 		// マテリアルデータ
 		StructuredBuffer<MaterialData> materialBuffer_;
 
 		// マテリアルにデータを書き込む
 		MaterialData* materialData_ = nullptr;
+
+		// テクスチャの名前
+		std::string textureName_ = "";
 
 		// テクスチャ情報
 		uint32_t defaultTextureHandle_ = 0;

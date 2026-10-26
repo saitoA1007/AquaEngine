@@ -32,17 +32,10 @@ void FractureDamageController::Initialize(Model* model) {
 	}
 	modelCenter_ = sum / static_cast<float>(chunks.size());
 
-	// 全チャンクが無傷の状態に初期化
-	std::vector<uint32_t> allIds;
-	allIds.reserve(chunks.size());
-	for (const auto& entry : chunks) {
-		allIds.push_back(entry.info.chunkId);
-	}
-
+	// 全チャンクが無傷の状態で、1つの静的なメッシュとして描画する
 	PackedGeometryBuffer* buffer = model_->GetFractureBuffers().at(groupName_).get();
-	breakState_.Intact().Initialize(allIds, *buffer);
-
-	RebuildIntactIndexMap(allIds);
+	staticMesh_.Initialize(buffer);
+	RebuildStaticState();
 }
 
 void FractureDamageController::Update(float deltaTime) {
@@ -99,11 +92,12 @@ void FractureDamageController::UpdateReassembly(float deltaTime) {
 	destroyedChunkIds_.clear();
 	chunkDamage_.clear();
 	crackActiveChunkIds_.clear();
+	looseChunkIds_.clear();
 	breakState_.DentedChunks().clear();
 	breakState_.MacroDebrisBatches().clear();
 
-	// destroyedChunkIds_、凹みが両方とも空になったので、全チャンクで無傷インスタンスが作り直される
-	RebuildIntactExcludingDented();
+	// 壊れた、凹んだ、個別に描画するチャンクが全て空になったので、全チャンクが1つの静的なメッシュに戻る
+	RebuildStaticState();
 
 	isReassembling_ = false;
 }
@@ -174,11 +168,12 @@ void FractureDamageController::ApplyChipDamage(const Vector3& impactPos, float d
 	// まだ切り離すほどではないので、付着させたまま動的に断面を凹ませる
 	CarveAttachedDent(chunkId, impactPos, ratio, craterRadius, craterPlaneCount, impactDirection, penetrationDepth);
 
-	// ひびの揺れエフェクトは、まだ凹んでおらずレイトレのIntact側に残っているチャンクにのみ適用する
+	// ひびを入れるチャンクと、その強さの倍率を集める
+	std::vector<std::pair<uint32_t, float>> crackTargets;
+	// ひびの揺れエフェクトは、まだ凹んでおらずレイトレ側に残っているチャンクにのみ適用する
 	if (!breakState_.HasDentedChunk(chunkId)) {
-		UpdateCrackVisual(chunkId, ratio, damageAmount);
+		crackTargets.push_back({ chunkId, 1.0f });
 	}
-
 	// 隣接チャンクにも弱めのひびを波及させる
 	if (kNeighborCrackFactor_ > 0.0f) {
 		auto it = chunksById_.find(chunkId);
@@ -186,9 +181,22 @@ void FractureDamageController::ApplyChipDamage(const Vector3& impactPos, float d
 			for (uint32_t neighborId : it->second->info.neighborChunkIds) {
 				if (destroyedChunkIds_.count(neighborId)) continue;
 				if (breakState_.HasDentedChunk(neighborId)) continue;
-				UpdateCrackVisual(neighborId, ratio * kNeighborCrackFactor_, damageAmount * kNeighborCrackFactor_);
+				crackTargets.push_back({ neighborId, kNeighborCrackFactor_ });
 			}
 		}
+	}
+
+	// ひびで動くチャンクは静的なメッシュから外し、個別に描画する。作り直しは1回にまとめる
+	bool hasNewLooseChunk = false;
+	for (const auto& [targetId, factor] : crackTargets) {
+		hasNewLooseChunk |= looseChunkIds_.insert(targetId).second;
+	}
+	if (hasNewLooseChunk) {
+		RebuildStaticState();
+	}
+
+	for (const auto& [targetId, factor] : crackTargets) {
+		UpdateCrackVisual(targetId, ratio * factor, damageAmount * factor);
 	}
 }
 
@@ -228,9 +236,9 @@ void FractureDamageController::CarveAttachedDent(uint32_t chunkId, const Vector3
 	dentedInstance.SetParentWorldMatrix(worldMatrix_);
 	dentedInstance.Update();
 
-	// 初めて凹んだチャンクは、レイトレ描画用の無傷インスタンスから除外する
+	// 初めて凹んだチャンクは、レイトレ描画用の静的なメッシュ、個別のインスタンスから除外する
 	if (!wasAlreadyDented) {
-		RebuildIntactExcludingDented();
+		RebuildStaticState();
 	}
 }
 
@@ -245,23 +253,57 @@ Vector3 FractureDamageController::ComputeDentCenter(const Vector3& impactPos, co
 	return dentCenter;
 }
 
-void FractureDamageController::RebuildIntactExcludingDented() {
+void FractureDamageController::RebuildStaticState() {
 	PackedGeometryBuffer* buffer = model_->GetFractureBuffers().at(groupName_).get();
 
-	std::vector<uint32_t> remainingIds;
-	for (const auto& [id, entry] : chunksById_) {
-		if (destroyedChunkIds_.count(id)) { continue; }
-		if (breakState_.HasDentedChunk(id)) { continue; }
-		remainingIds.push_back(id);
+	// 壊れた、凹んだチャンクは別の描画になるので、個別に描画する対象から外す
+	for (auto it = looseChunkIds_.begin(); it != looseChunkIds_.end();) {
+		if (destroyedChunkIds_.count(*it) || breakState_.HasDentedChunk(*it)) {
+			it = looseChunkIds_.erase(it);
+		} else {
+			++it;
+		}
 	}
 
-	if (!remainingIds.empty()) {
-		breakState_.Intact().Initialize(remainingIds, *buffer);
-		RebuildIntactIndexMap(remainingIds);
+	// 作り直してもひびの揺れが途切れないよう、個別に描画していたチャンクの状態を退避しておく
+	std::unordered_map<uint32_t, FractureChunkState> previousStates;
+	auto& previousTransforms = breakState_.Intact().GetTransformDatas();
+	for (const auto& [id, index] : chunkIndexInIntact_) {
+		if (index < previousTransforms.size()) {
+			previousStates[id] = previousTransforms[index];
+		}
+	}
+
+	std::vector<uint32_t> looseIds(looseChunkIds_.begin(), looseChunkIds_.end());
+	std::sort(looseIds.begin(), looseIds.end());
+
+	if (!looseIds.empty()) {
+		breakState_.Intact().Initialize(looseIds, *buffer);
+		RebuildIntactIndexMap(looseIds);
+
+		auto& transforms = breakState_.Intact().GetTransformDatas();
+		for (uint32_t i = 0; i < looseIds.size(); ++i) {
+			auto it = previousStates.find(looseIds[i]);
+			if (it != previousStates.end()) {
+				transforms[i] = it->second;
+			}
+		}
+		breakState_.Intact().Update();
 	} else {
 		breakState_.Intact().Clear();
 		chunkIndexInIntact_.clear();
 	}
+
+	// 残りの静的なチャンクを、内部の切断面を除いた1つのメッシュにまとめる
+	staticMesh_.Rebuild([this](uint32_t chunkId) { return IsStaticChunk(chunkId); });
+}
+
+bool FractureDamageController::IsStaticChunk(uint32_t chunkId) const {
+	if (chunksById_.find(chunkId) == chunksById_.end()) { return false; }
+	if (destroyedChunkIds_.count(chunkId)) { return false; }
+	if (breakState_.HasDentedChunk(chunkId)) { return false; }
+	if (looseChunkIds_.count(chunkId)) { return false; }
+	return true;
 }
 
 void FractureDamageController::ApplyDamage(const Vector3& impactPos, float damageRadius, float craterRadius, int craterPlaneCount,
@@ -341,8 +383,8 @@ void FractureDamageController::ApplyDamage(const Vector3& impactPos, float damag
 	// 直接の破壊でアンカーへの経路が絶たれ、支えを失ったチャンクがあれば併せて崩落させる
 	CollapseUnsupportedChunks();
 
-	// 直接破壊分・崩落分の両方を反映して、無傷インスタンスを1回だけ作り直す
-	RebuildIntactExcludingDented();
+	// 直接破壊分・崩落分の両方を反映して、静的なメッシュを1回だけ作り直す
+	RebuildStaticState();
 }
 
 void FractureDamageController::CollapseUnsupportedChunks() {
@@ -621,9 +663,24 @@ void FractureDamageController::SimulateCrackPhysics() {
 		}
 	}
 
+	bool hasReturnedChunk = false;
 	for (uint32_t id : settledIds) {
 		crackActiveChunkIds_.erase(id);
+
+		// 揺れが収まり、元の位置からのずれも残っていなければ静的なメッシュに戻す
+		auto indexIt = chunkIndexInIntact_.find(id);
+		if (indexIt == chunkIndexInIntact_.end()) {
+			continue;
+		}
+		if (transforms[indexIt->second].crackRestOffset.Length() < kSettleThreshold) {
+			looseChunkIds_.erase(id);
+			hasReturnedChunk = true;
+		}
 	}
 
 	breakState_.Intact().Update();
+
+	if (hasReturnedChunk) {
+		RebuildStaticState();
+	}
 }

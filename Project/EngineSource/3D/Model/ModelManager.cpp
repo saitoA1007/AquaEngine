@@ -2,17 +2,68 @@
 #include "ModelManager.h"
 #include <filesystem>
 #include <iostream>
+#include "ParallelFor.h"
 #include "LogManager.h"
 
 using namespace GameEngine;
 
 ModelManager::~ModelManager() {
+	if (parseFuture_.valid()) {
+		parseFuture_.wait();
+	}
 	models_.clear();
 }
 
 void ModelManager::Initialize(ID3D12GraphicsCommandList4* cmdList, TextureManager* textureManager, SrvManager* srvManager) {
 	// モデル生成システムの初期化
 	loader_.Initialize(cmdList, textureManager, srvManager);
+}
+
+void ModelManager::ApplyTexutre(TextureManager* textureManager) {
+
+	// モデルに存在するテクスチャを実際に適応
+	for (auto& model : models_) {
+		ModelEntryData& data = model.second;
+		auto& materials = data.model->GetMaterials();
+		for (auto& [key, material] : materials) {
+			uint32_t textureHandle = textureManager->GetHandleByName(material->GetTextureName());
+			material->SetTextureHandle(textureHandle);
+			material->SetDefaultTexture(textureHandle);
+		}
+	}
+}
+
+void ModelManager::BeginLoadAllModel() {
+	// ロードするファイル一覧を作る
+	loadFiles_ = EnumerateModelFiles();
+	parsedModels_.clear();
+	parsedModels_.resize(loadFiles_.size());
+
+	// 背景でパース開始
+	parseFuture_ = std::async(std::launch::async, [this] {
+		ParallelFor(loadFiles_.size(), [this](size_t i) {
+			try {
+				parsedModels_[i] = loader_.ParseModel(loadFiles_[i].fileName, loadFiles_[i].folderPath);
+			}
+			catch (...) {
+				parsedModels_[i] = nullptr;
+			}
+			});
+		});
+}
+
+void ModelManager::FinishLoadAllModel() {
+	// パース完了を待つ
+	if (parseFuture_.valid()) { parseFuture_.get(); }
+
+	// GPUリソース作成と登録
+	for (size_t i = 0; i < loadFiles_.size(); ++i) {
+		if (!parsedModels_[i]) { continue; }
+		RegisterModel(loadFiles_[i].fileName,
+			loader_.BuildModel(loadFiles_[i].fileName, std::move(parsedModels_[i])));
+	}
+	parsedModels_.clear();
+	loadFiles_.clear();
 }
 
 void ModelManager::RegisterModel(const std::string& modelFile, const std::string& objFileName) {
@@ -180,57 +231,37 @@ Model* ModelManager::GetNameByModel(const std::string& name) const {
 	return nullptr;
 }
 
-void ModelManager::LoadAllModel() {
+std::vector<ModelManager::ModelFile> ModelManager::EnumerateModelFiles() const {
 	const std::string kDirectoryPath = "Resources/Models";
+	std::vector<ModelFile> files;
+	if (!std::filesystem::exists(kDirectoryPath)) { return files; }
 
-	// ファイルパスがなければ終了
-	if (!std::filesystem::exists(kDirectoryPath)) {
-		return;
-	}
-
-	// 登録する拡張子
 	const std::vector<std::string> allowedExtensions = { ".obj", ".gltf" };
-
-	LogManager::GetInstance().Log("Start Loading All Models from: " + kDirectoryPath);
+	std::unordered_set<std::string> seenNames;
 
 	try {
 		for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(kDirectoryPath)) {
+			if (!dirEntry.is_regular_file()) { continue; }
 
-			if (!dirEntry.is_regular_file()) {
+			const std::string extension = dirEntry.path().extension().string();
+			if (std::find(allowedExtensions.begin(), allowedExtensions.end(), extension) == allowedExtensions.end()) {
 				continue;
 			}
 
-			// 拡張子のチェック
-			std::string extension = dirEntry.path().extension().string();
-			bool isAllowed = false;
-			for (const auto& ext : allowedExtensions) {
-				if (extension == ext) {
-					isAllowed = true;
-					break;
-				}
+			std::string fileName = dirEntry.path().filename().string();
+			if (nameToHandles_.contains(fileName) || !seenNames.insert(fileName).second) {
+				continue;
 			}
 
-			if (isAllowed) {
-				// 拡張子付きファイル名を取得
-				std::string fileName = dirEntry.path().filename().string();
+			auto relativePath = std::filesystem::relative(dirEntry.path(), kDirectoryPath);
+			std::string folderPath = relativePath.parent_path().string();
+			std::replace(folderPath.begin(), folderPath.end(), '\\', '/');
 
-				// 相対パスを取得
-				auto relativePath = std::filesystem::relative(dirEntry.path(), kDirectoryPath);
-
-				// ファイル名を除いた、拡張子が存在するまでのフォルダパスを取得
-				std::string folderPath = relativePath.parent_path().string();
-
-				// Windows環境のバックスラッシュ '\\' を '/' に置換して統一
-				std::replace(folderPath.begin(), folderPath.end(), '\\', '/');
-
-				// 登録
-				RegisterModel(folderPath, fileName);
-			}
+			files.push_back({ folderPath, fileName });
 		}
 	}
 	catch (std::filesystem::filesystem_error& e) {
 		std::cerr << "Filesystem error while loading models: " << e.what() << std::endl;
 	}
-
-	LogManager::GetInstance().Log("End Loading All Models");
+	return files;
 }

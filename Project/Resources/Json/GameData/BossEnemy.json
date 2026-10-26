@@ -78,10 +78,10 @@
         },
         "StatusWeight": {
             "CrossMove": 10,
-            "IceFallAttack": 20,
+            "IceFallAttack": 0,
             "RotateMove": 10,
             "RushAttack": 40,
-            "Wait": 5,
+            "Wait": 10,
             "WindAttack": 20
         },
         "Wait": {

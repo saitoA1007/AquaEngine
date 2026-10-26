@@ -20,12 +20,23 @@ namespace GameEngine {
 	private:
 		DXC* dxc_ = nullptr;
 
-		const std::wstring csoDirectory_ = L"Resources/Shaders/Compiled/";
 		const std::wstring kLibProfile_ = L"lib_6_6";
+
+#ifdef _DEBUG
+		const std::wstring csoDirectory_ = L"Resources/Shaders/Compiled/Debug/";
+#else
+		const std::wstring csoDirectory_ = L"Resources/Shaders/Compiled/Release/";
+#endif
 
 	private:
 
 		// コンパイル済みBlobからエクスポート名を取得
 		std::vector<std::wstring> ReflectExportNames(IDxcBlob* blob);
+
+		std::wstring GetCsoPath(const std::wstring& hlslPath) const;
+
+		Microsoft::WRL::ComPtr<IDxcBlob> LoadCso(const std::wstring& csoPath);
+
+		void SaveCso(const std::wstring& csoPath, IDxcBlob* blob);
 	};
 }

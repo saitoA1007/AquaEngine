@@ -17,6 +17,9 @@ namespace GameEngine {
 		uint32_t indexCount = 0;
 	};
 
+	// 元のモデルの外側の表面を表すfacingChunkId
+	inline constexpr uint32_t kFractureExteriorFace = 0xFFFFFFFF;
+
 	/// <summary>
 	/// 事前分割された破片1つ分のメタデータ
 	/// </summary>
@@ -38,5 +41,8 @@ namespace GameEngine {
 
 		// バウンディングボックス
 		AABB aabb;
+
+		// 三角形ごとに、その面が接している隣接チャンクのID。元の外側の表面ならkFractureExteriorFace
+		std::vector<uint32_t> triangleFacingChunkIds;
 	};
 }

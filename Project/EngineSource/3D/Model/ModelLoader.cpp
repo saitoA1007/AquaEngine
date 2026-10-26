@@ -5,6 +5,7 @@
 #include "LogManager.h"
 #include "MyMath.h"
 #include "Model.h"
+#include "ParallelFor.h"
 
 using namespace GameEngine;
 
@@ -119,6 +120,99 @@ std::unique_ptr<Model> ModelLoader::CreateCylinder(uint32_t cylinderDivide, floa
 	return model;
 }
 
+std::unique_ptr<ModelData> ModelLoader::ParseModel(const std::string& objFilename, const std::string& filename) {
+	return std::make_unique<ModelData>(LoadModelFile(kDirectoryPath_, objFilename, filename));
+}
+
+std::unique_ptr<Model> ModelLoader::BuildModel(const std::string& objFilename, std::unique_ptr<ModelData> parsed) {
+	LogManager::GetInstance().Log("Start create model");
+
+	std::unique_ptr<Model> model = std::make_unique<Model>();
+	ModelData& modelData = *parsed;   // 以降は従来の CreateModel の本体と同じ
+
+	std::unordered_map<std::string, std::vector<MeshData>> chunkMeshesByGroup;
+
+	// メッシュを作成
+	for (uint32_t index = 0; index < modelData.meshes.size(); ++index) {
+
+		// 破壊のチャンクデータであれば1つのデータに詰め込む
+		const auto& meshData = modelData.meshes[index];
+		if (meshData.fractureInfo.has_value()) {
+			chunkMeshesByGroup[meshData.fractureInfo->groupName].push_back(meshData);
+		} else {
+			// 破壊データでなければメッシュを作成
+			std::unique_ptr<Mesh> tmpMesh = std::make_unique<Mesh>();
+			tmpMesh->CreateModelMesh(modelData, index);
+
+			model->AddMesh(std::move(tmpMesh));
+		}
+	}
+
+	// Meshを元にBLASを作成する。アニメーションがあればBLASを更新用に作成
+	model->AddBLAS(cmdList_, modelData.isSkeleton);
+
+	uint32_t materialSrvIndex = 0;
+
+	// マテリアルを作成
+	for (uint32_t index = 0; index < modelData.materials.size(); ++index) {
+		std::unique_ptr<Material> tmpMaterial = std::make_unique<Material>();
+		tmpMaterial->Initialize(modelData.materials[index].color, modelData.materials[index].specularColor, modelData.materials[index].shininess, true);
+		materialSrvIndex = tmpMaterial->GetMaterialSrvIndex();
+
+		// テクスチャ情報があればを取得
+		if (!modelData.materials[index].textureFilePath.empty()) {
+			std::string texPath = std::filesystem::path(modelData.materials[index].textureFilePath).filename().string();
+			//uint32_t textureHandle = textureManager_->GetHandleByName(texPath);
+			//tmpMaterial->SetTextureHandle(textureHandle);
+			//tmpMaterial->SetDefaultTexture(textureHandle);
+			tmpMaterial->SetTextureName(texPath);
+		}
+
+		model->AddMaterial(modelData.materials[index].name, std::move(tmpMaterial));
+	}
+
+	// 破壊のチャンクデータを作成する
+	for (auto& [groupName, chunkMeshes] : chunkMeshesByGroup) {
+		auto packedBuffer = std::make_unique<PackedGeometryBuffer>();
+		packedBuffer->Build(chunkMeshes);
+		packedBuffer->BuildBLAS(cmdList_, materialSrvIndex);
+
+		std::vector<FractureChunkEntry> entries;
+		entries.reserve(chunkMeshes.size());
+		for (const auto& meshData : chunkMeshes) {
+			FractureChunkEntry entry;
+			entry.materialName = meshData.materialName;
+			entry.range = packedBuffer->GetRange(meshData.fractureInfo->chunkId);
+			entry.info = meshData.fractureInfo.value();
+			entries.push_back(std::move(entry));
+		}
+
+		model->AddFractureGroup(groupName, std::move(packedBuffer), std::move(entries));
+	}
+
+	// 外部からモデルをロードした時に必要な情報を取得
+	model->SetLoadModelData(modelData.rootNode);
+
+	// ボーンのデータが存在している場合、読み込む
+	if (modelData.isSkeleton) {
+		LogManager::GetInstance().Log(objFilename + " : Load animationData");
+		// ボーン情報を取得する
+		SkeletonData skeletonBone = CreateSkeleton(modelData.rootNode);
+
+		std::unique_ptr<Skeleton> skeleton = std::make_unique<Skeleton>();
+		skeleton->Create(cmdList_, skeletonBone, modelData);
+
+		model->SetSkeleton(std::move(skeleton));
+	}
+
+	// 参照用バッファを作成
+	model->CreateRefBuffer();
+
+	LogManager::GetInstance().Log("End create model");
+
+	return model;
+}
+
 [[nodiscard]]
 std::unique_ptr<Model> ModelLoader::CreateModel(const std::string& objFilename, const std::string& filename) {
 
@@ -171,9 +265,10 @@ std::unique_ptr<Model> ModelLoader::CreateModel(const std::string& objFilename, 
 		// テクスチャ情報があればを取得
 		if (!modelData.materials[index].textureFilePath.empty()) {
 			std::string texPath = std::filesystem::path(modelData.materials[index].textureFilePath).filename().string();
-			uint32_t textureHandle = textureManager_->GetHandleByName(texPath);
-			tmpMaterial->SetTextureHandle(textureHandle);
-			tmpMaterial->SetDefaultTexture(textureHandle);
+			//uint32_t textureHandle = textureManager_->GetHandleByName(texPath);
+			//tmpMaterial->SetTextureHandle(textureHandle);
+			//tmpMaterial->SetDefaultTexture(textureHandle);
+			tmpMaterial->SetTextureName(texPath);
 		}
 
 		model->AddMaterial(modelData.materials[index].name,std::move(tmpMaterial));
@@ -542,6 +637,8 @@ ModelData ModelLoader::LoadModelFile(const std::string& directoryPath, const std
 
 	// 破壊チャンクのAABBから隣接関係を構築する
 	BuildFractureAdjacency(modelData);
+	// 隣接関係を元に、三角形ごとの外側の表面、内部の切断面を判定する
+	ClassifyFractureFaces(modelData);
 
 	// シーン全体の階層構造を作る
 	modelData.rootNode = ReadNode(scene->mRootNode);
@@ -713,5 +810,123 @@ void ModelLoader::BuildFractureAdjacency(ModelData& modelData, float threshold) 
 				chunkB->neighborChunkIds.push_back(chunkA->chunkId);
 			}
 		}
+	}
+}
+
+void ModelLoader::ClassifyFractureFaces(ModelData& modelData, float threshold) {
+
+	// 各メッシュの三角形の形状情報を事前に計算しておく
+	std::vector<std::vector<TriangleGeometry>> trianglesByMesh(modelData.meshes.size());
+	// グループ名、チャンクIDからメッシュを引けるようにする
+	std::unordered_map<std::string, std::unordered_map<uint32_t, std::vector<size_t>>> meshIndicesByChunk;
+
+	for (size_t meshIndex = 0; meshIndex < modelData.meshes.size(); ++meshIndex) {
+		const MeshData& meshData = modelData.meshes[meshIndex];
+		if (!meshData.fractureInfo.has_value()) {
+			continue;
+		}
+		meshIndicesByChunk[meshData.fractureInfo->groupName][meshData.fractureInfo->chunkId].push_back(meshIndex);
+
+		auto& triangles = trianglesByMesh[meshIndex];
+		triangles.resize(meshData.indices.size() / 3);
+		for (size_t t = 0; t < triangles.size(); ++t) {
+			TriangleGeometry& tri = triangles[t];
+			for (int i = 0; i < 3; ++i) {
+				const Vector4& pos = meshData.vertices[meshData.indices[t * 3 + i]].position;
+				tri.p[i] = Vector3(pos.x, pos.y, pos.z);
+			}
+			Vector3 cross = Vector3::Cross(tri.p[1] - tri.p[0], tri.p[2] - tri.p[0]);
+			float length = cross.Length();
+			if (length < 1e-10f) {
+				tri.isDegenerate = true;
+				continue;
+			}
+			tri.normal = cross / length;
+			tri.planeDist = tri.normal.Dot(tri.p[0]);
+		}
+	}
+
+	// 法線がほぼ逆向きとみなす内積
+	constexpr float kOppositeNormalDot = -0.98f;
+
+	// pointがtriの上にあるか
+	auto isPointOnTriangle = [threshold](const Vector3& point, const TriangleGeometry& tri) {
+		if (std::abs(tri.normal.Dot(point) - tri.planeDist) > threshold) {
+			return false;
+		}
+		for (int i = 0; i < 3; ++i) {
+			const Vector3& a = tri.p[i];
+			const Vector3& b = tri.p[(i + 1) % 3];
+			Vector3 edge = b - a;
+			// 辺の内側なら正になる。辺の長さで割って距離に直してから許容誤差と比べる
+			float side = Vector3::Cross(edge, point - a).Dot(tri.normal);
+			float edgeLength = edge.Length();
+			if (edgeLength > 1e-10f && side / edgeLength < -threshold) {
+				return false;
+			}
+		}
+		return true;
+		};
+
+	ParallelFor(modelData.meshes.size(), [&](size_t meshIndex) {
+		MeshData& meshData = modelData.meshes[meshIndex];
+		if (!meshData.fractureInfo.has_value()) {
+			return;
+		}
+		FractureChunkInfo& info = meshData.fractureInfo.value();
+		const auto& chunkMeshes = meshIndicesByChunk.at(info.groupName);
+		const auto& triangles = trianglesByMesh[meshIndex];
+
+		info.triangleFacingChunkIds.assign(triangles.size(), kFractureExteriorFace);
+
+		for (size_t t = 0; t < triangles.size(); ++t) {
+			const TriangleGeometry& tri = triangles[t];
+			if (tri.isDegenerate) {
+				continue;
+			}
+			Vector3 centroid = (tri.p[0] + tri.p[1] + tri.p[2]) / 3.0f;
+
+			// 隣接チャンクの中に、同じ平面上で逆向きの三角形が重なっていれば、その隣接チャンクとの切断面
+			bool found = false;
+			for (uint32_t neighborId : info.neighborChunkIds) {
+				auto it = chunkMeshes.find(neighborId);
+				if (it == chunkMeshes.end()) {
+					continue;
+				}
+				for (size_t neighborMeshIndex : it->second) {
+					for (const TriangleGeometry& other : trianglesByMesh[neighborMeshIndex]) {
+						if (other.isDegenerate || tri.normal.Dot(other.normal) > kOppositeNormalDot) {
+							continue;
+						}
+						if (isPointOnTriangle(centroid, other)) {
+							info.triangleFacingChunkIds[t] = neighborId;
+							found = true;
+							break;
+						}
+					}
+					if (found) { break; }
+				}
+				if (found) { break; }
+			}
+		}
+		});
+
+	// 判定結果をログに残す
+	size_t exteriorCount = 0;
+	size_t interiorCount = 0;
+	for (const auto& meshData : modelData.meshes) {
+		if (!meshData.fractureInfo.has_value()) {
+			continue;
+		}
+		for (uint32_t facingId : meshData.fractureInfo->triangleFacingChunkIds) {
+			if (facingId == kFractureExteriorFace) {
+				++exteriorCount;
+			} else {
+				++interiorCount;
+			}
+		}
+	}
+	if (exteriorCount + interiorCount > 0) {
+		LogManager::GetInstance().Log("ClassifyFractureFaces exterior=" + std::to_string(exteriorCount) + " interior=" + std::to_string(interiorCount));
 	}
 }

@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <filesystem>
+#include <memory>
 
 #include "Windows/IEditorWindow.h"
 
@@ -27,6 +29,14 @@ namespace GameEngine {
 	private:
 
 		// ウィンドウレイアウトが保存してあるファイルパス名
-		const std::string& kFilePath = "Resources/Json/DebugData/windowLayout.json";
+		inline static const std::filesystem::path kFilePath = "EngineSource/Resources/Json/windowLayout.json";
+
+	private:
+
+		/// <summary>
+		/// 保存先のフォルダが無ければ生成する
+		/// </summary>
+		/// <returns></returns>
+		static bool EnsureDirectory();
 	};
 }

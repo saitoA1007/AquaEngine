@@ -25,6 +25,12 @@ BossRangedAttackManager::BossRangedAttackManager(GameEngine::GameObjectManager* 
 
     // 風エフェクトを生成
     windAttack_ = objectManager_->AddObject<WindAttack>(iceFallModel_, windParticle);
+
+    // 氷柱をあらかじめ確保しておく
+    iceFalls_.reserve(6);
+    for (int i = 0; i < 6; ++i) {
+        iceFalls_.push_back(objectManager_->AddObject<IceFall>(iceFallModel_, iceFallFractureModel_, Vector3(0.0f,0.0f,0.0f), currentIceFallNum_));
+    }
 }
 
 void BossRangedAttackManager::StartIceFall(float rangeRadius, float minDistance, int iceFallNum, int iceFallMaxNum, int maxIter) {
@@ -68,7 +74,14 @@ void BossRangedAttackManager::StartIceFall(float rangeRadius, float minDistance,
 
     // 求めた位置から氷を生成する
     for (size_t i = 0; i < points.size(); ++i) {
-        objectManager_->AddObject<IceFall>(iceFallModel_, iceFallFractureModel_, Vector3(points[i].x, 0.0f, points[i].y), currentIceFallNum_);
+
+        // 生成
+        for (int i = 0; i < iceFalls_.size(); ++i) {
+            if (!iceFalls_[i]->IsActive()) {
+                iceFalls_[i]->Start(Vector3(points[i].x, 0.0f, points[i].y));
+                break;
+            }
+        }
     }
 }
 

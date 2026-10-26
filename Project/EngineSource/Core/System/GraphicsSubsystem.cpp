@@ -9,6 +9,7 @@
 #include "CoreSubsystem.h"
 #include "Animator.h"
 #include "ParticleBehaviorGPU.h"
+#include "FractureStaticMesh.h"
 #include "Debug/PixCapture.h"
 #include "ScopedTimer.h"
 using namespace GameEngine;
@@ -50,17 +51,22 @@ void GraphicsSubsystem::Initialize() {
     BufferRefResource::StaticInitialize(bufferRefManager_.get(), graphicsDevice_->GetSrvManager()->GetStartSrvIndex(SrvHeapType::Buffer));
 
     {
-        ScopedTimer t("PsoManager");
+        ScopedTimer t("PSO");
 
         // PSO作成
-        InitializePSO();
+        //InitializePSO();
+
+        { ScopedTimer t1("CopyPSO"); InitializePSO(); }
 
         // PSO管理機能の作成
         psoManager_ = std::make_unique<PSOManager>();
         psoManager_->Initialize(graphicsDevice_->GetDevice(), dxc_.get());
-        psoManager_->DefaultLoadPSO();
-        psoManager_->DefaultLoadPostEffectPSO();
-
+        { ScopedTimer t2("DefaultLoadPSO"); psoManager_->DefaultLoadPSO(); }
+        { ScopedTimer t3("PostEffectPSO");  psoManager_->DefaultLoadPostEffectPSO(); }
+        //psoManager_->DefaultLoadPSO();
+        //psoManager_->DefaultLoadPostEffectPSO();
+        
+        ScopedTimer t4("Raytracing");
         // レイトレーシング用のパイプライン
         raytracingPipeline_ = std::make_unique<RaytracingPipeline>();
         raytracingPipeline_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetSrvManager(), dxc_.get());
@@ -108,6 +114,8 @@ void GraphicsSubsystem::Initialize() {
     Animator::StaticInitialize(graphicsDevice_->GetCommandList(), psoManager_.get());
     // Csパーティクル用
     ParticleBehaviorGPU::StaticInitialize(graphicsDevice_->GetCommandList(), psoManager_.get());
+    // 破壊オブジェクトの静的なメッシュのBLAS構築用
+    FractureStaticMesh::StaticInitialize(graphicsDevice_->GetCommandList());
 }
 
 void GraphicsSubsystem::InitializePSO() {

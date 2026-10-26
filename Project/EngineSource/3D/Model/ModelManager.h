@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+#include <future>
 #include <unordered_map>
 #include "ModelLoader.h"
 #include "Model.h"
@@ -14,12 +16,34 @@ namespace GameEngine {
 			std::unique_ptr<Model> model; // モデルデータ
 		};
 
+		// ロードするモデルファイルの情報
+		struct ModelFile {
+			std::string folderPath;
+			std::string fileName;
+		};
+
 	public:
 
 		ModelManager() = default;
 		~ModelManager();
 
 		void Initialize(ID3D12GraphicsCommandList4* cmdList, TextureManager* textureManager, SrvManager* srvManager);
+
+		/// <summary>
+		/// CPUでおこなうgltfやobjファイルからモデル情報を全てロードする
+		/// </summary>
+		void BeginLoadAllModel();
+
+		/// <summary>
+		/// GPUリソース作成と登録
+		/// </summary>
+		void FinishLoadAllModel();
+
+		/// <summary>
+		/// マテリアルで使用するテクスチャのハンドルを取得する
+		/// </summary>
+		/// <param name="textureManager"></param>
+		void ApplyTexutre(TextureManager* textureManager);
 
 		/// <summary>
 		/// モデルデータを登録
@@ -90,11 +114,6 @@ namespace GameEngine {
 		Model* GetNameByModel(const std::string& name) const;
 
 		/// <summary>
-		/// リソースファイルにあるモデルデータを全て取得する
-		/// </summary>
-		void LoadAllModel();
-
-		/// <summary>
 		/// モデルデータ達
 		/// </summary>
 		/// <returns></returns>
@@ -114,5 +133,17 @@ namespace GameEngine {
 
 		// 次のハンドル
 		uint32_t nextHandle_ = 1;
+
+		std::vector<ModelFile> loadFiles_;
+		std::vector<std::unique_ptr<ModelData>> parsedModels_;
+		std::future<void> parseFuture_;
+
+	private:
+
+		/// <summary>
+		/// 読み込むファイル一覧を取得
+		/// </summary>
+		/// <returns></returns>
+		std::vector<ModelFile> EnumerateModelFiles() const;
 	};
 }

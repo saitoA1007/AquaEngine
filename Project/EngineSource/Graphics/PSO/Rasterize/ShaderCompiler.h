@@ -42,7 +42,11 @@ namespace GameEngine {
 		};
 
 		// csoファイルのディレクトリパス
-		const std::wstring csoDirectory_ = L"Resources/Shaders/Compiled/";
+#ifdef _DEBUG
+		const std::wstring csoDirectory_ = L"Resources/Shaders/Compiled/Debug/";
+#else
+		const std::wstring csoDirectory_ = L"Resources/Shaders/Compiled/Release/";
+#endif
 
 		// 生成するファイルパス
 		const std::wstring generatedHlslDirectory_ = L"Resources/Shaders/Material/Generated/";

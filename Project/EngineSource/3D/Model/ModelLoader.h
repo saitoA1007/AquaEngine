@@ -13,6 +13,15 @@ namespace GameEngine {
     class Model;
 
 	class ModelLoader final {
+    public:
+        // 1枚の三角形の判定に使う形状情報
+        struct TriangleGeometry {
+            Vector3 p[3];
+            Vector3 normal;
+            float planeDist = 0.0f;
+            bool isDegenerate = false;
+        };
+
 	public:
 		ModelLoader() = default;
 		~ModelLoader() = default;
@@ -23,10 +32,22 @@ namespace GameEngine {
     public: // 生成処理
 
         /// <summary>
-        /// OBJファイルからモデルを生成
+        /// gltfやobjファイルからモデルを生成
         /// </summary>
         [[nodiscard]]
         std::unique_ptr<Model> CreateModel(const std::string& objFilename, const std::string& filename);
+
+        /// <summary>
+        /// ファイルを読み込んでCPU上のデータにする
+        /// </summary>
+        [[nodiscard]]
+        std::unique_ptr<ModelData> ParseModel(const std::string& objFilename, const std::string& filename);
+
+        /// <summary>
+        /// パース済みデータからGPUリソースを作ってモデルを組み立てる
+        /// </summary>
+        [[nodiscard]]
+        std::unique_ptr<Model> BuildModel(const std::string& objFilename, std::unique_ptr<ModelData> parsed);
 
         /// <summary>
         /// 球モデルを生成
@@ -152,6 +173,11 @@ namespace GameEngine {
         /// 各チャンクのAABBから、同じグループ内で近接、重なっているチャンク同士を隣接として登録する
         /// </summary>
         void BuildFractureAdjacency(ModelData& modelData, float threshold = kFractureAdjacencyThreshold_);
+
+        /// <summary>
+        /// 各チャンクの三角形が元の外側の表面か、どの隣接チャンクと接している内部の切断面かを判定する
+        /// </summary>
+        void ClassifyFractureFaces(ModelData& modelData, float threshold = kFractureAdjacencyThreshold_);
 
 	};
 }

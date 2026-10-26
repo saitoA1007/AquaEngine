@@ -40,8 +40,10 @@ DemoScene::DemoScene() {
 	//auto* testModel = modelManager_->GetNameByModel("sphereShade.obj");
 	//gameObjectManager_->AddObject<Test>(testModel);
 
+	// 破片のテスト
+	auto* testModel_ = modelManager_->GetNameByModel("test.gltf");
 	// 破片のデモ
-	//gameObjectManager_->AddObject<FructureDemo>("FructureDemo", inputCommand_, testModel_);
+	gameObjectManager_->AddObject<FructureDemo>("FructureDemo", inputCommand_, testModel_);
 
 	// PBRのデモ
 	auto* sphereModel = modelManager_->GetNameByModel("sphereShade.obj");

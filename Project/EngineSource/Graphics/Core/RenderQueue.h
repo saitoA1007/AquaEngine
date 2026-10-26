@@ -16,6 +16,8 @@
 
 namespace GameEngine {
 
+    class FractureStaticMesh;
+
     /// <summary>
     /// 溜めた描画コマンドを解放する機能
     /// </summary>
@@ -154,6 +156,9 @@ namespace GameEngine {
 
         // レイトレの破片を描画
         void SubmitRaytracingFracture(Model* model, FractureInstance& fractureInstance, WorldTransform& worldTransform);
+
+        // 静的なチャンクを1つにまとめたメッシュをレイトレで描画
+        void SubmitRaytracingFractureStaticMesh(const FractureStaticMesh& staticMesh, WorldTransform& worldTransform);
 
         void SubmitRuntimeCutFragments(FractureInstance& fractureInstance, const GpuResource* material, const float& alpha = 1.0f, const std::string& passName = "DefaultPass");
 

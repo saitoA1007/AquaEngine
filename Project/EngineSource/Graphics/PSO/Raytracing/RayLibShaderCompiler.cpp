@@ -3,21 +3,30 @@
 #include <cassert>
 #include <d3dcompiler.h>
 
+namespace fs = std::filesystem;
 using namespace GameEngine;
 
 void RayLibShaderCompiler::Initialize(DXC* dxc) {
 	dxc_ = dxc;
-
+    fs::create_directories(csoDirectory_);
 }
 
 LibraryResult RayLibShaderCompiler::CompileShader(const std::wstring& hlslPath) {
 
     LibraryResult result;
+    const std::wstring csoPath = GetCsoPath(hlslPath);
 
-    result.blob = dxc_->CompileShader(hlslPath, kLibProfile_.c_str(), L"");
+    // CSOがあり、HLSLより新しければ読み込む
+    if (fs::exists(csoPath) && fs::last_write_time(hlslPath) <= fs::last_write_time(csoPath)) {
+        result.blob = LoadCso(csoPath);
+    }
+    // なければ、または読み込みに失敗したらコンパイルして保存
+    if (!result.blob) {
+        result.blob = dxc_->CompileShader(hlslPath, kLibProfile_.c_str(), L"");
+        SaveCso(csoPath, result.blob.Get());
+    }
 
     result.exportNames = ReflectExportNames(result.blob.Get());
-
     return result;
 }
 
@@ -74,4 +83,29 @@ std::vector<std::wstring> RayLibShaderCompiler::ReflectExportNames(IDxcBlob* blo
     }
 
     return names;
+}
+
+std::wstring RayLibShaderCompiler::GetCsoPath(const std::wstring& hlslPath) const {
+    return csoDirectory_ + fs::path(hlslPath).stem().wstring() + L"_lib.cso";
+}
+
+Microsoft::WRL::ComPtr<IDxcBlob> RayLibShaderCompiler::LoadCso(const std::wstring& csoPath) {
+    std::ifstream file(csoPath, std::ios::binary | std::ios::ate);
+    if (!file.is_open()) { return nullptr; }
+    const std::streamsize size = file.tellg();
+    file.seekg(0, std::ios::beg);
+    std::vector<char> buffer(size);
+    if (!file.read(buffer.data(), size)) { return nullptr; }
+
+    Microsoft::WRL::ComPtr<IDxcBlobEncoding> blob;
+    if (FAILED(dxc_->dxcUtils_->CreateBlob(buffer.data(), static_cast<UINT32>(size), CP_ACP, &blob))) {
+        return nullptr;
+    }
+    return blob;
+}
+
+void RayLibShaderCompiler::SaveCso(const std::wstring& csoPath, IDxcBlob* blob) {
+    std::ofstream file(csoPath, std::ios::binary);
+    if (!file.is_open()) { return; }
+    file.write(static_cast<const char*>(blob->GetBufferPointer()), blob->GetBufferSize());
 }

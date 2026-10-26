@@ -41,6 +41,13 @@ namespace GameEngine {
 				packedIndices.insert(packedIndices.end(), meshData.indices.begin(), meshData.indices.end());
 
 				rangesByChunkId_[meshData.fractureInfo->chunkId] = range;
+
+				// 三角形ごとの接している隣接チャンクを、パック後の三角形の並びに合わせて保持する
+				const auto& facingIds = meshData.fractureInfo->triangleFacingChunkIds;
+				size_t triangleCount = meshData.indices.size() / 3;
+				for (size_t t = 0; t < triangleCount; ++t) {
+					triangleFacingChunkIds_.push_back(t < facingIds.size() ? facingIds[t] : kFractureExteriorFace);
+				}
 			}
 
 			// ランタイムカット用に保持しておく
@@ -72,6 +79,37 @@ namespace GameEngine {
 				cpuIndices_.begin() + range.indexOffset + range.indexCount);
 			return frag;
 		}
+
+		/// <summary>
+		/// 静的なチャンクを1つのメッシュとしてまとめて描画するためのインデックスを作る。
+		/// 静的なチャンクの三角形のうち、元の外側の表面か、静的でないチャンクと接している切断面だけを残す
+		/// </summary>
+		/// <param name="isStatic">chunkIdが静的なチャンクか</param>
+		/// <returns>パックされた頂点バッファの先頭を基準にしたインデックス</returns>
+		template <typename IsStaticFunc>
+		std::vector<uint32_t> BuildStaticIndices(IsStaticFunc&& isStatic) const {
+			std::vector<uint32_t> result;
+			for (const auto& [chunkId, range] : rangesByChunkId_) {
+				if (!isStatic(chunkId)) { continue; }
+
+				uint32_t firstTriangle = range.indexOffset / 3;
+				uint32_t triangleCount = range.indexCount / 3;
+				for (uint32_t t = 0; t < triangleCount; ++t) {
+					uint32_t facingId = triangleFacingChunkIds_[firstTriangle + t];
+					if (facingId != kFractureExteriorFace && isStatic(facingId)) { continue; }
+
+					// チャンク内のローカル参照を、パック後の頂点バッファ全体の参照に直す
+					uint32_t indexBase = (firstTriangle + t) * 3;
+					for (uint32_t i = 0; i < 3; ++i) {
+						result.push_back(cpuIndices_[indexBase + i] + range.vertexOffset);
+					}
+				}
+			}
+			return result;
+		}
+
+		// パックされた全頂点数
+		uint32_t GetTotalVertices() const { return vertexBuffer_.GetTotalVertices(); }
 
 		// バッファは1本しかないため、ビューは全チャンクで共有する
 		const D3D12_VERTEX_BUFFER_VIEW& GetVertexBufferView() const { return vertexBuffer_.GetView(); }
@@ -138,6 +176,9 @@ namespace GameEngine {
 		// ランタイムカット用のCPU側コピー
 		std::vector<VertexData> cpuVertices_;
 		std::vector<uint32_t> cpuIndices_;
+
+		// パック後の三角形ごとの、接している隣接チャンクのID。元の外側の表面ならkFractureExteriorFace
+		std::vector<uint32_t> triangleFacingChunkIds_;
 
 		std::unordered_map<uint32_t, std::unique_ptr<BLAS>> chunkBLAS_;
 		std::unordered_map<uint32_t, RefBuffer> chunkRefBuffers_;
