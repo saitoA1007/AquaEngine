@@ -5,7 +5,7 @@ using namespace GameEngine;
 
 GameObjectManager::GameObjectManager() {
     // あらかじめメモリを確保
-    objects_.reserve(100);
+    objects_.reserve(1000);
 }
 
 void GameObjectManager::InitializeAll() {
@@ -15,15 +15,18 @@ void GameObjectManager::InitializeAll() {
 }
 
 void GameObjectManager::UpdateAll() {
-    preSize_ = currentSize_;
-    currentSize_ = objects_.size();
 
     // オブジェクトの更新処理をおこなう
+    isIterating_ = true;
     for (auto& obj : objects_) {
         if (obj->IsActive() && !obj->IsDead()) {
             obj->Update();
         }
     }
+    isIterating_ = false;
+
+    // 更新中に追加されたオブジェクトを反映
+    FlushPendingObjects();
 
     // 削除フラグが立ったオブジェクトを削除
     std::erase_if(objects_, [](const std::unique_ptr<IGameObject>& obj) {
@@ -31,11 +34,12 @@ void GameObjectManager::UpdateAll() {
         });
 
     // ソートをおこなう
-    if (currentSize_ != preSize_) {
-        std::sort(objects_.begin(), objects_.end(),
+    if (needsSort_) {
+        std::stable_sort(objects_.begin(), objects_.end(),
             [](const std::unique_ptr<IGameObject>& a, const std::unique_ptr<IGameObject>& b) {
                 return a->GetUpdateOrder() < b->GetUpdateOrder();
             });
+        needsSort_ = false;
     }
 }
 
@@ -53,4 +57,13 @@ void GameObjectManager::DebugUpdateAll() {
             obj->DebugUpdate();
         }
     }
+}
+
+void GameObjectManager::FlushPendingObjects() {
+    if (pendingObjects_.empty()) { return; }
+    for (auto& obj : pendingObjects_) {
+        objects_.push_back(std::move(obj));
+    }
+    pendingObjects_.clear();
+    needsSort_ = true;
 }
