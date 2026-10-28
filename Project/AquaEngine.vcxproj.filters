@@ -708,6 +708,9 @@
     <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectData.cpp">
       <Filter>EngineSource\Graphics\PostProcess</Filter>
     </ClCompile>
+    <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectGraphLoader.cpp">
+      <Filter>EngineSource\Graphics\PostProcess</Filter>
+    </ClCompile>
     <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectGraphSerializer.cpp">
       <Filter>EngineSource\Graphics\PostProcess</Filter>
     </ClCompile>
@@ -1450,6 +1453,12 @@
       <Filter>EngineSource\Graphics\PostProcess</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectData.h">
+      <Filter>EngineSource\Graphics\PostProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectGraphFormat.h">
+      <Filter>EngineSource\Graphics\PostProcess</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectGraphLoader.h">
       <Filter>EngineSource\Graphics\PostProcess</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectGraphSerializer.h">

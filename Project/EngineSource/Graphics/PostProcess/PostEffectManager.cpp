@@ -1,19 +1,8 @@
 #include "pch.h"
 #include "PostEffectManager.h"
+#include "PostEffectGraphSerializer.h"
 #include "LogManager.h"
 using namespace GameEngine;
-
-namespace {
-    // 重複しない名前を作るヘルプ関数
-    template <class Map>
-    std::string MakeUniqueName(const std::string& base, const Map& existing) {
-        if (!existing.contains(base)) { return base; }
-        for (int i = 1;; ++i) {
-            std::string s = base + "_" + std::to_string(i);
-            if (!existing.contains(s)) { return s; }
-        }
-    }
-}
 
 void PostEffectManager::Initialize(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager, PSOManager* psoManager, RenderPassController* renderPassController) {
     commandList_ = commandList;
@@ -22,18 +11,18 @@ void PostEffectManager::Initialize(ID3D12GraphicsCommandList* commandList, SrvMa
 
     // 使い回し用のパスを生成
     for (auto& name : poolPassNames_) {
-        renderPassController_->AddPass(name);
+        EnsurePass(name);
     }
     // 輝度マスクの描画パスを作成
     EnsurePass("HighLumMaskPass");
 
     // 生成出来るポストエフェクトのタイプを追加する
-    RegisterEffectType<ColorGrading>("ColorGrading", psoManager);
-    RegisterEffectType<HighLumMask>("HighLumMask", psoManager);
-    RegisterEffectType<GaussVertical>("GaussVertical", psoManager);
-    RegisterEffectType<GaussHorizontal>("GaussHorizontal", psoManager);
-    RegisterEffectType<Bloom>("Bloom", psoManager);
-    RegisterEffectType<Dissolve>("Dissolve", psoManager);
+    registry_.RegisterType<ColorGrading>("ColorGrading", psoManager);
+    registry_.RegisterType<HighLumMask>("HighLumMask", psoManager);
+    registry_.RegisterType<GaussVertical>("GaussVertical", psoManager);
+    registry_.RegisterType<GaussHorizontal>("GaussHorizontal", psoManager);
+    registry_.RegisterType<Bloom>("Bloom", psoManager);
+    registry_.RegisterType<Dissolve>("Dissolve", psoManager);
 
     // デフォルトのノードが繋がっている状態
     BuildDefaultGraph();
@@ -43,125 +32,109 @@ void PostEffectManager::Initialize(ID3D12GraphicsCommandList* commandList, SrvMa
 
 void PostEffectManager::Execute() {
     // 削除済みエフェクトの遅延破棄
-    for (auto& r : retired_) { --r.framesLeft; }
-    std::erase_if(retired_, [](const Retired& r) { return r.framesLeft < 0; });
-
+    registry_.Tick();
 
     if (graph_.dirty) { RebuildOrder(); }
 
-    const std::string scenePass = renderPassController_->GetSceneFinalPass();
+    currentPassName_ = ExecuteGraph(renderPassController_->GetSceneFinalPass());
+    renderPassController_->SetPostProcessFinalPass(currentPassName_);
+    renderPassController_->SetPresentPass(currentPassName_);
+}
 
-    constexpr int kSceneRes = 0;
-    std::vector<Resource> resources;
-    resources.push_back({ renderPassController_->GetSrvIndex(scenePass), -1, 0, scenePass });
+std::string PostEffectManager::ExecuteGraph(const std::string& scenePass) {
+    frameResources_.Reset();
+    const int sceneRes = frameResources_.Add({ renderPassController_->GetSrvIndex(scenePass), -1, 0, &scenePass });
 
-    // 出力ピンID,resources添字
-    std::unordered_map<int, int> pinToRes;
-    std::array<bool, kPoolSize> slotBusy{};
-
-    // 今回実行されるノードだけを読み手として数える
-    const std::unordered_set<int> active(executeOrder_.begin(), executeOrder_.end());
-    auto consumers = [&](int outPinId) {
-        int n = 0;
-        for (const Link& l : graph_.links) {
-            if (l.startPinId != outPinId) { continue; }
-            const PostEffectNode* end = graph_.FindNodeByPin(l.endPinId);
-            if (end && active.contains(end->id)) { ++n; }
-        }
-        return n;
-        };
-    auto release = [&](int idx) {
-        Resource& r = resources[idx];
-        if (--r.refCount == 0 && r.poolSlot >= 0) { slotBusy[r.poolSlot] = false; }
-        };
+    stepRes_.assign(executeSteps_.size(), sceneRes);
 
     // 順序構築に失敗したらシーンを出力する
-    std::string finalPass = scenePass;   
+    const std::string* finalPass = &scenePass;
 
-    for (int nodeId : executeOrder_) {
-        PostEffectNode* node = graph_.FindNode(nodeId);
-        if (!node) { continue; }
+    for (size_t i = 0; i < executeSteps_.size(); ++i) {
+        const ExecuteStep& step = executeSteps_[i];
+        PostEffectNode* node = step.node;
 
-        if (node->kind == PostEffectNodeKind::kScene) {
-            pinToRes[node->output.id] = kSceneRes;
-            continue;
-        }
+        if (node->kind == PostEffectNodeKind::kScene) { continue; }
 
         // 入力
-        std::vector<int> inRes;
-        for (const Pin& pin : node->inputs) {
-            const Link* link = graph_.FindLinkToPin(pin.id);
-            auto it = link ? pinToRes.find(link->startPinId) : pinToRes.end();
-            inRes.push_back(it != pinToRes.end() ? it->second : kSceneRes);
+        inRes_.clear();
+        for (int src : step.inputSteps) {
+            inRes_.push_back(src >= 0 ? stepRes_[src] : sceneRes);
         }
 
         if (node->kind == PostEffectNodeKind::kOutput) {
-            finalPass = resources[inRes[0]].passName;
+            finalPass = frameResources_[inRes_[0]].passName;
             continue;
         }
 
         IPostEffect* fx = node->effect;
-        for (uint32_t s = 0; s < inRes.size(); ++s) {
-            fx->SetInputIndex(s, resources[inRes[s]].srvIndex);
+        for (uint32_t s = 0; s < inRes_.size(); ++s) {
+            fx->SetInputIndex(s, frameResources_[inRes_[s]].srvIndex);
         }
 
         // 無効の場合は指定スロットの入力をそのまま抜ける
         if (!fx->IsActive()) {
             const uint32_t pt = fx->GetPassThroughSlot();
-            for (uint32_t s = 0; s < inRes.size(); ++s) {
-                if (s != pt) { release(inRes[s]); }
+            for (uint32_t s = 0; s < inRes_.size(); ++s) {
+                if (s != pt) { frameResources_.Release(inRes_[s]); }
             }
-            resources[inRes[pt]].refCount += consumers(node->output.id) - 1;
-            pinToRes[node->output.id] = inRes[pt];
+            frameResources_[inRes_[pt]].refCount += step.consumers - 1;
+            stepRes_[i] = inRes_[pt];
             continue;
         }
 
-        // 出力先の決定
-        std::string outPass;
+        // 出力先の決定。保存パスが無ければプールから借りる
         int slot = -1;
-        if (!node->passName.empty()) {
-            outPass = node->passName;
-        } else {
-            for (int i = 0; i < (int)kPoolSize; ++i) { if (!slotBusy[i]) { slot = i; break; } }
+        const std::string* outPass = &node->passName;
+        if (outPass->empty()) {
+            slot = frameResources_.AcquireSlot();
             if (slot < 0) {
                 LogManager::GetInstance().Log("PostEffect: プールのRTが不足しています\n");
                 assert(false);
                 continue;
             }
-            slotBusy[slot] = true;
-            outPass = poolPassNames_[slot];
+            outPass = &poolPassNames_[slot];
         }
-        resources.push_back({ renderPassController_->GetSrvIndex(outPass), slot,
-                              consumers(node->output.id), outPass });
-        pinToRes[node->output.id] = (int)resources.size() - 1;
+        stepRes_[i] = frameResources_.Add({ renderPassController_->GetSrvIndex(*outPass), slot, step.consumers, outPass });
 
-        // 描画
-        fx->Update();
-        renderPassController_->PrePass(outPass);
-        renderPassController_->ClearRenderPass(outPass);
-        PreDraw(fx->GetPsoName());
-        fx->Draw(commandList_, srvManager_);
-        renderPassController_->PostPass(outPass);
+        DrawEffect(fx, *outPass);
 
         // 入力の解放
-        for (int idx : inRes) { release(idx); }
+        for (int idx : inRes_) {
+            frameResources_.Release(idx); 
+        }
     }
 
-    currentPassName_ = finalPass;
-    renderPassController_->SetPostProcessFinalPass(currentPassName_);
-    renderPassController_->SetPresentPass(currentPassName_);
+    return *finalPass;
+}
+
+void PostEffectManager::DrawEffect(IPostEffect* fx, const std::string& outPass) {
+    fx->Update();
+    renderPassController_->PrePass(outPass);
+    renderPassController_->ClearRenderPass(outPass);
+    PreDraw(fx->GetPsoName());
+    fx->Draw(commandList_, srvManager_);
+    renderPassController_->PostPass(outPass);
 }
 
 void PostEffectManager::PreDraw(const std::string& psoName) {
-    auto it = psoList_.find(psoName);
-    assert(it != psoList_.end() && "未登録のPSO名です");
+    const DrawPsoData* pso = registry_.FindPso(psoName);
+    assert(pso && "未登録のPSO名です");
 
-    commandList_->SetGraphicsRootSignature(it->second.rootSignature);
-    commandList_->SetPipelineState(it->second.graphicsPipelineState);
+    commandList_->SetGraphicsRootSignature(pso->rootSignature);
+    commandList_->SetPipelineState(pso->graphicsPipelineState);
+}
+
+void PostEffectManager::ResetGraph() {
+    BuildDefaultGraph();
+    executeOrder_.clear();
+    executeSteps_.clear();
 }
 
 void PostEffectManager::BuildDefaultGraph() {
-    graph_ = PostEffectGraph{};  
+    // 古いエフェクトが残ると名前がずれるので全て破棄する
+    registry_.RetireAll();
+    graph_ = PostEffectGraph{};
 
     auto* scene = graph_.AddSceneNode();
     auto* output = graph_.AddOutputNode();
@@ -173,7 +146,7 @@ void PostEffectManager::BuildDefaultGraph() {
     auto* bloom = CreateEffectNode("Bloom");
     auto* grading = CreateEffectNode("ColorGrading");
     auto* dissolve = CreateEffectNode("Dissolve");
-    
+
     // Scene → HighLum → GaussV → GaussH → Bloom(Blur) → Grading → Dissolve → Output
     graph_.AddLink(scene->output.id, highLum->inputs[0].id);
     graph_.AddLink(highLum->output.id, gaussV->inputs[0].id);
@@ -193,215 +166,88 @@ void PostEffectManager::RebuildOrder() {
         // 循環など。前回の有効な順序を使い続ける
         LogManager::GetInstance().Log("PostEffectGraph: 実行順の構築に失敗しました\n");
     }
+    BuildExecuteSteps();
     graph_.dirty = false;
 }
 
-bool PostEffectManager::SaveGraph(const std::string& filePath) {
-    // IPostEffect,effects_ のキー
-    std::unordered_map<const IPostEffect*, std::string> keyOf;
-    for (auto& [key, fx] : effects_) { keyOf[fx.get()] = key; }
+void PostEffectManager::BuildExecuteSteps() {
+    executeSteps_.clear();
 
-    nlohmann::json root;
-    root["version"] = 1;
-    root["nodes"] = nlohmann::json::array();
-    root["links"] = nlohmann::json::array();
+    // 出力ピンID → ステップ添字
+    std::unordered_map<int, int> pinToStep;
+    for (int nodeId : executeOrder_) {
+        PostEffectNode* node = graph_.FindNode(nodeId);
+        if (!node) { continue; }
 
-    for (auto& up : graph_.nodes) {
-        const PostEffectNode* node = up.get();
-        nlohmann::json n;
-        n["id"] = node->id;
-        n["pos"] = nlohmann::json::array({ node->pos.x, node->pos.y });
-
-        switch (node->kind) {
-        case PostEffectNodeKind::kScene:
-            n["kind"] = "Scene";
-            break;
-        case PostEffectNodeKind::kOutput:
-            n["kind"] = "Output";
-            break;
-        case PostEffectNodeKind::kEffect: {
-            auto it = keyOf.find(node->effect);
-            // 未登録のエフェクトは保存しない
-            if (it == keyOf.end()) { continue; }
-            n["kind"] = "Effect";
-            n["type"] = node->typeName;
-            n["name"] = node->name;
-            n["active"] = node->effect->IsActive();
-            n["passName"] = node->passName;
-            nlohmann::json params = nlohmann::json::object();
-            node->effect->SaveParams(params);
-            n["params"] = std::move(params);
-            break;
+        ExecuteStep step;
+        step.node = node;
+        for (const Pin& pin : node->inputs) {
+            const Link* link = graph_.FindLinkToPin(pin.id);
+            auto it = link ? pinToStep.find(link->startPinId) : pinToStep.end();
+            step.inputSteps.push_back(it != pinToStep.end() ? it->second : -1);
         }
-        }
-        root["nodes"].push_back(std::move(n));
+        pinToStep[node->output.id] = static_cast<int>(executeSteps_.size());
+        executeSteps_.push_back(std::move(step));
     }
 
+    // 今回実行されるノードだけを読み手として数える
     for (const Link& l : graph_.links) {
-        const PostEffectNode* from = graph_.FindNodeByPin(l.startPinId);
-        const PostEffectNode* to = graph_.FindNodeByPin(l.endPinId);
-        if (!from || !to) { continue; }
-        int slot = -1;
-        for (size_t i = 0; i < to->inputs.size(); ++i) {
-            if (to->inputs[i].id == l.endPinId) { slot = (int)i; break; }
-        }
-        if (slot < 0) { continue; }
-        root["links"].push_back({ {"from", from->id}, {"to", to->id}, {"slot", slot} });
+        auto it = pinToStep.find(l.startPinId);
+        if (it == pinToStep.end()) { continue; }
+        const PostEffectNode* end = graph_.FindNodeByPin(l.endPinId);
+        const bool endActive = end && std::ranges::any_of(executeSteps_,
+            [&](const ExecuteStep& s) { return s.node == end; });
+        if (endActive) { ++executeSteps_[it->second].consumers; }
     }
+}
 
-    JsonSerializer::SaveToFile(filePath, root);
-    return true;
+void PostEffectManager::FrameResources::Reset() {
+    resources_.clear();
+    slotBusy_.fill(false);
+}
+
+int PostEffectManager::FrameResources::Add(const Resource& r) {
+    resources_.push_back(r);
+    return static_cast<int>(resources_.size()) - 1;
+}
+
+int PostEffectManager::FrameResources::AcquireSlot() {
+    for (int i = 0; i < static_cast<int>(kPoolSize); ++i) {
+        if (!slotBusy_[i]) {
+            slotBusy_[i] = true;
+            return i;
+        }
+    }
+    return -1;
+}
+
+void PostEffectManager::FrameResources::Release(int idx) {
+    Resource& r = resources_[idx];
+    if (--r.refCount == 0 && r.poolSlot >= 0) { slotBusy_[r.poolSlot] = false; }
+}
+
+bool PostEffectManager::SaveGraph(const std::string& filePath) {
+    return PostEffectGraphSerializer::Save(filePath, graph_, registry_);
 }
 
 bool PostEffectManager::LoadGraph(const std::string& filePath) {
-    if (!JsonSerializer::FileExists(filePath)) { return false; }
-
-    const nlohmann::json root = JsonSerializer::LoadFromFile(filePath);
-    if (!root.is_object() || !root.contains("nodes") || !root["nodes"].is_array()) {
-        LogManager::GetInstance().Log("PostEffectGraph: jsonの形式が不正です\n");
-        return false;
-    }
-
-    PostEffectGraph tmp;
-    std::unordered_map<int, PostEffectNode*> idMap;
-    // 今回のロードで作るエフェクト(失敗したらここで破棄される)
-    std::unordered_map<std::string, std::unique_ptr<IPostEffect>> newEffects;
-    std::unordered_set<std::string> usedPasses;
-    std::vector<std::string> passesToCreate;
-    bool hasScene = false, hasOutput = false;
-
-    struct Pending { IPostEffect* fx; bool active; nlohmann::json params; };
-    std::vector<Pending> pending;
-
-    for (const nlohmann::json& n : root["nodes"]) {
-        try {
-            const int oldId = n.at("id").get<int>();
-            const std::string kind = n.at("kind").get<std::string>();
-            PostEffectNode* node = nullptr;
-
-            if (kind == "Scene") {
-                if (hasScene) { continue; }
-                node = tmp.AddSceneNode();
-                hasScene = true;
-            } else if (kind == "Output") {
-                if (hasOutput) { continue; }
-                node = tmp.AddOutputNode();
-                hasOutput = true;
-            } else if (kind == "Effect") {
-                std::string type = n.value("type", std::string());
-                if (type.empty()) {
-                    // version1 互換: "effect": "BloomPass" → "Bloom"
-                    type = n.at("effect").get<std::string>();
-                    if (type.ends_with("Pass")) { type.resize(type.size() - 4); }
-                }
-                auto f = factories_.find(type);
-                if (f == factories_.end()) {
-                    LogManager::GetInstance().Log("PostEffectGraph: 未登録の種類をスキップ: " + type + "\n");
-                    continue;
-                }
-
-                const std::string name = MakeUniqueName(n.value("name", type), newEffects);
-
-                // 保存パス名: 空 = プール。プール名や他ノードと重複するものは無効にする
-                std::string passName = n.value("passName", n.value("persistentPass", std::string()));
-                const bool reserved = std::find(poolPassNames_.begin(), poolPassNames_.end(), passName)
-                    != poolPassNames_.end();
-                if (reserved || (!passName.empty() && !usedPasses.insert(passName).second)) {
-                    passName.clear();
-                } else if (!passName.empty()) {
-                    passesToCreate.push_back(passName);
-                }
-
-                auto fx = f->second();
-                IPostEffect* raw = fx.get();
-                newEffects[name] = std::move(fx);
-                node = tmp.AddEffectNode(type, name, passName, raw);
-                pending.push_back({ raw, n.value("active", raw->IsActive()),
-                    n.contains("params") ? n["params"] : nlohmann::json::object() });
-            } else {
-                continue;
-            }
-
-            if (n.contains("pos") && n["pos"].is_array() && n["pos"].size() == 2
-                && n["pos"][0].is_number() && n["pos"][1].is_number()) {
-                node->pos.x = n["pos"][0].get<float>();
-                node->pos.y = n["pos"][1].get<float>();
-            }
-            // 保存時のID → 新しいノード
-            idMap[oldId] = node;
-
-            // ノードのリンクを繋ぐ
-            if (root.contains("links") && root["links"].is_array()) {
-                int total = 0, loaded = 0;
-                for (const nlohmann::json& l : root["links"]) {
-                    ++total;
-                    try {
-                        const int fromId = l.at("from").get<int>();
-                        const int toId = l.at("to").get<int>();
-                        const int slot = l.at("slot").get<int>();
-
-                        auto s = idMap.find(fromId);
-                        auto e = idMap.find(toId);
-                        if (s == idMap.end() || e == idMap.end()) {
-                            LogManager::GetInstance().Log("PostEffectGraph: リンクのノードが見つかりません from=" + std::to_string(fromId) + " to=" + std::to_string(toId) + "\n");
-                            continue;
-                        }
-
-                        PostEffectNode* from = s->second;
-                        PostEffectNode* to = e->second;
-                        if (from->kind == PostEffectNodeKind::kOutput || slot < 0 || slot >= (int)to->inputs.size()) {
-                            LogManager::GetInstance().Log("PostEffectGraph: リンクのスロットが不正です\n");
-                            continue;
-                        }
-                        if (!tmp.CanConnect(from->output.id, to->inputs[slot].id)) {
-                            LogManager::GetInstance().Log("PostEffectGraph: CanConnectが拒否しました "  + from->name + " -> " + to->name + "\n");
-                            continue;
-                        }
-                        tmp.AddLink(from->output.id, to->inputs[slot].id);
-                        ++loaded;
-                    }
-                    catch (const nlohmann::json::exception&) {
-                        LogManager::GetInstance().Log("PostEffectGraph: リンクの読み込みに失敗しました\n");
-                    }
-                }
-                LogManager::GetInstance().Log("PostEffectGraph: リンク " + std::to_string(loaded) + "/" + std::to_string(total) + " 本を読み込みました\n");
-            }
-        }
-        catch (const nlohmann::json::exception&) {
-            LogManager::GetInstance().Log("PostEffectGraph: ノードの読み込みに失敗しました\n");
-        }
-    }
-
-    if (!hasScene || !hasOutput) {
-        LogManager::GetInstance().Log("PostEffectGraph: Scene/Outputノードがありません\n");
-        return false;
-    }
+    PostEffectGraphSerializer::Loaded loaded;
+    if (!PostEffectGraphSerializer::Load(filePath, registry_, poolPassNames_, loaded)) { return false; }
 
     // ここまで成功したら反映する
-    for (auto& p : pending) {
-        p.fx->SetIsActive(p.active);
-        p.fx->LoadParams(p.params);
-    }
-    for (auto& pass : passesToCreate) { EnsurePass(pass); }
-
-    RetireAllEffects();
-    effects_ = std::move(newEffects);
-    graph_ = std::move(tmp);
+    for (auto& pass : loaded.passesToCreate) { EnsurePass(pass); }
+    registry_.Replace(std::move(loaded.effects));
+    graph_ = std::move(loaded.graph);
     executeOrder_.clear();
+    executeSteps_.clear();
     return true;
 }
 
 PostEffectNode* PostEffectManager::CreateEffectNode(const std::string& typeName, const std::string& name) {
-    auto f = factories_.find(typeName);
-    if (f == factories_.end()) {
-        LogManager::GetInstance().Log("PostEffect: 未登録の種類です: " + typeName + "\n");
-        return nullptr;
-    }
-    const std::string instName = MakeUniqueName(name.empty() ? typeName : name, effects_);
-    auto fx = f->second();
-    IPostEffect* raw = fx.get();
-    effects_[instName] = std::move(fx);
-    return graph_.AddEffectNode(typeName, instName, "", raw);
+    std::string instName;
+    IPostEffect* fx = registry_.Create(typeName, name, instName);
+    if (!fx) { return nullptr; }
+    return graph_.AddEffectNode(typeName, instName, "", fx);
 }
 
 void PostEffectManager::DestroyEffectNode(int nodeId) {
@@ -409,13 +255,8 @@ void PostEffectManager::DestroyEffectNode(int nodeId) {
     if (!node || node->kind != PostEffectNodeKind::kEffect) { return; }
     const std::string name = node->name;
 
-    graph_.RemoveNode(nodeId);   // これで node は無効になる
-
-    auto it = effects_.find(name);
-    if (it != effects_.end()) {
-        retired_.push_back({ std::move(it->second), kRetireFrames });
-        effects_.erase(it);
-    }
+    graph_.RemoveNode(nodeId);
+    registry_.Destroy(name);
 }
 
 void PostEffectManager::SetPersistent(int nodeId, bool enable) {
@@ -429,9 +270,4 @@ void PostEffectManager::SetPersistent(int nodeId, bool enable) {
         // プールに戻す
         node->passName.clear();
     }
-}
-
-void PostEffectManager::RetireAllEffects() {
-    for (auto& [key, fx] : effects_) { retired_.push_back({ std::move(fx), kRetireFrames }); }
-    effects_.clear();
 }

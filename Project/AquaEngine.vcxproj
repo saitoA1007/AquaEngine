@@ -358,6 +358,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Graphics\Core\ResourceGarbageCollector.cpp" />
     <ClCompile Include="EngineSource\Graphics\Debug\PixCapture.cpp" />
     <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectData.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectGraphLoader.cpp" />
     <ClCompile Include="EngineSource\Graphics\PostProcess\PostEffectGraphSerializer.cpp">
       <SubType>
       </SubType>
@@ -815,6 +816,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Graphics\Debug\PixCapture.h" />
     <ClInclude Include="EngineSource\Graphics\Debug\PixMarker.h" />
     <ClInclude Include="EngineSource\Graphics\PostProcess\IPostEffect.h" />
+    <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectGraphFormat.h" />
+    <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectGraphLoader.h" />
     <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectGraphSerializer.h" />
     <ClInclude Include="EngineSource\Graphics\PostProcess\PostEffectRegistry.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.h" />
