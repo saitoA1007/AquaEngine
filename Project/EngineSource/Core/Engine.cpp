@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "Engine.h"
-#include "Application/Scene/Register/SetUpScenes.h"
 #include "CrashHandle.h"
 #include "LogManager.h"
 #include "ScopedTimer.h"
@@ -12,9 +11,9 @@
 
 using namespace GameEngine;
 
-void Engine::RunEngine(HINSTANCE& hInstance) {
+void Engine::RunEngine(HINSTANCE& hInstance, const std::function<void(SceneRegistry&)>& setupScenes) {
     // 初期化
-    Initialize(hInstance);
+    Initialize(hInstance, setupScenes);
     // 非表示のままFPSが安定するまでフレームを回す
     const bool isReady = WarmUp();
     // ゲームウィンドウを表示してからロードウィンドウを閉じる
@@ -30,7 +29,7 @@ void Engine::RunEngine(HINSTANCE& hInstance) {
     Finalize();
 }
 
-void Engine::Initialize(HINSTANCE hInstance) {
+void Engine::Initialize(HINSTANCE hInstance, const std::function<void(SceneRegistry&)>& setupScenes) {
     SetUnhandledExceptionFilter(ExportDump);
     LogManager::GetInstance().Create();
     ScopedTimer total("AquaEngine Load Initialize (Total)");
@@ -71,8 +70,8 @@ void Engine::Initialize(HINSTANCE hInstance) {
     // 初期化をおこなう
     subsystemRegistry_.InitializeAll();
 
-    // シーンを登録する
-    SetupScenes(*scene_->GetSceneRegistry());
+    // ゲーム側のシーンを登録する
+    setupScenes(*scene_->GetSceneRegistry());
     // シーンに各機能を設定
     BuildSceneServices();
     // シーンの初期化
