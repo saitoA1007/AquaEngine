@@ -26,6 +26,12 @@ python -m sphinx -b html docs docs/_build/html
 python -m sphinx_autobuild docs docs/_build/html
 ```
 
+## 公開（GitHub Pages）
+
+`master` ブランチに push すると、`.github/workflows/Docs.yml` がドキュメントをビルドして GitHub Pages に公開します。
+`docs/` か `Project/EngineSource/` が変わったときだけ動きます。
+GitHub の Actions タブから「Docs」を選ぶと、手動でも実行できます。
+
 ## 何をどこに書くか
 
 | 書きたいもの | 書く場所 |
