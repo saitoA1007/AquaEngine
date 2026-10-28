@@ -8,35 +8,35 @@
         {
             "from": 5,
             "slot": 0,
-            "to": 9
+            "to": 8
         },
         {
-            "from": 9,
+            "from": 8,
             "slot": 0,
+            "to": 11
+        },
+        {
+            "from": 11,
+            "slot": 0,
+            "to": 14
+        },
+        {
+            "from": 1,
+            "slot": 1,
             "to": 14
         },
         {
             "from": 14,
             "slot": 0,
-            "to": 20
+            "to": 18
         },
         {
-            "from": 1,
-            "slot": 1,
-            "to": 20
-        },
-        {
-            "from": 20,
+            "from": 18,
             "slot": 0,
-            "to": 29
+            "to": 21
         },
         {
-            "from": 29,
-            "slot": 0,
-            "to": 38
-        },
-        {
-            "from": 38,
+            "from": 21,
             "slot": 0,
             "to": 3
         }
@@ -75,7 +75,7 @@
         },
         {
             "active": true,
-            "id": 9,
+            "id": 8,
             "kind": "Effect",
             "name": "GaussVertical",
             "params": {
@@ -90,7 +90,7 @@
         },
         {
             "active": true,
-            "id": 14,
+            "id": 11,
             "kind": "Effect",
             "name": "GaussHorizontal",
             "params": {
@@ -105,7 +105,7 @@
         },
         {
             "active": true,
-            "id": 20,
+            "id": 14,
             "kind": "Effect",
             "name": "Bloom",
             "params": {
@@ -120,7 +120,7 @@
         },
         {
             "active": true,
-            "id": 29,
+            "id": 18,
             "kind": "Effect",
             "name": "ColorGrading",
             "params": {
@@ -142,7 +142,7 @@
         },
         {
             "active": true,
-            "id": 38,
+            "id": 21,
             "kind": "Effect",
             "name": "Dissolve",
             "params": {

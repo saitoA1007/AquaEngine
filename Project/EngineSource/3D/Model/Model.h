@@ -193,6 +193,9 @@ namespace GameEngine {
 		// 参照用バッファ
 		std::vector<RefBuffer>& GetRefBuffers() {return refBuffers_; }
 
+		// モデルの寸法
+		const Vector3& GetModelSize() const { return modelSize_; }
+
 		// 破壊グループのPackedGeometryBufferを取得
 		const std::unordered_map<std::string, std::unique_ptr<PackedGeometryBuffer>>& GetFractureBuffers() const { return fractureBuffers_; }
 		// 破壊グループのチャンク一覧を取得
@@ -217,6 +220,9 @@ namespace GameEngine {
 		// 破壊オブジェクトのグループ
 		std::unordered_map<std::string, std::unique_ptr<PackedGeometryBuffer>> fractureBuffers_;
 		std::unordered_map<std::string, std::vector<FractureChunkEntry>> fractureChunks_;
+
+		// モデル自体の寸法
+		Vector3 modelSize_ = {0.0f,0.0f,0.0f};
 
 		// Nodeのローカル行列を保持しておく変数
 		Node node_;

@@ -41,6 +41,95 @@ def run_doxygen():
     subprocess.run(["doxygen", "Doxyfile"], cwd=DOCS_DIR, check=True)
 
 
+# EngineSource のフォルダごとの説明(API ページの先頭に表示する)
+#   group : "user" はゲーム制作でよく使うもの、"internal" はエンジン内部の実装
+#   guide : 使い方を説明しているガイドページ
+#   main  : よく使うクラス
+# ここにないフォルダは「エンジン内部」として扱う
+CATEGORY_INFO = {
+    "Scene": {
+        "group": "user",
+        "summary": "シーンの作成・登録・切り替えを行う機能です。",
+        "guide": "guide/scene",
+        "main": ["GameEngine::IScene", "GameEngine::SceneRegistry", "ITransitionEffect"],
+    },
+    "Core": {
+        "group": "user",
+        "summary": "エンジン本体と、ゲームオブジェクトの基底クラス・管理クラスです。",
+        "guide": "guide/game_object",
+        "main": ["GameEngine::IGameObject", "GameEngine::GameObjectManager"],
+    },
+    "3D": {
+        "group": "user",
+        "summary": "3D モデル・カメラ・アニメーション・ライト・エフェクトなど、3D の表示に使う機能です。",
+        "guide": "guide/rendering",
+        "main": [
+            "GameEngine::Camera",
+            "GameEngine::WorldTransform",
+            "GameEngine::ModelComponent",
+            "GameEngine::ModelManager",
+            "GameEngine::Animator",
+            "GameEngine::LightManager",
+        ],
+    },
+    "2D": {
+        "group": "user",
+        "summary": "スプライト(画像)とテキストの表示に使う機能です。",
+        "guide": "guide/rendering",
+        "main": ["GameEngine::Sprite", "GameEngine::Text", "GameEngine::FontManager"],
+    },
+    "Input": {
+        "group": "user",
+        "summary": "キーボード・マウス・ゲームパッドの入力を受け取る機能です。",
+        "guide": "guide/input",
+        "main": ["GameEngine::InputCommand", "GameEngine::Input"],
+    },
+    "Collision": {
+        "group": "user",
+        "summary": "コライダーによる当たり判定の機能です。",
+        "guide": "guide/collision",
+        "main": [
+            "GameEngine::SphereCollider",
+            "GameEngine::AABBCollider",
+            "GameEngine::OBBCollider",
+            "GameEngine::CollisionResult",
+            "GameEngine::UserData",
+        ],
+    },
+    "Audio": {
+        "group": "user",
+        "summary": "音声(.wav / .mp3)の再生を行う機能です。",
+        "guide": "guide/audio",
+        "main": ["GameEngine::AudioManager"],
+    },
+    "Math": {
+        "group": "user",
+        "summary": "ベクトル・行列などの計算に使う型と関数です。",
+        "main": ["Vector3", "Matrix4x4", "Transform"],
+    },
+    "Editor": {
+        "group": "internal",
+        "summary": "デバッグ用のエディタ(ImGui)です。ゲーム側からは主に DebugParameter を使います。",
+        "guide": "guide/debug_parameter",
+        "main": ["GameEngine::DebugParameter"],
+    },
+    "Graphics": {
+        "group": "internal",
+        "summary": "DirectX 12 を使った描画の内部実装です。ゲーム側からは主に RenderQueue と TextureManager を使います。",
+        "guide": "guide/rendering",
+        "main": ["GameEngine::RenderQueue", "GameEngine::TextureManager"],
+    },
+    "Common": {
+        "group": "internal",
+        "summary": "ログ出力や GPU リソース作成など、エンジン全体で使う補助機能です。",
+    },
+}
+
+API_GROUPS = [
+    ("user", "ゲーム制作でよく使うもの"),
+    ("internal", "エンジン内部"),
+]
+
 # ファイル単位で出力するメンバーの種類と、対応する Breathe ディレクティブ
 _MEMBER_DIRECTIVES = {
     "enum": "doxygenenum",
@@ -106,7 +195,7 @@ def generate_api_pages():
         category = category_dir.name
         categories.append(category)
 
-        lines = [category, "=" * len(category), ""]
+        lines = [category, "=" * len(category), "", *_category_intro(category)]
         for header in headers:
             # Doxygen のXMLはファイル名で管理されるため、ヘッダー名はエンジン内で一意にしておくこと
             directives = entities.get(header.name)
@@ -122,13 +211,34 @@ def generate_api_pages():
         "APIリファレンス",
         "===============",
         "",
-        ".. toctree::",
-        "   :maxdepth: 1",
-        "",
-        *[f"   {c}" for c in categories],
+        "エンジンのクラスや関数の一覧です。使い方の流れは :doc:`/guide/getting_started` から読んでください。",
         "",
     ]
+    for group, caption in API_GROUPS:
+        members = [c for c in categories if CATEGORY_INFO.get(c, {}).get("group", "internal") == group]
+        if not members:
+            continue
+        index_lines += [caption, "-" * (len(caption) * 2), ""]
+        for c in members:
+            summary = CATEGORY_INFO.get(c, {}).get("summary", "")
+            index_lines += [f"- :doc:`{c}` … {summary}" if summary else f"- :doc:`{c}`"]
+        index_lines += ["", ".. toctree::", "   :hidden:", "", *[f"   {c}" for c in members], ""]
     _write_if_changed(API_DIR / "index.rst", "\n".join(index_lines))
+
+
+def _category_intro(category):
+    """カテゴリページの先頭に置く説明文(rst の行リスト)"""
+    info = CATEGORY_INFO.get(category)
+    if not info:
+        return []
+    lines = [info["summary"], ""]
+    if "guide" in info:
+        lines += [f"使い方は :doc:`/{info['guide']}` を見てください。", ""]
+    if info.get("main"):
+        lines += ["**よく使うクラス**", ""]
+        lines += [f"- :cpp:any:`{name}`" for name in info["main"]]
+        lines += [""]
+    return lines
 
 
 def _write_if_changed(path, text):

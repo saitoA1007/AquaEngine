@@ -71,22 +71,8 @@ void ResourceSubsystem::LoadAllResources() {
 	
 	{
 		ScopedTimer t("Animation");
-		// アニメーションデータをロード
-		animationManager_->RegisterAnimation("Walk", "walk.gltf", "Resources/Models/Walk");
-
-		// プレイヤーのアニメーションデータを読み込む
-		animationManager_->RegisterAnimation("PlayerWalk", "PlayerWalk.gltf", "Resources/Animations/Player/PlayerWalk");
-		animationManager_->RegisterAnimation("PlayerAirMove", "PlayerAirMove.gltf", "Resources/Animations/Player/PlayerAirMove");
-		animationManager_->RegisterAnimation("PlayerRush", "PlayerRush.gltf", "Resources/Animations/Player/PlayerRush");
-		animationManager_->RegisterAnimation("PlayerDownAttack", "DownAttack.gltf", "Resources/Animations/Player/PlayerDownAttack");
-
-		// ボスのアニメーションデータを読み込む
-		animationManager_->RegisterAnimation("BossBirdBaseMove", "BossBirdBaseMove.gltf", "Resources/Animations/Boss/BossBirdBaseMove");
-		animationManager_->RegisterAnimation("BossBirdScream", "BossBird_Screamgltf.gltf", "Resources/Animations/Boss/BossBirdScream");
-		animationManager_->RegisterAnimation("BossBirdRush", "BossBirdRush.gltf", "Resources/Animations/Boss/BossBirdRush");
-		animationManager_->RegisterAnimation("BossBirdIceBreath", "BossBird_IceBreath.gltf", "Resources/Animations/Boss/BossBirdIceBreath");
-		animationManager_->RegisterAnimation("BossBirdAppearance", "BossBird_Screamgltf.gltf", "Resources/Animations/Boss/BossBirdAppearance");
-		animationManager_->RegisterAnimation("BossBirdShootDown", "ShootDown_Animation.gltf", "Resources/Animations/Boss/BossBirdShootDown");
+		// AnimationsRegister.jsonに登録されたアニメーションデータを全てロードする
+		animationManager_->LoadAllAnimation();
 	}
 	
 	{

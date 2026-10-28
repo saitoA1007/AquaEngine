@@ -2,6 +2,7 @@
 #include "AnimationManager.h"
 
 #include "ModelLoader.h"
+#include "JsonSerializer.h"
 using namespace GameEngine;
 
 AnimationManager::~AnimationManager() {
@@ -60,6 +61,24 @@ const std::map<std::string, AnimationData>& AnimationManager::GetNameByAnimation
 	return getAnimations->second;
 }
 
-void AnimationManager::LoadAllModel() {
+void AnimationManager::LoadAllAnimation() {
 
+	// 登録ファイルが無い場合は何も読み込まない
+	if (!JsonSerializer::FileExists(kRegisterFilePath)) {
+		return;
+	}
+
+	// 登録ファイルを読み込む
+	const nlohmann::json root = JsonSerializer::LoadFromFile(kRegisterFilePath);
+	if (!root.is_object()) {
+		return;
+	}
+
+	// <登録名> : { "file": ファイル名, "directory": ディレクトリ } の形式で登録する
+	for (const auto& [registerName, entry] : root.items()) {
+		if (!entry.contains("file") || !entry.contains("directory")) {
+			continue;
+		}
+		RegisterAnimation(registerName, entry["file"].get<std::string>(), entry["directory"].get<std::string>());
+	}
 }

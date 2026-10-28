@@ -41,11 +41,14 @@ namespace GameEngine {
 		const std::map<std::string, AnimationData>& GetNameByAnimations(const std::string& name) const;
 
 		/// <summary>
-		/// リソースファイルにあるモデルデータを全て取得する
+		/// 登録ファイル(AnimationsRegister.json)に記載されたアニメーションデータを全て読み込む
 		/// </summary>
-		void LoadAllModel();
+		void LoadAllAnimation();
 
 	private:
+		// アニメーションの登録ファイルのパス
+		static inline const std::string kRegisterFilePath = "Resources/Animations/AnimationsRegister.json";
+
 		AnimationManager(AnimationManager&) = delete;
 		AnimationManager& operator=(AnimationManager&) = delete;
 

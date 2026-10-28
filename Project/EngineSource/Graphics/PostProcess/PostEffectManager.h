@@ -1,34 +1,19 @@
 #pragma once
-#include <functional>
+#include <array>
+#include <unordered_set>
 #include "ConstantBuffer.h"
 #include "SrvManager.h"
 #include "PSO/Core/PSOManager.h"
 #include "RenderPass/RenderPassController.h"
 #include "IPostEffect.h"
 #include "PostEffectData.h"
+#include "PostEffectRegistry.h"
 #include "NodeSystem/PostEffectGraph.h"
 #include "JsonSerializer.h"
 
 namespace GameEngine {
 
 	class PostEffectManager {
-	public:
-		// ポストエフェクトタイプ
-		enum class PostEffectType {
-			kBloom,
-			kVignetting,
-			kRadialBlur,
-
-			kMaxCount,
-		};
-
-		struct Resource {
-			uint32_t srvIndex = 0;
-			int poolSlot = -1;
-			int refCount = 0;
-			std::string passName; // 実際に描かれたパス名
-		};
-
 	public:
 
 		// 初期化処理
@@ -37,44 +22,23 @@ namespace GameEngine {
 		// 描画コマンドの解放
 		void Execute();
 
-		// エフェクトの種類を登録する
-		template <class T>
-		void RegisterEffectType(const std::string& typeName, PSOManager* psoManager) {
-			RegisterPSO(typeName, psoManager);
-			factories_[typeName] = [typeName]() {
-				auto e = std::make_unique<T>();
-				e->Register(0, typeName);
-				return e;
-				};
-		}
+	public:
 
 		template <class T>
 		T* GetPostEffect(const std::string& name) {
-			auto it = effects_.find(name);
-			if (it != effects_.end()) {
-				return dynamic_cast<T*>(it->second.get());
-			}
-			return nullptr;
+			return dynamic_cast<T*>(registry_.Find(name));
 		}
 
 		// 追加メニュー用
-		std::vector<std::string> GetEffectTypeNames() const {
-			std::vector<std::string> names;
-			for (auto& [k, v] : factories_) { names.push_back(k); }
-			std::sort(names.begin(), names.end());
-			return names;
-		}
+		std::vector<std::string> GetEffectTypeNames() const { return registry_.GetTypeNames(); }
 
-		const std::unordered_map<std::string, std::unique_ptr<IPostEffect>>& GetEffects() const { return effects_; }
+		const std::unordered_map<std::string, std::unique_ptr<IPostEffect>>& GetEffects() const { return registry_.GetAll(); }
 
 		// ノードデータを受け取る
 		PostEffectGraph& GetGraph() { return graph_; }
 
 		// ノードデータをリセット
-		void ResetGraph() {
-			BuildDefaultGraph();
-			executeOrder_.clear();
-		}
+		void ResetGraph();
 
 		// ノードを作る
 		PostEffectNode* CreateEffectNode(const std::string& typeName, const std::string& name = "");
@@ -97,9 +61,42 @@ namespace GameEngine {
 		static constexpr const char* kGraphFilePath = "Resources/Json/PostEffect/PostEffectGraph.json";
 
 		// 使い回し用のパス
-		static constexpr const uint32_t kPoolSize = 3;
+		static constexpr uint32_t kPoolSize = 3;
 		const std::array<std::string, kPoolSize> poolPassNames_ = {
 			"PostProcess_RT0", "PostProcess_RT1", "PostProcess_RT2"
+		};
+
+	private:
+
+		// 実行順の1ノード分。グラフの構造が変わった時だけ作り直す
+		struct ExecuteStep {
+			PostEffectNode* node = nullptr;
+			std::vector<int> inputSteps; // 各入力の元になるステップ。-1はシーン
+			int consumers = 0;           // 出力を読む実行対象ノードの数
+		};
+
+		// 描画結果1つ分
+		struct Resource {
+			uint32_t srvIndex = 0;
+			int poolSlot = -1;
+			int refCount = 0;
+			const std::string* passName = nullptr; // 実際に描かれたパス名
+		};
+
+		// 1フレーム分の描画結果とプールの空き状況。容量を残して使い回す
+		class FrameResources {
+		public:
+			void Reset();
+			int Add(const Resource& r);
+			Resource& operator[](int idx) { return resources_[idx]; }
+			// 空いているプールのスロットを確保する。無ければ-1
+			int AcquireSlot();
+			// 読み手が居なくなったらプールに返す
+			void Release(int idx);
+
+		private:
+			std::vector<Resource> resources_;
+			std::array<bool, kPoolSize> slotBusy_{};
 		};
 
 	private:
@@ -108,16 +105,9 @@ namespace GameEngine {
 		RenderPassController* renderPassController_ = nullptr;
 
 		std::string currentPassName_ = "";
-		//uint32_t currentPassIndex_ = 0;
 
-		// エフェクトデータ
-		std::unordered_map<std::string, std::unique_ptr<IPostEffect>> effects_;
-
-		// 各エフェクトの生成
-		std::unordered_map<std::string, std::function<std::unique_ptr<IPostEffect>()>> factories_;
-
-		// psoのリスト
-		std::unordered_map<std::string, DrawPsoData> psoList_;
+		// エフェクトの種類、インスタンス、PSOを管理
+		PostEffectRegistry registry_;
 
 		// 作られている描画パスを管理
 		std::unordered_set<std::string> createdPasses_;
@@ -126,18 +116,15 @@ namespace GameEngine {
 		PostEffectGraph graph_;
 		// ノードIDの実行順
 		std::vector<int> executeOrder_;
+		// executeOrder_から作った実行計画
+		std::vector<ExecuteStep> executeSteps_;
 
-		// 削除したエフェクトの遅延破棄
-		static constexpr int kRetireFrames = 3;   // フレームバッファ数以上にする
-		struct Retired { std::unique_ptr<IPostEffect> fx; int framesLeft; };
-		std::vector<Retired> retired_;
+		// 毎フレームの作業領域
+		FrameResources frameResources_;
+		std::vector<int> stepRes_;
+		std::vector<int> inRes_;
 
 	private:
-
-		// psoを登録する
-		void RegisterPSO(const std::string& name, PSOManager* psoManager) {
-			psoList_[name] = psoManager->GetDrawPsoData(name);
-		}
 
 		// 作成していなければ描画パスを作る
 		void EnsurePass(const std::string& name) {
@@ -148,9 +135,14 @@ namespace GameEngine {
 
 		void BuildDefaultGraph();
 		void RebuildOrder();
+		// executeOrder_から入力元と読み手の数を求める
+		void BuildExecuteSteps();
 
-		// 破棄
-		void RetireAllEffects();
+		// グラフを実行して最終的な出力パス名を返す
+		std::string ExecuteGraph(const std::string& scenePass);
+
+		// エフェクトを1つ描画する
+		void DrawEffect(IPostEffect* fx, const std::string& outPass);
 
 		// 文字列キーでPSOをセット
 		void PreDraw(const std::string& psoName);
