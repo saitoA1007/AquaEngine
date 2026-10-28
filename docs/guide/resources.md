@@ -11,7 +11,7 @@
 | 画像 | `Resources/Textures/`（サブフォルダ可） | `.png` `.dds` など | `textureManager_->GetHandleByName("grass.png")` |
 | 音 | `Resources/Sounds/` | `.wav` `.mp3` | `AudioManager::GetInstance().GetHandleByName("se.mp3")` |
 | フォント | `Resources/Text/Generated/` | MSDF フォント（`.json` + `.png`） | `fontManager_->GetFont("フォント名")`（下記参照） |
-| アニメーション | `Resources/Animations/` など | `.gltf` | `animationManager_->GetNameByAnimations("登録名")`（下記参照） |
+| アニメーション | `AnimationsRegister.json` に登録 | `.gltf` | `animationManager_->GetNameByAnimations("登録名")`（下記参照） |
 
 ```{important}
 モデル・画像・音は**ファイル名（拡張子付き）**で管理されます。フォルダが違っても、同じファイル名の素材は2つ目が読み込まれません。
@@ -43,11 +43,24 @@ renderQueue_->SetSkyboxTexture(skyboxGH);
 
 ## アニメーション
 
-アニメーションは自動では読み込まれません。
-`EngineSource/Core/System/ResourceSubsystem.cpp` で、登録名・ファイル名・フォルダを指定して登録します。
+アニメーションは、フォルダに置くだけでは読み込まれません。
+`Resources/Animations/AnimationsRegister.json` に登録すると、起動時に読み込まれます。
 
-```cpp
-animationManager_->RegisterAnimation("PlayerWalk", "PlayerWalk.gltf", "Resources/Animations/Player/PlayerWalk");
+```json
+{
+    "Walk": { "file": "walk.gltf", "directory": "Resources/Models/Walk" },
+    "PlayerWalk": { "file": "PlayerWalk.gltf", "directory": "Resources/Animations/Player/PlayerWalk" }
+}
+```
+
+| 項目 | 内容 |
+|---|---|
+| キー（`"PlayerWalk"` など） | 登録名。コードではこの名前で取り出します |
+| `file` | `.gltf` のファイル名 |
+| `directory` | そのファイルがあるフォルダ（`Project/` からの相対パス） |
+
+```{note}
+`file` か `directory` が書かれていない項目は、エラーにならずに読み飛ばされます。アニメーションが見つからないときは、まずここを確認してください。
 ```
 
 登録したアニメーションは、シーンの中で登録名を使って取り出し、`Animator` で再生します。
