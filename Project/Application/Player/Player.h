@@ -73,9 +73,7 @@ public:
 	}
 
 	// ヒットエフェクトを開始
-	void StartHitEffect(Vector3 pos) {
-		effectManager_->StartHitEffect(pos, playerAttackDownAction_.GetPowerLevel());
-	}
+	void StartHitEffect(Vector3 pos);
 
 private:
 	// actions_が自身のメンバを指すためコピー禁止
@@ -106,6 +104,15 @@ private:
 	// 表示フラグ
 	bool isDraw_ = true;
 
+	// 敵に攻撃した時の揺れの強さ
+	float attackShakeIntensity_ = 0.3f;
+	// 敵に攻撃した時の揺れる時間
+	float attackShakeDuration_ = 0.5f;
+	// ダメージを受けた時の揺れの強さ
+	float damageShakeIntensity_ = 0.3f;
+	// ダメージを受けた時の揺れる時間
+	float damageShakeDuration_ = 0.6f;
+
 private: 
 	// プレイヤー
 	PlayerCommonData commonData_;
@@ -132,6 +139,9 @@ private:
 
 	// 制限
 	void ApplyClamp();
+
+	// ダメージを受ける
+	void TakeDamage(int32_t damage);
 
 	// 回転の更新
 	void UpdateRotation();

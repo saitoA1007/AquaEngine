@@ -68,7 +68,7 @@ GameScene::GameScene() {
 	player->SetCamera(cameraController_);
 
 	// ステージ
-	gameObjectManager_->AddObject<StageManager>(gameObjectManager_, modelManager_, textureManager_);
+	gameObjectManager_->AddObject<StageManager>(gameObjectManager_, modelManager_, textureManager_, cameraController_);
 
 	// 仮の背景の氷オブジェクト。後でオブジェクト設置エディターでマテリアルを変更出来るようにしておく。
 	auto* bgIceRockModel = modelManager_->GetNameByModel("BGIceRock.obj");

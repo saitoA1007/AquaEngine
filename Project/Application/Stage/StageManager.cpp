@@ -5,8 +5,9 @@
 #include "TextureManager.h"
 using namespace GameEngine;
 
-StageManager::StageManager(GameEngine::GameObjectManager* objectManager, GameEngine::ModelManager* modelManager, GameEngine::TextureManager* textureManager) {
+StageManager::StageManager(GameEngine::GameObjectManager* objectManager, GameEngine::ModelManager* modelManager, GameEngine::TextureManager* textureManager, CameraController* camera) {
 	objectManager_ = objectManager;
+	camera_ = camera;
 
 	auto* floorModel = modelManager->GetNameByModel("planeXZ.obj");
 	auto* wallFractureModel = modelManager->GetNameByModel("wallFracture.gltf");
@@ -83,6 +84,7 @@ void StageManager::GenerateWalls() {
 
 		auto* wall = objectManager_->AddObject<Wall>(wallModel_, wallFractureModel_, debugParame_.get());
 		wall->SetParameter(transform);
+		wall->SetCamera(camera_);
 
 		walls_.push_back(wall);
 	}

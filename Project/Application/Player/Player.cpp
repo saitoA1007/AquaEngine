@@ -33,6 +33,14 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model,
 	for (IPlayerAction* action : actions_) {
 		action->RegisterParameter(debugParame_.get());
 	}
+	{
+		std::string subGroup = "CameraShake";
+		int index = 0;
+		debugParame_->Register("AttackShakeIntensity", attackShakeIntensity_, index++, subGroup);
+		debugParame_->Register("AttackShakeDuration", attackShakeDuration_, index++, subGroup);
+		debugParame_->Register("DamageShakeIntensity", damageShakeIntensity_, index++, subGroup);
+		debugParame_->Register("DamageShakeDuration", damageShakeDuration_, index++, subGroup);
+	}
 	debugParame_->Apply();
 
 	// 当たり判定の設定
@@ -239,7 +247,7 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 	// 風による攻撃
 	if (isWind) {
 		// ダメージを受ける
-		playerStatus_.TakeDamage(1);
+		TakeDamage(1);
 	}
 
 	// ボスの衝突判定
@@ -256,8 +264,28 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 			if (commonData_.state != PlayerState::kAttackDown) {
 
 				// ダメージを受ける
-				playerStatus_.TakeDamage(1);
+				TakeDamage(1);
 			}
 		}
+	}
+}
+
+void Player::TakeDamage(int32_t damage) {
+	// 無敵時間中は何もしない
+	if (!playerStatus_.TakeDamage(damage)) { return; }
+
+	// カメラを揺らす
+	if (camera_) {
+		camera_->StartShake(damageShakeIntensity_, damageShakeDuration_);
+	}
+}
+
+void Player::StartHitEffect(Vector3 pos) {
+	uint32_t powerLevel = playerAttackDownAction_.GetPowerLevel();
+	effectManager_->StartHitEffect(pos, powerLevel);
+
+	// 攻撃の強さに応じてカメラを揺らす
+	if (camera_) {
+		camera_->StartShake(attackShakeIntensity_ * static_cast<float>(powerLevel), attackShakeDuration_);
 	}
 }

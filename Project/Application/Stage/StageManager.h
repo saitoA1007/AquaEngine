@@ -11,10 +11,11 @@
 namespace GameEngine {
 	class TextureManager;
 }
+class CameraController;
 
 class StageManager : public GameEngine::IGameObject {
 public:
-	StageManager(GameEngine::GameObjectManager* objectManager, GameEngine::ModelManager* modelManager, GameEngine::TextureManager* textureManager);
+	StageManager(GameEngine::GameObjectManager* objectManager, GameEngine::ModelManager* modelManager, GameEngine::TextureManager* textureManager, CameraController* camera);
 	~StageManager() = default;
 
 	// 初期化処理
@@ -30,6 +31,8 @@ private:
 	GameEngine::GameObjectManager* objectManager_ = nullptr;
 	GameEngine::Model* wallModel_ = nullptr;
 	GameEngine::Model* wallFractureModel_ = nullptr;
+	// カメラ機能
+	CameraController* camera_ = nullptr;
 
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;

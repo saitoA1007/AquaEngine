@@ -1,5 +1,6 @@
 #include "pch.h"
 #define NOMINMAX
+#include <algorithm>
 #include "CameraController.h"
 #include "MyMath.h"
 #include "FPSCounter.h"
@@ -41,6 +42,9 @@ void CameraController::Initialize() {
 	currentTarget_ = targetWorld_->GetWorldPosition();
 	currentTarget_.y = 1.0f;
 
+	// 揺れを停止
+	shakeTimer_ = 1.0f;
+
 	currentStateType_ = CameraState::kFollow;
 	currentState_ = states_[currentStateType_].get();
 	currentState_->Enter();
@@ -79,13 +83,18 @@ void CameraController::Update() {
 	currentFov_ = currentFov_ + (targetFov_ - currentFov_) * actualFovLerp;
 	camera_->SetProjectionMatrix(currentFov_, 1280, 720, 0.1f, 200.0f);
 	
+	// 揺れを加える
+	Vector3 shakeOffset = UpdateShake();
+	Vector3 eye = position_ + shakeOffset;
+	Vector3 target = currentTarget_ + shakeOffset;
+
 	// 回転行列に変換
-	Matrix4x4 rotateMatrix_ = LookAt(position_, currentTarget_, { 0.0f,1.0f,0.0f });
+	Matrix4x4 rotateMatrix_ = LookAt(eye, target, { 0.0f,1.0f,0.0f });
 	// ワールド行列
 	Matrix4x4 worldMatrix_ = rotateMatrix_;
-	worldMatrix_.m[3][0] = position_.x;
-	worldMatrix_.m[3][1] = position_.y;
-	worldMatrix_.m[3][2] = position_.z;
+	worldMatrix_.m[3][0] = eye.x;
+	worldMatrix_.m[3][1] = eye.y;
+	worldMatrix_.m[3][2] = eye.z;
 	
 	// ワールド行を設定
 	camera_->SetWorldMatrix(worldMatrix_);
@@ -97,6 +106,29 @@ void CameraController::ChangeState(CameraState next) {
 	currentStateType_ = next;
 	currentState_ = states_[currentStateType_].get();
 	currentState_->Enter();
+}
+
+void CameraController::StartShake(float intensity, float duration) {
+	// 揺れ中であれば強い方を優先する
+	float t = std::clamp(shakeTimer_, 0.0f, 1.0f);
+	float currentIntensity = shakeIntensity_ * (1.0f - t);
+	if (intensity < currentIntensity) { return; }
+
+	shakeIntensity_ = intensity;
+	shakeDuration_ = duration;
+	shakeTimer_ = 0.0f;
+}
+
+Vector3 CameraController::UpdateShake() {
+	if (shakeTimer_ >= 1.0f || shakeDuration_ <= 0.0f) { return { 0.0f,0.0f,0.0f }; }
+
+	shakeTimer_ += FpsCounter::deltaTime / shakeDuration_;
+	float t = std::clamp(shakeTimer_, 0.0f, 1.0f);
+	// 時間経過で減衰
+	float power = shakeIntensity_ * (1.0f - t) * (1.0f - t);
+
+	std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
+	return Vector3(dist(randomEngine_), dist(randomEngine_), dist(randomEngine_)) * power;
 }
 
 Matrix4x4 CameraController::LookAt(const Vector3& eye, const Vector3& center, const Vector3& up) {

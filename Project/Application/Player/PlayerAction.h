@@ -15,10 +15,11 @@ public:
 public:
 
 	// ダメージを受ける
-	void TakeDamage(int32_t damage) {
-		if (isCoolActive_) { return; }
+	bool TakeDamage(int32_t damage) {
+		if (isCoolActive_) { return false; }
 		currentHp_ -= damage;
 		isCoolActive_ = true;
+		return true;
 	}
 
 	// 現在Hp

@@ -1,5 +1,6 @@
 #pragma once
 #include <unordered_map>
+#include <random>
 #include "IGameObject.h"
 #include "Camera.h"
 #include "InputCommand.h"
@@ -46,6 +47,13 @@ public:
 	// 黒帯を表示させるか
 	bool UseLetterBoxUI() const { return currentStateType_ == CameraState::kLockOn; }
 
+	/// <summary>
+	/// カメラシェイクを開始
+	/// </summary>
+	/// <param name="intensity">揺れの強さ</param>
+	/// <param name="duration">揺れる時間</param>
+	void StartShake(float intensity, float duration);
+
 private:
 	GameEngine::InputCommand* inputCommand_ = nullptr;
 	const GameEngine::WorldTransform* targetWorld_ = nullptr;
@@ -76,7 +84,16 @@ private:
 	std::unordered_map<CameraState, std::unique_ptr<ICameraState>> states_;
 	ICameraState* currentState_ = nullptr;
 	CameraState currentStateType_ = CameraState::kFollow;
+
+	// カメラシェイク
+	float shakeIntensity_ = 0.0f;
+	float shakeDuration_ = 0.0f;
+	float shakeTimer_ = 1.0f; // 1.0f以上で停止中
+	std::mt19937 randomEngine_{ std::random_device{}() };
 private:
+
+	// 揺れの量を更新して取得
+	Vector3 UpdateShake();
 
 	// カメラの状態を切り替える
 	void ChangeState(CameraState next);

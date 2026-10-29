@@ -1,10 +1,13 @@
 #include "pch.h"
+#define NOMINMAX
+#include <algorithm>
 #include "Wall.h"
 #include "FPSCounter.h"
 #include "DebugParameter.h"
 #include "Application/CollisionConfig.h"
 #include "Application/Player/Player.h"
 #include "Application/Enemy/BossEnemy.h"
+#include "Application/Camera/CameraController.h"
 using namespace GameEngine;
 
 Wall::Wall(GameEngine::Model* model, GameEngine::Model* fractureModel, GameEngine::DebugParameter* parame) : underWallModelComponent_(model),
@@ -19,6 +22,9 @@ Wall::Wall(GameEngine::Model* model, GameEngine::Model* fractureModel, GameEngin
 	parame_->Register("MaxHp", maxHp_, index++, subGroup);
 	parame_->Register("RespawnTime", respawnTime_, index++, subGroup);
 	parame_->Register("ReassembleDestroyedRatio", reassembleDestroyedRatio_, index++, subGroup);
+	parame_->Register("HitShakeIntensity", hitShakeIntensity_, index++, subGroup);
+	parame_->Register("BreakShakeIntensity", breakShakeIntensity_, index++, subGroup);
+	parame_->Register("ShakeDuration", shakeDuration_, index++, subGroup);
 
 	// 破片側の当たり判定を無効
 	destructObject_.SetIsColliderActive(false);
@@ -146,6 +152,11 @@ void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& 
 
 			// 攻撃を受けた位置に破片を飛び散らせる
 			destructObject_.OnCollisionEnter(result);
+			
+			// 当たった強さに応じてカメラを揺らす
+			if (camera_) {
+				camera_->StartShake(hitShakeIntensity_ * std::clamp(ratio, 0.0f, 1.0f), shakeDuration_);
+			}
 		}
 	} else if (boss != nullptr) {
 
@@ -160,16 +171,4 @@ void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& 
 			destructObject_.OnCollisionEnter(result);
 		}
 	}
-
-	//// hpによって形を帰る
-	//if (currentHp_ == 2) {
-	//	destructObject_.worldTransform_.transform_.scale.z = 1.0f;
-	//} else if (currentHp_ == 1) {
-	//	destructObject_.worldTransform_.transform_.scale.z = 0.5f;
-	//}else if (currentHp_ <= 0) {
-	//	currentHp_ = 0;
-	//	isBreakIce_ = true;
-	//}
-
-	//destructObject_.worldTransform_.UpdateTransformMatrix();
 }
