@@ -319,6 +319,20 @@ void PlayerAttackRushAction::RegisterParameter(GameEngine::DebugParameter* param
 // プレイヤーの跳ね返りアクション
 //=======================================================
 
+void PlayerBounceAction::Update() {
+	if (!isBounceRising_) { return; }
+
+	// 上昇が終わった、または別の状態に移ったら解除
+	if (commonData_->state != PlayerState::kJump || commonData_->velocity.y <= 0.0f) {
+		isBounceRising_ = false;
+	}
+}
+
+void PlayerBounceAction::Reset() {
+	isHitWall_ = false;
+	isBounceRising_ = false;
+}
+
 void PlayerBounceAction::WallBounce(Vector3& pos, const Vector3& bounceDirection, const float& penetrationDepth, const float kRushMaxSpeed) {
 
 	// ラッシュ状態からの突進であれば上に飛ぶ
@@ -348,6 +362,9 @@ void PlayerBounceAction::WallBounce(Vector3& pos, const Vector3& bounceDirection
 		commonData_->velocity.y = kWallBounceUpSpeed_ * kWallBounceReflectFactor_ * heightMultiplier;
 
 		commonData_->state = PlayerState::kJump;
+
+		// 上昇中はダメージを受けない
+		isBounceRising_ = true;
 	} else {
 
 		// 壁に衝突していたら押し戻す

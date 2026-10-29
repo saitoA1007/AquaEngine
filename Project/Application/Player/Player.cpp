@@ -274,6 +274,9 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 }
 
 void Player::TakeDamage(int32_t damage) {
+	// 壁に衝突して上昇している間はダメージを受けない
+	if (bounceAction_.IsBounceRising()) { return; }
+
 	// 無敵時間中は何もしない
 	if (!playerStatus_.TakeDamage(damage)) { return; }
 

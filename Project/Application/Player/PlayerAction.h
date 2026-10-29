@@ -163,6 +163,11 @@ private:
 // 跳ね返りアクション
 class PlayerBounceAction : public IPlayerAction {
 public:
+	void Update() override;
+
+	// 状態をリセットする
+	void Reset() override;
+
 	void WallBounce(Vector3& pos, const Vector3& bounceDirection, const float& penetrationDepth, const float kRushMaxSpeed);
 
 	// パラメータを登録する
@@ -170,6 +175,9 @@ public:
 
 	bool IsHitWall() const { return isHitWall_; }
 	void SetIsHitWall(bool isHitWall) { isHitWall_ = isHitWall; }
+
+	// 突進で壁に衝突して上昇中か
+	bool IsBounceRising() const { return isBounceRising_; }
 
 private:
 	// 跳ね上がり後の高さ
@@ -191,6 +199,9 @@ private:
 
 	// 壁のヒットフラグ
 	bool isHitWall_ = false;
+
+	// 突進で壁に衝突して上昇中か
+	bool isBounceRising_ = false;
 };
 
 // 急降下攻撃アクション
