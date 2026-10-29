@@ -4,9 +4,10 @@
 // プレイヤーの状態
 class PlayerStatus : public IPlayerAction {
 public:
-	void Initialize(PlayerCommonData* commonData);
+	void Update() override;
 
-	void Update();
+	// 状態をリセットする
+	void Reset() override;
 
 	// パラメータを登録する
 	void RegisterParameter(GameEngine::DebugParameter* param) override;
@@ -29,6 +30,9 @@ public:
 	// 体力をリセット
 	void ResetHp() { currentHp_ = maxHp_; }
 
+protected:
+	void OnInitialize() override;
+
 private:
 
 	int32_t maxHp_ = 3;
@@ -47,9 +51,7 @@ private:
 // プレイヤーが常に受ける物理
 class PlayerPhysics : public IPlayerAction {
 public:
-	void Initialize(PlayerCommonData* commonData);
-
-	void Update();
+	void Update() override;
 
 	// パラメータを登録する
 	void RegisterParameter(GameEngine::DebugParameter* param) override;
@@ -67,21 +69,14 @@ private:
 // 移動アクション
 class PlayerMoveAction : public IPlayerAction {
 public:
-	// 初期化
-	void Initialize(PlayerCommonData* commonData, GameEngine::InputCommand* inputCommand);
-
 	// 入力
-	void ProcessInput();
+	void ProcessInput() override;
 
 	// カメラ基準のベクトルを更新する
 	void UpdateCameraBasis(const Matrix4x4& cameraWorldMatrix);
 
 	// パラメータを登録する
 	void RegisterParameter(GameEngine::DebugParameter* param) override;
-
-private:
-	// 入力機能
-	GameEngine::InputCommand* inputCommand_ = nullptr;
 
 private:
 	// 地上の移動速度
@@ -110,21 +105,15 @@ private:
 // 突進アクション
 class PlayerAttackRushAction : public IPlayerAction {
 public:
-	void Initialize(PlayerCommonData* commonData, GameEngine::InputCommand* inputCommand);
+	void ProcessInput() override;
 
-	void ProcessInput();
-
-	void Update();
+	void Update() override;
 
 	// パラメータを登録する
 	void RegisterParameter(GameEngine::DebugParameter* param) override;
 
 	// 突進の最大速度を取得
 	float GetRushMaxSpeed() const { return  kRushMaxSpeed_; }
-
-private:
-	// 入力機能
-	GameEngine::InputCommand* inputCommand_ = nullptr;
 
 private:
 	// 突撃予備動作最大時間
@@ -164,8 +153,6 @@ private:
 // 跳ね返りアクション
 class PlayerBounceAction : public IPlayerAction {
 public:
-	void Initialize(PlayerCommonData* commonData);
-
 	void WallBounce(Vector3& pos, const Vector3& bounceDirection, const float& penetrationDepth, const float kRushMaxSpeed);
 
 	// パラメータを登録する
@@ -199,11 +186,9 @@ private:
 // 急降下攻撃アクション
 class PlayerAttackDownAction : public IPlayerAction {
 public:
-	void Initialize(PlayerCommonData* commonData, GameEngine::InputCommand* inputCommand);
+	void ProcessInput() override;
 
-	void ProcessInput();
-
-	void Update();
+	void Update() override;
 
 	// パラメータを登録する
 	void RegisterParameter(GameEngine::DebugParameter* param) override;
@@ -226,10 +211,6 @@ public:
 		}
 		return level;
 	}
-
-private:
-	// 入力機能
-	GameEngine::InputCommand* inputCommand_ = nullptr;
 
 private:
 	// 落下前の硬直時間

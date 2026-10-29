@@ -1,5 +1,4 @@
 #include "pch.h"
-#define NOMINMAX
 #include <algorithm>
 #include "Player.h"
 #include "LogManager.h"
@@ -18,15 +17,22 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model,
 	// ワールド行列を初期化
 	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,2.0f,0.0f},{0.0f,2.0f,10.0f} });
 
+	// アクションを登録
+	actions_ = {
+		&moveAction_,             // 移動
+		&attackRushAction_,       // 突進
+		&playerAttackDownAction_, // 落下攻撃
+		&bounceAction_,           // 跳ね返り
+		&playerPhysics_,          // 重力
+		&playerStatus_,           // 状態
+	};
+
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>("Player");
 	// 値を登録
-	moveAction_.RegisterParameter(debugParame_.get());
-	bounceAction_.RegisterParameter(debugParame_.get());
-	attackRushAction_.RegisterParameter(debugParame_.get());
-	playerAttackDownAction_.RegisterParameter(debugParame_.get());
-	playerPhysics_.RegisterParameter(debugParame_.get());
-	playerStatus_.RegisterParameter(debugParame_.get());
+	for (IPlayerAction* action : actions_) {
+		action->RegisterParameter(debugParame_.get());
+	}
 	debugParame_->Apply();
 
 	// 当たり判定の設定
@@ -51,20 +57,10 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model,
 	commonData_.effectManager_ = effectManager;
 	effectManager_ = effectManager;
 
-	// 移動アクション
-	moveAction_.Initialize(&commonData_, inputCommand);
-	// 跳ね返りアクション
-	bounceAction_.Initialize(&commonData_);
-	// 突進アクション
-	attackRushAction_.Initialize(&commonData_, inputCommand);
-	// 落下攻撃アクション
-	playerAttackDownAction_.Initialize(&commonData_, inputCommand);
-
-	// 重力
-	playerPhysics_.Initialize(&commonData_);
-
-	// プレイヤーの状態
-	playerStatus_.Initialize(&commonData_);
+	// 各アクションを初期化
+	for (IPlayerAction* action : actions_) {
+		action->Initialize(&commonData_, inputCommand);
+	}
 }
 
 void Player::Initialize() {
@@ -80,8 +76,10 @@ void Player::Initialize() {
 
 	isDraw_ = true;
 
-	// 体力をリセット
-	playerStatus_.ResetHp();
+	// 各アクションの状態をリセット
+	for (IPlayerAction* action : actions_) {
+		action->Reset();
+	}
 
 	// 初期化
 	animator_->Initialize();
@@ -94,21 +92,15 @@ void Player::Update() {
 	// カメベクトルを更新
 	moveAction_.UpdateCameraBasis(camera_->GetWorldMatrix());
 
-	// 移動操作
-	moveAction_.ProcessInput();
-	// 突進操作
-	attackRushAction_.ProcessInput();
-	// 落下攻撃操作
-	playerAttackDownAction_.ProcessInput();
+	// 入力処理
+	for (IPlayerAction* action : actions_) {
+		action->ProcessInput();
+	}
 
-	// 落下攻撃の更新処理
-	playerAttackDownAction_.Update();
-	// 受ける物理を更新
-	playerPhysics_.Update();
-	// 更新
-	attackRushAction_.Update();
-	// 状態
-	playerStatus_.Update();
+	// 更新処理
+	for (IPlayerAction* action : actions_) {
+		action->Update();
+	}
 
 	// 範囲制限
 	ApplyClamp();

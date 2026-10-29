@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "IGameObject.h"
 #include "WorldTransform.h"
 #include "InputCommand.h"
@@ -77,6 +78,10 @@ public:
 	}
 
 private:
+	// actions_が自身のメンバを指すためコピー禁止
+	Player(const Player&) = delete;
+	Player& operator=(const Player&) = delete;
+
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;
 	// 入力機能
@@ -119,6 +124,9 @@ private:
 
 	// プレイヤーの状態
 	PlayerStatus playerStatus_;
+
+	// 一括処理用のアクション一覧
+	std::vector<IPlayerAction*> actions_;
 
 private:
 

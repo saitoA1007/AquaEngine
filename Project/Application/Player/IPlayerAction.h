@@ -50,10 +50,32 @@ class IPlayerAction {
 public:
 	virtual ~IPlayerAction() = default;
 
+	// 初期化
+	void Initialize(PlayerCommonData* commonData, GameEngine::InputCommand* inputCommand) {
+		commonData_ = commonData;
+		inputCommand_ = inputCommand;
+		OnInitialize();
+	}
+
+	// 入力処理
+	virtual void ProcessInput() {}
+
+	// 更新処理
+	virtual void Update() {}
+
+	// 状態をリセットする
+	virtual void Reset() {}
+
 	// 値を登録する
-	virtual void RegisterParameter([[maybe_unused]] GameEngine::DebugParameter* param) {};
+	virtual void RegisterParameter([[maybe_unused]] GameEngine::DebugParameter* param) {}
 
 protected:
 	// プレイヤーの共通状態
 	PlayerCommonData* commonData_ = nullptr;
+	// 入力機能
+	GameEngine::InputCommand* inputCommand_ = nullptr;
+
+protected:
+	// 派生クラス固有の初期化
+	virtual void OnInitialize() {}
 };

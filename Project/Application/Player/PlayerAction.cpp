@@ -15,10 +15,12 @@ using namespace GameEngine;
 // プレイヤーが受ける物理
 //=====================================================
 
-void PlayerStatus::Initialize(PlayerCommonData* commonData) {
-	commonData_ = commonData;
-
+void PlayerStatus::OnInitialize() {
 	currentHp_ = maxHp_;
+}
+
+void PlayerStatus::Reset() {
+	ResetHp();
 }
 
 void PlayerStatus::Update() {
@@ -44,10 +46,6 @@ void PlayerStatus::RegisterParameter(GameEngine::DebugParameter* param) {
 // プレイヤーが受ける物理
 //=====================================================
 
-void PlayerPhysics::Initialize(PlayerCommonData* commonData) {
-	commonData_ = commonData;
-}
-
 void PlayerPhysics::Update() {
 	// 重力を適応
 	commonData_->velocity.y += kFallAcceleration_ * FpsCounter::gameDeltaTime;
@@ -72,11 +70,6 @@ void PlayerPhysics::RegisterParameter(GameEngine::DebugParameter* param) {
 //======================================================
 // プレイヤーの移動アクション
 //======================================================
-
-void PlayerMoveAction::Initialize(PlayerCommonData* commonData, GameEngine::InputCommand* inputCommand) {
-	commonData_ = commonData;
-	inputCommand_ = inputCommand;
-}
 
 void PlayerMoveAction::ProcessInput() {
 
@@ -179,11 +172,6 @@ void PlayerMoveAction::RegisterParameter(GameEngine::DebugParameter* param) {
 //=======================================================
 // プレイヤーの突進アクション
 //=======================================================
-
-void PlayerAttackRushAction::Initialize(PlayerCommonData* commonData, GameEngine::InputCommand* inputCommand) {
-	commonData_ = commonData;
-	inputCommand_ = inputCommand;
-}
 
 void PlayerAttackRushAction::ProcessInput() {
 	// ため状態
@@ -318,10 +306,6 @@ void PlayerAttackRushAction::RegisterParameter(GameEngine::DebugParameter* param
 // プレイヤーの跳ね返りアクション
 //=======================================================
 
-void PlayerBounceAction::Initialize(PlayerCommonData* commonData) {
-	commonData_ = commonData;
-}
-
 void PlayerBounceAction::WallBounce(Vector3& pos, const Vector3& bounceDirection, const float& penetrationDepth, const float kRushMaxSpeed) {
 
 	// ラッシュ状態からの突進であれば上に飛ぶ
@@ -398,11 +382,6 @@ void PlayerBounceAction::RegisterParameter(GameEngine::DebugParameter* param) {
 //=======================================================
 // プレイヤーの急降下攻撃アクション
 //=======================================================
-
-void PlayerAttackDownAction::Initialize(PlayerCommonData* commonData, GameEngine::InputCommand* inputCommand) {
-	commonData_ = commonData;
-	inputCommand_ = inputCommand;
-}
 
 void PlayerAttackDownAction::ProcessInput() {
 
