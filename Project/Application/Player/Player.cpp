@@ -249,8 +249,10 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 
 	// 風による攻撃
 	if (isWind) {
-		// ダメージを受ける
-		TakeDamage(1);
+		if (commonData_.state != PlayerState::kAttackDown) {
+			// ダメージを受ける
+			TakeDamage(1);
+		}	
 	}
 
 	// ボスの衝突判定
@@ -265,7 +267,6 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 		} else {
 
 			if (commonData_.state != PlayerState::kAttackDown) {
-
 				// ダメージを受ける
 				TakeDamage(1);
 			}

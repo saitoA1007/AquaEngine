@@ -62,6 +62,7 @@ GameScene::GameScene() {
 	enemyModel->SetDefaultIsEnableLight(true);
 	auto* eggModel = modelManager_->GetNameByModel("BossEgg.obj");
 	auto bossEnemy = gameObjectManager_->AddObject<BossEnemy>(enemyModel, eggModel, player->GetWorldTransform(), animationManager_, bossRangedAttackManager);
+	bossEnemy->SetPlayer(player);
 
 	// カメラ操作
 	cameraController_ = gameObjectManager_->AddObject<CameraController>(inputCommand_, &bossEnemy->GetWorldTransform(), &player->GetWorldTransform());
