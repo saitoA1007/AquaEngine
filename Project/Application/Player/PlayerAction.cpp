@@ -21,6 +21,10 @@ void PlayerStatus::OnInitialize() {
 
 void PlayerStatus::Reset() {
 	ResetHp();
+
+	// クールタイムを解除
+	isCoolActive_ = false;
+	timer_ = 0.0f;
 }
 
 void PlayerStatus::Update() {
@@ -40,6 +44,15 @@ void PlayerStatus::RegisterParameter(GameEngine::DebugParameter* param) {
 
 	param->Register("MaxHp", maxHp_, index++, subGroup);
 	param->Register("CoolTime", coolTime_, index++, subGroup);
+	param->Register("BlinkInterval", blinkInterval_, index++, subGroup);
+}
+
+bool PlayerStatus::IsBlinkHidden() const {
+	if (!isCoolActive_ || blinkInterval_ <= 0.0f) { return false; }
+
+	// クールタイム開始からの経過時間
+	float elapsed = timer_ * coolTime_;
+	return static_cast<int32_t>(elapsed / blinkInterval_) % 2 == 1;
 }
 
 //=====================================================

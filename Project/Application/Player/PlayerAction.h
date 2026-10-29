@@ -28,6 +28,12 @@ public:
 	// 最大Hp
 	int32_t GetMaxHp()const { return maxHp_; }
 
+	// ダメージ後のクールタイム中か
+	bool IsCoolActive() const { return isCoolActive_; }
+
+	// クールタイム中の点滅で非表示にするか
+	bool IsBlinkHidden() const;
+
 	// 体力をリセット
 	void ResetHp() { currentHp_ = maxHp_; }
 
@@ -39,6 +45,9 @@ private:
 	int32_t maxHp_ = 3;
 
 	float coolTime_ = 2.0f;
+
+	// クールタイム中の点滅間隔
+	float blinkInterval_ = 0.08f;
 
 private:
 	// クール状態

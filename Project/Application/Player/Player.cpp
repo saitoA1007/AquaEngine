@@ -134,6 +134,9 @@ void Player::Update() {
 void Player::Draw() {
 	if (!isDraw_) { return; }
 
+	// クールタイム中は点滅させる
+	if (playerStatus_.IsBlinkHidden()) { return; }
+
 	// モデル描画
 	renderQueue_->SubmitRaytracingModel(model_, worldTransform_);
 }
