@@ -198,10 +198,6 @@ void PlayerAttackRushAction::ProcessInput() {
 	if (commonData_->state == PlayerState::kNone) {
 		if (inputCommand_->IsCommandActive("RushCharge")) {
 			chargeTimer_ = 0.0f;
-			// Rush方向初期化
-			Vector3 rushDirXZ = commonData_->currentDir;
-			if (rushDirXZ.x == 0.0f && rushDirXZ.z == 0.0f) { rushDirXZ = { commonData_->velocity.x, 0.0f, commonData_->velocity.z }; }
-			rushDirection_ = (rushDirXZ.x == 0.0f && rushDirXZ.z == 0.0f) ? Vector3(0, 0, 1) : rushDirXZ.Normalize();
 			// 溜め開始時はレベルをリセット
 			rushChargeLevel_ = 0;
 			// 現在の状態
@@ -227,6 +223,13 @@ void PlayerAttackRushAction::ProcessInput() {
 			}
 			rushTimer_ = 0.0f;
 			coolTime_ = 0.0f;
+
+			// 突進方向を決める
+			Vector3 rushDirXZ = { commonData_->targetDir.x, 0.0f, commonData_->targetDir.z };
+			if (rushDirXZ.x == 0.0f && rushDirXZ.z == 0.0f) { 
+				rushDirXZ = { commonData_->currentDir.x, 0.0f, commonData_->currentDir.z }; 
+			}
+			rushDirection_ = (rushDirXZ.x == 0.0f && rushDirXZ.z == 0.0f) ? Vector3(0, 0, 1) : rushDirXZ.Normalize();
 
 			float levelMultiplier = 1.0f;
 			switch (rushChargeLevel_) {
