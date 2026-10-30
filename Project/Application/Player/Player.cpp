@@ -260,10 +260,9 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 		IceFall* iceFall = result.userData.As<IceFall>();
 		if (iceFall == nullptr) { return; }
 
-		// 氷柱を削除
+		// 氷柱を破壊する(使い回すため削除はしない)
 		if (commonData_.state == PlayerState::kAttackRush) {
-			iceFall->Destroy();
-			//iceFall->SetIsBreak(true);
+			iceFall->Break(result.contactPosition, commonData_.velocity);
 		}
 
 		bounceAction_.WallBounce(worldTransform_.transform_.translate, result.contactNormal * -1.0f, result.penetrationDepth, attackRushAction_.GetRushMaxSpeed());

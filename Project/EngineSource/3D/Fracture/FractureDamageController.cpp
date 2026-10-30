@@ -89,12 +89,17 @@ void FractureDamageController::UpdateReassembly(float deltaTime) {
 	}
 
 	// 全てのマクロ破片が元の位置、回転へ収束したので、まとめて無傷状態へ復元する
+	ResetToIntact();
+}
+
+void FractureDamageController::ResetToIntact() {
 	destroyedChunkIds_.clear();
 	chunkDamage_.clear();
 	crackActiveChunkIds_.clear();
 	looseChunkIds_.clear();
 	breakState_.DentedChunks().clear();
 	breakState_.MacroDebrisBatches().clear();
+	breakState_.MicroDebrisBatches().clear();
 
 	// 壊れた、凹んだ、個別に描画するチャンクが全て空になったので、全チャンクが1つの静的なメッシュに戻る
 	RebuildStaticState();

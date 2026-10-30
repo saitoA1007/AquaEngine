@@ -29,6 +29,9 @@ namespace GameEngine {
 		void BeginReassembly();
 		bool IsReassembling() const { return isReassembling_; }
 
+		// 破片を全て消し、アニメーションせずにすぐ無傷の状態へ戻す
+		void ResetToIntact();
+
 		// チャンクの破壊された割合を取得
 		float GetDestroyedRatio() const {
 			if (chunksById_.empty()) { return 0.0f; }

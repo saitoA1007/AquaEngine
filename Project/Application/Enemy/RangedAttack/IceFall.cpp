@@ -25,6 +25,9 @@ IceFall::IceFall(GameEngine::Model* model, GameEngine::Model* fractureModel, Vec
 	debugParame_->Register("StartPosY", startPosY_);
 	debugParame_->Register("EndPosY", endPosY_);
 	debugParame_->Register("Scale", destructibleObject_.worldTransform_.transform_.scale);
+	debugParame_->Register("BreakDamage", breakDamage_);
+	debugParame_->Register("BreakCraterRadius", breakCraterRadius_);
+	debugParame_->Register("BreakDisappearTime", breakDisappearTime_);
 	debugParame_->Apply();
 
 	// 当たり判定
@@ -32,6 +35,8 @@ IceFall::IceFall(GameEngine::Model* model, GameEngine::Model* fractureModel, Vec
 	collider_.SetRadius(colliderRadius_);
 	collider_.SetCollisionAttribute(kCollisionAttributeEnemy);
 	collider_.SetCollisionMask(~kCollisionAttributeEnemy);
+	// 出現するまでは当たり判定を無効にしておく
+	collider_.SetActive(false);
 	// データを登録
 	UserData userData;
 	userData.typeID = static_cast<uint32_t>(CollisionTypeID::kIceFall);
@@ -48,8 +53,7 @@ IceFall::IceFall(GameEngine::Model* model, GameEngine::Model* fractureModel, Vec
 }
 
 IceFall::~IceFall() {
-	// 現在の数を減らす
-	iceFallCurrentNum_ -= 1;
+	// 使い回すため、数の管理はStartとUpdateでおこなう
 }
 
 void IceFall::Initialize() {
@@ -71,9 +75,9 @@ void IceFall::Update() {
 	destructibleObject_.Update();
 
 	if (isBreak_) {
-		timer_ += FpsCounter::gameDeltaTime / 2.0f;
+		timer_ += FpsCounter::gameDeltaTime / breakDisappearTime_;
 	
-		// 削除する
+		// 破片が落ちきったら非表示にして、次の出現まで待機させる
 		if (timer_ >= 1.0f) {
 			isActive_ = false;
 			isBreak_ = false;
@@ -99,10 +103,37 @@ void IceFall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResul
 	//destructibleObject_.OnCollisionEnter(result);
 }
 
+void IceFall::Break(const Vector3& hitPos, const Vector3& hitDir) {
+	if (isBreak_) { return; }
+
+	isBreak_ = true;
+	isEnterMoveActive_ = false;
+	timer_ = 0.0f;
+
+	// 破片が残っている間に再び当たらないよう当たり判定を無効にする
+	collider_.SetActive(false);
+
+	// 大きなダメージを与えて全体を砕く
+	destructibleObject_.ApplyDamage(hitPos, hitDir, breakDamage_, breakCraterRadius_);
+}
+
 void IceFall::Start(Vector3 pos) {
 	// 現在数を増やす
 	iceFallCurrentNum_ += 1;
+
+	// 前回の破片を消して無傷の状態に戻す
+	destructibleObject_.ResetToIntact();
+
+	// 状態をリセット
+	isBreak_ = false;
+	isEnterMoveActive_ = true;
+	timer_ = 0.0f;
+
+	pos.y = startPosY_;
 	destructibleObject_.worldTransform_.transform_.translate = pos;
+
+	collider_.SetWorldPosition(pos);
+	collider_.SetActive(true);
 	isActive_ = true;
 }
 

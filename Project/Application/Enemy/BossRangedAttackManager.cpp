@@ -72,16 +72,19 @@ void BossRangedAttackManager::StartIceFall(float rangeRadius, float minDistance,
         }
     }
 
-    // 求めた位置から氷を生成する
-    for (size_t i = 0; i < points.size(); ++i) {
+    // 求めた位置に、待機中の氷柱を出現させる
+    size_t poolIndex = 0;
+    for (const Vector2& point : points) {
 
-        // 生成
-        for (int i = 0; i < iceFalls_.size(); ++i) {
-            if (!iceFalls_[i]->IsActive()) {
-                iceFalls_[i]->Start(Vector3(points[i].x, 0.0f, points[i].y));
-                break;
-            }
+        // 待機中の氷柱を探す
+        while (poolIndex < iceFalls_.size() && iceFalls_[poolIndex]->IsActive()) {
+            ++poolIndex;
         }
+        // 全て使用中
+        if (poolIndex >= iceFalls_.size()) { break; }
+
+        iceFalls_[poolIndex]->Start(Vector3(point.x, 0.0f, point.y));
+        poolIndex++;
     }
 }
 

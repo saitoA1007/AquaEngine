@@ -35,6 +35,18 @@ namespace GameEngine {
 		// 元に戻るアニメーションを再生中か
 		bool IsReassembling() const { return damageController_.IsReassembling(); }
 
+		// 破片を全て消し、すぐに無傷の状態へ戻す
+		void ResetToIntact() { damageController_.ResetToIntact(); }
+
+		/// <summary>
+		/// ワールド座標で指定した位置にダメージを与える
+		/// </summary>
+		/// <param name="worldImpactPos">当たった位置</param>
+		/// <param name="worldImpactDirection">当たった方向</param>
+		/// <param name="damageAmount">与えるダメージ</param>
+		/// <param name="craterRadius">ダメージを与える範囲</param>
+		void ApplyDamage(const Vector3& worldImpactPos, const Vector3& worldImpactDirection, float damageAmount, float craterRadius);
+
 		// チャンクの破壊された割合
 		float GetDestroyedRatio() const { return damageController_.GetDestroyedRatio(); }
 
