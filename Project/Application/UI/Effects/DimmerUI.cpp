@@ -25,6 +25,10 @@ DimmerUI::DimmerUI(std::string name, GameEngine::DebugParameter* debugParame, bo
 }
 
 void DimmerUI::Initialize() {
+	// アニメーション途中で止まっていた場合は元の大きさに戻す
+	if (isPlay_) {
+		world_.transform_.scale = startScale_;
+	}
 	startScale_ = world_.transform_.scale;
 	endScale_ = startScale_ * scaleRatio_;
 
