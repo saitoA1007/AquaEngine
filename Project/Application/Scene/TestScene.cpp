@@ -82,6 +82,9 @@ TestScene::TestScene() {
 	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerLandingEffect", 32, textureManager_, waModel);
 	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerChargeParticle", 32, textureManager_, waModel);
 
+	gameObjectManager_->AddObject<ParticleBehavior>("PlayerRushWaveParticle", 32, textureManager_, waModel);
+	gameObjectManager_->AddObject<ParticleBehavior>("PlayerRushTipWaveParticle", 32, textureManager_, waModel);
+
 	// 中ポリゴン氷
 	iceMiddleModel_ = modelManager_->GetNameByModel("ice_middlePolygon.gltf");
 	iceMiddleModel_->SetDefaultIsEnableLight(true);
