@@ -27,6 +27,7 @@ GamePhaseManager::GamePhaseManager(GameEngine::InputCommand* inputCommand, Playe
 	phases_[ScenePhase::kGameOver] = std::make_unique<GameOverPhase>(commonData_, gameOverUIManager);
 	phases_[ScenePhase::kClear] = std::make_unique<ClearPhase>(commonData_, clearUIManager);
 	phases_[ScenePhase::kPause] = std::make_unique<PausePhase>(commonData_, pauseUIManager);
+	phases_[ScenePhase::kOption] = std::make_unique<OptionPhase>(commonData_);
 
 	player_ = player;
 	bossEnemy_ = bossEnemy;

@@ -15,6 +15,7 @@ enum class ScenePhase {
     kGameOver, // ゲームオーバー
     kClear,    // クリア
     kPause,    // ポーズ
+    kOption,   // オプション
 
     kMaxCount
 };

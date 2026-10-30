@@ -141,3 +141,19 @@ private:
 
 
 };
+
+// オプション
+class OptionPhase : public IScenePhase {
+public:
+    OptionPhase(PhaseCommonData& commonData);
+    ~OptionPhase() = default;
+
+    void Enter() override;
+
+    void Update() override;
+
+    void Exit() override;
+
+private:
+
+};

@@ -377,3 +377,25 @@ void ClearPhase::Exit() {
 	// UIを無効化
 	clearUIManager_->SetActive(false);
 }
+
+//===========================================
+// オプション
+//===========================================
+
+OptionPhase::OptionPhase(PhaseCommonData& commonData) : IScenePhase(commonData) {
+
+	
+}
+
+void OptionPhase::Enter() {
+	
+}
+
+void OptionPhase::Update() {
+
+	
+}
+
+void OptionPhase::Exit() {
+
+}
