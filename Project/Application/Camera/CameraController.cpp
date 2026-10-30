@@ -76,7 +76,22 @@ void CameraController::Update() {
 	float actualTargetLerp = 1.0f - std::powf(1.0f - common.targetLerpRate, dt60);
 	float actualPositionLerp = 1.0f - std::powf(1.0f - common.positionLerpRate, dt60);
 	currentTarget_ = Lerp(currentTarget_, common.idealTarget, actualTargetLerp);
+
+	// 補間前の注視点との距離
+	float prevDistance = (position_ - common.idealTarget).Length();
 	position_ = Lerp(position_, common.idealPosition, actualPositionLerp);
+
+	if (common.keepDistance) {
+		// 直線で補間すると回り込む時に内側を通って近づくため、距離は別で補間して保つ
+		float idealDistance = (common.idealPosition - common.idealTarget).Length();
+		float distance = prevDistance + (idealDistance - prevDistance) * actualPositionLerp;
+
+		Vector3 toCamera = position_ - common.idealTarget;
+		float length = toCamera.Length();
+		if (length > 0.0001f) {
+			position_ = common.idealTarget + toCamera * (distance / length);
+		}
+	}
 	// Fovを補間
 	targetFov_ = common.targetFov;
 	float actualFovLerp = 1.0f - std::powf(1.0f - common.fovLerpRate, dt60);

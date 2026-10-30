@@ -35,10 +35,29 @@ private:
 	float kMinRotateY_ = -std::numbers::pi_v<float> * 0.5f;
 	float kMaxRotateY_ = -0.01f;
 
+	// 入力し続けた時の最大速度の倍率
+	float kRotateMaxSpeedRate_ = 3.0f;
+	// 最大速度に達するまでの入力時間
+	float kRotateAccelTime_ = 1.0f;
+
 private:
+	// 入力し続けている時間と向き
+	struct HoldInput {
+		float time = 0.0f;
+		float dir = 0.0f;
+	};
+
 	// フォロー固有の回転慣性
 	float rotateVelocityX_ = 0.0f;
 	float rotateVelocityY_ = 0.0f;
+
+	// 各軸の入力状態
+	HoldInput holdX_;
+	HoldInput holdY_;
+
+private:
+	// 入力し続けた時間に応じた目標回転速度を求める
+	float CalcHoldRotateSpeed(float inputDir, float baseSpeed, HoldInput& hold);
 };
 
 // ロックオンカメラ

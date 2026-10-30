@@ -28,6 +28,9 @@ struct CameraCommonData {
 	// Fovの補間
 	float fovLerpRate = 0.05f;
 
+	// 注視点との距離を保ったまま位置を補間するか
+	bool keepDistance = false;
+
 	// カメラの遷移切り替え
 	std::optional<CameraState> requestState = std::nullopt;
 };
