@@ -25,6 +25,8 @@ Wall::Wall(GameEngine::Model* model, GameEngine::Model* fractureModel, GameEngin
 	parame_->Register("HitShakeIntensity", hitShakeIntensity_, index++, subGroup);
 	parame_->Register("BreakShakeIntensity", breakShakeIntensity_, index++, subGroup);
 	parame_->Register("ShakeDuration", shakeDuration_, index++, subGroup);
+	parame_->Register("HitVibrationIntensity", hitVibrationIntensity_, index++, subGroup);
+	parame_->Register("HitVibrationDuration", hitVibrationDuration_, index++, subGroup);
 
 	// 破片側の当たり判定を無効
 	destructObject_.SetIsColliderActive(false);
@@ -157,6 +159,9 @@ void Wall::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& 
 			if (camera_) {
 				camera_->StartShake(hitShakeIntensity_ * std::clamp(ratio, 0.0f, 1.0f), shakeDuration_);
 			}
+
+			// 当たった強さに応じてコントローラーを振動させる
+			player->StartVibration(hitVibrationIntensity_ * std::clamp(ratio, 0.0f, 1.0f), hitVibrationDuration_);
 		}
 	} else if (boss != nullptr) {
 

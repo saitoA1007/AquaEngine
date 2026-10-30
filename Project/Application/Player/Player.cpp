@@ -41,6 +41,12 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model,
 		debugParame_->Register("DamageShakeIntensity", damageShakeIntensity_, index++, subGroup);
 		debugParame_->Register("DamageShakeDuration", damageShakeDuration_, index++, subGroup);
 	}
+	{
+		std::string subGroup = "Vibration";
+		int index = 0;
+		debugParame_->Register("AttackVibrationIntensity", attackVibrationIntensity_, index++, subGroup);
+		debugParame_->Register("AttackVibrationDuration", attackVibrationDuration_, index++, subGroup);
+	}
 	debugParame_->Apply();
 
 	// 当たり判定の設定
@@ -71,6 +77,11 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model,
 	}
 }
 
+Player::~Player() {
+	// 振動したまま終了しないように止める
+	StopVibration();
+}
+
 void Player::Initialize() {
 	// ステータスを初期化
 	commonData_ = PlayerCommonData{};
@@ -91,6 +102,9 @@ void Player::Initialize() {
 
 	// 初期化
 	animator_->Initialize();
+
+	// 振動を止める
+	StopVibration();
 }
 
 void Player::Update() {
@@ -129,6 +143,9 @@ void Player::Update() {
 
 	// アニメーションの更新
 	animator_->Update();
+
+	// 振動の更新
+	UpdateVibration();
 }
 
 void Player::Draw() {
@@ -294,5 +311,36 @@ void Player::StartHitEffect(Vector3 pos) {
 	// 攻撃の強さに応じてカメラを揺らす
 	if (camera_) {
 		camera_->StartShake(attackShakeIntensity_ * static_cast<float>(powerLevel), attackShakeDuration_);
+	}
+
+	// 攻撃の強さに応じてコントローラーを振動させる
+	StartVibration(attackVibrationIntensity_ * static_cast<float>(powerLevel), attackVibrationDuration_);
+}
+
+void Player::StartVibration(float intensity, float duration) {
+	intensity = std::clamp(intensity, 0.0f, 1.0f);
+
+	// 振動中であれば強い方を優先する
+	if (vibrationTimer_ > 0.0f && intensity < vibrationIntensity_) { return; }
+
+	vibrationIntensity_ = intensity;
+	vibrationTimer_ = duration;
+	inputCommand_->PlayPadVibration(intensity, intensity);
+}
+
+void Player::UpdateVibration() {
+	if (vibrationTimer_ <= 0.0f) { return; }
+
+	vibrationTimer_ -= FpsCounter::deltaTime;
+	if (vibrationTimer_ <= 0.0f) {
+		StopVibration();
+	}
+}
+
+void Player::StopVibration() {
+	vibrationTimer_ = 0.0f;
+	vibrationIntensity_ = 0.0f;
+	if (inputCommand_) {
+		inputCommand_->PlayPadVibration(0.0f, 0.0f);
 	}
 }

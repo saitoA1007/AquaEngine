@@ -51,6 +51,11 @@ private:
 	// 揺れる時間
 	float shakeDuration_ = 0.3f;
 
+	// プレイヤーの突進が当たった時の振動の強さ
+	float hitVibrationIntensity_ = 0.8f;
+	// 振動する時間
+	float hitVibrationDuration_ = 0.2f;
+
 private:
 	// パラメーター機能
 	GameEngine::DebugParameter* parame_ = nullptr;
