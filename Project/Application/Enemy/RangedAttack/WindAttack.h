@@ -40,6 +40,9 @@ public:
 		}
 	}
 
+	// 攻撃を途中で止め、残っているパーティクルも消す
+	void Stop();
+
 private:
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;

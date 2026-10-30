@@ -8,6 +8,7 @@
 
 #include "Application/CollisionConfig.h"
 #include "Application/Player/Player.h"
+#include "BossRangedAttackManager.h"
 
 using namespace GameEngine;
 
@@ -16,6 +17,9 @@ BossEnemy::BossEnemy(GameEngine::Model* model, GameEngine::Model* eggModel, Game
 
 	// 卵モデルを取得
 	eggModel_ = eggModel;
+
+	// 遠距離攻撃管理
+	rangedAttackManager_ = rangedAttackManager;
 
 	// 初期化
 	modelComponent_.worldTransform_.Initialize({ {3.0f,3.0f,3.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
@@ -92,6 +96,11 @@ void BossEnemy::Initialize() {
 
 	stateCommonData_.isBreakEgg = false;
 	stateCommonData_.isDrawEgg = true;
+
+	// 出ている遠距離攻撃を全て止める
+	if (rangedAttackManager_) {
+		rangedAttackManager_->Reset();
+	}
 
 	// 初期化
 	if (currentState_) {

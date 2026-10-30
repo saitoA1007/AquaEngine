@@ -93,6 +93,20 @@ void BossRangedAttackManager::StartWind(Vector3 pos, Vector3 startDir, Vector3 e
     windAttack_->Start(pos, startDir, endDir, maxTime);
 }
 
+void BossRangedAttackManager::Reset() {
+    // 風攻撃を止める
+    windAttack_->Stop();
+
+    // 突進パーティクルを止める
+    rushParticle_->SetIsLoop(false);
+    rushParticle_->Clear();
+
+    // 氷柱を全て待機状態に戻す
+    for (IceFall* iceFall : iceFalls_) {
+        iceFall->Stop();
+    }
+}
+
 void BossRangedAttackManager::SetRush(Vector3 pos, Vector3 dir, bool isActive) {
     rushParticle_->SetIsLoop(isActive);
     rushParticle_->SetEmitterPos(pos);

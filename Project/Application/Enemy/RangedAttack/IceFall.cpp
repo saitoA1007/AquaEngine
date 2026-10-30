@@ -137,6 +137,22 @@ void IceFall::Start(Vector3 pos) {
 	isActive_ = true;
 }
 
+void IceFall::Stop() {
+	if (!isActive_) { return; }
+
+	// 現在数を減らす
+	iceFallCurrentNum_ -= 1;
+
+	isActive_ = false;
+	isBreak_ = false;
+	isEnterMoveActive_ = false;
+	timer_ = 0.0f;
+	collider_.SetActive(false);
+
+	// 破片を消して無傷の状態に戻す
+	destructibleObject_.ResetToIntact();
+}
+
 void IceFall::EnterMove() {
 	if (!isEnterMoveActive_) { return; }
 

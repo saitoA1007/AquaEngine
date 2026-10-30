@@ -35,6 +35,9 @@ public:
 	// 出現させる
 	void Start(Vector3 pos);
 
+	// 出現中の氷柱を消して待機状態に戻す
+	void Stop();
+
 private:
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;

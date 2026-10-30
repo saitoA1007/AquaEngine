@@ -99,6 +99,9 @@ private:
 	// プレイヤー
 	const Player* player_ = nullptr;
 
+	// 遠距離攻撃管理
+	BossRangedAttackManager* rangedAttackManager_ = nullptr;
+
 private:
 
 	// 現在の当たり判定の半径を取得

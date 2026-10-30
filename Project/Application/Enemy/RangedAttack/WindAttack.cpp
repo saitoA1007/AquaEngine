@@ -88,6 +88,19 @@ void WindAttack::Draw() {
 	//modelComponent_.DrawRaytracing(renderQueue_);
 }
 
+void WindAttack::Stop() {
+	isActive_ = false;
+	timer_ = 0.0f;
+	// 当たり判定を無効
+	collider_.SetActive(false);
+
+	// パーティクルの発生を止め、出ているものも消す
+	if (windParticle_ != nullptr) {
+		windParticle_->SetIsLoop(false);
+		windParticle_->Clear();
+	}
+}
+
 void WindAttack::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
 
 }
