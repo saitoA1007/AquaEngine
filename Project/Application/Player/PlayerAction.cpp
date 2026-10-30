@@ -343,10 +343,10 @@ void PlayerBounceAction::Reset() {
 	isBounceRising_ = false;
 }
 
-void PlayerBounceAction::WallBounce(Vector3& pos, const Vector3& bounceDirection, const float& penetrationDepth, const float kRushMaxSpeed) {
+void PlayerBounceAction::WallBounce(Vector3& pos, const Vector3& bounceDirection, const float& penetrationDepth, const float kRushMaxSpeed, bool canBounceUp) {
 
-	// ラッシュ状態からの突進であれば上に飛ぶ
-	if (commonData_->state == PlayerState::kAttackRush) {
+	// ラッシュ状態からの突進で、壁が存在していれば上に飛ぶ
+	if (commonData_->state == PlayerState::kAttackRush && canBounceUp) {
 
 		// ヒットフラグを有効
 		isHitWall_ = true;

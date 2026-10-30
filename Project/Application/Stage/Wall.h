@@ -30,6 +30,9 @@ public:
 	// カメラを設定
 	void SetCamera(CameraController* camera) { camera_ = camera; }
 
+	// 壁が壊れているか
+	bool IsBroken() const { return isBreakIce_ || destructObject_.IsReassembling(); }
+
 private:
 
 	// 最大hp

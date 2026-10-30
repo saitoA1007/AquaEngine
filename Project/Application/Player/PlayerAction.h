@@ -168,7 +168,8 @@ public:
 	// 状態をリセットする
 	void Reset() override;
 
-	void WallBounce(Vector3& pos, const Vector3& bounceDirection, const float& penetrationDepth, const float kRushMaxSpeed);
+	// 壁に衝突した時の跳ね返り
+	void WallBounce(Vector3& pos, const Vector3& bounceDirection, const float& penetrationDepth, const float kRushMaxSpeed, bool canBounceUp = true);
 
 	// パラメータを登録する
 	void RegisterParameter(GameEngine::DebugParameter* param) override;

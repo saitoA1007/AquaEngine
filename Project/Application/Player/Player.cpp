@@ -8,6 +8,7 @@
 #include "Application/CollisionConfig.h"
 #include "Application/Enemy/RangedAttack/IceFall.h"
 #include "Application/Enemy/BossEnemy.h"
+#include "Application/Stage/Wall.h"
 using namespace GameEngine;
 
 Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model, GameEngine::AnimationManager* animationManager, PlayerEffectManager* effectManager) {
@@ -247,7 +248,11 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 
 	// 壁の衝突処理
 	if (isWall) {
-		bounceAction_.WallBounce(worldTransform_.transform_.translate, result.contactNormal, result.penetrationDepth, attackRushAction_.GetRushMaxSpeed());
+		// 壊れている壁では上昇せず、見えない壁として押し戻しだけ行う
+		Wall* wall = result.userData.As<Wall>();
+		bool canBounceUp = ((wall == nullptr) || !wall->IsBroken());
+		bounceAction_.WallBounce(worldTransform_.transform_.translate, result.contactNormal, result.penetrationDepth,
+			attackRushAction_.GetRushMaxSpeed(), canBounceUp);
 	}
 
 	// 氷柱との衝突
