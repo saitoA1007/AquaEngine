@@ -93,10 +93,17 @@ void PlayerMoveAction::ProcessInput() {
 	Vector3 desiredVelocityXZ = { 0,0,0 };
 
 	// 移動の操作
-	if (inputCommand_->IsCommandActive("MoveUp")) { dir -= cameraForwardXZ_; }
-	if (inputCommand_->IsCommandActive("MoveDown")) { dir += cameraForwardXZ_; }
-	if (inputCommand_->IsCommandActive("MoveLeft")) { dir -= cameraRightXZ_; }
-	if (inputCommand_->IsCommandActive("MoveRight")) { dir += cameraRightXZ_; }
+	Vector2 stick = inputCommand_->GetLeftStick();
+	if (stick.x != 0.0f || stick.y != 0.0f) {
+		// パッドのスティックは傾けた向きをそのまま使い、360度の方向に移動する
+		dir = cameraForwardXZ_ * -stick.y + cameraRightXZ_ * stick.x;
+	} else {
+		// キーボード、十字キーは8方向
+		if (inputCommand_->IsCommandActive("MoveUp")) { dir -= cameraForwardXZ_; }
+		if (inputCommand_->IsCommandActive("MoveDown")) { dir += cameraForwardXZ_; }
+		if (inputCommand_->IsCommandActive("MoveLeft")) { dir -= cameraRightXZ_; }
+		if (inputCommand_->IsCommandActive("MoveRight")) { dir += cameraRightXZ_; }
+	}
 
 	// 目標方向
 	if (commonData_->state != PlayerState::kAttackRush) {
