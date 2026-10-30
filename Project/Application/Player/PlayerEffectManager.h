@@ -38,6 +38,9 @@ public:
 	// チャージエフェクト
 	void StartChargeEffect(Vector3 pos, Vector4 color, bool isActive);
 
+	// 歩いた時のエフェクト
+	void StartMoveEffect(Vector3 pos, Vector3 dir, bool isActive);
+
 private:
 	GameEngine::GameObjectManager* objectManager_ = nullptr;
 	GameEngine::EffectsManager* effectsManager_ = nullptr;
@@ -76,4 +79,7 @@ private:
 
 	// 着地パーティクル
 	GameEngine::ParticleBehavior* landingEffect_ = nullptr;
+
+	// 歩いた時のパーティクル
+	GameEngine::ParticleBehavior* moveEffect_ = nullptr;
 };

@@ -125,6 +125,9 @@ private:
 	// 敵に攻撃した時の振動する時間
 	float attackVibrationDuration_ = 0.25f;
 
+	// 歩きエフェクトを出す最低の速さ
+	float moveEffectMinSpeed_ = 2.0f;
+
 	// 振動の残り時間
 	float vibrationTimer_ = 0.0f;
 	// 現在の振動の強さ
@@ -168,6 +171,9 @@ private:
 
 	// 回転の更新
 	void UpdateRotation();
+
+	// 歩きエフェクトの更新
+	void UpdateMoveEffect();
 
 	// 当たり判定
 	void OnCollisionStay(const GameEngine::CollisionResult& result);

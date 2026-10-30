@@ -48,6 +48,11 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model,
 		debugParame_->Register("AttackVibrationIntensity", attackVibrationIntensity_, index++, subGroup);
 		debugParame_->Register("AttackVibrationDuration", attackVibrationDuration_, index++, subGroup);
 	}
+	{
+		std::string subGroup = "Effect";
+		int index = 0;
+		debugParame_->Register("MoveEffectMinSpeed", moveEffectMinSpeed_, index++, subGroup);
+	}
 	debugParame_->Apply();
 
 	// 当たり判定の設定
@@ -106,6 +111,9 @@ void Player::Initialize() {
 
 	// 振動を止める
 	StopVibration();
+
+	// 歩きエフェクトを止める
+	effectManager_->StartMoveEffect(worldTransform_.transform_.translate, Vector3(0.0f, 0.0f, 0.0f), false);
 }
 
 void Player::Update() {
@@ -144,6 +152,9 @@ void Player::Update() {
 
 	// アニメーションの更新
 	animator_->Update();
+
+	// 歩きエフェクトの更新
+	UpdateMoveEffect();
 
 	// 振動の更新
 	UpdateVibration();
@@ -190,6 +201,24 @@ void Player::UpdateRotation() {
 		// 現在の角度を更新
 		commonData_.currentDir = Math::YawToDirection(commonData_.currentYaw);
 	}
+}
+
+void Player::UpdateMoveEffect() {
+	// 地上で一定以上の速さで移動している時だけ出す
+	Vector3 horizontalVelocity = { commonData_.velocity.x, 0.0f, commonData_.velocity.z };
+	bool isWalking = (commonData_.state == PlayerState::kNone) &&
+		(horizontalVelocity.Length() >= moveEffectMinSpeed_);
+
+	// 移動方向と逆向きにパーティクルを飛ばす
+	Vector3 effectDir = { 0.0f, 0.0f, 0.0f };
+	if (isWalking) {
+		effectDir = horizontalVelocity * -1.0f;
+		// 少し上に向ける
+		effectDir.y = 0.3f;
+		effectDir.Normalize();
+	}
+
+	effectManager_->StartMoveEffect(worldTransform_.transform_.translate, effectDir, isWalking);
 }
 
 void Player::ApplyClamp() {

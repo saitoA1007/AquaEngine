@@ -56,6 +56,10 @@ PlayerEffectManager::PlayerEffectManager(GameEngine::GameObjectManager* objectMa
 	landingEffect_ = objectManager_->AddObject<ParticleBehavior>("PlayerLandingEffect", 32, textureManager, waveModel);
 	landingEffect_->SetIsLoop(false);
 
+	// 歩いた時のエフェクト
+	moveEffect_ = objectManager_->AddObject<ParticleBehavior>("PlayerMoveParticle", 32, textureManager, planeXYmodel);
+	moveEffect_->SetIsLoop(false);
+
 	// プレイヤーのヒットエフェクト
 	uint32_t hitEffectGH = textureManager->GetHandleByName("HitEffect.png");
 	playerHitAttackEffect_ = objectManager_->AddObject<PlayerHitAttackEffect>(hitEffectGH, planeXYmodel);
@@ -169,4 +173,16 @@ void PlayerEffectManager::StartChargeEffect(Vector3 pos, Vector4 color, bool isA
 		chargeEffect_->SetColor(color);
 	}
 	chargeEffect_->SetIsLoop(isActive);
+}
+
+void PlayerEffectManager::StartMoveEffect(Vector3 pos, Vector3 dir, bool isActive) {
+	// 停止時は発生だけ止め、出ているパーティクルは消えるまで表示する
+	if (isActive) {
+		moveEffect_->SetEmitterPos(pos);
+		// パーティクルの移動方向を設定
+		moveEffect_->SetDirection(dir);
+	}
+	if (moveEffect_->IsLoop() != isActive) {
+		moveEffect_->SetIsLoop(isActive);
+	}
 }
