@@ -1,6 +1,7 @@
 {
     "BossEnemy": {
         "Collider": {
+            "AttackDownColliderRadius": 5.0,
             "ColliderOffsetPosY": 3.950000047683716,
             "ColliderRadius": 4.0
         },
@@ -78,7 +79,7 @@
         },
         "StatusWeight": {
             "CrossMove": 10,
-            "IceFallAttack": 0,
+            "IceFallAttack": 20,
             "RotateMove": 10,
             "RushAttack": 40,
             "Wait": 10,
