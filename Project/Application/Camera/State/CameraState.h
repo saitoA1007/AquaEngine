@@ -1,4 +1,5 @@
 #pragma once
+#include <numbers>
 #include "Application/Camera/ICameraState.h"
 
 // 前方宣言
@@ -24,12 +25,20 @@ private:
 	// 回転の減衰率
 	float kRotateDamping_ = 0.88f;
 
+	// Y軸回転の初期値
 	float kFollowRotateY_ = -1.2f;
 	float kFollowFov_ = 0.45f;
 
+	// Y軸回転の入力速度
+	float kRotateSpeedY_ = 1.5f;
+	// Y軸回転の範囲
+	float kMinRotateY_ = -std::numbers::pi_v<float> * 0.5f;
+	float kMaxRotateY_ = -0.01f;
+
 private:
 	// フォロー固有の回転慣性
-	float rotateVelocityX_ = 0.0f; 
+	float rotateVelocityX_ = 0.0f;
+	float rotateVelocityY_ = 0.0f;
 };
 
 // ロックオンカメラ

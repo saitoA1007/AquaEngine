@@ -148,6 +148,8 @@ void GameScene::InputRegisterCommand() {
 	// カメラ操作のコマンドを登録する
 	inputCommand_->RegisterCommand("CameraMoveLeft", { { InputState::KeyPush, DIK_LEFT },{InputState::PadRightStick,0,{-1.0f,0.0f},0.2f} });
 	inputCommand_->RegisterCommand("CameraMoveRight", { { InputState::KeyPush, DIK_RIGHT },{InputState::PadRightStick,0,{1.0f,0.0f},0.2f} });
+	inputCommand_->RegisterCommand("CameraMoveUp", { { InputState::KeyPush, DIK_UP },{InputState::PadRightStick,0,{0.0f,1.0f},0.2f} });
+	inputCommand_->RegisterCommand("CameraMoveDown", { { InputState::KeyPush, DIK_DOWN },{InputState::PadRightStick,0,{0.0f,-1.0f},0.2f} });
 	// ロックオン
 	inputCommand_->RegisterCommand("CameraLockOn", { {InputState::KeyTrigger, DIK_L},{InputState::PadTriggerRightTrigger,0,{0.0f,0.0f},0.2f},{InputState::PadTriggerLeftTrigger,0,{0.0f,0.0f},0.2f} });
 

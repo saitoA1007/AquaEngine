@@ -21,11 +21,18 @@ FollowCameraState::FollowCameraState(CameraController* controller, GameEngine::D
 	param->Register("RotateDamping", kRotateDamping_, index++, subGroup);
 	param->Register("RotateY", kFollowRotateY_, index++, subGroup);
 	param->Register("Fov", kFollowFov_, index++, subGroup);
+	param->Register("RotateSpeedY", kRotateSpeedY_, index++, subGroup);
+	param->Register("MinRotateY", kMinRotateY_, index++, subGroup);
+	param->Register("MaxRotateY", kMaxRotateY_, index++, subGroup);
 }
 
 void FollowCameraState::Enter() {
 	// ロックオン解除時は慣性をリセットして違和感なく戻す
 	rotateVelocityX_ = 0.0f;
+	rotateVelocityY_ = 0.0f;
+
+	// Y軸の角度を初期値に戻す
+	controller_->GetRotateMove().y = std::clamp(kFollowRotateY_, kMinRotateY_, kMaxRotateY_);
 }
 
 void FollowCameraState::Update(float dt60) {
@@ -40,6 +47,7 @@ void FollowCameraState::Update(float dt60) {
 	Vector3 idealTarget = controller_->GetPlayerWorld()->GetWorldPosition();
 	idealTarget.y += offsetY_;
 
+	// 入力
 	float targetRotateSpeed = 0.0f;
 	if (controller_->GetInputCommand()->IsCommandActive("CameraMoveLeft")) {
 		targetRotateSpeed += kRotateSpeed_;
@@ -49,10 +57,27 @@ void FollowCameraState::Update(float dt60) {
 		targetRotateSpeed -= kRotateSpeed_;
 	}
 
+	float targetRotateSpeedY = 0.0f;
+	if (controller_->GetInputCommand()->IsCommandActive("CameraMoveUp")) {
+		targetRotateSpeedY += kRotateSpeedY_;
+	}
+
+	if (controller_->GetInputCommand()->IsCommandActive("CameraMoveDown")) {
+		targetRotateSpeedY -= kRotateSpeedY_;
+	}
+
 	float currentDamping = std::powf(kRotateDamping_, dt60);
 	rotateVelocityX_ = rotateVelocityX_ * currentDamping + targetRotateSpeed * (1.0f - currentDamping);
 	rotateMove.x += rotateVelocityX_ * FpsCounter::gameDeltaTime;
-	rotateMove.y = kFollowRotateY_;
+
+	rotateVelocityY_ = rotateVelocityY_ * currentDamping + targetRotateSpeedY * (1.0f - currentDamping);
+	rotateMove.y += rotateVelocityY_ * FpsCounter::gameDeltaTime;
+
+	// 水平から真上の手前までに制限する
+	if (rotateMove.y <= kMinRotateY_ || rotateMove.y >= kMaxRotateY_) {
+		rotateMove.y = std::clamp(rotateMove.y, kMinRotateY_, kMaxRotateY_);
+		rotateVelocityY_ = 0.0f;
+	}
 
 	Vector3 idealPosition;
 	float distance = kDistance_;
