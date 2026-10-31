@@ -38,6 +38,9 @@ namespace GameEngine {
 		// 破片を全て消し、すぐに無傷の状態へ戻す
 		void ResetToIntact() { damageController_.ResetToIntact(); }
 
+		// 最下層のチャンクをアンカーとして切り離さないようにするか
+		void SetUseAnchor(bool isUse) { damageController_.SetUseAnchor(isUse); }
+
 		/// <summary>
 		/// ワールド座標で指定した位置にダメージを与える
 		/// </summary>
@@ -73,15 +76,15 @@ namespace GameEngine {
 		// 切る数
 		int planeCount_ = 8;
 
+		// 氷のマテリアル
+		IceMaterial iceMaterial_;
+
 	private:
 		// 名前
 		std::string name_ = "noName";
 
 		// モデル
 		Model* model_ = nullptr;
-
-		// 氷のマテリアル
-		IceMaterial iceMaterial_;
 
 		// aabbの当たり判定
 		AABBCollider collider_;

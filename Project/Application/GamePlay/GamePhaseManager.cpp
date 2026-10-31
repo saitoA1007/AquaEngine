@@ -3,6 +3,7 @@
 #include "Application/Player/Player.h"
 #include "Application/Enemy/BossEnemy.h"
 #include "Application/UI/Managers/PlayUIManager.h"
+#include "Application/Stage/StageManager.h"
 #include "FPSCounter.h"
 #include "EasingManager.h"
 // 各フェーズ
@@ -12,7 +13,7 @@ using namespace GameEngine;
 
 GamePhaseManager::GamePhaseManager(GameEngine::InputCommand* inputCommand, Player* player, BossEnemy* bossEnemy,
 	TitleUIManager* titleUIManager, PlayUIManager* playUIManager, GameOverUIManager* gameOverUIManager, ClearUIManager* clearUIManager,
-	PauseUIManager* pauseUIManager,CameraController* cameraController, GameEngine::Dissolve* dissolve) {
+	PauseUIManager* pauseUIManager,CameraController* cameraController, GameEngine::Dissolve* dissolve, StageManager* stageManager) {
 
 	dissolve_ = dissolve;
 
@@ -32,6 +33,7 @@ GamePhaseManager::GamePhaseManager(GameEngine::InputCommand* inputCommand, Playe
 	player_ = player;
 	bossEnemy_ = bossEnemy;
 	playUIManager_ = playUIManager;
+	stageManager_ = stageManager;
 }
 
 void GamePhaseManager::Initialize() {
@@ -114,4 +116,5 @@ void GamePhaseManager::SceneReset() {
 	player_->Initialize();
 	bossEnemy_->Initialize();
 	playUIManager_->Initialize();
+	stageManager_->Reset();
 }

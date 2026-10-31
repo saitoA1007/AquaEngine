@@ -32,6 +32,9 @@ namespace GameEngine {
 		// 破片を全て消し、アニメーションせずにすぐ無傷の状態へ戻す
 		void ResetToIntact();
 
+		// 最下層のチャンクを地面に固定されたアンカーとして扱うか
+		void SetUseAnchor(bool isUse) { useAnchor_ = isUse; }
+
 		// チャンクの破壊された割合を取得
 		float GetDestroyedRatio() const {
 			if (chunksById_.empty()) { return 0.0f; }
@@ -124,6 +127,9 @@ namespace GameEngine {
 
 		// 元の姿へ戻るアニメーションを再生中か
 		bool isReassembling_ = false;
+
+		// アンカーを使用するか
+		bool useAnchor_ = true;
 
 		// 生成元オブジェクトの現在のワールド行列
 		Matrix4x4 worldMatrix_ = Matrix4x4::MakeIdentity();

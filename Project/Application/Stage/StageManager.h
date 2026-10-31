@@ -12,6 +12,7 @@ namespace GameEngine {
 	class TextureManager;
 }
 class CameraController;
+class Floor;
 
 class StageManager : public GameEngine::IGameObject {
 public:
@@ -26,6 +27,9 @@ public:
 
 	// 描画処理
 	void Draw() override;
+
+	// ステージを元の状態に戻す
+	void Reset();
 
 private:
 	GameEngine::GameObjectManager* objectManager_ = nullptr;
@@ -46,6 +50,9 @@ private:
 	
 	// 壁のデータ
 	std::vector<Wall*> walls_;
+
+	// 床
+	Floor* floor_ = nullptr;
 
 private:
 
