@@ -72,6 +72,14 @@ PlayerEffectManager::PlayerEffectManager(GameEngine::GameObjectManager* objectMa
 	chargeParentMatrix_ = Matrix4x4::MakeTranslateMatrix({ 0.0f,0.0f,0.0f });
 	chargeEffect_->SetEmitterPos({ 0.0f,0.0f,0.0f });
 	chargeEffect_->SetParent(&chargeParentMatrix_, ParticleSimulationSpace::kLocal);
+
+	// 突進エフェクト
+	rushAttackEffect_ = effectsManager_->GetEffect("PlayerRushEffect");
+	if (rushAttackEffect_) {
+		// プレイヤーに追従させるため、発生位置は親からの相対位置にする
+		rushParentMatrix_ = Matrix4x4::MakeTranslateMatrix({ 0.0f,0.0f,0.0f });
+		rushAttackEffect_->SetParent(&rushParentMatrix_, ParticleSimulationSpace::kLocal);
+	}
 }
 
 void PlayerEffectManager::Update() {
@@ -102,6 +110,11 @@ void PlayerEffectManager::Update() {
 
 	// 落下エフェクトの更新
 	downAttackEffect_->Update();
+
+	// 突進エフェクトの更新
+	if (rushAttackEffect_) {
+		rushAttackEffect_->Update();
+	}
 }
 
 void PlayerEffectManager::Draw() {
@@ -112,6 +125,11 @@ void PlayerEffectManager::Draw() {
 
 	// 落下エフェクトの描画
 	downAttackEffect_->Draw();
+
+	// 突進エフェクトの描画
+	if (rushAttackEffect_) {
+		rushAttackEffect_->Draw();
+	}
 }
 
 void PlayerEffectManager::StartShockWave(Vector3 pos) {
@@ -185,4 +203,25 @@ void PlayerEffectManager::StartMoveEffect(Vector3 pos, Vector3 dir, bool isActiv
 	if (moveEffect_->IsLoop() != isActive) {
 		moveEffect_->SetIsLoop(isActive);
 	}
+}
+
+void PlayerEffectManager::StartRushEffect(const Matrix4x4& parentMatrix, bool isActive) {
+	if (!rushAttackEffect_) { return; }
+
+	// 突進中はプレイヤーの行列に追従させる
+	if (isActive) {
+		rushParentMatrix_ = parentMatrix;
+	}
+
+	// 突進を始めた時だけ最初から再生する
+	if (isActive && !isRushEffectActive_) {
+		rushAttackEffect_->Play({ 0.0f,0.0f,0.0f });
+	}
+
+	// 突進が終わったら発生を止め、出ているパーティクルは消えるまで表示する
+	if (!isActive && isRushEffectActive_) {
+		rushAttackEffect_->Stop();
+	}
+
+	isRushEffectActive_ = isActive;
 }

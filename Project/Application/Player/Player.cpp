@@ -114,6 +114,9 @@ void Player::Initialize() {
 
 	// 歩きエフェクトを止める
 	effectManager_->StartMoveEffect(worldTransform_.transform_.translate, Vector3(0.0f, 0.0f, 0.0f), false);
+
+	// 突進エフェクトを止める
+	effectManager_->StartRushEffect(worldTransform_.GetWorldMatrix(), false);
 }
 
 void Player::Update() {
@@ -155,6 +158,9 @@ void Player::Update() {
 
 	// 歩きエフェクトの更新
 	UpdateMoveEffect();
+
+	// 突進エフェクトの更新
+	effectManager_->StartRushEffect(worldTransform_.GetWorldMatrix(), commonData_.state == PlayerState::kAttackRush);
 
 	// 振動の更新
 	UpdateVibration();

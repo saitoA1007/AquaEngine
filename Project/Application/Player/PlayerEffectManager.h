@@ -41,6 +41,13 @@ public:
 	// 歩いた時のエフェクト
 	void StartMoveEffect(Vector3 pos, Vector3 dir, bool isActive);
 
+	/// <summary>
+	/// 突進エフェクト
+	/// </summary>
+	/// <param name="parentMatrix">親にするプレイヤーのワールド行列</param>
+	/// <param name="isActive">突進中か</param>
+	void StartRushEffect(const Matrix4x4& parentMatrix, bool isActive);
+
 private:
 	GameEngine::GameObjectManager* objectManager_ = nullptr;
 	GameEngine::EffectsManager* effectsManager_ = nullptr;
@@ -50,6 +57,13 @@ private:
 
 	// 落下エフェクト
 	std::unique_ptr<GameEngine::EffectObject> downAttackEffect_;
+
+	// 突進エフェクト
+	std::unique_ptr<GameEngine::EffectObject> rushAttackEffect_;
+	// 突進エフェクトの親行列
+	Matrix4x4 rushParentMatrix_{};
+	// 突進エフェクトを出しているか
+	bool isRushEffectActive_ = false;
 
 	// チャージエフェクト
 	GameEngine::ParticleBehavior* chargeEffect_;

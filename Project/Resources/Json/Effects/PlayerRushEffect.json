@@ -1,0 +1,34 @@
+{
+    "Duration": 1.0,
+    "IsLoop": true,
+    "Tracks": [
+        {
+            "Duration": 1.0,
+            "EmitMode": "Continuous",
+            "MaxNum": 32,
+            "ModelName": "rushWave.obj",
+            "Name": "TipWave",
+            "Offset": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "ParticleName": "PlayerRushTipWaveParticle",
+            "StartTime": 0.0
+        },
+        {
+            "Duration": 1.0,
+            "EmitMode": "Continuous",
+            "MaxNum": 32,
+            "ModelName": "rushWave.obj",
+            "Name": "Wave",
+            "Offset": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "ParticleName": "PlayerRushWaveParticle",
+            "StartTime": 0.0
+        }
+    ]
+}
