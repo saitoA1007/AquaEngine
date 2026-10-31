@@ -22,6 +22,7 @@ Wall::Wall(GameEngine::Model* model, GameEngine::Model* fractureModel, GameEngin
 	parame_->Register("MaxHp", maxHp_, index++, subGroup);
 	parame_->Register("RespawnTime", respawnTime_, index++, subGroup);
 	parame_->Register("ReassembleDestroyedRatio", reassembleDestroyedRatio_, index++, subGroup);
+	parame_->Register("FloorPosY", floorPosY_, index++, subGroup);
 	parame_->Register("HitShakeIntensity", hitShakeIntensity_, index++, subGroup);
 	parame_->Register("BreakShakeIntensity", breakShakeIntensity_, index++, subGroup);
 	parame_->Register("ShakeDuration", shakeDuration_, index++, subGroup);
@@ -49,6 +50,9 @@ Wall::Wall(GameEngine::Model* model, GameEngine::Model* fractureModel, GameEngin
 
 	underWallModelComponent_.SetBufferMaterial(0, iceMaterial_.GetMaterialSrvIndex());
 	underWallModelComponent_.SetHitGroup(1);
+
+	// 地面の位置を設定
+	destructObject_.SetGroundHeight(floorPosY_);
 }
 
 void Wall::SetParameter(const Transform& transform) {

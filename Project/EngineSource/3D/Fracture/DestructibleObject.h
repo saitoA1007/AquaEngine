@@ -41,6 +41,9 @@ namespace GameEngine {
 		// 最下層のチャンクをアンカーとして切り離さないようにするか
 		void SetUseAnchor(bool isUse) { damageController_.SetUseAnchor(isUse); }
 
+		// 破片が跳ねる地面の高さ(ワールド座標)を設定する
+		void SetGroundHeight(float worldY) { damageController_.SetGroundHeight(worldY); }
+
 		/// <summary>
 		/// ワールド座標で指定した位置にダメージを与える
 		/// </summary>

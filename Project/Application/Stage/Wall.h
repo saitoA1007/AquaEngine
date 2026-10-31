@@ -47,6 +47,9 @@ private:
 	// 破壊された時に戻す割合
 	float reassembleDestroyedRatio_ = 0.4f;
 
+	// 破片が着地する地面の位置
+	float floorPosY_ = 0.0f;
+
 	// プレイヤーの突進が当たった時の揺れの強さ
 	float hitShakeIntensity_ = 0.15f;
 	// 壁が崩れた時の揺れの強さ

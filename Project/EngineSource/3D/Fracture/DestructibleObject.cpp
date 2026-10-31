@@ -66,6 +66,15 @@ DestructibleObject::DestructibleObject(std::string name, Model* model, uint32_t 
 	debugParameter_->Register("CrackAngularSpringStiffness", damageController_.kCrackAngularSpringStiffness_, 0, subGroup);
 	debugParameter_->Register("CrackAngularDamping", damageController_.kCrackAngularDamping_, 0, subGroup);
 	debugParameter_->Register("CrackImpulseStrength", damageController_.kCrackImpulseStrength_, 0, subGroup);
+	// 破片の落下、地面で跳ねる動き
+	subGroup = "Debris";
+	debugParameter_->Register("Gravity", damageController_.kDebrisGravity_, 0, subGroup);
+	debugParameter_->Register("AngularSpeed", damageController_.kDebrisAngularSpeed_, 0, subGroup);
+	debugParameter_->Register("BounceRestitution", damageController_.kBounceRestitution_, 0, subGroup);
+	debugParameter_->Register("BounceFriction", damageController_.kBounceFriction_, 0, subGroup);
+	debugParameter_->Register("GroundDrag", damageController_.kGroundDrag_, 0, subGroup);
+	debugParameter_->Register("SleepSpeed", damageController_.kSleepSpeed_, 0, subGroup);
+	debugParameter_->Register("MinUpSpeed", damageController_.kDebrisMinUpSpeed_, 0, subGroup);
 
 	debugParameter_->Apply();
 }

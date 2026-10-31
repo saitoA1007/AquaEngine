@@ -90,11 +90,13 @@ void Floor::Initialize() {
 void Floor::Update() {
 	debugParame_->ApplyIfDirty();
 
-	// 上層部の上面を氷の床面に合わせる(破壊モデルのYは-1~1)
+	// 上層部の上面を氷の床面に合わせる
 	const Vector3 baseTranslate = iceModelComponent_.worldTransform_.transform_.translate;
 	destructObject_.worldTransform_.transform_.scale = fractureScale_;
 	destructObject_.worldTransform_.transform_.translate = baseTranslate;
 	destructObject_.worldTransform_.transform_.translate.y -= fractureScale_.y;
+	// 破片は床面の上で跳ねさせる
+	destructObject_.SetGroundHeight(baseTranslate.y);
 	destructObject_.Update();
 
 	// 壊れてから一定時間で元に戻す
