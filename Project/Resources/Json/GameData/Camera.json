@@ -20,17 +20,22 @@
             "WaitMaxTime": 1.0,
             "WaitPosition": [
                 0.0,
-                10.0,
+                15.0,
                 -30.0
             ]
         },
         "Follow": {
             "Distance": 30.0,
             "Fov": 0.5,
+            "MaxRotateY": -0.009999999776482582,
+            "MinRotateY": -1.5707963705062866,
             "OffsetY": 1.0,
             "PositionLerpRate": 0.07000000029802322,
+            "RotateAccelTime": 1.0,
             "RotateDamping": 0.8799999952316284,
+            "RotateMaxSpeedRate": 3.0,
             "RotateSpeed": 2.0,
+            "RotateSpeedY": 1.5,
             "RotateY": -1.2000000476837158,
             "TargetLerpRate": 0.10000000149011612
         },
