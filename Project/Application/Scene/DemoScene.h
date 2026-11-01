@@ -13,8 +13,6 @@
 #include "Collider.h"
 #include "DestructibleObject.h"
 
-#include "Text.h"
-
 #include "Application/Scene/Transition/Fade.h"
 
 class DemoScene : public GameEngine::IScene {
@@ -62,18 +60,10 @@ private: // シーン機能
 
 	// メインカメラ
 	std::unique_ptr<GameEngine::Camera> mainCamera_;
-
-	// プリミティブのエフェクト
-	GameEngine::ParticleBehavior* testEffect_;
 	
 	float intensity_ = 0.8f;
 	Vector3 dir_ = { 0.0f,-1.0f,0.0f };
 	Vector4 lightColor_ = { 1.0f,1.0f,1.0f,1.0f };
-	
-	// テキストのテスト
-	std::unique_ptr<GameEngine::Text> text_;
-	std::string textName_;
-	static inline char buf[128] = "";
 
 	Vector4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 	float roughness_ = 0.5f;

@@ -58,6 +58,17 @@ TestScene::TestScene() {
 	terrainModel_->SetDefaultNormalTexture(normalGH);
 
 	// エフェクト用モデル
+	//auto* effectModel = modelManager_->GetNameByModel("plane.obj");
+	//effectModel->SetDefaultIsEnableLight(false);
+	//gameObjectManager_->AddObject<ParticleBehavior>("DemoParticle", 64, textureManager_, effectModel);
+	//gameObjectManager_->AddObject<ParticleBehavior>("Demo2Particle", 64, textureManager_, effectModel);
+	//gameObjectManager_->AddObject<ParticleBehavior>("Demo3Particle", 64, textureManager_, effectModel);
+	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerHitRingParticle", 8, textureManager_, effectModel);
+	// オブジェクトのテスト
+	//auto* testModel = modelManager_->GetNameByModel("sphereShade.obj");
+	//gameObjectManager_->AddObject<Test>(testModel);
+
+	// エフェクト用モデル
 	effectModel_ = modelManager_->GetNameByModel("plane.obj");
 	effectModel_->SetDefaultIsEnableLight(false);
 	//gameObjectManager_->AddObject<ParticleBehavior>("HitAfterEffect", 32, textureManager_, effectModel_, &renderQueue_->GetMainCamera());
@@ -87,6 +98,7 @@ TestScene::TestScene() {
 
 	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerRushWaveParticle", 32, textureManager_, waModel);
 	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerRushTipWaveParticle", 32, textureManager_, waModel);
+	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerRushTrailParticle", 32, textureManager_, effectModel_);
 
 	// 中ポリゴン氷
 	iceMiddleModel_ = modelManager_->GetNameByModel("ice_middlePolygon.gltf");

@@ -77,6 +77,8 @@ DestructibleObject::DestructibleObject(std::string name, Model* model, uint32_t 
 	debugParameter_->Register("MinUpSpeed", damageController_.kDebrisMinUpSpeed_, 0, subGroup);
 
 	debugParameter_->Apply();
+
+	iceMaterial_.GetMaterialData()->dissolveThreshold = 0.0f;
 }
 
 void DestructibleObject::Initialize() {
