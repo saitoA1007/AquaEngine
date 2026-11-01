@@ -170,6 +170,9 @@ void Player::Update() {
 void Player::Draw() {
 	if (!isDraw_) { return; }
 
+	// Hpが0になったら表示しない
+	if (playerStatus_.GetCurrentHp() <= 0) { return; }
+
 	// クールタイム中は点滅させる
 	if (playerStatus_.IsBlinkHidden()) { return; }
 
