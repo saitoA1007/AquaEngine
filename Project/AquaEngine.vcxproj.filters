@@ -1669,6 +1669,7 @@
     <FxCompile Include="Resources\Shaders\PostEffect\ColorGrading.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\DepthCopy.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\Dissolve\Dissolve.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\PostEffect\UIComposite.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\LightingComposite.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\OutLine\DepthOutLine.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\Smoothing\Gauss5x5Horizontal.PS.hlsl" />

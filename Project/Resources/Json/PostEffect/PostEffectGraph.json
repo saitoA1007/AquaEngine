@@ -33,6 +33,11 @@
         {
             "from": 18,
             "slot": 0,
+            "to": 24
+        },
+        {
+            "from": 24,
+            "slot": 0,
             "to": 21
         },
         {
@@ -54,7 +59,7 @@
             "id": 3,
             "kind": "Output",
             "pos": [
-                1656.0,
+                1944.0,
                 252.0
             ]
         },
@@ -150,10 +155,23 @@
             },
             "passName": "",
             "pos": [
-                1368.0,
+                1656.0,
                 244.0
             ],
             "type": "Dissolve"
+        },
+        {
+            "active": true,
+            "id": 24,
+            "kind": "Effect",
+            "name": "UIComposite",
+            "params": {},
+            "passName": "",
+            "pos": [
+                1368.0,
+                244.0
+            ],
+            "type": "UIComposite"
         }
     ],
     "version": 1

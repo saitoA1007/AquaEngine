@@ -23,6 +23,7 @@ void PostEffectManager::Initialize(ID3D12GraphicsCommandList* commandList, SrvMa
     registry_.RegisterType<GaussHorizontal>("GaussHorizontal", psoManager);
     registry_.RegisterType<Bloom>("Bloom", psoManager);
     registry_.RegisterType<Dissolve>("Dissolve", psoManager);
+    registry_.RegisterType<UIComposite>("UIComposite", psoManager);
 
     // デフォルトのノードが繋がっている状態
     BuildDefaultGraph();
@@ -35,6 +36,9 @@ void PostEffectManager::Execute() {
     registry_.Tick();
 
     if (graph_.dirty) { RebuildOrder(); }
+
+    // UIの合成に使うUIパス
+    UIComposite::SetUITextureIndex(renderPassController_->GetSrvIndex(renderPassController_->GetUIPass()));
 
     currentPassName_ = ExecuteGraph(renderPassController_->GetSceneFinalPass());
     renderPassController_->SetPostProcessFinalPass(currentPassName_);
@@ -145,16 +149,18 @@ void PostEffectManager::BuildDefaultGraph() {
     auto* gaussH = CreateEffectNode("GaussHorizontal");
     auto* bloom = CreateEffectNode("Bloom");
     auto* grading = CreateEffectNode("ColorGrading");
+    auto* uiComposite = CreateEffectNode("UIComposite");
     auto* dissolve = CreateEffectNode("Dissolve");
 
-    // Scene → HighLum → GaussV → GaussH → Bloom(Blur) → Grading → Dissolve → Output
+    // Scene → HighLum → GaussV → GaussH → Bloom(Blur) → Grading → UIComposite → Dissolve → Output
     graph_.AddLink(scene->output.id, highLum->inputs[0].id);
     graph_.AddLink(highLum->output.id, gaussV->inputs[0].id);
     graph_.AddLink(gaussV->output.id, gaussH->inputs[0].id);
     graph_.AddLink(gaussH->output.id, bloom->inputs[0].id);   // Blur
     graph_.AddLink(scene->output.id, bloom->inputs[1].id);   // 元の画像
     graph_.AddLink(bloom->output.id, grading->inputs[0].id);
-    graph_.AddLink(grading->output.id, dissolve->inputs[0].id);
+    graph_.AddLink(grading->output.id, uiComposite->inputs[0].id);
+    graph_.AddLink(uiComposite->output.id, dissolve->inputs[0].id);
     graph_.AddLink(dissolve->output.id, output->inputs[0].id);
 }
 
