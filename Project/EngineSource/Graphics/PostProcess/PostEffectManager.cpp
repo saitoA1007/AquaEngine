@@ -37,9 +37,6 @@ void PostEffectManager::Execute() {
 
     if (graph_.dirty) { RebuildOrder(); }
 
-    // UIの合成に使うUIパス
-    UIComposite::SetUITextureIndex(renderPassController_->GetSrvIndex(renderPassController_->GetUIPass()));
-
     currentPassName_ = ExecuteGraph(renderPassController_->GetSceneFinalPass());
     renderPassController_->SetPostProcessFinalPass(currentPassName_);
     renderPassController_->SetPresentPass(currentPassName_);
@@ -48,6 +45,8 @@ void PostEffectManager::Execute() {
 std::string PostEffectManager::ExecuteGraph(const std::string& scenePass) {
     frameResources_.Reset();
     const int sceneRes = frameResources_.Add({ renderPassController_->GetSrvIndex(scenePass), -1, 0, &scenePass });
+    const std::string& uiPass = renderPassController_->GetUIPass();
+    const int uiRes = frameResources_.Add({ renderPassController_->GetSrvIndex(uiPass), -1, 0, &uiPass });
 
     stepRes_.assign(executeSteps_.size(), sceneRes);
 
@@ -59,6 +58,10 @@ std::string PostEffectManager::ExecuteGraph(const std::string& scenePass) {
         PostEffectNode* node = step.node;
 
         if (node->kind == PostEffectNodeKind::kScene) { continue; }
+        if (node->kind == PostEffectNodeKind::kUI) {
+            stepRes_[i] = uiRes;
+            continue;
+        }
 
         // 入力
         inRes_.clear();
@@ -141,6 +144,7 @@ void PostEffectManager::BuildDefaultGraph() {
     graph_ = PostEffectGraph{};
 
     auto* scene = graph_.AddSceneNode();
+    auto* ui = graph_.AddUINode();
     auto* output = graph_.AddOutputNode();
 
     auto* highLum = CreateEffectNode("HighLumMask");
@@ -152,7 +156,7 @@ void PostEffectManager::BuildDefaultGraph() {
     auto* uiComposite = CreateEffectNode("UIComposite");
     auto* dissolve = CreateEffectNode("Dissolve");
 
-    // Scene → HighLum → GaussV → GaussH → Bloom(Blur) → Grading → UIComposite → Dissolve → Output
+    // Scene → HighLum → GaussV → GaussH → Bloom(Blur) → Grading → UIComposite(+UI) → Dissolve → Output
     graph_.AddLink(scene->output.id, highLum->inputs[0].id);
     graph_.AddLink(highLum->output.id, gaussV->inputs[0].id);
     graph_.AddLink(gaussV->output.id, gaussH->inputs[0].id);
@@ -160,6 +164,7 @@ void PostEffectManager::BuildDefaultGraph() {
     graph_.AddLink(scene->output.id, bloom->inputs[1].id);   // 元の画像
     graph_.AddLink(bloom->output.id, grading->inputs[0].id);
     graph_.AddLink(grading->output.id, uiComposite->inputs[0].id);
+    graph_.AddLink(ui->output.id, uiComposite->inputs[1].id);  // UI
     graph_.AddLink(uiComposite->output.id, dissolve->inputs[0].id);
     graph_.AddLink(dissolve->output.id, output->inputs[0].id);
 }

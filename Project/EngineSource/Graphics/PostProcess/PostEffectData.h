@@ -244,7 +244,7 @@ namespace GameEngine {
         ConstantBuffer<DissolveData> buffer_;
     };
 
-    // UIの合成。UIパスの内容を入力の上に重ねる
+    // UIの合成。UIの画像をシーンの上に重ねる
     class UIComposite : public IPostEffect {
         struct UICompositeData {
             uint32_t gameTextureHandle;
@@ -255,22 +255,21 @@ namespace GameEngine {
     public:
         UIComposite();
 
-        void Update() override;
-
         void Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) override;
 
         void SetPassIndex(const uint32_t& index) override {
             buffer_.GetData()->gameTextureHandle = index;
         }
 
+        uint32_t GetInputCount() const override { return 2; }
+        const char* GetInputName(uint32_t slot) const override { return slot == 0 ? "Scene" : "UI"; }
+        void SetInputIndex(uint32_t slot, uint32_t srvIndex) override {
+            if (slot == 0) { buffer_.GetData()->gameTextureHandle = srvIndex; } else { buffer_.GetData()->uiTextureHandle = srvIndex; }
+        }
         const char* GetDisplayName() const override { return "UIComposite"; }
-
-        // UIパスのSRVインデックス。全インスタンスで共通
-        static void SetUITextureIndex(uint32_t index) { uiTextureIndex_ = index; }
 
     private:
         ConstantBuffer<UICompositeData> buffer_;
-        static inline uint32_t uiTextureIndex_ = 0;
     };
 
     // アウトライン

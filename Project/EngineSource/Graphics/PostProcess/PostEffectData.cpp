@@ -235,10 +235,6 @@ UIComposite::UIComposite() {
     isActive_ = true;
 }
 
-void UIComposite::Update() {
-    buffer_.GetData()->uiTextureHandle = uiTextureIndex_;
-}
-
 void UIComposite::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
     commandList->SetGraphicsRootDescriptorTable(0, srvManager->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
     commandList->SetGraphicsRootConstantBufferView(1, buffer_.GetGpuVirtualAddress());
