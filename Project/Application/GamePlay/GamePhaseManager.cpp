@@ -13,7 +13,8 @@ using namespace GameEngine;
 
 GamePhaseManager::GamePhaseManager(GameEngine::InputCommand* inputCommand, Player* player, BossEnemy* bossEnemy,
 	TitleUIManager* titleUIManager, PlayUIManager* playUIManager, GameOverUIManager* gameOverUIManager, ClearUIManager* clearUIManager,
-	PauseUIManager* pauseUIManager,CameraController* cameraController, GameEngine::Dissolve* dissolve, StageManager* stageManager) {
+	PauseUIManager* pauseUIManager,CameraController* cameraController, GameEngine::Dissolve* dissolve, StageManager* stageManager,
+	EnterMovieUIManager* enterMovieUIManager) {
 
 	dissolve_ = dissolve;
 
@@ -23,7 +24,7 @@ GamePhaseManager::GamePhaseManager(GameEngine::InputCommand* inputCommand, Playe
 	commonData_.timeController_ = &timeController_;
 
 	phases_[ScenePhase::kTitle] = std::make_unique<TitlePhase>(commonData_, cameraController, titleUIManager, player);
-	phases_[ScenePhase::kTutorial] = std::make_unique<TutorialPhase>(commonData_, cameraController, player, bossEnemy, playUIManager);
+	phases_[ScenePhase::kTutorial] = std::make_unique<TutorialPhase>(commonData_, cameraController, player, bossEnemy, playUIManager, enterMovieUIManager);
 	phases_[ScenePhase::kPlay] = std::make_unique<PlayPhase>(commonData_, player, bossEnemy, playUIManager, cameraController);
 	phases_[ScenePhase::kGameOver] = std::make_unique<GameOverPhase>(commonData_, gameOverUIManager);
 	phases_[ScenePhase::kClear] = std::make_unique<ClearPhase>(commonData_, clearUIManager);

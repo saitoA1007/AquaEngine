@@ -22,6 +22,9 @@ struct BossStateCommonData {
 	bool isBreakEgg = false;
 	bool isDrawEgg = false;
 
+	// 入りの演出で叫び始めたか
+	bool isScream = false;
+
 	// hp
 	int32_t hp_ = 1;
 

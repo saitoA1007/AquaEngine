@@ -1,0 +1,43 @@
+{
+    "EnterMovieUI": {
+        "Animation": {
+            "HoldTime": 1.2000000476837158,
+            "InTime": 0.4000000059604645,
+            "MoveOffsetY": 120.0,
+            "OutTime": 0.30000001192092896
+        },
+        "DownText": {
+            "Color": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Scale": [
+                80.0,
+                80.0
+            ],
+            "TargetPos": [
+                640.0,
+                600.0
+            ]
+        },
+        "SceneName": "Game",
+        "UpText": {
+            "Color": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Scale": [
+                80.0,
+                80.0
+            ],
+            "TargetPos": [
+                640.0,
+                150.0
+            ]
+        }
+    }
+}

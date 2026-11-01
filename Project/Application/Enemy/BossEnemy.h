@@ -56,6 +56,9 @@ public:
 	// 卵が割れたか
 	bool IsBreakEgg() const { return stateCommonData_.isBreakEgg; }
 
+	// 入りの演出で叫び始めたか
+	bool IsScream() const { return stateCommonData_.isScream; }
+
 	// プレイヤーを設定
 	void SetPlayer(const Player* player) { player_ = player; }
 

@@ -21,6 +21,7 @@ void BossStateIn::Enter() {
 	isMove_ = true;
 	delayBreakEgg_ = true;
 	timer_ = 0.0f;
+	stateCommonData_.isScream = false;
 }
 
 void BossStateIn::Update() {
@@ -61,6 +62,7 @@ void BossStateIn::Update() {
 
 			// 叫びモージョンに以降
 			stateCommonData_.animator->StartAnimation(BossAnimationType::kScream, "Scream", maxWaitTime_, false);
+			stateCommonData_.isScream = true;
 
 		}
 	} else {

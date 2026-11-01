@@ -21,6 +21,7 @@ using namespace GameEngine;
 #include "Application/UI/Managers/GameOverUIManager.h"
 #include "Application/UI/Managers/ClearUIManager.h"
 #include "Application/UI/Managers/PauseUIManager.h"
+#include "Application/UI/Managers/EnterMovieUIManager.h"
 
 GameScene::~GameScene() {
 }
@@ -90,6 +91,8 @@ GameScene::GameScene() {
 	auto* clearUIManager = gameObjectManager_->AddObject<ClearUIManager>(textureManager_);
 	// ポーズのUI
 	auto* pauseUIManager = gameObjectManager_->AddObject<PauseUIManager>(textureManager_);
+	// 入りのムービーのUI
+	auto* enterMovieUIManager = gameObjectManager_->AddObject<EnterMovieUIManager>(fontManager_, textureManager_);
 
 	// 遷移する用のテクスチャを設定
 	Dissolve* dissolve = postEffectManager_->GetPostEffect<Dissolve>("Dissolve");
@@ -97,7 +100,7 @@ GameScene::GameScene() {
 
 	// シーンフェーズを管理
 	gameObjectManager_->AddObject<GamePhaseManager>(inputCommand_, player, bossEnemy, titleUIManager, playUIManager, gameOverUIManager, clearUIManager,
-		pauseUIManager, cameraController_, dissolve, stageManager);
+		pauseUIManager, cameraController_, dissolve, stageManager, enterMovieUIManager);
 
 	// ライトを設定
 	auto* light = renderQueue_->GetLightManager();
