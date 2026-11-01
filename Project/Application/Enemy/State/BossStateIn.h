@@ -22,6 +22,13 @@ public:
 	/// </summary>
 	void Exit() override;
 
+public:
+
+	/// <summary>
+	/// 入りの演出を飛ばして、終わった状態にする
+	/// </summary>
+	void Skip();
+
 private:
 	BossStateCommonData& stateCommonData_;
 

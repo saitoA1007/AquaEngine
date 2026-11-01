@@ -111,6 +111,15 @@ void BossEnemy::Initialize() {
 	currentState_->Enter();
 }
 
+void BossEnemy::SkipEnterMovie() {
+	if (bossState_ != BossState::kIn) { return; }
+
+	BossStateIn* inState = dynamic_cast<BossStateIn*>(currentState_);
+	if (inState) {
+		inState->Skip();
+	}
+}
+
 void BossEnemy::Update() {
 	// 値の適応
 	debugParame_->ApplyIfDirty();

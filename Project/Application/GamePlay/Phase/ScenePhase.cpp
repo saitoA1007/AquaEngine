@@ -126,6 +126,14 @@ void TutorialPhase::Update() {
 			isPlayBossName_ = true;
 			enterMovieUIManager_->Play();
 		}
+
+		// 入りのムービーを飛ばす
+		if (commonData_.inputCommand->IsCommandActive("SkipMovie")) {
+			bossEnemy_->SkipEnterMovie();
+			// 名前は表示しない
+			isPlayBossName_ = true;
+			enterMovieUIManager_->Stop();
+		}
 	} else {
 		// 黒帯UIを表示
 		playUIManager_->SetBarActive(cameraController_->UseLetterBoxUI());

@@ -59,6 +59,9 @@ public:
 	// 入りの演出で叫び始めたか
 	bool IsScream() const { return stateCommonData_.isScream; }
 
+	// 入りの演出を飛ばす
+	void SkipEnterMovie();
+
 	// プレイヤーを設定
 	void SetPlayer(const Player* player) { player_ = player; }
 
