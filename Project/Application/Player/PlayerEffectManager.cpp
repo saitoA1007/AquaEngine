@@ -80,6 +80,9 @@ PlayerEffectManager::PlayerEffectManager(GameEngine::GameObjectManager* objectMa
 		rushParentMatrix_ = Matrix4x4::MakeTranslateMatrix({ 0.0f,0.0f,0.0f });
 		rushAttackEffect_->SetParent(&rushParentMatrix_, ParticleSimulationSpace::kLocal);
 	}
+
+	// ダメージを受けた時のエフェクト
+	hitEffect_ = effectsManager_->GetEffect("PlayerHitEffect");
 }
 
 void PlayerEffectManager::Update() {
@@ -115,6 +118,11 @@ void PlayerEffectManager::Update() {
 	if (rushAttackEffect_) {
 		rushAttackEffect_->Update();
 	}
+
+	// ダメージを受けた時のエフェクトの更新
+	if (hitEffect_) {
+		hitEffect_->Update();
+	}
 }
 
 void PlayerEffectManager::Draw() {
@@ -129,6 +137,11 @@ void PlayerEffectManager::Draw() {
 	// 突進エフェクトの描画
 	if (rushAttackEffect_) {
 		rushAttackEffect_->Draw();
+	}
+
+	// ダメージを受けた時のエフェクトの描画
+	if (hitEffect_) {
+		hitEffect_->Draw();
 	}
 }
 
@@ -224,4 +237,10 @@ void PlayerEffectManager::StartRushEffect(const Matrix4x4& parentMatrix, bool is
 	}
 
 	isRushEffectActive_ = isActive;
+}
+
+void PlayerEffectManager::StartDamageEffect(Vector3 pos) {
+	if (!hitEffect_) { return; }
+	// 再生中でも最初から再生し直す
+	hitEffect_->Play(pos);
 }

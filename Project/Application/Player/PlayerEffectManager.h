@@ -48,6 +48,9 @@ public:
 	/// <param name="isActive">突進中か</param>
 	void StartRushEffect(const Matrix4x4& parentMatrix, bool isActive);
 
+	// ダメージを受けた時のエフェクト
+	void StartDamageEffect(Vector3 pos);
+
 private:
 	GameEngine::GameObjectManager* objectManager_ = nullptr;
 	GameEngine::EffectsManager* effectsManager_ = nullptr;
@@ -64,6 +67,9 @@ private:
 	Matrix4x4 rushParentMatrix_{};
 	// 突進エフェクトを出しているか
 	bool isRushEffectActive_ = false;
+
+	// ダメージを受けた時のエフェクト
+	std::unique_ptr<GameEngine::EffectObject> hitEffect_;
 
 	// チャージエフェクト
 	GameEngine::ParticleBehavior* chargeEffect_;

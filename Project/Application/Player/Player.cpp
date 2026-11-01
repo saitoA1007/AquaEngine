@@ -343,6 +343,9 @@ void Player::TakeDamage(int32_t damage) {
 	// 無敵時間中は何もしない
 	if (!playerStatus_.TakeDamage(damage)) { return; }
 
+	// ダメージを受けた位置にエフェクトを出す
+	effectManager_->StartDamageEffect(worldTransform_.GetWorldPosition());
+
 	// カメラを揺らす
 	if (camera_) {
 		camera_->StartShake(damageShakeIntensity_, damageShakeDuration_);

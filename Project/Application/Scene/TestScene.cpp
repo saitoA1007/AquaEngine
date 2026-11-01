@@ -75,6 +75,9 @@ TestScene::TestScene() {
 	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerHitBoxParticle", 32, textureManager_, effectModel_);
 
 	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerMoveParticle", 32, textureManager_, effectModel_);
+	
+	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerHitParticle", 32, textureManager_, effectModel_);
+	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerHitRingParticle", 32, textureManager_, effectModel_);
 
 	// ボスのラッシュ演出
 	auto* waModel = modelManager_->GetNameByModel("rushWave.obj");
@@ -82,8 +85,8 @@ TestScene::TestScene() {
 	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerLandingEffect", 32, textureManager_, waModel);
 	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerChargeParticle", 32, textureManager_, waModel);
 
-	gameObjectManager_->AddObject<ParticleBehavior>("PlayerRushWaveParticle", 32, textureManager_, waModel);
-	gameObjectManager_->AddObject<ParticleBehavior>("PlayerRushTipWaveParticle", 32, textureManager_, waModel);
+	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerRushWaveParticle", 32, textureManager_, waModel);
+	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerRushTipWaveParticle", 32, textureManager_, waModel);
 
 	// 中ポリゴン氷
 	iceMiddleModel_ = modelManager_->GetNameByModel("ice_middlePolygon.gltf");
