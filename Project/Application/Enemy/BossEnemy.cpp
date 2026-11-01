@@ -8,6 +8,7 @@
 
 #include "Application/CollisionConfig.h"
 #include "Application/Player/Player.h"
+#include "BossRangedAttackManager.h"
 
 using namespace GameEngine;
 
@@ -16,6 +17,9 @@ BossEnemy::BossEnemy(GameEngine::Model* model, GameEngine::Model* eggModel, Game
 
 	// 卵モデルを取得
 	eggModel_ = eggModel;
+
+	// 遠距離攻撃管理
+	rangedAttackManager_ = rangedAttackManager;
 
 	// 初期化
 	modelComponent_.worldTransform_.Initialize({ {3.0f,3.0f,3.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} });
@@ -39,6 +43,7 @@ BossEnemy::BossEnemy(GameEngine::Model* model, GameEngine::Model* eggModel, Game
 	debugParame_->Register("Scale", modelComponent_.worldTransform_.transform_.scale);
 	debugParame_->Register("ColliderRadius", colliderRadius_,0,"Collider");
 	debugParame_->Register("ColliderOffsetPosY", colliderOffsetPosY_, 1,"Collider");
+	debugParame_->Register("AttackDownColliderRadius", attackDownColliderRadius_, 2, "Collider");
 
 	for (uint32_t i = 0; i < meshNum; ++i) {
 		std::string name = "Color" + std::to_string(i);
@@ -92,6 +97,11 @@ void BossEnemy::Initialize() {
 	stateCommonData_.isBreakEgg = false;
 	stateCommonData_.isDrawEgg = true;
 
+	// 出ている遠距離攻撃を全て止める
+	if (rangedAttackManager_) {
+		rangedAttackManager_->Reset();
+	}
+
 	// 初期化
 	if (currentState_) {
 		currentState_->Exit();
@@ -99,6 +109,15 @@ void BossEnemy::Initialize() {
 	bossState_ = BossState::kIn;
 	currentState_ = statesTable_[static_cast<size_t>(BossState::kIn)].get();
 	currentState_->Enter();
+}
+
+void BossEnemy::SkipEnterMovie() {
+	if (bossState_ != BossState::kIn) { return; }
+
+	BossStateIn* inState = dynamic_cast<BossStateIn*>(currentState_);
+	if (inState) {
+		inState->Skip();
+	}
 }
 
 void BossEnemy::Update() {
@@ -124,11 +143,10 @@ void BossEnemy::Update() {
 	// 当たり判定の位置を更新
 	if (stateCommonData_.isBreakEgg) {
 		collider_.SetWorldPosition(modelComponent_.worldTransform_.GetWorldPosition() + Vector3(0.0f, colliderOffsetPosY_, 0.0f));
-		collider_.SetRadius(colliderRadius_);
 	} else {
 		collider_.SetWorldPosition(modelComponent_.worldTransform_.GetWorldPosition() + Vector3(0.0f, 0.0f, 0.0f));
-		collider_.SetRadius(colliderRadius_);
 	}
+	collider_.SetRadius(GetCurrentColliderRadius());
 
 	// アニメーションの更新
 	animator_->Update();
@@ -146,7 +164,6 @@ void BossEnemy::Draw() {
 }
 
 void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionResult& result) {
-
 
 	bool isPlayer = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kPlayer));
 
@@ -182,6 +199,14 @@ void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRes
 void BossEnemy::OnCollisionStay([[maybe_unused]] const GameEngine::CollisionResult& result) {
 
 
+}
+
+float BossEnemy::GetCurrentColliderRadius() const {
+	// プレイヤーが落下攻撃中は当てやすくするために大きくする
+	if (player_ != nullptr && player_->GetCurrentState() == PlayerState::kAttackDown) {
+		return attackDownColliderRadius_;
+	}
+	return colliderRadius_;
 }
 
 BossBattleState BossEnemy::GetBattleState() const {

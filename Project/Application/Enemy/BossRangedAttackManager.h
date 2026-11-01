@@ -45,6 +45,11 @@ public:
 	/// <param name="dir"></param>
 	void SetRush(Vector3 pos, Vector3 dir, bool isActive);
 
+	/// <summary>
+	/// 出ている遠距離攻撃を全て止める
+	/// </summary>
+	void Reset();
+
 private:
 	GameEngine::GameObjectManager* objectManager_ = nullptr;
 

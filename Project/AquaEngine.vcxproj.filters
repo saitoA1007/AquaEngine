@@ -345,6 +345,9 @@
     <ClCompile Include="Application\UI\Managers\GameOverUIManager.cpp">
       <Filter>Application\UI\Managers</Filter>
     </ClCompile>
+    <ClCompile Include="Application\UI\Managers\EnterMovieUIManager.cpp">
+      <Filter>Application\UI\Managers</Filter>
+    </ClCompile>
     <ClCompile Include="Application\UI\Managers\PauseUIManager.cpp">
       <Filter>Application\UI\Managers</Filter>
     </ClCompile>
@@ -985,6 +988,9 @@
       <Filter>Application\UI\Managers</Filter>
     </ClInclude>
     <ClInclude Include="Application\UI\Managers\GameOverUIManager.h">
+      <Filter>Application\UI\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\UI\Managers\EnterMovieUIManager.h">
       <Filter>Application\UI\Managers</Filter>
     </ClInclude>
     <ClInclude Include="Application\UI\Managers\PauseUIManager.h">
@@ -1663,6 +1669,7 @@
     <FxCompile Include="Resources\Shaders\PostEffect\ColorGrading.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\DepthCopy.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\Dissolve\Dissolve.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\PostEffect\UIComposite.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\LightingComposite.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\OutLine\DepthOutLine.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\Smoothing\Gauss5x5Horizontal.PS.hlsl" />

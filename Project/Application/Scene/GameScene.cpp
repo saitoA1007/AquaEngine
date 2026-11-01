@@ -21,6 +21,7 @@ using namespace GameEngine;
 #include "Application/UI/Managers/GameOverUIManager.h"
 #include "Application/UI/Managers/ClearUIManager.h"
 #include "Application/UI/Managers/PauseUIManager.h"
+#include "Application/UI/Managers/EnterMovieUIManager.h"
 
 GameScene::~GameScene() {
 }
@@ -62,13 +63,14 @@ GameScene::GameScene() {
 	enemyModel->SetDefaultIsEnableLight(true);
 	auto* eggModel = modelManager_->GetNameByModel("BossEgg.obj");
 	auto bossEnemy = gameObjectManager_->AddObject<BossEnemy>(enemyModel, eggModel, player->GetWorldTransform(), animationManager_, bossRangedAttackManager);
+	bossEnemy->SetPlayer(player);
 
 	// カメラ操作
 	cameraController_ = gameObjectManager_->AddObject<CameraController>(inputCommand_, &bossEnemy->GetWorldTransform(), &player->GetWorldTransform());
 	player->SetCamera(cameraController_);
 
 	// ステージ
-	gameObjectManager_->AddObject<StageManager>(gameObjectManager_, modelManager_, textureManager_);
+	auto* stageManager = gameObjectManager_->AddObject<StageManager>(gameObjectManager_, modelManager_, textureManager_, cameraController_);
 
 	// 仮の背景の氷オブジェクト。後でオブジェクト設置エディターでマテリアルを変更出来るようにしておく。
 	auto* bgIceRockModel = modelManager_->GetNameByModel("BGIceRock.obj");
@@ -89,6 +91,8 @@ GameScene::GameScene() {
 	auto* clearUIManager = gameObjectManager_->AddObject<ClearUIManager>(textureManager_);
 	// ポーズのUI
 	auto* pauseUIManager = gameObjectManager_->AddObject<PauseUIManager>(textureManager_);
+	// 入りのムービーのUI
+	auto* enterMovieUIManager = gameObjectManager_->AddObject<EnterMovieUIManager>(fontManager_, textureManager_);
 
 	// 遷移する用のテクスチャを設定
 	Dissolve* dissolve = postEffectManager_->GetPostEffect<Dissolve>("Dissolve");
@@ -96,7 +100,7 @@ GameScene::GameScene() {
 
 	// シーンフェーズを管理
 	gameObjectManager_->AddObject<GamePhaseManager>(inputCommand_, player, bossEnemy, titleUIManager, playUIManager, gameOverUIManager, clearUIManager,
-		pauseUIManager, cameraController_, dissolve);
+		pauseUIManager, cameraController_, dissolve, stageManager, enterMovieUIManager);
 
 	// ライトを設定
 	auto* light = renderQueue_->GetLightManager();
@@ -133,6 +137,8 @@ void GameScene::InputRegisterCommand() {
 	// 決定ボタン
 	inputCommand_->RegisterCommand("PauseAction", { {InputState::KeyTrigger, DIK_M},{InputState::PadTrigger, XINPUT_GAMEPAD_START} });
 	inputCommand_->RegisterCommand("Decision", { {InputState::KeyTrigger, DIK_SPACE},{InputState::PadTrigger, XINPUT_GAMEPAD_A} });
+	// 入りのムービーを飛ばす
+	inputCommand_->RegisterCommand("SkipMovie", { {InputState::KeyTrigger, DIK_SPACE},{InputState::PadTrigger, XINPUT_GAMEPAD_A} });
 	inputCommand_->RegisterCommand("SelectUp", { {InputState::KeyTrigger, DIK_W },{InputState::PadLeftStick,0,{0.0f,1.0f},0.2f}, { InputState::PadTrigger, XINPUT_GAMEPAD_DPAD_UP } });
 	inputCommand_->RegisterCommand("SelectDown", { {InputState::KeyTrigger, DIK_S },{InputState::PadLeftStick,0,{0.0f,-1.0f},0.2f}, {InputState::PadTrigger, XINPUT_GAMEPAD_DPAD_DOWN} });
 
@@ -147,6 +153,8 @@ void GameScene::InputRegisterCommand() {
 	// カメラ操作のコマンドを登録する
 	inputCommand_->RegisterCommand("CameraMoveLeft", { { InputState::KeyPush, DIK_LEFT },{InputState::PadRightStick,0,{-1.0f,0.0f},0.2f} });
 	inputCommand_->RegisterCommand("CameraMoveRight", { { InputState::KeyPush, DIK_RIGHT },{InputState::PadRightStick,0,{1.0f,0.0f},0.2f} });
+	inputCommand_->RegisterCommand("CameraMoveUp", { { InputState::KeyPush, DIK_UP },{InputState::PadRightStick,0,{0.0f,1.0f},0.2f} });
+	inputCommand_->RegisterCommand("CameraMoveDown", { { InputState::KeyPush, DIK_DOWN },{InputState::PadRightStick,0,{0.0f,-1.0f},0.2f} });
 	// ロックオン
 	inputCommand_->RegisterCommand("CameraLockOn", { {InputState::KeyTrigger, DIK_L},{InputState::PadTriggerRightTrigger,0,{0.0f,0.0f},0.2f},{InputState::PadTriggerLeftTrigger,0,{0.0f,0.0f},0.2f} });
 

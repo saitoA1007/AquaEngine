@@ -1,0 +1,34 @@
+{
+    "Duration": 1.0,
+    "IsLoop": false,
+    "Tracks": [
+        {
+            "Duration": 1.0,
+            "EmitMode": "Burst",
+            "MaxNum": 32,
+            "ModelName": "plane.obj",
+            "Name": "Star",
+            "Offset": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "ParticleName": "PlayerHitParticle",
+            "StartTime": 0.0
+        },
+        {
+            "Duration": 1.0,
+            "EmitMode": "Burst",
+            "MaxNum": 16,
+            "ModelName": "plane.obj",
+            "Name": "Ring",
+            "Offset": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "ParticleName": "PlayerHitRingParticle",
+            "StartTime": 0.08999999612569809
+        }
+    ]
+}

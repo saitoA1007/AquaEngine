@@ -5,11 +5,13 @@
 #include "TextureManager.h"
 using namespace GameEngine;
 
-StageManager::StageManager(GameEngine::GameObjectManager* objectManager, GameEngine::ModelManager* modelManager, GameEngine::TextureManager* textureManager) {
+StageManager::StageManager(GameEngine::GameObjectManager* objectManager, GameEngine::ModelManager* modelManager, GameEngine::TextureManager* textureManager, CameraController* camera) {
 	objectManager_ = objectManager;
+	camera_ = camera;
 
 	auto* floorModel = modelManager->GetNameByModel("planeXZ.obj");
 	auto* wallFractureModel = modelManager->GetNameByModel("wallFracture.gltf");
+	auto* floorFractureModel = modelManager->GetNameByModel("floorFracture.gltf");
 	auto* wallModel = modelManager->GetNameByModel("wall.obj");
 	wallModel->SetDefaultIsEnableLight(true);
 	wallModel->SetDefaultColor({ 1,1,1,0.9f });
@@ -22,7 +24,7 @@ StageManager::StageManager(GameEngine::GameObjectManager* objectManager, GameEng
 	uint32_t terrainNormalGH = textureManager->GetHandleByName("aerial_grass_rock_nor_gl_1k.png");
 
 	// 床モデルを生成
-	objectManager_->AddObject<Floor>(floorModel, iceNormalGH, iceHeightGH, terrainGH, terrainNormalGH);
+	floor_ = objectManager_->AddObject<Floor>(floorModel, floorFractureModel, iceNormalGH, iceHeightGH, terrainGH, terrainNormalGH);
 
 	// モデルを取得
 	wallModel_ = wallModel;
@@ -39,6 +41,11 @@ StageManager::StageManager(GameEngine::GameObjectManager* objectManager, GameEng
 
 void StageManager::Initialize() {
 
+}
+
+void StageManager::Reset() {
+	// 壊れた床を元に戻す
+	floor_->Initialize();
 }
 
 void StageManager::Update() {
@@ -83,6 +90,7 @@ void StageManager::GenerateWalls() {
 
 		auto* wall = objectManager_->AddObject<Wall>(wallModel_, wallFractureModel_, debugParame_.get());
 		wall->SetParameter(transform);
+		wall->SetCamera(camera_);
 
 		walls_.push_back(wall);
 	}

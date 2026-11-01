@@ -6,6 +6,7 @@
 #include "Application/UI/Managers/GameOverUIManager.h"
 #include "Application/UI/Managers/ClearUIManager.h"
 #include "Application/UI/Managers/PauseUIManager.h"
+#include "Application/UI/Managers/EnterMovieUIManager.h"
 #include "Application/Player/Player.h"
 #include "Application/Enemy/BossEnemy.h"
 #include "Application/Camera/CameraController.h"
@@ -66,7 +67,8 @@ void TitlePhase::Exit() {
 // チュートリアル
 //=====================================================
 
-TutorialPhase::TutorialPhase(PhaseCommonData& commonData, CameraController* cameraController, Player* player, BossEnemy* bossEnemy, PlayUIManager* playUIManager) : IScenePhase(commonData) {
+TutorialPhase::TutorialPhase(PhaseCommonData& commonData, CameraController* cameraController, Player* player, BossEnemy* bossEnemy, PlayUIManager* playUIManager,
+	EnterMovieUIManager* enterMovieUIManager) : IScenePhase(commonData) {
 
 	// カメラ管理を取得
 	cameraController_ = cameraController;
@@ -82,6 +84,9 @@ TutorialPhase::TutorialPhase(PhaseCommonData& commonData, CameraController* came
 
 	// UIを無効
 	playUIManager_->SetActive(false);
+
+	// 入りのムービーのUIを取得
+	enterMovieUIManager_ = enterMovieUIManager;
 }
 
 void TutorialPhase::Enter() {
@@ -94,6 +99,12 @@ void TutorialPhase::Enter() {
 	playUIManager_->SetIsDrawTutorialGuide(true);
 	playUIManager_->SetIsDrawPlayGuide(true);
 	playUIManager_->SetIsDrawArrowUI(true);
+
+	// ポーズから戻った時以外は、ボスの名前を表示し直せるようにする
+	if (ScenePhase::kPause != commonData_.GetPrePhase()) {
+		isPlayBossName_ = false;
+		enterMovieUIManager_->Initialize();
+	}
 }
 
 void TutorialPhase::Update() {
@@ -109,6 +120,20 @@ void TutorialPhase::Update() {
 		playUIManager_->SetBarActive(true);
 		// プレイヤーを表示しない
 		player_->SetIsDraw(false);
+
+		// ボスが叫び始めたら名前を表示する
+		if (!isPlayBossName_ && bossEnemy_->IsScream()) {
+			isPlayBossName_ = true;
+			enterMovieUIManager_->Play();
+		}
+
+		// 入りのムービーを飛ばす
+		if (commonData_.inputCommand->IsCommandActive("SkipMovie")) {
+			bossEnemy_->SkipEnterMovie();
+			// 名前は表示しない
+			isPlayBossName_ = true;
+			enterMovieUIManager_->Stop();
+		}
 	} else {
 		// 黒帯UIを表示
 		playUIManager_->SetBarActive(cameraController_->UseLetterBoxUI());
@@ -133,6 +158,8 @@ void TutorialPhase::Exit() {
 		playUIManager_->SetIsDrawArrowUI(false);
 		// プレイヤーを表示
 		player_->SetIsDraw(true);
+		// ボスの名前を消す
+		enterMovieUIManager_->Stop();
 		// フォローカメラに変更
 		cameraController_->SetChangeState(CameraState::kFollow);
 	}
@@ -376,4 +403,26 @@ void ClearPhase::Update() {
 void ClearPhase::Exit() {
 	// UIを無効化
 	clearUIManager_->SetActive(false);
+}
+
+//===========================================
+// オプション
+//===========================================
+
+OptionPhase::OptionPhase(PhaseCommonData& commonData) : IScenePhase(commonData) {
+
+	
+}
+
+void OptionPhase::Enter() {
+	
+}
+
+void OptionPhase::Update() {
+
+	
+}
+
+void OptionPhase::Exit() {
+
 }

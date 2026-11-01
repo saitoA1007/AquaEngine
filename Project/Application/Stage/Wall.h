@@ -9,6 +9,7 @@
 namespace GameEngine {
 	class DebugParameter;
 }
+class CameraController;
 
 class Wall : public GameEngine::IGameObject {
 public:
@@ -26,6 +27,12 @@ public:
 
 	void SetParameter(const Transform& transform);
 
+	// カメラを設定
+	void SetCamera(CameraController* camera) { camera_ = camera; }
+
+	// 壁が壊れているか
+	bool IsBroken() const { return isBreakIce_ || destructObject_.IsReassembling(); }
+
 private:
 
 	// 最大hp
@@ -40,9 +47,27 @@ private:
 	// 破壊された時に戻す割合
 	float reassembleDestroyedRatio_ = 0.4f;
 
+	// 破片が着地する地面の位置
+	float floorPosY_ = 0.0f;
+
+	// プレイヤーの突進が当たった時の揺れの強さ
+	float hitShakeIntensity_ = 0.15f;
+	// 壁が崩れた時の揺れの強さ
+	float breakShakeIntensity_ = 0.5f;
+	// 揺れる時間
+	float shakeDuration_ = 0.3f;
+
+	// プレイヤーの突進が当たった時の振動の強さ
+	float hitVibrationIntensity_ = 0.8f;
+	// 振動する時間
+	float hitVibrationDuration_ = 0.2f;
+
 private:
 	// パラメーター機能
 	GameEngine::DebugParameter* parame_ = nullptr;
+
+	// カメラ機能
+	CameraController* camera_ = nullptr;
 
 	// モデル
 	//GameEngine::ModelComponent modelComponent_;

@@ -187,33 +187,35 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
         float4 normalMapColor = gTexture[material.normalTextureHandle].SampleLevel(gSampler, parallaxUV, 0);
         localNormal = GetNormalFromMap(normalMapColor, vtx.normal, vtx.tangent);
     }
-    float3 worldNormal = mul(localNormal, (float3x3) ObjectToWorld4x3());
-    worldNormal = normalize(worldNormal);
-    
-     // 裏面の法線を視線側に向け直す
-    if (dot(worldNormal, viewDir) < 0.0f)
-    {
-        worldNormal = -worldNormal;
-    }
-    
-    // テクスチャカラーを取得
-    float4 textureColor = gTexture[material.textureHandle].SampleLevel(gSampler, parallaxUV, 0);
-    // アルベド色を取得
-    float3 albedoColor = material.color.rgb * textureColor.rgb;
-    
+
+    // 粗い表面
     if (material.dissolveThreshold > 0.0f)
     {
-        float mask = FBMNoise(worldPosition * 2.0f, 1);
+        float mask = FBMNoise(vtx.position.xyz * 2.0f, 1);
         if (mask <= material.dissolveThreshold)
         {
              // 法線を取得
-            worldNormal = ChiseledIceNormal(worldNormal, worldPosition,
+            localNormal = ChiseledIceNormal(localNormal, vtx.position.xyz,
                                     material.chipScale, material.chipStrength,
                                     material.edgeWidth, material.edgeStrength,
                                     material.microScale, material.microStrength);
         }
     }
-    
+
+    float3 worldNormal = mul(localNormal, (float3x3) ObjectToWorld4x3());
+    worldNormal = normalize(worldNormal);
+
+     // 裏面の法線を視線側に向け直す
+    if (dot(worldNormal, viewDir) < 0.0f)
+    {
+        worldNormal = -worldNormal;
+    }
+
+    // テクスチャカラーを取得
+    float4 textureColor = gTexture[material.textureHandle].SampleLevel(gSampler, parallaxUV, 0);
+    // アルベド色を取得
+    float3 albedoColor = material.color.rgb * textureColor.rgb;
+
     float3 lightDir = normalize(-gDirectionalLight.direction);
     // 影を取る
     float shadowFactor = ComputeShadowFactor(worldPosition, lightDir);

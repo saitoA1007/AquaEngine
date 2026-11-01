@@ -4,9 +4,10 @@
 // プレイヤーの状態
 class PlayerStatus : public IPlayerAction {
 public:
-	void Initialize(PlayerCommonData* commonData);
+	void Update() override;
 
-	void Update();
+	// 状態をリセットする
+	void Reset() override;
 
 	// パラメータを登録する
 	void RegisterParameter(GameEngine::DebugParameter* param) override;
@@ -14,10 +15,11 @@ public:
 public:
 
 	// ダメージを受ける
-	void TakeDamage(int32_t damage) {
-		if (isCoolActive_) { return; }
+	bool TakeDamage(int32_t damage) {
+		if (isCoolActive_) { return false; }
 		currentHp_ -= damage;
 		isCoolActive_ = true;
+		return true;
 	}
 
 	// 現在Hp
@@ -26,14 +28,26 @@ public:
 	// 最大Hp
 	int32_t GetMaxHp()const { return maxHp_; }
 
+	// ダメージ後のクールタイム中か
+	bool IsCoolActive() const { return isCoolActive_; }
+
+	// クールタイム中の点滅で非表示にするか
+	bool IsBlinkHidden() const;
+
 	// 体力をリセット
 	void ResetHp() { currentHp_ = maxHp_; }
+
+protected:
+	void OnInitialize() override;
 
 private:
 
 	int32_t maxHp_ = 3;
 
 	float coolTime_ = 2.0f;
+
+	// クールタイム中の点滅間隔
+	float blinkInterval_ = 0.08f;
 
 private:
 	// クール状態
@@ -47,9 +61,7 @@ private:
 // プレイヤーが常に受ける物理
 class PlayerPhysics : public IPlayerAction {
 public:
-	void Initialize(PlayerCommonData* commonData);
-
-	void Update();
+	void Update() override;
 
 	// パラメータを登録する
 	void RegisterParameter(GameEngine::DebugParameter* param) override;
@@ -67,21 +79,14 @@ private:
 // 移動アクション
 class PlayerMoveAction : public IPlayerAction {
 public:
-	// 初期化
-	void Initialize(PlayerCommonData* commonData, GameEngine::InputCommand* inputCommand);
-
 	// 入力
-	void ProcessInput();
+	void ProcessInput() override;
 
 	// カメラ基準のベクトルを更新する
 	void UpdateCameraBasis(const Matrix4x4& cameraWorldMatrix);
 
 	// パラメータを登録する
 	void RegisterParameter(GameEngine::DebugParameter* param) override;
-
-private:
-	// 入力機能
-	GameEngine::InputCommand* inputCommand_ = nullptr;
 
 private:
 	// 地上の移動速度
@@ -110,21 +115,15 @@ private:
 // 突進アクション
 class PlayerAttackRushAction : public IPlayerAction {
 public:
-	void Initialize(PlayerCommonData* commonData, GameEngine::InputCommand* inputCommand);
+	void ProcessInput() override;
 
-	void ProcessInput();
-
-	void Update();
+	void Update() override;
 
 	// パラメータを登録する
 	void RegisterParameter(GameEngine::DebugParameter* param) override;
 
 	// 突進の最大速度を取得
 	float GetRushMaxSpeed() const { return  kRushMaxSpeed_; }
-
-private:
-	// 入力機能
-	GameEngine::InputCommand* inputCommand_ = nullptr;
 
 private:
 	// 突撃予備動作最大時間
@@ -164,15 +163,22 @@ private:
 // 跳ね返りアクション
 class PlayerBounceAction : public IPlayerAction {
 public:
-	void Initialize(PlayerCommonData* commonData);
+	void Update() override;
 
-	void WallBounce(Vector3& pos, const Vector3& bounceDirection, const float& penetrationDepth, const float kRushMaxSpeed);
+	// 状態をリセットする
+	void Reset() override;
+
+	// 壁に衝突した時の跳ね返り
+	void WallBounce(Vector3& pos, const Vector3& bounceDirection, const float& penetrationDepth, const float kRushMaxSpeed, bool canBounceUp = true);
 
 	// パラメータを登録する
 	void RegisterParameter(GameEngine::DebugParameter* param) override;
 
 	bool IsHitWall() const { return isHitWall_; }
 	void SetIsHitWall(bool isHitWall) { isHitWall_ = isHitWall; }
+
+	// 突進で壁に衝突して上昇中か
+	bool IsBounceRising() const { return isBounceRising_; }
 
 private:
 	// 跳ね上がり後の高さ
@@ -194,16 +200,17 @@ private:
 
 	// 壁のヒットフラグ
 	bool isHitWall_ = false;
+
+	// 突進で壁に衝突して上昇中か
+	bool isBounceRising_ = false;
 };
 
 // 急降下攻撃アクション
 class PlayerAttackDownAction : public IPlayerAction {
 public:
-	void Initialize(PlayerCommonData* commonData, GameEngine::InputCommand* inputCommand);
+	void ProcessInput() override;
 
-	void ProcessInput();
-
-	void Update();
+	void Update() override;
 
 	// パラメータを登録する
 	void RegisterParameter(GameEngine::DebugParameter* param) override;
@@ -226,10 +233,6 @@ public:
 		}
 		return level;
 	}
-
-private:
-	// 入力機能
-	GameEngine::InputCommand* inputCommand_ = nullptr;
 
 private:
 	// 落下前の硬直時間

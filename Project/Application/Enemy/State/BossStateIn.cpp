@@ -21,6 +21,7 @@ void BossStateIn::Enter() {
 	isMove_ = true;
 	delayBreakEgg_ = true;
 	timer_ = 0.0f;
+	stateCommonData_.isScream = false;
 }
 
 void BossStateIn::Update() {
@@ -61,6 +62,7 @@ void BossStateIn::Update() {
 
 			// 叫びモージョンに以降
 			stateCommonData_.animator->StartAnimation(BossAnimationType::kScream, "Scream", maxWaitTime_, false);
+			stateCommonData_.isScream = true;
 
 		}
 	} else {
@@ -74,6 +76,26 @@ void BossStateIn::Update() {
 			stateCommonData_.animator->StartAnimation(BossAnimationType::kMove, "基本移動");
 		}
 	}
+}
+
+void BossStateIn::Skip() {
+	// 卵が割れる前、すでに戦闘へ移る時は何もしない
+	if (!stateCommonData_.isBreakEgg || stateCommonData_.bossStateRequest) { return; }
+
+	// 卵を描画しない
+	delayBreakEgg_ = false;
+	stateCommonData_.isDrawEgg = false;
+
+	// 上昇、回転が終わった位置にする
+	isMove_ = false;
+	timer_ = 0.0f;
+	stateCommonData_.worldTransform->transform_.translate = startPos_;
+	stateCommonData_.worldTransform->transform_.translate.y = startPos_.y + moveHeight_;
+	stateCommonData_.worldTransform->transform_.rotate.y = 1620.0f * (std::numbers::pi_v<float> / 180.0f);
+
+	// 戦闘へ移る
+	stateCommonData_.bossStateRequest = BossState::kBattle;
+	stateCommonData_.animator->StartAnimation(BossAnimationType::kMove, "基本移動");
 }
 
 void BossStateIn::Exit() {

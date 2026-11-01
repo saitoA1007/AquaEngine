@@ -58,6 +58,17 @@ TestScene::TestScene() {
 	terrainModel_->SetDefaultNormalTexture(normalGH);
 
 	// エフェクト用モデル
+	//auto* effectModel = modelManager_->GetNameByModel("plane.obj");
+	//effectModel->SetDefaultIsEnableLight(false);
+	//gameObjectManager_->AddObject<ParticleBehavior>("DemoParticle", 64, textureManager_, effectModel);
+	//gameObjectManager_->AddObject<ParticleBehavior>("Demo2Particle", 64, textureManager_, effectModel);
+	//gameObjectManager_->AddObject<ParticleBehavior>("Demo3Particle", 64, textureManager_, effectModel);
+	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerHitRingParticle", 8, textureManager_, effectModel);
+	// オブジェクトのテスト
+	//auto* testModel = modelManager_->GetNameByModel("sphereShade.obj");
+	//gameObjectManager_->AddObject<Test>(testModel);
+
+	// エフェクト用モデル
 	effectModel_ = modelManager_->GetNameByModel("plane.obj");
 	effectModel_->SetDefaultIsEnableLight(false);
 	//gameObjectManager_->AddObject<ParticleBehavior>("HitAfterEffect", 32, textureManager_, effectModel_, &renderQueue_->GetMainCamera());
@@ -73,13 +84,21 @@ TestScene::TestScene() {
 	//gameObjectManager_->AddObject<ParticleBehavior>("tParticle", 128, textureManager_, effectModel_);
 	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerHitLineParticle", 32, textureManager_, effectModel_);
 	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerHitBoxParticle", 32, textureManager_, effectModel_);
-	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerHitCircleParticle", 32, textureManager_, effectModel_);
+
+	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerMoveParticle", 32, textureManager_, effectModel_);
+	
+	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerHitParticle", 32, textureManager_, effectModel_);
+	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerHitRingParticle", 32, textureManager_, effectModel_);
 
 	// ボスのラッシュ演出
 	auto* waModel = modelManager_->GetNameByModel("rushWave.obj");
 	waModel->SetDefaultIsEnableLight(false);
 	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerLandingEffect", 32, textureManager_, waModel);
 	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerChargeParticle", 32, textureManager_, waModel);
+
+	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerRushWaveParticle", 32, textureManager_, waModel);
+	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerRushTipWaveParticle", 32, textureManager_, waModel);
+	//gameObjectManager_->AddObject<ParticleBehavior>("PlayerRushTrailParticle", 32, textureManager_, effectModel_);
 
 	// 中ポリゴン氷
 	iceMiddleModel_ = modelManager_->GetNameByModel("ice_middlePolygon.gltf");
@@ -117,7 +136,7 @@ TestScene::TestScene() {
 	auto* sphereModel = modelManager_->GetNameByModel("sphereShade.obj");
 	gameObjectManager_->AddObject<PBRDemo>(sphereModel);
 
-	text_ = std::make_unique<Text>(fontManager_->GetFont("源直ゴシック EMG 2 - Medium"), "馬力強い馬にマタガーリ");
+	text_ = std::make_unique<Text>(fontManager_->GetFont("Gisshiri"), "馬力強い馬にマタガーリ");
 }
 
 void TestScene::Initialize() {

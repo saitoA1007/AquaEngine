@@ -21,11 +21,25 @@ FollowCameraState::FollowCameraState(CameraController* controller, GameEngine::D
 	param->Register("RotateDamping", kRotateDamping_, index++, subGroup);
 	param->Register("RotateY", kFollowRotateY_, index++, subGroup);
 	param->Register("Fov", kFollowFov_, index++, subGroup);
+	param->Register("RotateSpeedY", kRotateSpeedY_, index++, subGroup);
+	param->Register("MinRotateY", kMinRotateY_, index++, subGroup);
+	param->Register("MaxRotateY", kMaxRotateY_, index++, subGroup);
+	param->Register("RotateMaxSpeedRate", kRotateMaxSpeedRate_, index++, subGroup);
+	param->Register("RotateAccelTime", kRotateAccelTime_, index++, subGroup);
+
+	// 回り込む時にプレイヤーとの距離を保つ
+	commonData_.keepDistance = true;
 }
 
 void FollowCameraState::Enter() {
 	// ロックオン解除時は慣性をリセットして違和感なく戻す
 	rotateVelocityX_ = 0.0f;
+	rotateVelocityY_ = 0.0f;
+	holdX_ = {};
+	holdY_ = {};
+
+	// Y軸の角度を初期値に戻す
+	controller_->GetRotateMove().y = std::clamp(kFollowRotateY_, kMinRotateY_, kMaxRotateY_);
 }
 
 void FollowCameraState::Update(float dt60) {
@@ -40,19 +54,40 @@ void FollowCameraState::Update(float dt60) {
 	Vector3 idealTarget = controller_->GetPlayerWorld()->GetWorldPosition();
 	idealTarget.y += offsetY_;
 
-	float targetRotateSpeed = 0.0f;
+	// 入力
+	Vector2 input = {0.0f,0.0f};
 	if (controller_->GetInputCommand()->IsCommandActive("CameraMoveLeft")) {
-		targetRotateSpeed += kRotateSpeed_;
+		input.x += 1.0f;
 	}
 
 	if (controller_->GetInputCommand()->IsCommandActive("CameraMoveRight")) {
-		targetRotateSpeed -= kRotateSpeed_;
+		input.x -= 1.0f;
 	}
+
+	if (controller_->GetInputCommand()->IsCommandActive("CameraMoveUp")) {
+		input.y += 1.0f;
+	}
+
+	if (controller_->GetInputCommand()->IsCommandActive("CameraMoveDown")) {
+		input.y -= 1.0f;
+	}
+
+	// 入力し続けた時間に応じて速くする
+	float targetRotateSpeed = CalcHoldRotateSpeed(input.x, kRotateSpeed_, holdX_);
+	float targetRotateSpeedY = CalcHoldRotateSpeed(input.y, kRotateSpeedY_, holdY_);
 
 	float currentDamping = std::powf(kRotateDamping_, dt60);
 	rotateVelocityX_ = rotateVelocityX_ * currentDamping + targetRotateSpeed * (1.0f - currentDamping);
 	rotateMove.x += rotateVelocityX_ * FpsCounter::gameDeltaTime;
-	rotateMove.y = kFollowRotateY_;
+
+	rotateVelocityY_ = rotateVelocityY_ * currentDamping + targetRotateSpeedY * (1.0f - currentDamping);
+	rotateMove.y += rotateVelocityY_ * FpsCounter::gameDeltaTime;
+
+	// 水平から真上の手前までに制限する
+	if (rotateMove.y <= kMinRotateY_ || rotateMove.y >= kMaxRotateY_) {
+		rotateMove.y = std::clamp(rotateMove.y, kMinRotateY_, kMaxRotateY_);
+		rotateVelocityY_ = 0.0f;
+	}
 
 	Vector3 idealPosition;
 	float distance = kDistance_;
@@ -63,6 +98,22 @@ void FollowCameraState::Update(float dt60) {
 	commonData_.idealTarget = idealTarget;
 	commonData_.idealPosition = idealPosition;
 	commonData_.targetFov = kFollowFov_;
+}
+
+float FollowCameraState::CalcHoldRotateSpeed(float inputDir, float baseSpeed, HoldInput& hold) {
+	// 入力が無い、または向きが変わったら最初から加速し直す
+	if (inputDir == 0.0f || inputDir != hold.dir) {
+		hold.time = 0.0f;
+	}
+	hold.dir = inputDir;
+	if (inputDir == 0.0f) { return 0.0f; }
+
+	hold.time += FpsCounter::gameDeltaTime;
+
+	// 入力時間の割合に応じて、基本速度から最大速度まで上げる
+	float t = (kRotateAccelTime_ > 0.0f) ? std::clamp(hold.time / kRotateAccelTime_, 0.0f, 1.0f) : 1.0f;
+	float speedRate = Lerp(1.0f, kRotateMaxSpeedRate_, t);
+	return inputDir * baseSpeed * speedRate;
 }
 
 //======================================================================

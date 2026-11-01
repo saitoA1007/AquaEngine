@@ -15,6 +15,7 @@ namespace GameEngine {
 	class GameObjectManager;
 }
 class BossRangedAttackManager;
+class Player;
 
 class BossEnemy : public GameEngine::IGameObject {
 public:
@@ -55,6 +56,15 @@ public:
 	// 卵が割れたか
 	bool IsBreakEgg() const { return stateCommonData_.isBreakEgg; }
 
+	// 入りの演出で叫び始めたか
+	bool IsScream() const { return stateCommonData_.isScream; }
+
+	// 入りの演出を飛ばす
+	void SkipEnterMovie();
+
+	// プレイヤーを設定
+	void SetPlayer(const Player* player) { player_ = player; }
+
 private:
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;
@@ -87,10 +97,21 @@ private:
 	int32_t maxHp_ = 100;
 	// 当たり判定
 	float colliderRadius_ = 3.0f;
+	// プレイヤーが落下攻撃中の当たり判定
+	float attackDownColliderRadius_ = 5.0f;
 	// 当たり判定のオフセット
 	float colliderOffsetPosY_ = 0.0f;
 
+	// プレイヤー
+	const Player* player_ = nullptr;
+
+	// 遠距離攻撃管理
+	BossRangedAttackManager* rangedAttackManager_ = nullptr;
+
 private:
+
+	// 現在の当たり判定の半径を取得
+	float GetCurrentColliderRadius() const;
 
 	/// <summary>
 	/// 当たり判定

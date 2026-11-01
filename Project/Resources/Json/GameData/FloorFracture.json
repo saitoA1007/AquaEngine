@@ -1,0 +1,14 @@
+{
+    "FloorFracture": {
+        "Debris": {
+            "AngularSpeed": 3.0,
+            "BounceFriction": 0.7,
+            "BounceRestitution": 0.4,
+            "Gravity": 49.0,
+            "GroundDrag": 4.0,
+            "MinUpSpeed": 16.0,
+            "SleepSpeed": 0.5
+        },
+        "SceneName": "Game"
+    }
+}

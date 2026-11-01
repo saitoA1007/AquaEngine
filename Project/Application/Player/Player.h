@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "IGameObject.h"
 #include "WorldTransform.h"
 #include "InputCommand.h"
@@ -15,7 +16,7 @@ class PlayerEffectManager;
 class Player : public GameEngine::IGameObject {
 public:
 	Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model, GameEngine::AnimationManager* animationManager, PlayerEffectManager* effectManager);
-	~Player() = default;
+	~Player();
 
 	// 初期化処理
 	void Initialize() override;
@@ -72,11 +73,20 @@ public:
 	}
 
 	// ヒットエフェクトを開始
-	void StartHitEffect(Vector3 pos) {
-		effectManager_->StartHitEffect(pos, playerAttackDownAction_.GetPowerLevel());
-	}
+	void StartHitEffect(Vector3 pos);
+
+	/// <summary>
+	/// コントローラーを振動させる
+	/// </summary>
+	/// <param name="intensity">振動の強さ(0~1)</param>
+	/// <param name="duration">振動する時間(秒)</param>
+	void StartVibration(float intensity, float duration);
 
 private:
+	// actions_が自身のメンバを指すためコピー禁止
+	Player(const Player&) = delete;
+	Player& operator=(const Player&) = delete;
+
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;
 	// 入力機能
@@ -101,6 +111,28 @@ private:
 	// 表示フラグ
 	bool isDraw_ = true;
 
+	// 敵に攻撃した時の揺れの強さ
+	float attackShakeIntensity_ = 0.3f;
+	// 敵に攻撃した時の揺れる時間
+	float attackShakeDuration_ = 0.5f;
+	// ダメージを受けた時の揺れの強さ
+	float damageShakeIntensity_ = 0.3f;
+	// ダメージを受けた時の揺れる時間
+	float damageShakeDuration_ = 0.6f;
+
+	// 敵に攻撃した時の振動の強さ
+	float attackVibrationIntensity_ = 0.3f;
+	// 敵に攻撃した時の振動する時間
+	float attackVibrationDuration_ = 0.25f;
+
+	// 歩きエフェクトを出す最低の速さ
+	float moveEffectMinSpeed_ = 2.0f;
+
+	// 振動の残り時間
+	float vibrationTimer_ = 0.0f;
+	// 現在の振動の強さ
+	float vibrationIntensity_ = 0.0f;
+
 private: 
 	// プレイヤー
 	PlayerCommonData commonData_;
@@ -120,13 +152,28 @@ private:
 	// プレイヤーの状態
 	PlayerStatus playerStatus_;
 
+	// 一括処理用のアクション一覧
+	std::vector<IPlayerAction*> actions_;
+
 private:
 
 	// 制限
 	void ApplyClamp();
 
+	// ダメージを受ける
+	void TakeDamage(int32_t damage);
+
+	// 振動の更新
+	void UpdateVibration();
+
+	// 振動を止める
+	void StopVibration();
+
 	// 回転の更新
 	void UpdateRotation();
+
+	// 歩きエフェクトの更新
+	void UpdateMoveEffect();
 
 	// 当たり判定
 	void OnCollisionStay(const GameEngine::CollisionResult& result);

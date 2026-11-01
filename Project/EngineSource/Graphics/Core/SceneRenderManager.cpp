@@ -145,6 +145,10 @@ void SceneRenderManager::CreateRenderPasses() {
 
     renderPassController_->AddPass("CompositePass");
 
+    // UIを描画するパス。ポストエフェクトが掛からないように分けて、後で合成する
+    renderPassController_->AddPass(uiPassName_, RenderTextureMode::RtvAndDsv, 1280, 720, { 0.0f,0.0f,0.0f,0.0f });
+    renderPassController_->SetUIPass(uiPassName_);
+
     // 実行順序を設定
     RegisterPassOrder({ "ShadowPass", "DefaultPass" });
 }
@@ -484,8 +488,11 @@ void SceneRenderManager::RaytracingExecute() {
 void SceneRenderManager::Draw2dExecute() {
 
     auto draw2dQueueList = renderQueue_->GetDraw2dQueue();
-    
-    renderPassController_->PrePass(finalPassName_);
+
+    // UIは専用のパスに描き、ポストエフェクトのUIComposite で合成する。
+    // 透明でクリアし、2DのPSOのアルファ設定で乗算済みアルファとして書き込まれる
+    renderPassController_->PrePass(uiPassName_);
+    renderPassController_->ClearRenderPass(uiPassName_);
     currentPsoName_.clear();
     for (const auto& passName : passExecuteOrder_) {
 
@@ -503,7 +510,7 @@ void SceneRenderManager::Draw2dExecute() {
             }
         }
     }
-    renderPassController_->PostPass(finalPassName_);
+    renderPassController_->PostPass(uiPassName_);
 }
 
 void SceneRenderManager::LightingComposite() {

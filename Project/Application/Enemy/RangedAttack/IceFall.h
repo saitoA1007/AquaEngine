@@ -22,13 +22,21 @@ public:
 
 public:
 
-	// 破壊
-	void SetIsBreak(bool isBreak) {
-		isBreak_ = isBreak;
-	}
+	/// <summary>
+	/// 破壊する
+	/// </summary>
+	/// <param name="hitPos">当たった位置</param>
+	/// <param name="hitDir">当たった方向</param>
+	void Break(const Vector3& hitPos, const Vector3& hitDir);
+
+	// 破壊されているか
+	bool IsBreak() const { return isBreak_; }
 
 	// 出現させる
 	void Start(Vector3 pos);
+
+	// 出現中の氷柱を消して待機状態に戻す
+	void Stop();
 
 private:
 	// パラメータ機能
@@ -54,7 +62,7 @@ private:
 
 	float timer_ = 0.0f;
 
-	bool isEnterMoveActive_ = true;
+	bool isEnterMoveActive_ = false;
 
 	bool isBreak_ = false;
 
@@ -67,6 +75,13 @@ private:
 
 	float startPosY_ = -2.0f;
 	float endPosY_ = 0.0f;
+
+	// 破壊された時に与えるダメージ
+	float breakDamage_ = 1000.0f;
+	// 破壊された時にダメージを与える範囲
+	float breakCraterRadius_ = 100.0f;
+	// 破壊されてから消えるまでの時間
+	float breakDisappearTime_ = 2.0f;
 
 private:
 

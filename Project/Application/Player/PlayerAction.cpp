@@ -15,10 +15,16 @@ using namespace GameEngine;
 // プレイヤーが受ける物理
 //=====================================================
 
-void PlayerStatus::Initialize(PlayerCommonData* commonData) {
-	commonData_ = commonData;
-
+void PlayerStatus::OnInitialize() {
 	currentHp_ = maxHp_;
+}
+
+void PlayerStatus::Reset() {
+	ResetHp();
+
+	// クールタイムを解除
+	isCoolActive_ = false;
+	timer_ = 0.0f;
 }
 
 void PlayerStatus::Update() {
@@ -38,15 +44,20 @@ void PlayerStatus::RegisterParameter(GameEngine::DebugParameter* param) {
 
 	param->Register("MaxHp", maxHp_, index++, subGroup);
 	param->Register("CoolTime", coolTime_, index++, subGroup);
+	param->Register("BlinkInterval", blinkInterval_, index++, subGroup);
+}
+
+bool PlayerStatus::IsBlinkHidden() const {
+	if (!isCoolActive_ || blinkInterval_ <= 0.0f) { return false; }
+
+	// クールタイム開始からの経過時間
+	float elapsed = timer_ * coolTime_;
+	return static_cast<int32_t>(elapsed / blinkInterval_) % 2 == 1;
 }
 
 //=====================================================
 // プレイヤーが受ける物理
 //=====================================================
-
-void PlayerPhysics::Initialize(PlayerCommonData* commonData) {
-	commonData_ = commonData;
-}
 
 void PlayerPhysics::Update() {
 	// 重力を適応
@@ -73,11 +84,6 @@ void PlayerPhysics::RegisterParameter(GameEngine::DebugParameter* param) {
 // プレイヤーの移動アクション
 //======================================================
 
-void PlayerMoveAction::Initialize(PlayerCommonData* commonData, GameEngine::InputCommand* inputCommand) {
-	commonData_ = commonData;
-	inputCommand_ = inputCommand;
-}
-
 void PlayerMoveAction::ProcessInput() {
 
 	bool isJump = commonData_->state == PlayerState::kJump;
@@ -87,10 +93,17 @@ void PlayerMoveAction::ProcessInput() {
 	Vector3 desiredVelocityXZ = { 0,0,0 };
 
 	// 移動の操作
-	if (inputCommand_->IsCommandActive("MoveUp")) { dir -= cameraForwardXZ_; }
-	if (inputCommand_->IsCommandActive("MoveDown")) { dir += cameraForwardXZ_; }
-	if (inputCommand_->IsCommandActive("MoveLeft")) { dir -= cameraRightXZ_; }
-	if (inputCommand_->IsCommandActive("MoveRight")) { dir += cameraRightXZ_; }
+	Vector2 stick = inputCommand_->GetLeftStick();
+	if (stick.x != 0.0f || stick.y != 0.0f) {
+		// パッドのスティックは傾けた向きをそのまま使い、360度の方向に移動する
+		dir = cameraForwardXZ_ * -stick.y + cameraRightXZ_ * stick.x;
+	} else {
+		// キーボード、十字キーは8方向
+		if (inputCommand_->IsCommandActive("MoveUp")) { dir -= cameraForwardXZ_; }
+		if (inputCommand_->IsCommandActive("MoveDown")) { dir += cameraForwardXZ_; }
+		if (inputCommand_->IsCommandActive("MoveLeft")) { dir -= cameraRightXZ_; }
+		if (inputCommand_->IsCommandActive("MoveRight")) { dir += cameraRightXZ_; }
+	}
 
 	// 目標方向
 	if (commonData_->state != PlayerState::kAttackRush) {
@@ -180,20 +193,11 @@ void PlayerMoveAction::RegisterParameter(GameEngine::DebugParameter* param) {
 // プレイヤーの突進アクション
 //=======================================================
 
-void PlayerAttackRushAction::Initialize(PlayerCommonData* commonData, GameEngine::InputCommand* inputCommand) {
-	commonData_ = commonData;
-	inputCommand_ = inputCommand;
-}
-
 void PlayerAttackRushAction::ProcessInput() {
 	// ため状態
 	if (commonData_->state == PlayerState::kNone) {
 		if (inputCommand_->IsCommandActive("RushCharge")) {
 			chargeTimer_ = 0.0f;
-			// Rush方向初期化
-			Vector3 rushDirXZ = commonData_->currentDir;
-			if (rushDirXZ.x == 0.0f && rushDirXZ.z == 0.0f) { rushDirXZ = { commonData_->velocity.x, 0.0f, commonData_->velocity.z }; }
-			rushDirection_ = (rushDirXZ.x == 0.0f && rushDirXZ.z == 0.0f) ? Vector3(0, 0, 1) : rushDirXZ.Normalize();
 			// 溜め開始時はレベルをリセット
 			rushChargeLevel_ = 0;
 			// 現在の状態
@@ -219,6 +223,13 @@ void PlayerAttackRushAction::ProcessInput() {
 			}
 			rushTimer_ = 0.0f;
 			coolTime_ = 0.0f;
+
+			// 突進方向を決める
+			Vector3 rushDirXZ = { commonData_->targetDir.x, 0.0f, commonData_->targetDir.z };
+			if (rushDirXZ.x == 0.0f && rushDirXZ.z == 0.0f) { 
+				rushDirXZ = { commonData_->currentDir.x, 0.0f, commonData_->currentDir.z }; 
+			}
+			rushDirection_ = (rushDirXZ.x == 0.0f && rushDirXZ.z == 0.0f) ? Vector3(0, 0, 1) : rushDirXZ.Normalize();
 
 			float levelMultiplier = 1.0f;
 			switch (rushChargeLevel_) {
@@ -318,14 +329,24 @@ void PlayerAttackRushAction::RegisterParameter(GameEngine::DebugParameter* param
 // プレイヤーの跳ね返りアクション
 //=======================================================
 
-void PlayerBounceAction::Initialize(PlayerCommonData* commonData) {
-	commonData_ = commonData;
+void PlayerBounceAction::Update() {
+	if (!isBounceRising_) { return; }
+
+	// 上昇が終わった、または別の状態に移ったら解除
+	if (commonData_->state != PlayerState::kJump || commonData_->velocity.y <= 0.0f) {
+		isBounceRising_ = false;
+	}
 }
 
-void PlayerBounceAction::WallBounce(Vector3& pos, const Vector3& bounceDirection, const float& penetrationDepth, const float kRushMaxSpeed) {
+void PlayerBounceAction::Reset() {
+	isHitWall_ = false;
+	isBounceRising_ = false;
+}
 
-	// ラッシュ状態からの突進であれば上に飛ぶ
-	if (commonData_->state == PlayerState::kAttackRush) {
+void PlayerBounceAction::WallBounce(Vector3& pos, const Vector3& bounceDirection, const float& penetrationDepth, const float kRushMaxSpeed, bool canBounceUp) {
+
+	// ラッシュ状態からの突進で、壁が存在していれば上に飛ぶ
+	if (commonData_->state == PlayerState::kAttackRush && canBounceUp) {
 
 		// ヒットフラグを有効
 		isHitWall_ = true;
@@ -351,6 +372,9 @@ void PlayerBounceAction::WallBounce(Vector3& pos, const Vector3& bounceDirection
 		commonData_->velocity.y = kWallBounceUpSpeed_ * kWallBounceReflectFactor_ * heightMultiplier;
 
 		commonData_->state = PlayerState::kJump;
+
+		// 上昇中はダメージを受けない
+		isBounceRising_ = true;
 	} else {
 
 		// 壁に衝突していたら押し戻す
@@ -398,11 +422,6 @@ void PlayerBounceAction::RegisterParameter(GameEngine::DebugParameter* param) {
 //=======================================================
 // プレイヤーの急降下攻撃アクション
 //=======================================================
-
-void PlayerAttackDownAction::Initialize(PlayerCommonData* commonData, GameEngine::InputCommand* inputCommand) {
-	commonData_ = commonData;
-	inputCommand_ = inputCommand;
-}
 
 void PlayerAttackDownAction::ProcessInput() {
 

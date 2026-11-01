@@ -3,6 +3,7 @@
 #include "Application/Player/Player.h"
 #include "Application/Enemy/BossEnemy.h"
 #include "Application/UI/Managers/PlayUIManager.h"
+#include "Application/Stage/StageManager.h"
 #include "FPSCounter.h"
 #include "EasingManager.h"
 // 各フェーズ
@@ -12,7 +13,8 @@ using namespace GameEngine;
 
 GamePhaseManager::GamePhaseManager(GameEngine::InputCommand* inputCommand, Player* player, BossEnemy* bossEnemy,
 	TitleUIManager* titleUIManager, PlayUIManager* playUIManager, GameOverUIManager* gameOverUIManager, ClearUIManager* clearUIManager,
-	PauseUIManager* pauseUIManager,CameraController* cameraController, GameEngine::Dissolve* dissolve) {
+	PauseUIManager* pauseUIManager,CameraController* cameraController, GameEngine::Dissolve* dissolve, StageManager* stageManager,
+	EnterMovieUIManager* enterMovieUIManager) {
 
 	dissolve_ = dissolve;
 
@@ -22,15 +24,17 @@ GamePhaseManager::GamePhaseManager(GameEngine::InputCommand* inputCommand, Playe
 	commonData_.timeController_ = &timeController_;
 
 	phases_[ScenePhase::kTitle] = std::make_unique<TitlePhase>(commonData_, cameraController, titleUIManager, player);
-	phases_[ScenePhase::kTutorial] = std::make_unique<TutorialPhase>(commonData_, cameraController, player, bossEnemy, playUIManager);
+	phases_[ScenePhase::kTutorial] = std::make_unique<TutorialPhase>(commonData_, cameraController, player, bossEnemy, playUIManager, enterMovieUIManager);
 	phases_[ScenePhase::kPlay] = std::make_unique<PlayPhase>(commonData_, player, bossEnemy, playUIManager, cameraController);
 	phases_[ScenePhase::kGameOver] = std::make_unique<GameOverPhase>(commonData_, gameOverUIManager);
 	phases_[ScenePhase::kClear] = std::make_unique<ClearPhase>(commonData_, clearUIManager);
 	phases_[ScenePhase::kPause] = std::make_unique<PausePhase>(commonData_, pauseUIManager);
+	phases_[ScenePhase::kOption] = std::make_unique<OptionPhase>(commonData_);
 
 	player_ = player;
 	bossEnemy_ = bossEnemy;
 	playUIManager_ = playUIManager;
+	stageManager_ = stageManager;
 }
 
 void GamePhaseManager::Initialize() {
@@ -113,4 +117,5 @@ void GamePhaseManager::SceneReset() {
 	player_->Initialize();
 	bossEnemy_->Initialize();
 	playUIManager_->Initialize();
+	stageManager_->Reset();
 }

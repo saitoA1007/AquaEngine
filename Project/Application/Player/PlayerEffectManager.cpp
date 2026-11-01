@@ -56,6 +56,10 @@ PlayerEffectManager::PlayerEffectManager(GameEngine::GameObjectManager* objectMa
 	landingEffect_ = objectManager_->AddObject<ParticleBehavior>("PlayerLandingEffect", 32, textureManager, waveModel);
 	landingEffect_->SetIsLoop(false);
 
+	// 歩いた時のエフェクト
+	moveEffect_ = objectManager_->AddObject<ParticleBehavior>("PlayerMoveParticle", 32, textureManager, planeXYmodel);
+	moveEffect_->SetIsLoop(false);
+
 	// プレイヤーのヒットエフェクト
 	uint32_t hitEffectGH = textureManager->GetHandleByName("HitEffect.png");
 	playerHitAttackEffect_ = objectManager_->AddObject<PlayerHitAttackEffect>(hitEffectGH, planeXYmodel);
@@ -68,6 +72,17 @@ PlayerEffectManager::PlayerEffectManager(GameEngine::GameObjectManager* objectMa
 	chargeParentMatrix_ = Matrix4x4::MakeTranslateMatrix({ 0.0f,0.0f,0.0f });
 	chargeEffect_->SetEmitterPos({ 0.0f,0.0f,0.0f });
 	chargeEffect_->SetParent(&chargeParentMatrix_, ParticleSimulationSpace::kLocal);
+
+	// 突進エフェクト
+	rushAttackEffect_ = effectsManager_->GetEffect("PlayerRushEffect");
+	if (rushAttackEffect_) {
+		// プレイヤーに追従させるため、発生位置は親からの相対位置にする
+		rushParentMatrix_ = Matrix4x4::MakeTranslateMatrix({ 0.0f,0.0f,0.0f });
+		rushAttackEffect_->SetParent(&rushParentMatrix_, ParticleSimulationSpace::kLocal);
+	}
+
+	// ダメージを受けた時のエフェクト
+	hitEffect_ = effectsManager_->GetEffect("PlayerHitEffect");
 }
 
 void PlayerEffectManager::Update() {
@@ -98,6 +113,16 @@ void PlayerEffectManager::Update() {
 
 	// 落下エフェクトの更新
 	downAttackEffect_->Update();
+
+	// 突進エフェクトの更新
+	if (rushAttackEffect_) {
+		rushAttackEffect_->Update();
+	}
+
+	// ダメージを受けた時のエフェクトの更新
+	if (hitEffect_) {
+		hitEffect_->Update();
+	}
 }
 
 void PlayerEffectManager::Draw() {
@@ -108,6 +133,16 @@ void PlayerEffectManager::Draw() {
 
 	// 落下エフェクトの描画
 	downAttackEffect_->Draw();
+
+	// 突進エフェクトの描画
+	if (rushAttackEffect_) {
+		rushAttackEffect_->Draw();
+	}
+
+	// ダメージを受けた時のエフェクトの描画
+	if (hitEffect_) {
+		hitEffect_->Draw();
+	}
 }
 
 void PlayerEffectManager::StartShockWave(Vector3 pos) {
@@ -169,4 +204,43 @@ void PlayerEffectManager::StartChargeEffect(Vector3 pos, Vector4 color, bool isA
 		chargeEffect_->SetColor(color);
 	}
 	chargeEffect_->SetIsLoop(isActive);
+}
+
+void PlayerEffectManager::StartMoveEffect(Vector3 pos, Vector3 dir, bool isActive) {
+	// 停止時は発生だけ止め、出ているパーティクルは消えるまで表示する
+	if (isActive) {
+		moveEffect_->SetEmitterPos(pos);
+		// パーティクルの移動方向を設定
+		moveEffect_->SetDirection(dir);
+	}
+	if (moveEffect_->IsLoop() != isActive) {
+		moveEffect_->SetIsLoop(isActive);
+	}
+}
+
+void PlayerEffectManager::StartRushEffect(const Matrix4x4& parentMatrix, bool isActive) {
+	if (!rushAttackEffect_) { return; }
+
+	// 突進中はプレイヤーの行列に追従させる
+	if (isActive) {
+		rushParentMatrix_ = parentMatrix;
+	}
+
+	// 突進を始めた時だけ最初から再生する
+	if (isActive && !isRushEffectActive_) {
+		rushAttackEffect_->Play({ 0.0f,0.0f,0.0f });
+	}
+
+	// 突進が終わったら発生を止め、出ているパーティクルは消えるまで表示する
+	if (!isActive && isRushEffectActive_) {
+		rushAttackEffect_->Stop();
+	}
+
+	isRushEffectActive_ = isActive;
+}
+
+void PlayerEffectManager::StartDamageEffect(Vector3 pos) {
+	if (!hitEffect_) { return; }
+	// 再生中でも最初から再生し直す
+	hitEffect_->Play(pos);
 }

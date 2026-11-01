@@ -11,10 +11,12 @@
 namespace GameEngine {
 	class TextureManager;
 }
+class CameraController;
+class Floor;
 
 class StageManager : public GameEngine::IGameObject {
 public:
-	StageManager(GameEngine::GameObjectManager* objectManager, GameEngine::ModelManager* modelManager, GameEngine::TextureManager* textureManager);
+	StageManager(GameEngine::GameObjectManager* objectManager, GameEngine::ModelManager* modelManager, GameEngine::TextureManager* textureManager, CameraController* camera);
 	~StageManager() = default;
 
 	// 初期化処理
@@ -26,10 +28,15 @@ public:
 	// 描画処理
 	void Draw() override;
 
+	// ステージを元の状態に戻す
+	void Reset();
+
 private:
 	GameEngine::GameObjectManager* objectManager_ = nullptr;
 	GameEngine::Model* wallModel_ = nullptr;
 	GameEngine::Model* wallFractureModel_ = nullptr;
+	// カメラ機能
+	CameraController* camera_ = nullptr;
 
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;
@@ -43,6 +50,9 @@ private:
 	
 	// 壁のデータ
 	std::vector<Wall*> walls_;
+
+	// 床
+	Floor* floor_ = nullptr;
 
 private:
 

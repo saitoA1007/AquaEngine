@@ -1,5 +1,14 @@
 {
     "FructureDemo": {
+        "Debris": {
+            "AngularSpeed": 3.0,
+            "BounceFriction": 0.699999988079071,
+            "BounceRestitution": 0.4000000059604645,
+            "Gravity": 9.800000190734863,
+            "GroundDrag": 4.0,
+            "MinUpSpeed": 4.0,
+            "SleepSpeed": 0.30000001192092896
+        },
         "Material": {
             "Bubble": {
                 "bubbleDensity": 0.029999999329447746,
@@ -33,7 +42,7 @@
             "CrackImpulseStrength": 1.7999999523162842,
             "CrackSpringStiffness": 400.0
         },
-        "SceneName": "Test",
+        "SceneName": "Demo",
         "State": {
             "BreakDetachRadius": 3.0,
             "BreakThreshold": 3.0,
@@ -51,6 +60,9 @@
             "MinDentRatio": 0.15000000596046448,
             "NeighborCrackFactor": 0.3499999940395355,
             "PlaneCount": 8
+        },
+        "TestCollider": {
+            "Radius": 1.0
         },
         "WorldTransform": {
             "Rotate": [

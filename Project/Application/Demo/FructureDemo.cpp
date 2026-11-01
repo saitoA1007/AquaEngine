@@ -45,6 +45,9 @@ FructureDemo::FructureDemo(std::string name, GameEngine::InputCommand* inputComm
 	index = 0;
 	debugParame_->Register("Radius", radius_, index++, subGroup);
 	debugParame_->Apply();
+
+	// 地面の高さを設定
+	destructibleObject_.SetGroundHeight(-2.0f);
 }
 
 void FructureDemo::Initialize() {

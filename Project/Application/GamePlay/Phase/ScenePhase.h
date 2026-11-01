@@ -11,6 +11,7 @@ class PlayUIManager;
 class GameOverUIManager;
 class ClearUIManager;
 class PauseUIManager;
+class EnterMovieUIManager;
 
 // タイトル
 class TitlePhase : public IScenePhase {
@@ -35,7 +36,8 @@ private:
 // チュートリアル
 class TutorialPhase : public IScenePhase {
 public:
-    TutorialPhase(PhaseCommonData& commonData, CameraController* cameraController, Player* player, BossEnemy* bossEnemy, PlayUIManager* playUIManager);
+    TutorialPhase(PhaseCommonData& commonData, CameraController* cameraController, Player* player, BossEnemy* bossEnemy, PlayUIManager* playUIManager,
+        EnterMovieUIManager* enterMovieUIManager);
     ~TutorialPhase() = default;
 
     void Enter() override;
@@ -57,6 +59,10 @@ private:
     // カメラ管理処理
     CameraController* cameraController_ = nullptr;
 
+    // 入りのムービーのUI
+    EnterMovieUIManager* enterMovieUIManager_ = nullptr;
+    // ボスの名前を表示したか
+    bool isPlayBossName_ = false;
 };
 
 // プレイ
@@ -139,5 +145,21 @@ public:
 private:
     ClearUIManager* clearUIManager_ = nullptr;
 
+
+};
+
+// オプション
+class OptionPhase : public IScenePhase {
+public:
+    OptionPhase(PhaseCommonData& commonData);
+    ~OptionPhase() = default;
+
+    void Enter() override;
+
+    void Update() override;
+
+    void Exit() override;
+
+private:
 
 };

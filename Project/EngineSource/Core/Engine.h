@@ -26,7 +26,7 @@ namespace GameEngine {
         Engine(const Engine&) = delete;
         Engine& operator=(const Engine&) = delete;
 
-        void RunEngine(HINSTANCE& hInstance);
+        void RunEngine(HINSTANCE& hInstance, const std::function<void(SceneRegistry&)>& setupScenes);
 
     private:
         std::unique_ptr<CoreSubsystem> core_;
@@ -60,7 +60,7 @@ namespace GameEngine {
         const std::chrono::seconds kWarmUpTimeout{ 1 };
 
     private:
-        void Initialize(HINSTANCE hInstance);
+        void Initialize(HINSTANCE hInstance, const std::function<void(SceneRegistry&)>& setupScenes);
         void Finalize();
         void MainLoop();
         void RunFrame();

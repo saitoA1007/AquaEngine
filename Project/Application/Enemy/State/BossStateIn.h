@@ -22,12 +22,19 @@ public:
 	/// </summary>
 	void Exit() override;
 
+public:
+
+	/// <summary>
+	/// 入りの演出を飛ばして、終わった状態にする
+	/// </summary>
+	void Skip();
+
 private:
 	BossStateCommonData& stateCommonData_;
 
 	Vector3 startPos_ = {0.0f,0.0f,0.0f};
 	Vector3 endPos_ = {0.0f,15.0f,0.0f};
-	float moveHeight_ = 4.0f;
+	float moveHeight_ = 12.0f;
 	uint32_t cycleCount_ = 3;
 
 	float timer_ = 0.0f;

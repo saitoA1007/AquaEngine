@@ -1,5 +1,4 @@
 #include "pch.h"
-#define NOMINMAX
 #include <algorithm>
 #include "Player.h"
 #include "LogManager.h"
@@ -9,6 +8,8 @@
 #include "Application/CollisionConfig.h"
 #include "Application/Enemy/RangedAttack/IceFall.h"
 #include "Application/Enemy/BossEnemy.h"
+#include "Application/Stage/Wall.h"
+#include "Application/Stage/Floor.h"
 using namespace GameEngine;
 
 Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model, GameEngine::AnimationManager* animationManager, PlayerEffectManager* effectManager) {
@@ -18,15 +19,41 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model,
 	// ワールド行列を初期化
 	worldTransform_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,2.0f,0.0f},{0.0f,2.0f,10.0f} });
 
+	// アクションを登録
+	actions_ = {
+		&moveAction_,             // 移動
+		&attackRushAction_,       // 突進
+		&playerAttackDownAction_, // 落下攻撃
+		&bounceAction_,           // 跳ね返り
+		&playerPhysics_,          // 重力
+		&playerStatus_,           // 状態
+	};
+
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>("Player");
 	// 値を登録
-	moveAction_.RegisterParameter(debugParame_.get());
-	bounceAction_.RegisterParameter(debugParame_.get());
-	attackRushAction_.RegisterParameter(debugParame_.get());
-	playerAttackDownAction_.RegisterParameter(debugParame_.get());
-	playerPhysics_.RegisterParameter(debugParame_.get());
-	playerStatus_.RegisterParameter(debugParame_.get());
+	for (IPlayerAction* action : actions_) {
+		action->RegisterParameter(debugParame_.get());
+	}
+	{
+		std::string subGroup = "CameraShake";
+		int index = 0;
+		debugParame_->Register("AttackShakeIntensity", attackShakeIntensity_, index++, subGroup);
+		debugParame_->Register("AttackShakeDuration", attackShakeDuration_, index++, subGroup);
+		debugParame_->Register("DamageShakeIntensity", damageShakeIntensity_, index++, subGroup);
+		debugParame_->Register("DamageShakeDuration", damageShakeDuration_, index++, subGroup);
+	}
+	{
+		std::string subGroup = "Vibration";
+		int index = 0;
+		debugParame_->Register("AttackVibrationIntensity", attackVibrationIntensity_, index++, subGroup);
+		debugParame_->Register("AttackVibrationDuration", attackVibrationDuration_, index++, subGroup);
+	}
+	{
+		std::string subGroup = "Effect";
+		int index = 0;
+		debugParame_->Register("MoveEffectMinSpeed", moveEffectMinSpeed_, index++, subGroup);
+	}
 	debugParame_->Apply();
 
 	// 当たり判定の設定
@@ -51,20 +78,15 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model,
 	commonData_.effectManager_ = effectManager;
 	effectManager_ = effectManager;
 
-	// 移動アクション
-	moveAction_.Initialize(&commonData_, inputCommand);
-	// 跳ね返りアクション
-	bounceAction_.Initialize(&commonData_);
-	// 突進アクション
-	attackRushAction_.Initialize(&commonData_, inputCommand);
-	// 落下攻撃アクション
-	playerAttackDownAction_.Initialize(&commonData_, inputCommand);
+	// 各アクションを初期化
+	for (IPlayerAction* action : actions_) {
+		action->Initialize(&commonData_, inputCommand);
+	}
+}
 
-	// 重力
-	playerPhysics_.Initialize(&commonData_);
-
-	// プレイヤーの状態
-	playerStatus_.Initialize(&commonData_);
+Player::~Player() {
+	// 振動したまま終了しないように止める
+	StopVibration();
 }
 
 void Player::Initialize() {
@@ -80,11 +102,22 @@ void Player::Initialize() {
 
 	isDraw_ = true;
 
-	// 体力をリセット
-	playerStatus_.ResetHp();
+	// 各アクションの状態をリセット
+	for (IPlayerAction* action : actions_) {
+		action->Reset();
+	}
 
 	// 初期化
 	animator_->Initialize();
+
+	// 振動を止める
+	StopVibration();
+
+	// 歩きエフェクトを止める
+	effectManager_->StartMoveEffect(worldTransform_.transform_.translate, Vector3(0.0f, 0.0f, 0.0f), false);
+
+	// 突進エフェクトを止める
+	effectManager_->StartRushEffect(worldTransform_.GetWorldMatrix(), false);
 }
 
 void Player::Update() {
@@ -94,21 +127,15 @@ void Player::Update() {
 	// カメベクトルを更新
 	moveAction_.UpdateCameraBasis(camera_->GetWorldMatrix());
 
-	// 移動操作
-	moveAction_.ProcessInput();
-	// 突進操作
-	attackRushAction_.ProcessInput();
-	// 落下攻撃操作
-	playerAttackDownAction_.ProcessInput();
+	// 入力処理
+	for (IPlayerAction* action : actions_) {
+		action->ProcessInput();
+	}
 
-	// 落下攻撃の更新処理
-	playerAttackDownAction_.Update();
-	// 受ける物理を更新
-	playerPhysics_.Update();
-	// 更新
-	attackRushAction_.Update();
-	// 状態
-	playerStatus_.Update();
+	// 更新処理
+	for (IPlayerAction* action : actions_) {
+		action->Update();
+	}
 
 	// 範囲制限
 	ApplyClamp();
@@ -129,10 +156,25 @@ void Player::Update() {
 
 	// アニメーションの更新
 	animator_->Update();
+
+	// 歩きエフェクトの更新
+	UpdateMoveEffect();
+
+	// 突進エフェクトの更新
+	effectManager_->StartRushEffect(worldTransform_.GetWorldMatrix(), commonData_.state == PlayerState::kAttackRush);
+
+	// 振動の更新
+	UpdateVibration();
 }
 
 void Player::Draw() {
 	if (!isDraw_) { return; }
+
+	// Hpが0になったら表示しない
+	if (playerStatus_.GetCurrentHp() <= 0) { return; }
+
+	// クールタイム中は点滅させる
+	if (playerStatus_.IsBlinkHidden()) { return; }
 
 	// モデル描画
 	renderQueue_->SubmitRaytracingModel(model_, worldTransform_);
@@ -169,6 +211,24 @@ void Player::UpdateRotation() {
 		// 現在の角度を更新
 		commonData_.currentDir = Math::YawToDirection(commonData_.currentYaw);
 	}
+}
+
+void Player::UpdateMoveEffect() {
+	// 地上で一定以上の速さで移動している時だけ出す
+	Vector3 horizontalVelocity = { commonData_.velocity.x, 0.0f, commonData_.velocity.z };
+	bool isWalking = (commonData_.state == PlayerState::kNone) &&
+		(horizontalVelocity.Length() >= moveEffectMinSpeed_);
+
+	// 移動方向と逆向きにパーティクルを飛ばす
+	Vector3 effectDir = { 0.0f, 0.0f, 0.0f };
+	if (isWalking) {
+		effectDir = horizontalVelocity * -1.0f;
+		// 少し上に向ける
+		effectDir.y = 0.3f;
+		effectDir.Normalize();
+	}
+
+	effectManager_->StartMoveEffect(worldTransform_.transform_.translate, effectDir, isWalking);
 }
 
 void Player::ApplyClamp() {
@@ -209,6 +269,11 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 				// 地面破壊スタート
 				commonData_.effectManager_->StartShockWave(Vector3(worldTransform_.transform_.translate.x, 1.0f, worldTransform_.transform_.translate.z));
 
+				// 着地した位置の床の上層部を壊す
+				//if (Floor* floor = result.userData.As<Floor>()) {
+				//	floor->Break(Vector3(worldTransform_.transform_.translate.x, floor->GetWorldTransform().transform_.translate.y, worldTransform_.transform_.translate.z));
+				//}
+
 				// 着地エフェクトを開始
 				effectManager_->StartLandingEffect(Vector3(worldTransform_.transform_.translate.x, 0.0f, worldTransform_.transform_.translate.z));
 
@@ -227,7 +292,11 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 
 	// 壁の衝突処理
 	if (isWall) {
-		bounceAction_.WallBounce(worldTransform_.transform_.translate, result.contactNormal, result.penetrationDepth, attackRushAction_.GetRushMaxSpeed());
+		// 壊れている壁では上昇せず、見えない壁として押し戻しだけ行う
+		Wall* wall = result.userData.As<Wall>();
+		bool canBounceUp = ((wall == nullptr) || !wall->IsBroken());
+		bounceAction_.WallBounce(worldTransform_.transform_.translate, result.contactNormal, result.penetrationDepth,
+			attackRushAction_.GetRushMaxSpeed(), canBounceUp);
 	}
 
 	// 氷柱との衝突
@@ -235,10 +304,9 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 		IceFall* iceFall = result.userData.As<IceFall>();
 		if (iceFall == nullptr) { return; }
 
-		// 氷柱を削除
+		// 氷柱を破壊する(使い回すため削除はしない)
 		if (commonData_.state == PlayerState::kAttackRush) {
-			iceFall->Destroy();
-			//iceFall->SetIsBreak(true);
+			iceFall->Break(result.contactPosition, commonData_.velocity);
 		}
 
 		bounceAction_.WallBounce(worldTransform_.transform_.translate, result.contactNormal * -1.0f, result.penetrationDepth, attackRushAction_.GetRushMaxSpeed());
@@ -246,8 +314,10 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 
 	// 風による攻撃
 	if (isWind) {
-		// ダメージを受ける
-		playerStatus_.TakeDamage(1);
+		if (commonData_.state != PlayerState::kAttackDown) {
+			// ダメージを受ける
+			TakeDamage(1);
+		}	
 	}
 
 	// ボスの衝突判定
@@ -262,10 +332,66 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 		} else {
 
 			if (commonData_.state != PlayerState::kAttackDown) {
-
 				// ダメージを受ける
-				playerStatus_.TakeDamage(1);
+				TakeDamage(1);
 			}
 		}
+	}
+}
+
+void Player::TakeDamage(int32_t damage) {
+	// 壁に衝突して上昇している間はダメージを受けない
+	if (bounceAction_.IsBounceRising()) { return; }
+
+	// 無敵時間中は何もしない
+	if (!playerStatus_.TakeDamage(damage)) { return; }
+
+	// ダメージを受けた位置にエフェクトを出す
+	effectManager_->StartDamageEffect(worldTransform_.GetWorldPosition());
+
+	// カメラを揺らす
+	if (camera_) {
+		camera_->StartShake(damageShakeIntensity_, damageShakeDuration_);
+	}
+}
+
+void Player::StartHitEffect(Vector3 pos) {
+	uint32_t powerLevel = playerAttackDownAction_.GetPowerLevel();
+	effectManager_->StartHitEffect(pos, powerLevel);
+
+	// 攻撃の強さに応じてカメラを揺らす
+	if (camera_) {
+		camera_->StartShake(attackShakeIntensity_ * static_cast<float>(powerLevel), attackShakeDuration_);
+	}
+
+	// 攻撃の強さに応じてコントローラーを振動させる
+	StartVibration(attackVibrationIntensity_ * static_cast<float>(powerLevel), attackVibrationDuration_);
+}
+
+void Player::StartVibration(float intensity, float duration) {
+	intensity = std::clamp(intensity, 0.0f, 1.0f);
+
+	// 振動中であれば強い方を優先する
+	if (vibrationTimer_ > 0.0f && intensity < vibrationIntensity_) { return; }
+
+	vibrationIntensity_ = intensity;
+	vibrationTimer_ = duration;
+	inputCommand_->PlayPadVibration(intensity, intensity);
+}
+
+void Player::UpdateVibration() {
+	if (vibrationTimer_ <= 0.0f) { return; }
+
+	vibrationTimer_ -= FpsCounter::deltaTime;
+	if (vibrationTimer_ <= 0.0f) {
+		StopVibration();
+	}
+}
+
+void Player::StopVibration() {
+	vibrationTimer_ = 0.0f;
+	vibrationIntensity_ = 0.0f;
+	if (inputCommand_) {
+		inputCommand_->PlayPadVibration(0.0f, 0.0f);
 	}
 }
