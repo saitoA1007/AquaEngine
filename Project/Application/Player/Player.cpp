@@ -270,9 +270,9 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 				commonData_.effectManager_->StartShockWave(Vector3(worldTransform_.transform_.translate.x, 1.0f, worldTransform_.transform_.translate.z));
 
 				// 着地した位置の床の上層部を壊す
-				if (Floor* floor = result.userData.As<Floor>()) {
-					floor->Break(Vector3(worldTransform_.transform_.translate.x, floor->GetWorldTransform().transform_.translate.y, worldTransform_.transform_.translate.z));
-				}
+				//if (Floor* floor = result.userData.As<Floor>()) {
+				//	floor->Break(Vector3(worldTransform_.transform_.translate.x, floor->GetWorldTransform().transform_.translate.y, worldTransform_.transform_.translate.z));
+				//}
 
 				// 着地エフェクトを開始
 				effectManager_->StartLandingEffect(Vector3(worldTransform_.transform_.translate.x, 0.0f, worldTransform_.transform_.translate.z));

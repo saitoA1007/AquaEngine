@@ -66,7 +66,7 @@ Floor::Floor(GameEngine::Model* model, GameEngine::Model* fractureModel, uint32_
 	destructObject_.SetIsColliderActive(false);
 	// 床の破片は全て底面まで届いているため、アンカーを使わずに切り離せるようにする
 	destructObject_.SetUseAnchor(false);
-	destructObject_.iceMaterial_.GetMaterialData()->dissolveThreshold = 0.0f;
+	//destructObject_.iceMaterial_.GetMaterialData()->dissolveThreshold = 0.0f;
 
 	// 参照するマテリアルを変更
 	iceModelComponent_.SetBufferMaterial(0, iceMaterial_.GetMaterialSrvIndex());
@@ -129,7 +129,7 @@ void Floor::Update() {
 
 void Floor::Draw() {
 	// 上層部を描画
-	destructObject_.Draw();
+	//destructObject_.Draw();
 
 	// 外側の氷を描画
 	iceModelComponent_.DrawRaytracing(renderQueue_);
