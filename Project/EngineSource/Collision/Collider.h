@@ -42,12 +42,12 @@ namespace GameEngine {
 		}
 
 		// コールバック関数を登録する
-		void SetOnCollisionCallback(std::function<void(const CollisionResult&)> callback) {
+		void SetOnCollisionStayCallback(std::function<void(const CollisionResult&)> callback) {
 			onCollisionCallback_ = callback;
 		}
 
 		// 衝突時に呼ばれる関数
-		void OnCollision(const CollisionResult& result) {
+		void OnCollisionStay(const CollisionResult& result) {
 			// コールバックを実行する
 			if (onCollisionCallback_) {
 				onCollisionCallback_(result);

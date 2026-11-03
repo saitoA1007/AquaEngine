@@ -73,6 +73,10 @@ void CollisionManager::NotifyCollisionExit() {
 		CollisionResult resultB;
 		resultB.userData = colliderA->GetUserData();
 
+		// 衝突している間に呼び出す
+		colliderA->OnCollisionStay(resultA);
+		colliderB->OnCollisionStay(resultB);
+
 		// 離れた瞬間に呼び出す
 		colliderA->OnCollisionExit(resultA);
 		colliderB->OnCollisionExit(resultB);
@@ -111,12 +115,12 @@ void  CollisionManager::CheckCollisionPair(Collider* colliderA, Collider* collid
 		// コライダーの衝突時コールバックを呼び出す
 		if (wasHit) {
 			// 衝突している間に呼び出す
-			colliderA->OnCollision(result);
-			colliderB->OnCollision(resultB);
+			colliderA->OnCollisionStay(result);
+			colliderB->OnCollisionStay(resultB);
 		} else {
 			// 衝突している間に呼び出す
-			colliderA->OnCollision(result);
-			colliderB->OnCollision(resultB);
+			colliderA->OnCollisionStay(result);
+			colliderB->OnCollisionStay(resultB);
 			// 衝突した瞬間に呼び出す
 			colliderA->OnCollisionEnter(result);
 			colliderB->OnCollisionEnter(resultB);
