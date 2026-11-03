@@ -54,6 +54,18 @@ namespace GameEngine {
 			}
 		}
 
+		// 離れた瞬間を取得するコールバック関数を登録する
+		void SetOnCollisionExitCallback(std::function<void(const CollisionResult&)> callback) {
+			onCollisionExitCallback_ = callback;
+		}
+
+		// 衝突終了時に呼ばれる関数
+		void OnCollisionExit(const CollisionResult& result) {
+			if (onCollisionExitCallback_) {
+				onCollisionExitCallback_(result);
+			}
+		}
+
 		// 衝突属性を取得
 		uint32_t GetCollisionAttribute() const { return collisionAttribute_; }
 		// 衝突属性を設定
@@ -88,6 +100,8 @@ namespace GameEngine {
 		std::function<void(const CollisionResult&)> onCollisionEnterCallback_;
 		// コールバック関数(触れている間)
 		std::function<void(const CollisionResult&)> onCollisionCallback_;
+		// コールバック関数(離れた時)
+		std::function<void(const CollisionResult&)> onCollisionExitCallback_;
 		// ユーザーデータ
 		UserData userData_;
 	};
