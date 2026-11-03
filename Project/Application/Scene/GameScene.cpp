@@ -80,6 +80,9 @@ GameScene::GameScene() {
 	auto* planeModel = modelManager_->GetNameByModel("plane.obj");
 	planeModel->SetDefaultIsEnableLight(false);
 	gameObjectManager_->AddObject<ParticleBehavior>("BgSnowParticle", 64, textureManager_, planeModel);
+	// 床の近くを流れる吹雪
+	auto* crossPlaneModel = modelManager_->GetNameByModel("crossPlane.gltf");
+	gameObjectManager_->AddObject<ParticleBehavior>("BgDriftSnowParticle", 160, textureManager_, planeModel);
 
 	// タイトル中のUI
 	auto* titleUIManager = gameObjectManager_->AddObject<TitleUIManager>(textureManager_);
