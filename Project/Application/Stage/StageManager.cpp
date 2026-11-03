@@ -2,6 +2,7 @@
 #include "StageManager.h"
 #include <numbers>
 #include "Floor.h"
+#include "BgRockField.h"
 #include "TextureManager.h"
 using namespace GameEngine;
 
@@ -25,6 +26,11 @@ StageManager::StageManager(GameEngine::GameObjectManager* objectManager, GameEng
 
 	// 床モデルを生成
 	floor_ = objectManager_->AddObject<Floor>(floorModel, floorFractureModel, iceNormalGH, iceHeightGH, terrainGH, terrainNormalGH);
+
+	// 背景の岩を配置
+	auto* bgRockModel = modelManager->GetNameByModel("iceFall.obj");
+	bgRockModel->SetDefaultIsEnableLight(true);
+	objectManager_->AddObject<BgRockField>(bgRockModel, bgRockModel);
 
 	// モデルを取得
 	wallModel_ = wallModel;

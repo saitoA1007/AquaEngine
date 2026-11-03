@@ -324,6 +324,9 @@
     <ClCompile Include="Application\Stage\BgIceRock.cpp">
       <Filter>Application\Stage</Filter>
     </ClCompile>
+    <ClCompile Include="Application\Stage\BgRockField.cpp">
+      <Filter>Application\Stage</Filter>
+    </ClCompile>
     <ClCompile Include="Application\Stage\Floor.cpp">
       <Filter>Application\Stage</Filter>
     </ClCompile>
@@ -967,6 +970,9 @@
       <Filter>Application\Scene\Transition</Filter>
     </ClInclude>
     <ClInclude Include="Application\Stage\BgIceRock.h">
+      <Filter>Application\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Stage\BgRockField.h">
       <Filter>Application\Stage</Filter>
     </ClInclude>
     <ClInclude Include="Application\Stage\Floor.h">
@@ -1670,6 +1676,7 @@
     <FxCompile Include="Resources\Shaders\PostEffect\DepthCopy.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\Dissolve\Dissolve.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\UIComposite.PS.hlsl" />
+    <FxCompile Include="Resources\Shaders\PostEffect\Fog.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\LightingComposite.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\OutLine\DepthOutLine.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\PostEffect\Smoothing\Gauss5x5Horizontal.PS.hlsl" />
