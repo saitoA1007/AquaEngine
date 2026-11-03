@@ -21,7 +21,7 @@ namespace GameEngine {
 
 	// リソースの現在の状態を追跡する列挙型
 	enum class ColorResourceState {
-		ShaderResource,   // D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
+		ShaderResource,   // D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | NON_PIXEL_SHADER_RESOURCE
 		RenderTarget,     // D3D12_RESOURCE_STATE_RENDER_TARGET
 		UnorderedAccess,  // D3D12_RESOURCE_STATE_UNORDERED_ACCESS
 	};

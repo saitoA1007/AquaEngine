@@ -199,7 +199,7 @@ float3 TranslucentRefraction(float3 worldPosition, float3 worldNormal, int recur
     }
 }
 
-// 影判定用のレイ
+// 影判定用のレイ。RayQueryで飛ばすため、ヒットシェーダーとコンピュートシェーダーの両方から使える
 // rayMask : 遮蔽物として扱うインスタンスのマスク
 bool ShootShadowRay(float3 origin, float3 direction, uint rayMask = RAY_MASK_ALL)
 {
@@ -209,23 +209,11 @@ bool ShootShadowRay(float3 origin, float3 direction, uint rayMask = RAY_MASK_ALL
     rayDesc.TMin = 0.001f;
     rayDesc.TMax = 100000;
 
-    ShadowPayload payload;
-    payload.isHit = true;
-
-    RAY_FLAG flags = RAY_FLAG_NONE;
-    //flags |= RAY_FLAG_FORCE_OPAQUE;
-    flags |= RAY_FLAG_SKIP_CLOSEST_HIT_SHADER;
-
-    TraceRay(
-        gRtScene,
-        flags,
-        rayMask,
-        0, // ray index
-        1, // MultiplierForGeometryContrib
-        1, // miss index
-        rayDesc,
-        payload);
-    return payload.isHit;
+    // 何かに当たった時点で探索を打ち切る
+    RayQuery<RAY_FLAG_FORCE_OPAQUE | RAY_FLAG_ACCEPT_FIRST_HIT_AND_END_SEARCH> q;
+    q.TraceRayInline(gRtScene, RAY_FLAG_NONE, rayMask, rayDesc);
+    while (q.Proceed()) {}
+    return q.CommittedStatus() == COMMITTED_TRIANGLE_HIT;
 }
 
 // 遮蔽物の種類を区別して影の透過率を求める
@@ -369,6 +357,155 @@ float3 IceBSDF(float3 worldPos, float3 worldNormal, int recursive, float ior, fl
     }
 
     return lerp(refractColor, reflectColor, F) + sssContrib;
+}
+
+// 頂点データのストライド
+static const uint VERTEX_STRIDE = 52;
+
+// コースティクス影のサンプル数。多いほどノイズが減る
+static const int CAUSTIC_SAMPLES = 8;
+// サンプルを取る円錐の広さ(cos)。氷が光を曲げる角度より広くする
+static const float CAUSTIC_CONE_COS = 0.985f;
+// 太陽の見かけの大きさ。大きいほど模様が鋭くなる
+static const float CAUSTIC_SHARPNESS = 400.0f;
+
+// インラインレイのヒット情報から法線を求める
+float3 FetchHitNormal(uint instanceID, uint primIndex, float2 barys, float4x3 objToWorld)
+{
+    BufferRef ref = gBufferRefs[instanceID];
+    uint start = primIndex * 3;
+    float3 normals[3];
+    for (int i = 0; i < 3; ++i)
+    {
+        uint localIndex = gBufferData[ref.indexHandle].Load<uint>((start + i) * 4 + ref.indexOffset * 4);
+        uint index = localIndex + ref.vertexOffset;
+        // position(16byte) + texcoord(8byte) の後ろに法線がある
+        normals[i] = gBufferData[ref.vertexHandle].Load<float3>(index * VERTEX_STRIDE + 24);
+    }
+    return normalize(mul(CalcHitAttribute3(normals, barys), (float3x3) objToWorld));
+}
+
+// 氷だけを対象にインラインでレイを飛ばす
+// ior : ヒットした氷のマテリアルの屈折率
+bool TraceIceInline(float3 origin, float3 dir, out float t, out float3 n, out float ior)
+{
+    RayDesc ray;
+    ray.Origin = origin;
+    ray.Direction = dir;
+    ray.TMin = 0.001f;
+    ray.TMax = 100000.0f;
+
+    RayQuery<RAY_FLAG_FORCE_OPAQUE> q;
+    q.TraceRayInline(gRtScene, RAY_FLAG_NONE, RAY_MASK_ICE, ray);
+    while (q.Proceed()) {}
+
+    t = 0.0f;
+    n = float3(0.0f, 1.0f, 0.0f);
+    ior = 1.31f;
+    if (q.CommittedStatus() != COMMITTED_TRIANGLE_HIT)
+    {
+        return false;
+    }
+    t = q.CommittedRayT();
+    n = FetchHitNormal(q.CommittedInstanceID(), q.CommittedPrimitiveIndex(),
+                       q.CommittedTriangleBarycentrics(), q.CommittedObjectToWorld4x3());
+    // マテリアルの先頭から128byte目にiorがある
+    ior = max(gBufferData[gBufferRefs[q.CommittedInstanceID()].MaterialIndex].Load<float>(128), 1.0f);
+    return true;
+}
+
+// 円錐内の方向を立体角一様にサンプリング
+float3 SampleCone(float3 axis, float cosMax, float2 u)
+{
+    float cosT = lerp(1.0f, cosMax, u.x);
+    float sinT = sqrt(saturate(1.0f - cosT * cosT));
+    float phi = 6.2831853f * u.y;
+    float3 t = normalize(cross(abs(axis.y) < 0.99f ? float3(0.0f, 1.0f, 0.0f) : float3(1.0f, 0.0f, 0.0f), axis));
+    float3 b = cross(axis, t);
+    return normalize((t * cos(phi) + b * sin(phi)) * sinT + axis * cosT);
+}
+
+float Hash12(float2 p)
+{
+    float3 p3 = frac(float3(p.xyx) * 0.1031f);
+    p3 += dot(p3, p3.yzx + 33.33f);
+    return frac((p3.x + p3.y) * p3.z);
+}
+
+// フレネル透過率
+float FresnelTransmittance(float cosTheta, float ior)
+{
+    float r0 = (1.0f - ior) / (1.0f + ior);
+    r0 *= r0;
+    return 1.0f - (r0 + (1.0f - r0) * pow(1.0f - saturate(cosTheta), 5.0f));
+}
+
+// 氷を屈折しながら通過して届く直射光の割合を色付きで求める
+// 不透明物に遮られれば0、遮る物が無ければ1、光が集まる所(コースティクス)は1を超える
+// pixelIndex : サンプルの乱数に使う画素の位置
+float3 ComputeShadowColor(float3 origin, float3 lightDir, uint2 pixelIndex)
+{
+    if (ShootShadowRay(origin, lightDir, RAY_MASK_OPAQUE))
+    {
+        return float3(0.0f, 0.0f, 0.0f);
+    }
+
+    float2 pixel = float2(pixelIndex);
+
+    float3 sum = float3(0.0f, 0.0f, 0.0f);
+    float norm = 0.0f;
+    for (int i = 0; i < CAUSTIC_SAMPLES; ++i)
+    {
+        float2 u = float2(Hash12(pixel + i * 17.0f), Hash12(pixel * 1.7f + i * 31.0f));
+        float3 d0 = SampleCone(lightDir, CAUSTIC_CONE_COS, u);
+        // 氷が無い場合にこの方向から届く光の重み。正規化に使う
+        float base = pow(saturate(dot(d0, lightDir)), CAUSTIC_SHARPNESS);
+        norm += base;
+
+        float t0, ior;
+        float3 n0;
+        if (!TraceIceInline(origin, d0, t0, n0, ior))
+        {
+            sum += base;
+            continue;
+        }
+
+        // 入射面で屈折
+        float3 N0 = dot(n0, d0) < 0.0f ? n0 : -n0;
+        float3 d1 = refract(d0, N0, 1.0f / ior);
+        if (dot(d1, d1) < 1e-4f)
+        {
+            continue;
+        }
+        float T0 = FresnelTransmittance(dot(-d0, N0), ior);
+
+        // 氷の内部を進み、出射面で屈折
+        float3 p0 = origin + d0 * t0;
+        float3 d2 = d0;
+        float T1 = 1.0f;
+        float3 absorb = float3(1.0f, 1.0f, 1.0f);
+        float t1, ior1;
+        float3 n1;
+        if (TraceIceInline(p0, d1, t1, n1, ior1))
+        {
+            float3 N1 = dot(n1, d1) < 0.0f ? n1 : -n1;
+            d2 = refract(d1, N1, ior);
+            if (dot(d2, d2) < 1e-4f)
+            {
+                // 全反射。光は届かない
+                continue;
+            }
+            T1 = FresnelTransmittance(dot(-d1, N1), ior);
+            absorb = BeerLambert(ICE_ABSORPTION_COEFF, t1);
+        }
+
+        // 屈折後の方向が太陽を向いているほど光が届く
+        float lobe = pow(saturate(dot(normalize(d2), lightDir)), CAUSTIC_SHARPNESS);
+        sum += lobe * T0 * T1 * absorb;
+    }
+
+    // 平らな氷板なら透過率程度、曲面で光が集まる所は1を超える
+    return norm > 0.0f ? sum / norm : float3(1.0f, 1.0f, 1.0f);
 }
 
 #endif

@@ -37,6 +37,9 @@ namespace GameEngine {
 
 		// SRVインデックスの取得
 		uint32_t GetSrvIndex() const { return srvIndex_; }
+
+		// インスタンス情報(D3D12_RAYTRACING_INSTANCE_DESCの配列)のアドレス。シェーダーから行列などを読むために使う
+		D3D12_GPU_VIRTUAL_ADDRESS GetInstanceBufferAddress() const { return instanceBuffer_->GetGPUVirtualAddress(); }
 		const CD3DX12_GPU_DESCRIPTOR_HANDLE& GetSrvHandleGPU() const { return srvHandleGPU_; }
 	
 	private:

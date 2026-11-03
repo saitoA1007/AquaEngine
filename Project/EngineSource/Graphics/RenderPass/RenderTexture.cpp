@@ -5,6 +5,12 @@
 #include "CreateBufferResource.h"
 using namespace GameEngine;
 
+namespace {
+	// カラーをシェーダーで読み込む時の状態。コンピュートシェーダーからも読めるようにする
+	constexpr D3D12_RESOURCE_STATES kColorShaderResourceState =
+		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+}
+
 RtvManager* RenderTexture::rtvManager_ = nullptr;
 DsvManager* RenderTexture::dsvManager_ = nullptr;
 
@@ -98,7 +104,7 @@ void RenderTexture::TransitionToRenderTarget(ID3D12GraphicsCommandList* commandL
 		if (colorState_ == ColorResourceState::UnorderedAccess) {
 			stateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 		} else {
-			stateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+			stateBefore = kColorShaderResourceState;
 		}
 		// rtvに遷移するバリア
 		TransitionResource(commandList, resource_.Get(), stateBefore, D3D12_RESOURCE_STATE_RENDER_TARGET);
@@ -127,7 +133,7 @@ void RenderTexture::TransitionToShaderResource(ID3D12GraphicsCommandList* comman
 				stateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 			}
 			// srvに遷移するバリア
-			TransitionResource(commandList, resource_.Get(), stateBefore, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+			TransitionResource(commandList, resource_.Get(), stateBefore, kColorShaderResourceState);
 		}
 	}
 
@@ -151,7 +157,7 @@ void RenderTexture::TransitionToUnorderedAccess(ID3D12GraphicsCommandList* comma
 	if (colorState_ == ColorResourceState::RenderTarget) {
 		stateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	} else {
-		stateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+		stateBefore = kColorShaderResourceState;
 	}
 
 	// uavに遷移するバリア
@@ -194,7 +200,7 @@ void RenderTexture::CreateColorTarget(uint32_t width, uint32_t height, DXGI_FORM
 
 	// リソース作成
 	D3D12_RESOURCE_DESC desc = CreateTexture2dDesc(width, height, format, flags);
-	resource_ = CreateResource(device_, desc, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, &clearValue);
+	resource_ = CreateResource(device_, desc, D3D12_HEAP_TYPE_DEFAULT, kColorShaderResourceState, &clearValue);
 
 	// rtvの完成
 	rtvIndex_ = rtvManager_->CreateView(resource_.Get(), format);

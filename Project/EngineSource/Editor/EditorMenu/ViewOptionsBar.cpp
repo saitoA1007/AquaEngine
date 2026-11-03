@@ -37,6 +37,18 @@ void ViewOptionsBar::Run() {
 		if (ImGui::BeginMenu("View")) {
 			ImGui::Checkbox("isDebugView", &isDebugView_);
 			ImGui::Checkbox("isDebugDraw", &isDebugDraw_);
+
+			// レイトレーシングの方式
+			const char* raytracingModeNames[] = { "DXR", "RayQuery", "PathTrace" };
+			int raytracingMode = static_cast<int>(renderQueue_->GetRaytracingMode());
+			if (ImGui::Combo("Raytracing", &raytracingMode, raytracingModeNames, IM_ARRAYSIZE(raytracingModeNames))) {
+				renderQueue_->SetRaytracingMode(static_cast<RaytracingMode>(raytracingMode));
+			}
+			// パストレーシングの最初のヒットをラスタライズで求めるか
+			bool useVisibilityBuffer = renderQueue_->GetUsePathTraceVisibilityBuffer();
+			if (ImGui::Checkbox("PathTrace VisibilityBuffer", &useVisibilityBuffer)) {
+				renderQueue_->SetUsePathTraceVisibilityBuffer(useVisibilityBuffer);
+			}
 			ImGui::EndMenu();
 		}
 		ImGui::EndMainMenuBar();

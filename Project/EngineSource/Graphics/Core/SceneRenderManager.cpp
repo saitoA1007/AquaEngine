@@ -9,6 +9,21 @@
 #include "SpriteRenderer.h"
 using namespace GameEngine;
 
+namespace {
+    // パストレーシングのデノイズに使うパス。[2]のものはフレームごとに交互に使う
+    const std::string kPathTraceNoisyPass = "PathTraceNoisyPass";
+    const std::string kPathTraceAlbedoPass = "PathTraceAlbedoPass";
+    const std::string kPathTraceGuidePass[2] = { "PathTraceGuidePass0", "PathTraceGuidePass1" };
+    const std::string kPathTraceHistoryPass[2] = { "PathTraceHistoryPass0", "PathTraceHistoryPass1" };
+    const std::string kPathTraceMomentsPass[2] = { "PathTraceMomentsPass0", "PathTraceMomentsPass1" };
+    const std::string kPathTraceFilterPass[2] = { "PathTraceFilterPass0", "PathTraceFilterPass1" };
+    const std::string kPathTraceCameraPass = "PathTraceCameraPass";
+    // パストレーシングの最初のヒットを求めるビジビリティバッファ
+    const std::string kPathTraceVisibilityPass = "PathTraceVisibilityPass";
+    // À-Trousフィルタの回数。サンプル間隔は1,2,4,8と広げる
+    constexpr uint32_t kAtrousIterationCount = 4;
+}
+
 void SceneRenderManager::Initialize(ID3D12GraphicsCommandList4* commandList, SrvManager* srvManager, PSOManager* psoManager, RenderPassController* renderPassController,
 	RaytracingPipeline* raytracingPipeline, BufferRefManager* bufferRefManager, RenderQueue* renderQueue) {
     commandList_ = commandList;
@@ -121,6 +136,21 @@ void SceneRenderManager::CreateRenderPasses() {
     renderPassController_->AddPass("RaytracingPass", RenderTextureMode::RtvAndUav);
     // レイトレーシング描画の深度情報を記録する。描画に使用しない
     renderPassController_->AddPass("RaytracingPassDepth", RenderTextureMode::UavOnly, 1280, 720, { 0.0f,0.0f,0.0f,1.0f }, DXGI_FORMAT_R32_FLOAT);
+
+    // パストレーシングのデノイズに使うパス
+    const Vector4 clearBlack = { 0.0f,0.0f,0.0f,0.0f };
+    renderPassController_->AddPass(kPathTraceNoisyPass, RenderTextureMode::UavOnly, 1280, 720, clearBlack, DXGI_FORMAT_R16G16B16A16_FLOAT);
+    renderPassController_->AddPass(kPathTraceAlbedoPass, RenderTextureMode::UavOnly, 1280, 720, clearBlack, DXGI_FORMAT_R16G16B16A16_FLOAT);
+    for (uint32_t i = 0; i < 2; ++i) {
+        renderPassController_->AddPass(kPathTraceGuidePass[i], RenderTextureMode::UavOnly, 1280, 720, clearBlack, DXGI_FORMAT_R32G32B32A32_FLOAT);
+        renderPassController_->AddPass(kPathTraceHistoryPass[i], RenderTextureMode::UavOnly, 1280, 720, clearBlack, DXGI_FORMAT_R16G16B16A16_FLOAT);
+        renderPassController_->AddPass(kPathTraceMomentsPass[i], RenderTextureMode::UavOnly, 1280, 720, clearBlack, DXGI_FORMAT_R32G32B32A32_FLOAT);
+        renderPassController_->AddPass(kPathTraceFilterPass[i], RenderTextureMode::UavOnly, 1280, 720, clearBlack, DXGI_FORMAT_R16G16B16A16_FLOAT);
+    }
+    // 前フレームのカメラ。0~3:VP行列の各行, 4:カメラ位置
+    renderPassController_->AddPass(kPathTraceCameraPass, RenderTextureMode::UavOnly, 5, 1, clearBlack, DXGI_FORMAT_R32G32B32A32_FLOAT);
+    // ビジビリティバッファ。x:TLASのインスタンス番号+1(0なら何も無い), y:三角形の番号
+    renderPassController_->AddPass(kPathTraceVisibilityPass, RenderTextureMode::RtvAndDsv, 1280, 720, clearBlack, DXGI_FORMAT_R32G32_UINT);
 
     // レイトレとラスタライズを合成する用のパス
     renderPassController_->AddPass("LightingCompositePass");
@@ -268,22 +298,48 @@ void SceneRenderManager::DrawRaytracing() {
     // Bufferのセット
     commandList_->SetComputeRootDescriptorTable(3, srvManager_->GetGPUHandle(bufferStartSrvIndex_));
     // カメラのセット
-    if (renderQueue_->GetUseDebugCamera()) {
-        commandList_->SetComputeRootConstantBufferView(4, renderQueue_->GetDebugCameraResource()->GetGpuVirtualAddress());
-    } else {
-        commandList_->SetComputeRootConstantBufferView(4, renderQueue_->GetCameraResource()->GetGpuVirtualAddress());
-    }
+    commandList_->SetComputeRootConstantBufferView(4, GetRaytracingCameraAddress());
     // ライトのセット
     commandList_->SetComputeRootConstantBufferView(5, renderQueue_->GetLightResource()->GetGpuVirtualAddress());
-    // 出力画像を設定
-    commandList_->SetComputeRootDescriptorTable(6, srvManager_->GetGPUHandle(renderPassController_->GetUavIndex("RaytracingPass")));
+    // 出力画像を設定。パストレーシングはデノイズ前の画像に書き込み、デノイズ後にRaytracingPassへ書き込む
+    const RaytracingMode raytracingMode = renderQueue_->GetRaytracingMode();
+    const std::string& outputPass = (raytracingMode == RaytracingMode::PathTrace) ? kPathTraceNoisyPass : "RaytracingPass";
+    commandList_->SetComputeRootDescriptorTable(6, srvManager_->GetGPUHandle(renderPassController_->GetUavIndex(outputPass)));
     commandList_->SetComputeRootDescriptorTable(7, srvManager_->GetGPUHandle(renderPassController_->GetUavIndex("RaytracingPassDepth")));
     // 背景画像
     commandList_->SetComputeRootDescriptorTable(8, srvManager_->GetGPUHandle(renderQueue_->GetSkyboxTexture()));
 
+    // フレーム番号と、ビジビリティバッファを使うか
+    const bool useVisibilityBuffer = (raytracingMode == RaytracingMode::PathTrace) && renderQueue_->GetUsePathTraceVisibilityBuffer();
+    commandList_->SetComputeRoot32BitConstant(9, raytracingFrameIndex_, 0);
+    commandList_->SetComputeRoot32BitConstant(9, useVisibilityBuffer ? 1u : 0u, 1);
+
+    // デノイズ用のガイドバッファ
+    const uint32_t current = raytracingFrameIndex_ & 1;
+    commandList_->SetComputeRootDescriptorTable(10, srvManager_->GetGPUHandle(renderPassController_->GetUavIndex(kPathTraceGuidePass[current])));
+    commandList_->SetComputeRootDescriptorTable(11, srvManager_->GetGPUHandle(renderPassController_->GetUavIndex(kPathTraceAlbedoPass)));
+
+    // ビジビリティバッファと、そのインスタンス番号から行列などを読むためのTLASのインスタンス情報
+    commandList_->SetComputeRootDescriptorTable(12, renderPassController_->GetSrvHandle(kPathTraceVisibilityPass));
+    commandList_->SetComputeRootShaderResourceView(13, tlas_.GetInstanceBufferAddress());
+
     // レイトレーシングを開始
-    commandList_->SetPipelineState1(raytracingPipeline_->GetStateObject());
-    commandList_->DispatchRays(&raytracingPipeline_->GetDispatchRayDesc());
+    switch (raytracingMode) {
+    case RaytracingMode::DXR:
+        // DXRのパイプラインで描画
+        commandList_->SetPipelineState1(raytracingPipeline_->GetStateObject());
+        commandList_->DispatchRays(&raytracingPipeline_->GetDispatchRayDesc());
+        break;
+
+    case RaytracingMode::RayQuery:
+    case RaytracingMode::PathTrace:
+        // コンピュートシェーダー内のRayQueryで描画
+        commandList_->SetPipelineState(raytracingMode == RaytracingMode::PathTrace
+            ? raytracingPipeline_->GetPathTracePipelineState()
+            : raytracingPipeline_->GetRayQueryPipelineState());
+        commandList_->Dispatch(raytracingPipeline_->GetRayQueryThreadGroupCountX(), raytracingPipeline_->GetRayQueryThreadGroupCountY(), 1);
+        break;
+    }
 }
 
 void SceneRenderManager::RasterizeExecute() {
@@ -471,9 +527,27 @@ void SceneRenderManager::RaytracingExecute() {
     // UAVに状態を変更
     renderPassController_->SwitchToUAV("RaytracingPass");
     renderPassController_->SwitchToUAV("RaytracingPassDepth");
+    renderPassController_->SwitchToUAV(kPathTraceNoisyPass);
+    renderPassController_->SwitchToUAV(kPathTraceAlbedoPass);
+    renderPassController_->SwitchToUAV(kPathTraceGuidePass[0]);
+    renderPassController_->SwitchToUAV(kPathTraceGuidePass[1]);
+
+    // パストレーシングの最初のヒットをラスタライズで求める
+    if (renderQueue_->GetRaytracingMode() == RaytracingMode::PathTrace && renderQueue_->GetUsePathTraceVisibilityBuffer()) {
+        DrawVisibilityBuffer(raytracingDrawQueueList);
+    }
 
     // レイトレーシングの描画
     DrawRaytracing();
+
+    // パストレーシングのノイズを除去してRaytracingPassに書き込む
+    const bool isPathTrace = renderQueue_->GetRaytracingMode() == RaytracingMode::PathTrace;
+    if (isPathTrace) {
+        DenoisePathTrace();
+    }
+    // パストレーシングが途切れたら、次に使う時に履歴を捨てる
+    wasPathTraceLastFrame_ = isPathTrace;
+    raytracingFrameIndex_++;
 
     // UAV書き込み完了
     renderPassController_->InsertUavBarrier("RaytracingPass");
@@ -483,6 +557,115 @@ void SceneRenderManager::RaytracingExecute() {
 
     // 最終描画先に設定
     finalPassName_ = raytracingFinalPassName_;
+}
+
+void SceneRenderManager::DenoisePathTrace() {
+    const uint32_t current = raytracingFrameIndex_ & 1;
+    const uint32_t previous = current ^ 1;
+
+    // UAVに状態を変更
+    for (uint32_t i = 0; i < 2; ++i) {
+        renderPassController_->SwitchToUAV(kPathTraceHistoryPass[i]);
+        renderPassController_->SwitchToUAV(kPathTraceMomentsPass[i]);
+        renderPassController_->SwitchToUAV(kPathTraceFilterPass[i]);
+    }
+    renderPassController_->SwitchToUAV(kPathTraceCameraPass);
+
+    // パストレーシングの書き込みを待つ
+    D3D12_RESOURCE_BARRIER uavBarrier{};
+    uavBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+    uavBarrier.UAV.pResource = nullptr;
+    commandList_->ResourceBarrier(1, &uavBarrier);
+
+    commandList_->SetComputeRootSignature(raytracingPipeline_->GetDenoiseRootSignature());
+    commandList_->SetComputeRootConstantBufferView(1, GetRaytracingCameraAddress());
+
+    // PathTraceDenoise.CS.hlslのUAV(u0~u11)に対応するパス
+    std::string uavPasses[RaytracingPipeline::kDenoiseUavCount] = {
+        kPathTraceNoisyPass,                // u0 デノイズ前の画像
+        kPathTraceGuidePass[current],       // u1 法線・距離
+        kPathTraceGuidePass[previous],      // u2 前フレームの法線・距離
+        kPathTraceAlbedoPass,               // u3 アルベド
+        kPathTraceHistoryPass[previous],    // u4 前フレームの蓄積
+        kPathTraceHistoryPass[current],     // u5 蓄積の書き込み先
+        kPathTraceMomentsPass[previous],    // u6 前フレームの輝度モーメント
+        kPathTraceMomentsPass[current],     // u7 輝度モーメントの書き込み先
+        kPathTraceFilterPass[1],            // u8 フィルタの入力
+        kPathTraceFilterPass[0],            // u9 フィルタの出力
+        "RaytracingPass",                   // u10 最終出力
+        kPathTraceCameraPass,               // u11 前フレームのカメラ
+    };
+    auto setUavs = [&]() {
+        for (uint32_t i = 0; i < RaytracingPipeline::kDenoiseUavCount; ++i) {
+            commandList_->SetComputeRootDescriptorTable(2 + i, srvManager_->GetGPUHandle(renderPassController_->GetUavIndex(uavPasses[i])));
+        }
+    };
+    auto setConstants = [&](uint32_t stepSize, uint32_t isFinal) {
+        uint32_t constants[4] = { stepSize, isFinal, wasPathTraceLastFrame_ ? 0u : 1u, 0u };
+        commandList_->SetComputeRoot32BitConstants(0, 4, constants, 0);
+    };
+    const uint32_t groupX = raytracingPipeline_->GetRayQueryThreadGroupCountX();
+    const uint32_t groupY = raytracingPipeline_->GetRayQueryThreadGroupCountY();
+
+    // 時間方向の蓄積。結果はFilterPass0へ
+    setUavs();
+    setConstants(1, 0);
+    commandList_->SetPipelineState(raytracingPipeline_->GetTemporalPipelineState());
+    commandList_->Dispatch(groupX, groupY, 1);
+    commandList_->ResourceBarrier(1, &uavBarrier);
+
+    // 次のフレームのためにカメラを保存
+    commandList_->SetPipelineState(raytracingPipeline_->GetStoreCameraPipelineState());
+    commandList_->Dispatch(1, 1, 1);
+
+    // À-Trousフィルタ。FilterPass0と1を交互に読み書きし、最後はRaytracingPassへ
+    commandList_->SetPipelineState(raytracingPipeline_->GetAtrousPipelineState());
+    for (uint32_t i = 0; i < kAtrousIterationCount; ++i) {
+        uavPasses[8] = kPathTraceFilterPass[i & 1];
+        uavPasses[9] = kPathTraceFilterPass[(i + 1) & 1];
+        setUavs();
+        setConstants(1u << i, (i + 1 == kAtrousIterationCount) ? 1u : 0u);
+        commandList_->Dispatch(groupX, groupY, 1);
+        commandList_->ResourceBarrier(1, &uavBarrier);
+    }
+}
+
+void SceneRenderManager::DrawVisibilityBuffer(const std::vector<TLASInstanceData>& instances) {
+    // 描画先を設定してクリア
+    renderPassController_->PrePass(kPathTraceVisibilityPass);
+    renderPassController_->ClearRenderPass(kPathTraceVisibilityPass);
+
+    commandList_->SetGraphicsRootSignature(raytracingPipeline_->GetVisibilityRootSignature());
+    commandList_->SetPipelineState(raytracingPipeline_->GetVisibilityPipelineState());
+    commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    commandList_->SetGraphicsRootConstantBufferView(1, GetRaytracingCameraAddress());
+    commandList_->SetGraphicsRootDescriptorTable(2, bufferRefManager_->GetSrvHandleGPU());
+    commandList_->SetGraphicsRootDescriptorTable(3, srvManager_->GetGPUHandle(bufferStartSrvIndex_));
+
+    // TLASと同じ順番で描画し、インスタンス番号を書き込む
+    for (uint32_t i = 0; i < static_cast<uint32_t>(instances.size()); ++i) {
+        const TLASInstanceData& instance = instances[i];
+
+        uint32_t constants[RaytracingPipeline::kVisibilityConstantCount] = {};
+        constants[0] = i;
+        constants[1] = instance.instanceID;
+        constants[2] = instance.hitGroupIndexOffset;
+        std::memcpy(&constants[4], instance.transform, sizeof(float) * 12);
+        commandList_->SetGraphicsRoot32BitConstants(0, RaytracingPipeline::kVisibilityConstantCount, constants, 0);
+
+        // インデックスは頂点シェーダーでgBufferDataから読むため、インデックス数だけ頂点を処理する
+        commandList_->DrawInstanced(instance.blas->GetIndexCount(), 1, 0, 0);
+    }
+
+    // コンピュートシェーダーから読める状態にする
+    renderPassController_->PostPass(kPathTraceVisibilityPass);
+}
+
+D3D12_GPU_VIRTUAL_ADDRESS SceneRenderManager::GetRaytracingCameraAddress() {
+    if (renderQueue_->GetUseDebugCamera()) {
+        return renderQueue_->GetDebugCameraResource()->GetGpuVirtualAddress();
+    }
+    return renderQueue_->GetCameraResource()->GetGpuVirtualAddress();
 }
 
 void SceneRenderManager::Draw2dExecute() {

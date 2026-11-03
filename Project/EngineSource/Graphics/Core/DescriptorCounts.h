@@ -17,7 +17,7 @@ namespace GameEngine {
 	// 使用するヒープの数
 	enum class SrvHeapTypeCount : uint32_t {
 		TextureMaxCount = 256,
-		SystemMaxCount = 32,
+		SystemMaxCount = 64, // パストレーシングのデノイズ用のパス(SRV+UAVを11枚分)を含む
 		AccessMaxCount = 2,
 		BufferMaxCount = 4096,
 		OtherMaxCount = 1

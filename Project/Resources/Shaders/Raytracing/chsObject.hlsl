@@ -1,36 +1,6 @@
 #include "Common.hlsli"
 #include "../LightElement.hlsli"
-
-struct VertexData {
-    float4 position;
-    float2 texcoord;
-    float3 normal;
-    float4 tangent;
-};
-
-struct MaterialData {
-    float4 color;
-    
-    int enableLighting;
-    float dissolveThreshold;
-    float2 padding0;
-    
-    float4x4 uvTransform;
-    
-    float4 specularColor;
-    
-    float shininess;
-    uint textureHandle;
-    float metallic;
-    int isActiveShadow;
-    
-    float ior;
-    float roughness;
-    uint normalTextureHandle;
-    uint dissolveTextureHandle;
-};
-
-static const uint VERTEX_STRIDE = 52;
+#include "RtMaterials.hlsli"
 
 VertexData GetHitVertex(MyAttribute attrib, uint vertexHandle, uint indexHandle)
 {
@@ -145,8 +115,8 @@ void MainObjectCHS(inout Payload payload, MyAttribute attrib) {
     // 最終的な色を設定
     payload.color = directLight + indirectLight;
     
-    // 遮蔽物が不透明かをマスクで区別して影の濃さを取得する
-    float shadowFactor = ComputeShadowFactor(worldPosition, lightDir);
+    // 氷を屈折して届く光も含めた影の色を取得する。氷の影にはコースティクスが出る
+    float3 shadowColor = ComputeShadowColor(worldPosition, lightDir, DispatchRaysIndex().xy);
     // 影の中であれば、影色を設定
-    payload.color.xyz *= lerp(0.5f, 1.0f, shadowFactor);
+    payload.color.xyz *= lerp(0.5f, 1.0f, shadowColor);
 }

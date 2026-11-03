@@ -30,6 +30,16 @@ void RootSignatureBuilder::AddCBVParameter(uint32_t shaderRegister, D3D12_SHADER
     parameterTypes_.push_back(ParameterType::CBV);
 }
 
+void RootSignatureBuilder::AddSRVParameter(uint32_t shaderRegister, D3D12_SHADER_VISIBILITY visibility, uint32_t space) {
+	D3D12_ROOT_PARAMETER param = {};
+	param.ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV;
+	param.ShaderVisibility = visibility;
+	param.Descriptor.ShaderRegister = shaderRegister;
+	param.Descriptor.RegisterSpace = space;
+	rootParameters_.push_back(param);
+	parameterTypes_.push_back(ParameterType::SRV);
+}
+
 void RootSignatureBuilder::AddSRVDescriptorTable(uint32_t shaderRegister, uint32_t arrayNum, uint32_t spaceNum, 
     D3D12_SHADER_VISIBILITY visibility, uint32_t startNum) {
     AddDescriptorTable(ParameterType::SRV, shaderRegister, startNum, arrayNum, spaceNum, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, visibility);

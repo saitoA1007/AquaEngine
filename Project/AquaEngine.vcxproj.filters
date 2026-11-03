@@ -1688,6 +1688,9 @@
     <FxCompile Include="Resources\Shaders\Rasterize\WBOITAccumulate.VS.hlsl" />
     <FxCompile Include="Resources\Shaders\Raytracing\ChsIceObject.hlsl" />
     <FxCompile Include="Resources\Shaders\Raytracing\chsObject.hlsl" />
+    <FxCompile Include="Resources\Shaders\Raytracing\RayQuery.CS.hlsl" />
+    <FxCompile Include="Resources\Shaders\Raytracing\VisibilityBuffer.hlsl" />
+    <FxCompile Include="Resources\Shaders\Raytracing\PathTraceDenoise.CS.hlsl" />
     <FxCompile Include="Resources\Shaders\IceFracture.PS.hlsl" />
     <FxCompile Include="Resources\Shaders\Raytracing\Miss.hlsl" />
     <FxCompile Include="Resources\Shaders\Raytracing\RayGen.hlsl" />
@@ -1706,6 +1709,7 @@
     <None Include="Resources\Shaders\RandomUtils.hlsli" />
     <None Include="Resources\Shaders\Rasterize\WBOIT.hlsli" />
     <None Include="Resources\Shaders\Raytracing\Common.hlsli" />
+    <None Include="Resources\Shaders\Raytracing\RtMaterials.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Externals\imgui\LICENSE.txt" />

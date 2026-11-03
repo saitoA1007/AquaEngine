@@ -72,6 +72,11 @@ namespace GameEngine {
 		bool enableDrawRasterize_ = false;
 		bool enableDrawRasterizeTranslucent_ = false;
 
+		// フレーム番号。パストレーシングの乱数とデノイズの履歴の切り替えに使う
+		uint32_t raytracingFrameIndex_ = 0;
+		// 前のフレームでパストレーシングを行ったか。行っていなければデノイズの履歴を捨てる
+		bool wasPathTraceLastFrame_ = false;
+
 	private:
 
 		// パスの実行順を登録
@@ -113,6 +118,15 @@ namespace GameEngine {
 
 		// レイトレの描画コマンドを解放
 		void RaytracingExecute();
+
+		// パストレーシングの結果のノイズを除去して、RaytracingPassに書き込む
+		void DenoisePathTrace();
+
+		// パストレーシングの最初のヒットを求めるため、TLASのインスタンスをビジビリティバッファにラスタライズする
+		void DrawVisibilityBuffer(const std::vector<TLASInstanceData>& instances);
+
+		// レイトレーシングに使うカメラの定数バッファ
+		D3D12_GPU_VIRTUAL_ADDRESS GetRaytracingCameraAddress();
 
 		// 2Dのスプライトを描画。UIパスに描いてポストエフェクトで合成する
 		void Draw2dExecute();

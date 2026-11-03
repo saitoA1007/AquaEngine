@@ -22,6 +22,9 @@ namespace GameEngine {
 		/// <param name="cmdList"></param>
 		void Update(ID3D12GraphicsCommandList4* cmdList, const D3D12_VERTEX_BUFFER_VIEW& vertexBufView);
 
+		// インデックス数。ラスタライズで同じ三角形を描画するために使う
+		uint32_t GetIndexCount() const { return geometryDesc_.Triangles.IndexCount; }
+
 	private:
 		// ジオメトリ情報
 		D3D12_RAYTRACING_GEOMETRY_DESC geometryDesc_{};

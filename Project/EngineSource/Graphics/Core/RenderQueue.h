@@ -18,6 +18,13 @@ namespace GameEngine {
 
     class FractureStaticMesh;
 
+    // レイトレーシングの方式
+    enum class RaytracingMode {
+        DXR,       // DXRのパイプライン(RayGen + ClosestHit)
+        RayQuery,  // コンピュートシェーダー内のRayQuery。DXRと同じ見た目
+        PathTrace, // コンピュートシェーダー内のRayQueryによるパストレーシング
+    };
+
     /// <summary>
     /// 溜めた描画コマンドを解放する機能
     /// </summary>
@@ -84,6 +91,14 @@ namespace GameEngine {
         }
 
         const bool& GetUseDebugCamera() const { return useDebugCamera_; }
+
+        // レイトレーシングの方式
+        void SetRaytracingMode(RaytracingMode mode) { raytracingMode_ = mode; }
+        RaytracingMode GetRaytracingMode() const { return raytracingMode_; }
+
+        // パストレーシングの最初のヒットをラスタライズしたビジビリティバッファから求めるか
+        void SetUsePathTraceVisibilityBuffer(bool use) { usePathTraceVisibilityBuffer_ = use; }
+        bool GetUsePathTraceVisibilityBuffer() const { return usePathTraceVisibilityBuffer_; }
 
         // カメラリソースを取得
         GpuResource* GetCameraResource() { return mainCamera_.GetConstantBuffer(); }
@@ -218,5 +233,10 @@ namespace GameEngine {
 
         // デバックカメラを使用するか
         bool useDebugCamera_ = false;
+
+        // レイトレーシングの方式
+        RaytracingMode raytracingMode_ = RaytracingMode::RayQuery;
+        // パストレーシングでビジビリティバッファを使うか
+        bool usePathTraceVisibilityBuffer_ = true;
     };
 }
