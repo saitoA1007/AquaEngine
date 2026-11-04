@@ -57,7 +57,7 @@
         },
         "RushAttack": {
             "RotateMoveMaxTime": 2.0,
-            "RushDistanceRatio": 1.5,
+            "RushDistanceRatio": 1.600000023841858,
             "RushMaxTime": 2.0
         },
         "Scale": [
@@ -81,12 +81,12 @@
             "CrossMove": 10,
             "IceFallAttack": 20,
             "RotateMove": 10,
-            "RushAttack": 40,
+            "RushAttack": 30,
             "Wait": 10,
             "WindAttack": 20
         },
         "Wait": {
-            "MaxTime": 3.5
+            "MaxTime": 4.0
         },
         "WindAttack": {
             "InMaxTime": 1.0,
