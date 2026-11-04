@@ -67,9 +67,9 @@ VertexData GetHitVertex(MyAttribute attrib, uint vertexHandle, uint indexHandle,
 
     for (int i = 0; i < 3; ++i)
     {
-        uint localIndex = gBufferData[indexHandle].Load<uint>((start + i) * 4 + indexOffset * 4);
+        uint localIndex = GetBuffer(indexHandle).Load<uint>((start + i) * 4 + indexOffset * 4);
         uint index = localIndex + vertexOffset;
-        VertexData v = gBufferData[vertexHandle].Load<VertexData>(index * VERTEX_STRIDE);
+        VertexData v = GetBuffer(vertexHandle).Load<VertexData>(index * VERTEX_STRIDE);
         
         positions[i] = v.position.xyz;
         normals[i] = v.normal;
@@ -97,9 +97,9 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
     
     // アクセスデータを取得
     uint refHandle = InstanceID();
-    BufferRef ref = gBufferRefs[refHandle];
+    BufferRef ref = GetBufferRefs()[refHandle];
     // マテリアルデータを取得
-    IceMaterialData material = gBufferData[ref.MaterialIndex].Load<IceMaterialData>(0);
+    IceMaterialData material = GetBuffer(ref.MaterialIndex).Load<IceMaterialData>(0);
     
     // 頂点データを取得する
     VertexData vtx = GetHitVertex(attrib, ref.vertexHandle, ref.indexHandle, ref.vertexOffset, ref.indexOffset);
@@ -132,7 +132,7 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
         float3 tangentViewDir = normalize(mul(tbn, localViewDir));
         
         parallaxUV = ParallaxOcclusionMapping(
-            gTexture[material.heightTextureHandle], gSampler,
+            GetTexture(material.heightTextureHandle), gSampler,
             transformedUV.xy, tangentViewDir, material.heightScale);
     }
     
@@ -184,7 +184,7 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
     // ノーマルマップがあれば法線に適応
     if (material.normalTextureHandle != 0)
     {
-        float4 normalMapColor = gTexture[material.normalTextureHandle].SampleLevel(gSampler, parallaxUV, 0);
+        float4 normalMapColor = GetTexture(material.normalTextureHandle).SampleLevel(gSampler, parallaxUV, 0);
         localNormal = GetNormalFromMap(normalMapColor, vtx.normal, vtx.tangent);
     }
 
@@ -212,7 +212,7 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
     }
 
     // テクスチャカラーを取得
-    float4 textureColor = gTexture[material.textureHandle].SampleLevel(gSampler, parallaxUV, 0);
+    float4 textureColor = GetTexture(material.textureHandle).SampleLevel(gSampler, parallaxUV, 0);
     // アルベド色を取得
     float3 albedoColor = material.color.rgb * textureColor.rgb;
 
