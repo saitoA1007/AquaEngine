@@ -28,7 +28,7 @@ StageManager::StageManager(GameEngine::GameObjectManager* objectManager, GameEng
 	floor_ = objectManager_->AddObject<Floor>(floorModel, floorFractureModel, iceNormalGH, iceHeightGH, terrainGH, terrainNormalGH);
 
 	// 背景の岩を配置
-	auto* bgRockModel = modelManager->GetNameByModel("iceFall.obj");
+	auto* bgRockModel = modelManager->GetNameByModel("rock.gltf");
 	bgRockModel->SetDefaultIsEnableLight(true);
 	objectManager_->AddObject<BgRockField>(bgRockModel, bgRockModel);
 

@@ -1,0 +1,75 @@
+{
+    "BgRockField": {
+        "Generater": {
+            "CenterPos": [
+                0.0,
+                -0.5,
+                0.0
+            ],
+            "HeightScaleRange": [
+                0.699999988079071,
+                1.399999976158142
+            ],
+            "MaxTilt": 0.20000000298023224,
+            "Seed": 1
+        },
+        "Material": {
+            "IceColor": [
+                0.8100000023841858,
+                0.7699999809265137,
+                0.9200000166893005,
+                1.0
+            ],
+            "RockColor": [
+                0.550000011920929,
+                0.6000000238418579,
+                0.699999988079071,
+                1.0
+            ],
+            "bubbleDensity": 0.029999999329447746,
+            "bubbleScale": 0.10000000149011612,
+            "rimColor": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "rimIntensity": 1.0,
+            "rimPower": 5.0
+        },
+        "Ring0": {
+            "Count": 16,
+            "HeightOffset": -0.30000001192092896,
+            "IceRatio": 0.6000000238418579,
+            "Radius": 28.0,
+            "RadiusJitter": 2.0,
+            "ScaleRange": [
+                1.5,
+                2.0
+            ]
+        },
+        "Ring1": {
+            "Count": 14,
+            "HeightOffset": -0.800000011920929,
+            "IceRatio": 0.4000000059604645,
+            "Radius": 38.0,
+            "RadiusJitter": 3.0,
+            "ScaleRange": [
+                2.5,
+                4.0
+            ]
+        },
+        "Ring2": {
+            "Count": 12,
+            "HeightOffset": -1.5,
+            "IceRatio": 0.30000001192092896,
+            "Radius": 52.0,
+            "RadiusJitter": 4.0,
+            "ScaleRange": [
+                5.0,
+                8.0
+            ]
+        },
+        "SceneName": "Game"
+    }
+}

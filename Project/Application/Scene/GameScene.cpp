@@ -31,7 +31,7 @@ GameScene::GameScene() {
 	InputRegisterCommand();
 
 	// 背景を設定
-	uint32_t skyboxGH = textureManager_->GetHandleByName("qwantani_moon_noon_puresky_1k.dds");
+	uint32_t skyboxGH = textureManager_->GetHandleByName("starrySky.dds");
 	renderQueue_->SetSkyboxTexture(skyboxGH);
 
 	// メインカメラの初期化
