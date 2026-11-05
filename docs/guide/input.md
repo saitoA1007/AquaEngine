@@ -14,22 +14,28 @@
 
 ### 登録する
 
-`RegisterCommand(名前, 条件の一覧)` で登録します。条件のどれか1つを満たすと、そのコマンドが有効になります。
+`RegisterCommand(名前, 入力の一覧)` で登録します。入力はデバイスごとの型（`KeyBinding` など）で書き、どれか1つを満たすとそのコマンドが有効になります。
 
 ```cpp
 using namespace GameEngine;
 
 // スペースキー、またはパッドの X ボタンを押した瞬間
 inputCommand_->RegisterCommand("Decision", {
-	{ InputState::KeyTrigger, DIK_SPACE },
-	{ InputState::PadTrigger, XINPUT_GAMEPAD_X },
+	KeyBinding{ DIK_SPACE, PressType::kTrigger },
+	PadButtonBinding{ XINPUT_GAMEPAD_X, PressType::kTrigger },
 });
 
 // A キーを押している間、左スティックを左に倒している間、十字キーの左を押している間
 inputCommand_->RegisterCommand("MoveLeft", {
-	{ InputState::KeyPush, DIK_A },
-	{ InputState::PadLeftStick, 0, { -1.0f, 0.0f }, 0.2f }, // 方向、しきい値
-	{ InputState::PadPush, XINPUT_GAMEPAD_DPAD_LEFT },
+	KeyBinding{ DIK_A },
+	PadStickBinding{ PadSide::kLeft, { -1.0f, 0.0f } },
+	PadButtonBinding{ XINPUT_GAMEPAD_DPAD_LEFT },
+});
+
+// 右クリックを離した瞬間、または R2 を押した瞬間
+inputCommand_->RegisterCommand("Shot", {
+	MouseBinding{ 1, PressType::kRelease },
+	PadTriggerBinding{ PadSide::kRight, PressType::kTrigger },
 });
 ```
 
@@ -41,15 +47,25 @@ if (inputCommand_->IsCommandActive("MoveLeft")) {
 }
 ```
 
-### 条件の種類（InputState）
+### 入力の種類
 
-| 種類 | 意味 |
+| 型 | 書き方 | 意味 |
+|---|---|---|
+| `KeyBinding` | `{ キー, 押し方 }` | キーボード。キーは `DIK_〜` |
+| `MouseBinding` | `{ ボタン, 押し方 }` | マウス。ボタンは 0:左、1:右、2:中 |
+| `PadButtonBinding` | `{ ボタン, 押し方 }` | パッドのボタン。ボタンは `XINPUT_GAMEPAD_〜` |
+| `PadStickBinding` | `{ 左右, 方向, しきい値 }` | スティックを指定した方向に倒している間 |
+| `PadTriggerBinding` | `{ 左右, 押し方, しきい値 }` | L2 / R2 トリガー。しきい値は 0〜1 |
+
+押し方（`PressType`）は次の3つです。省略すると `kPush` になります。しきい値は省略すると `0.2f` です。
+
+| `PressType` | 意味 |
 |---|---|
-| `KeyPush` / `KeyTrigger` / `KeyRelease` | キーを押している間 / 押した瞬間 / 離した瞬間。コードは `DIK_〜` |
-| `MousePush` / `MouseTrigger` / `MouseRelease` | マウスボタン。コードは 0:左、1:右、2:中 |
-| `PadPush` / `PadTrigger` / `PadRelease` | パッドのボタン。コードは `XINPUT_GAMEPAD_〜` |
-| `PadLeftStick` / `PadRightStick` | スティックを指定した方向に倒している間 |
-| `PadPushLeftTrigger` など | L2 / R2 トリガー |
+| `kPush` | 押している間 |
+| `kTrigger` | 押した瞬間 |
+| `kRelease` | 離した瞬間 |
+
+左右（`PadSide`）は `kLeft` / `kRight` で指定します。
 
 パッドを振動させるときは `inputCommand_->PlayPadVibration(左, 右)` を使います（0〜1）。
 
