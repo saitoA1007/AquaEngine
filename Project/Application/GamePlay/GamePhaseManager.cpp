@@ -78,7 +78,7 @@ void GamePhaseManager::Update() {
 	}
 
 	if (isResetActive_) {
-		timer_ += FpsCounter::deltaTime / maxTime_;
+		timer_ += FpsCounter::GetDeltaTime() / maxTime_;
 
 		float t = 0.0f;
 		if (timer_ <= 0.5f) {

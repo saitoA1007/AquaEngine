@@ -75,7 +75,7 @@ void IceFall::Update() {
 	destructibleObject_.Update();
 
 	if (isBreak_) {
-		timer_ += FpsCounter::gameDeltaTime / breakDisappearTime_;
+		timer_ += FpsCounter::GetGameDeltaTime() / breakDisappearTime_;
 	
 		// 破片が落ちきったら非表示にして、次の出現まで待機させる
 		if (timer_ >= 1.0f) {
@@ -156,7 +156,7 @@ void IceFall::Stop() {
 void IceFall::EnterMove() {
 	if (!isEnterMoveActive_) { return; }
 
-	timer_ += FpsCounter::gameDeltaTime / inMaxTime_;
+	timer_ += FpsCounter::GetGameDeltaTime() / inMaxTime_;
 
 	destructibleObject_.worldTransform_.transform_.translate.y = Lerp(startPosY_, endPosY_, timer_, EaseType::kEaseInOutQuad);
 

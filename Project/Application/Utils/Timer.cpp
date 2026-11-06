@@ -17,5 +17,5 @@ void Timer::Reset() {
 
 void Timer::Update() {
 	if (!isActive_) { return; }
-	timer_ += FpsCounter::deltaTime;
+	timer_ += FpsCounter::GetDeltaTime();
 }

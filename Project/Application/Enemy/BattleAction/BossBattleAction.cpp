@@ -78,7 +78,7 @@ void BossRushAttackAction::RegisterParameter(GameEngine::DebugParameter* param) 
 }
 
 void BossRushAttackAction::RotateMove() {
-	timer_ += FpsCounter::gameDeltaTime / rotateMoveMaxTime_;
+	timer_ += FpsCounter::GetGameDeltaTime() / rotateMoveMaxTime_;
 
 	// 角度補間
 	float preAngle = angle_;
@@ -152,7 +152,7 @@ void BossRushAttackAction::RotateMove() {
 }
 
 void BossRushAttackAction::RushAttack() {
-	timer_ += FpsCounter::gameDeltaTime / rushMaxTime_;
+	timer_ += FpsCounter::GetGameDeltaTime() / rushMaxTime_;
 
 	// 移動
 	commonData_.transform.translate = Lerp(startRushPos_, endRushPos_,timer_,EaseType::kEaseOutQuad);
@@ -200,7 +200,7 @@ void BossWaitAction::Initialize() {
 }
 
 void BossWaitAction::Update() {
-	timer_ += FpsCounter::gameDeltaTime / maxTime_;
+	timer_ += FpsCounter::GetGameDeltaTime() / maxTime_;
 
 	if (timer_ >= 1.0f) {
 		isFinished_ = true;
@@ -257,7 +257,7 @@ void BossCrossMoveAction::Initialize() {
 
 void BossCrossMoveAction::Update() {
 
-	timer_ += FpsCounter::gameDeltaTime / maxTime_;
+	timer_ += FpsCounter::GetGameDeltaTime() / maxTime_;
 	timer_ = std::min(timer_, 1.0f);
 
 	// 縦移動
@@ -369,7 +369,7 @@ void RotateMoveAction::Initialize() {
 }
 
 void RotateMoveAction::Update() {
-	timer_ += FpsCounter::gameDeltaTime / maxTime_;
+	timer_ += FpsCounter::GetGameDeltaTime() / maxTime_;
 	timer_ = std::min(timer_, 1.0f);
 
 	// 角度補間
@@ -466,7 +466,7 @@ void IceFallAttackAction::Initialize() {
 }
 
 void IceFallAttackAction::Update() {
-	timer_ += FpsCounter::gameDeltaTime / maxTime_;
+	timer_ += FpsCounter::GetGameDeltaTime() / maxTime_;
 
 
 	if (timer_ >= 1.0f) {
@@ -521,7 +521,7 @@ void WindAttackAction::Update() {
 	switch (state_)
 	{
 	case WindAttackAction::State::kIn: {
-		timer_ += FpsCounter::gameDeltaTime / inMaxTime_;
+		timer_ += FpsCounter::GetGameDeltaTime() / inMaxTime_;
 
 		// 回転
 		Vector3 dir = Slerp(startCurrentRotDir_, startRotDir_, timer_);
@@ -548,7 +548,7 @@ void WindAttackAction::Update() {
 	}
 
 	case WindAttackAction::State::kMain: {
-		timer_ += FpsCounter::gameDeltaTime / mainMaxTime_;
+		timer_ += FpsCounter::GetGameDeltaTime() / mainMaxTime_;
 
 		// 回転
 		Vector3 dir = Slerp(startRotDir_, endRotDir_, timer_);
@@ -565,7 +565,7 @@ void WindAttackAction::Update() {
 
 
 	case WindAttackAction::State::kOut: {
-		timer_ += FpsCounter::gameDeltaTime / outMaxTime_;
+		timer_ += FpsCounter::GetGameDeltaTime() / outMaxTime_;
 
 		// 回転
 		Vector3 dir = Slerp(endRotDir_, startCurrentRotDir_, timer_);
@@ -665,7 +665,7 @@ void ResetAction::Update() {
 	switch (state_)
 	{
 	case ResetAction::State::kIn: {
-		timer_ += FpsCounter::gameDeltaTime / inRotateMaxTime_;
+		timer_ += FpsCounter::GetGameDeltaTime() / inRotateMaxTime_;
 
 		// 回転
 		Vector3 dir = Slerp(inStartRotDir_, inEndRotDir_, timer_);
@@ -681,7 +681,7 @@ void ResetAction::Update() {
 	}
 
 	case ResetAction::State::kMain: {
-		timer_ += FpsCounter::gameDeltaTime / moveMaxTime_;
+		timer_ += FpsCounter::GetGameDeltaTime() / moveMaxTime_;
 
 		// 移動
 		commonData_.transform.translate = Lerp(startPos_, endPos_, timer_, EaseType::kEaseInOutQuad);
@@ -695,7 +695,7 @@ void ResetAction::Update() {
 	}
 
 	case ResetAction::State::kOut: {
-		timer_ += FpsCounter::gameDeltaTime / outRotateMaxTime_;
+		timer_ += FpsCounter::GetGameDeltaTime() / outRotateMaxTime_;
 
 		// 回転
 		Vector3 dir = Slerp(outStartRotDir_, outEndRotDir_, timer_);

@@ -141,7 +141,7 @@ void Player::Update() {
 	ApplyClamp();
 
 	// 移動を適応
-	worldTransform_.transform_.translate += commonData_.velocity * FpsCounter::gameDeltaTime;
+	worldTransform_.transform_.translate += commonData_.velocity * FpsCounter::GetGameDeltaTime();
 
 	// 角度を更新
 	UpdateRotation();
@@ -203,7 +203,7 @@ void Player::UpdateRotation() {
 
 		// 最短経路で角度補間をして現在の角度を求める
 		float kRotationLerpSpeed_ = 10.0f;
-		float maxStep = kRotationLerpSpeed_ * FpsCounter::gameDeltaTime;
+		float maxStep = kRotationLerpSpeed_ * FpsCounter::GetGameDeltaTime();
 		commonData_.currentYaw = Math::LerpShortAngle(commonData_.currentYaw, targetYaw, maxStep);
 
 		// ヨー角をワールドトランスフォームに反映
@@ -382,7 +382,7 @@ void Player::StartVibration(float intensity, float duration) {
 void Player::UpdateVibration() {
 	if (vibrationTimer_ <= 0.0f) { return; }
 
-	vibrationTimer_ -= FpsCounter::deltaTime;
+	vibrationTimer_ -= FpsCounter::GetDeltaTime();
 	if (vibrationTimer_ <= 0.0f) {
 		StopVibration();
 	}

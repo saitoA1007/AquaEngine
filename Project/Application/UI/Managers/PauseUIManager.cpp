@@ -105,7 +105,7 @@ void PauseUIManager::Animation() {
 	switch (phase_)
 	{
 	case PauseUIManager::Phase::kIn:
-		timer_ += FpsCounter::deltaTime / kInMaxTime_;
+		timer_ += FpsCounter::GetDeltaTime() / kInMaxTime_;
 
 		// 背景の表示
 		if (timer_ <= 0.5f) {
@@ -144,7 +144,7 @@ void PauseUIManager::Animation() {
 		break;
 
 	case PauseUIManager::Phase::kOut:
-		timer_ += FpsCounter::deltaTime / kOutMaxTime_;
+		timer_ += FpsCounter::GetDeltaTime() / kOutMaxTime_;
 
 		// 背景の表示
 		bgSprite_.color_.w = Lerp(0.5f, 0.0f, timer_);

@@ -25,14 +25,14 @@ void PlayerHitAttackEffect::Initialize() {
 void PlayerHitAttackEffect::Update() {
 	debugParame_->ApplyIfDirty();
 
-	timer_ += FpsCounter::gameDeltaTime / maxTime_;
+	timer_ += FpsCounter::GetGameDeltaTime() / maxTime_;
 
 	if (timer_ >= 1.0f) {
 		isActive_ = false;
 	}
 
 	// 回転
-	modelComponent_.worldTransform_.transform_.rotate.z += rotateSpeed_ * FpsCounter::gameDeltaTime;
+	modelComponent_.worldTransform_.transform_.rotate.z += rotateSpeed_ * FpsCounter::GetGameDeltaTime();
 
 	// カメラのワールド行列を取得
 	Matrix4x4 cameraMatrix = renderQueue_->GetMainCamera().GetWorldMatrix();

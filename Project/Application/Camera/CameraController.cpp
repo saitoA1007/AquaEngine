@@ -53,7 +53,7 @@ void CameraController::Initialize() {
 void CameraController::Update() {
 	debugParame_->ApplyIfDirty();
 	
-	float dt60 = FpsCounter::deltaTime * FpsCounter::maxFrameCount;
+	float dt60 = FpsCounter::GetDeltaTime() * FpsCounter::GetMaxFrameCount();
 	
 	// カメラを切り替える
 	CameraCommonData& common = currentState_->GetCommonData();
@@ -137,7 +137,7 @@ void CameraController::StartShake(float intensity, float duration) {
 Vector3 CameraController::UpdateShake() {
 	if (shakeTimer_ >= 1.0f || shakeDuration_ <= 0.0f) { return { 0.0f,0.0f,0.0f }; }
 
-	shakeTimer_ += FpsCounter::deltaTime / shakeDuration_;
+	shakeTimer_ += FpsCounter::GetDeltaTime() / shakeDuration_;
 	float t = std::clamp(shakeTimer_, 0.0f, 1.0f);
 	// 時間経過で減衰
 	float power = shakeIntensity_ * (1.0f - t) * (1.0f - t);

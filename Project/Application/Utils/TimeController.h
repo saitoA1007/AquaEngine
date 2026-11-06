@@ -17,11 +17,8 @@ public:
 		isStopTimeActive_ = true;
 	}
 
-	// リセット
-	void Reset() {
-		isStopTimeActive_ = false;
-		timer_ = 0.0f;
-	}
+	// リセット（ゲーム用の時間を通常の速さに戻す）
+	void Reset();
 
 private:
 	bool isStopTimeActive_ = false;

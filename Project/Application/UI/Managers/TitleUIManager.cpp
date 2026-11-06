@@ -33,7 +33,7 @@ void TitleUIManager::Update() {
 	debugParame_->ApplyIfDirty();
 
 	if (!isDraw_ && isActiveFadeOut_) {
-		timer_ += FpsCounter::gameDeltaTime / kFadeOutMaxTime_;
+		timer_ += FpsCounter::GetGameDeltaTime() / kFadeOutMaxTime_;
 
 		// 透明にする
 		float alpha = Lerp(1.0f, 0.0f, timer_);

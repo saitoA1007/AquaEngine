@@ -51,7 +51,7 @@ void WindAttack::Initialize() {
 void WindAttack::Update() {
 	debugParame_->ApplyIfDirty();
 
-	timer_ += FpsCounter::gameDeltaTime / maxTime_;
+	timer_ += FpsCounter::GetGameDeltaTime() / maxTime_;
 
 	// 回転
 	Vector3 dir = Slerp(startDir_, endDir_, timer_);

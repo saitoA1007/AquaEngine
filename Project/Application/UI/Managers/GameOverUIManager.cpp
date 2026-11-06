@@ -85,7 +85,7 @@ void GameOverUIManager::Draw() {
 }
 
 void GameOverUIManager::EnterAnimation() {
-	timer_ += FpsCounter::gameDeltaTime / kEnterMaxTime_;
+	timer_ += FpsCounter::GetGameDeltaTime() / kEnterMaxTime_;
 
 	// 透明度
 	float alpha = Lerp(0.0f, 1.0f, timer_);

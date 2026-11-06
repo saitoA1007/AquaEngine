@@ -86,7 +86,7 @@ void ClearUIManager::Draw() {
 
 void ClearUIManager::EnterAnimation() {
 
-	timer_ += FpsCounter::gameDeltaTime / kEnterMaxTime_;
+	timer_ += FpsCounter::GetGameDeltaTime() / kEnterMaxTime_;
 
 	if (timer_ <= 0.2f) {
 		// 背景で覆う
