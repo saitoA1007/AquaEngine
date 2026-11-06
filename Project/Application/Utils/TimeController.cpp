@@ -24,6 +24,25 @@ void TimeController::Update() {
 	}
 }
 
+void TimeController::StartStopTime(float stopMaxTime) {
+	// 0以下の時間では止めない（0除算を防ぐ）
+	if (stopMaxTime <= 0.0f) { return; }
+
+	// すでに止まっている場合、残り時間の方が長ければそのままにする
+	// （ポーズ中のヒットストップは無視し、ヒットストップ中のポーズは優先する）
+	if (isStopTimeActive_) {
+		float remainingTime = stopMaxTime_ * (1.0f - timer_);
+		if (stopMaxTime <= remainingTime) { return; }
+	}
+
+	stopMaxTime_ = stopMaxTime;
+	timer_ = 0.0f;
+	isStopTimeActive_ = true;
+
+	// 呼ばれたフレームからすぐに止める
+	FpsCounter::SetTimeScale(0.0f);
+}
+
 void TimeController::Reset() {
 	isStopTimeActive_ = false;
 	timer_ = 0.0f;

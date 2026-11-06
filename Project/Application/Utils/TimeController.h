@@ -10,12 +10,11 @@ public:
 
 public:
 
-	// 時間を止める
-	void StartStopTime(float stopMaxTime) {
-		if (isStopTimeActive_) { return; }
-		stopMaxTime_ = stopMaxTime;
-		isStopTimeActive_ = true;
-	}
+	// 時間を止める（停止中に呼ばれた場合は、残り時間が長い方を優先する）
+	void StartStopTime(float stopMaxTime);
+
+	// 時間が止まっているか
+	bool IsStopTimeActive() const { return isStopTimeActive_; }
 
 	// リセット（ゲーム用の時間を通常の速さに戻す）
 	void Reset();
