@@ -64,7 +64,7 @@ void Wall::SetParameter(const Transform& transform) {
 	// 下に存在する壁を設置する
 	underWallModelComponent_.worldTransform_.transform_ = destructObject_.worldTransform_.transform_;
 	underWallModelComponent_.worldTransform_.transform_.translate.y = -2.0f;
-	underWallModelComponent_.worldTransform_.transform_.scale * 0.8f;
+	underWallModelComponent_.worldTransform_.transform_.scale *= 0.8f;
 
 	// 初期化
 	Initialize();
