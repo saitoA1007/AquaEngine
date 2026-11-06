@@ -80,7 +80,7 @@ BossEnemy::BossEnemy(GameEngine::Model* model, GameEngine::Model* eggModel, Game
 		this->OnCollisionEnter(result);
 	});
 
-	collider_.SetOnCollisionCallback([this](const CollisionResult& result) {
+	collider_.SetOnCollisionStayCallback([this](const CollisionResult& result) {
 		this->OnCollisionStay(result);
 	});
 

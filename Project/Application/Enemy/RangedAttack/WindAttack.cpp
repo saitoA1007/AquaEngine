@@ -35,7 +35,7 @@ WindAttack::WindAttack(GameEngine::Model* model, GameEngine::ParticleBehavior* w
 	userData.object = this;
 	collider_.SetUserData(userData);
 	// コールバック関数に登録する
-	collider_.SetOnCollisionCallback([this](const CollisionResult& result) {
+	collider_.SetOnCollisionStayCallback([this](const CollisionResult& result) {
 		this->OnCollisionEnter(result);
 		});
 }

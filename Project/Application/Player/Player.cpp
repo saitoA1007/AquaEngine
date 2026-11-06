@@ -67,7 +67,7 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model,
 	userData.object = this;
 	collider_.SetUserData(userData);
 	// コールバック登録
-	collider_.SetOnCollisionCallback([this](const CollisionResult& result) {
+	collider_.SetOnCollisionStayCallback([this](const CollisionResult& result) {
 		this->OnCollisionStay(result);
 		});
 

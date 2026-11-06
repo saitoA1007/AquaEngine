@@ -58,7 +58,7 @@ Floor::Floor(GameEngine::Model* model, GameEngine::Model* fractureModel, uint32_
 	userData.object = this;
 	collider_.SetUserData(userData);
 	// コールバック関数に登録する
-	collider_.SetOnCollisionCallback([this](const CollisionResult& result) {
+	collider_.SetOnCollisionStayCallback([this](const CollisionResult& result) {
 		this->OnCollisionEnter(result);
 	});
 
