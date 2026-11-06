@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "HpContainer.h"
+#include <algorithm>
 
 using namespace GameEngine;
 
@@ -60,12 +61,14 @@ void HpContainer::Draw() {
 }
 
 void HpContainer::SetMaxHp(int32_t hp) {
-	if (hpSprites_.size() == hp) { return; }
+	hp = std::max(hp, 0);
 
 	int32_t currentNum = static_cast<int32_t>(hpSprites_.size());
+	if (currentNum == hp) { return; }
+
 	maxHp_ = hp;
 
-	hpSprites_.resize(maxHp_);
+	hpSprites_.resize(static_cast<size_t>(maxHp_));
 
 	for (int32_t i = currentNum; i < maxHp_; ++i) {
 		hpSprites_[i] = std::make_unique<Sprite>();

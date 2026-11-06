@@ -1,5 +1,6 @@
 #pragma once
 #include <list>
+#include <algorithm>
 #include "IGameObject.h"
 #include "Sprite.h"
 #include "WorldTransform.h"
@@ -34,7 +35,8 @@ public:
 
 	void SetCurrentHp(int32_t hp) { currentHp_ = hp; }
 
-	void SetMaxHp(int32_t hp) { maxHp_ = hp; }
+	// 最大hpを設定する
+	void SetMaxHp(int32_t hp) { maxHp_ = std::max(hp, 1); }
 
 	// 基準点に親を設定
 	void SetParent(GameEngine::WorldTransform* parent) {
