@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "BossRangedAttackManager.h"
 #include <numbers>
+#include <algorithm>
 #include "RandomGenerator.h"
 #include "Application/Enemy/RangedAttack/IceFall.h"
 #include "ParticleBehavior.h"
@@ -34,7 +35,11 @@ BossRangedAttackManager::BossRangedAttackManager(GameEngine::GameObjectManager* 
 }
 
 void BossRangedAttackManager::StartIceFall(float rangeRadius, float minDistance, int iceFallNum, int iceFallMaxNum, int maxIter) {
-    if (currentIceFallNum_ > iceFallMaxNum) { return; }
+    // 上限に達していたら生成しない
+    if (currentIceFallNum_ >= iceFallMaxNum) { return; }
+
+    // 生成数を残り枠（上限 − 現在数）以下にする
+    iceFallNum = std::min(iceFallNum, iceFallMaxNum - currentIceFallNum_);
 
     std::vector<Vector2> points;
     int attempts = 0;
