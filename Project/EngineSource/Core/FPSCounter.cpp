@@ -42,7 +42,7 @@ void FpsCounter::Update() {
 }
 
 void FpsCounter::SetTimeScale(float timeScale) {
-	timeScale_ = (std::max)(timeScale, 0.0f);
+	timeScale_ = std::max(timeScale, 0.0f);
 	// このフレームの途中で設定された場合もすぐに反映する
 	gameDeltaTime_ = deltaTime_ * timeScale_;
 }

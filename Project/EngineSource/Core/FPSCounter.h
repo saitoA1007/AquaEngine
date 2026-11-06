@@ -56,6 +56,14 @@ namespace GameEngine {
 		static int GetFrameCount() { return frameCount_; }
 
 	private:
+		// 現在の時間を保持
+		std::chrono::time_point<std::chrono::high_resolution_clock> currentTime_;
+		// 前の時間を保持
+		std::chrono::time_point<std::chrono::high_resolution_clock> preTime_;
+
+		// 時間の累積
+		float elapsedTime_ = 0.0f;
+
 		// 直近1秒間のFPS
 		static float maxFrameCount_;
 		// デルタ時間
@@ -66,14 +74,5 @@ namespace GameEngine {
 		static float timeScale_;
 		// fpsの累積
 		static int frameCount_;
-
-	private:
-		// 現在の時間を保持
-		std::chrono::time_point<std::chrono::high_resolution_clock> currentTime_;
-		// 前の時間を保持
-		std::chrono::time_point<std::chrono::high_resolution_clock> preTime_;
-
-		// 時間の累積
-		float elapsedTime_ = 0.0f;
 	};
 }
