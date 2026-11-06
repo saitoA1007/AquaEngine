@@ -64,7 +64,7 @@ void Wall::SetParameter(const Transform& transform) {
 	// 下に存在する壁を設置する
 	underWallModelComponent_.worldTransform_.transform_ = destructObject_.worldTransform_.transform_;
 	underWallModelComponent_.worldTransform_.transform_.translate.y = -2.0f;
-	underWallModelComponent_.worldTransform_.transform_.scale * 0.8f;
+	underWallModelComponent_.worldTransform_.transform_.scale *= 0.8f;
 
 	// 初期化
 	Initialize();
@@ -93,7 +93,7 @@ void Wall::Update() {
 	}
 
 	if (!isBreakIce_) { return; }
-	respawnTimer_ += FpsCounter::gameDeltaTime / respawnTime_;
+	respawnTimer_ += FpsCounter::GetGameDeltaTime() / respawnTime_;
 
 	// リスポーン時間を超えたら、復活する
 	if (respawnTimer_ >= 1.0f) {

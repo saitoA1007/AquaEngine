@@ -34,7 +34,7 @@ void BossStateOut::Update() {
 	switch (phase_)
 	{
 	case BossStateOut::Phase::kIn: {
-		timer_ += FpsCounter::gameDeltaTime / InmaxTime_;
+		timer_ += FpsCounter::GetGameDeltaTime() / InmaxTime_;
 
 		float swayFade = 1.0f - timer_;
 
@@ -73,7 +73,7 @@ void BossStateOut::Update() {
 
 	case BossStateOut::Phase::kFade: {
 
-		timer_ += FpsCounter::gameDeltaTime / FadeMaxTime_;
+		timer_ += FpsCounter::GetGameDeltaTime() / FadeMaxTime_;
 
 		if (timer_ >= 1.0f) {
 			// ボスの全ての処理が終了

@@ -27,7 +27,7 @@ void PlayerAnimator::Initialize() {
 void PlayerAnimator::Update() {
 	if (isStop_) { return; }
 
-	timer_ += FpsCounter::gameDeltaTime / maxTime_;
+	timer_ += FpsCounter::GetGameDeltaTime() / maxTime_;
 
 	if (timer_ >= 1.0f) {
 

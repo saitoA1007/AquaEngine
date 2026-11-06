@@ -78,10 +78,10 @@ void FollowCameraState::Update(float dt60) {
 
 	float currentDamping = std::powf(kRotateDamping_, dt60);
 	rotateVelocityX_ = rotateVelocityX_ * currentDamping + targetRotateSpeed * (1.0f - currentDamping);
-	rotateMove.x += rotateVelocityX_ * FpsCounter::gameDeltaTime;
+	rotateMove.x += rotateVelocityX_ * FpsCounter::GetGameDeltaTime();
 
 	rotateVelocityY_ = rotateVelocityY_ * currentDamping + targetRotateSpeedY * (1.0f - currentDamping);
-	rotateMove.y += rotateVelocityY_ * FpsCounter::gameDeltaTime;
+	rotateMove.y += rotateVelocityY_ * FpsCounter::GetGameDeltaTime();
 
 	// 水平から真上の手前までに制限する
 	if (rotateMove.y <= kMinRotateY_ || rotateMove.y >= kMaxRotateY_) {
@@ -108,7 +108,7 @@ float FollowCameraState::CalcHoldRotateSpeed(float inputDir, float baseSpeed, Ho
 	hold.dir = inputDir;
 	if (inputDir == 0.0f) { return 0.0f; }
 
-	hold.time += FpsCounter::gameDeltaTime;
+	hold.time += FpsCounter::GetGameDeltaTime();
 
 	// 入力時間の割合に応じて、基本速度から最大速度まで上げる
 	float t = (kRotateAccelTime_ > 0.0f) ? std::clamp(hold.time / kRotateAccelTime_, 0.0f, 1.0f) : 1.0f;
@@ -216,7 +216,7 @@ void EnterMovieCameraState::Update(float dt60) {
 	{
 	case EnterMovieCameraState::Phase::kMove:
 		
-		timer_ += FpsCounter::gameDeltaTime / kMoveMaxTime_;
+		timer_ += FpsCounter::GetGameDeltaTime() / kMoveMaxTime_;
 
 		commonData_.idealTarget.y += kMoveOfferY_;
 		commonData_.idealPosition = kMovePos_;
@@ -230,7 +230,7 @@ void EnterMovieCameraState::Update(float dt60) {
 
 
 	case EnterMovieCameraState::Phase::kWait:
-		timer_ += FpsCounter::gameDeltaTime / kWaitMaxTime_;
+		timer_ += FpsCounter::GetGameDeltaTime() / kWaitMaxTime_;
 
 		commonData_.idealPosition = kWaitPos_;
 		commonData_.targetFov = kWaitFov_;

@@ -30,7 +30,7 @@ void PlayerStatus::Reset() {
 void PlayerStatus::Update() {
 	if (!isCoolActive_) { return; }
 
-	timer_ += FpsCounter::gameDeltaTime / coolTime_;
+	timer_ += FpsCounter::GetGameDeltaTime() / coolTime_;
 
 	if (timer_ >= 1.0f) {
 		timer_ = 0.0f;
@@ -61,7 +61,7 @@ bool PlayerStatus::IsBlinkHidden() const {
 
 void PlayerPhysics::Update() {
 	// 重力を適応
-	commonData_->velocity.y += kFallAcceleration_ * FpsCounter::gameDeltaTime;
+	commonData_->velocity.y += kFallAcceleration_ * FpsCounter::GetGameDeltaTime();
 
 	if (commonData_->state == PlayerState::kJump) {
 		if (commonData_->velocity.y <= 1.0f) {
@@ -128,11 +128,11 @@ void PlayerMoveAction::ProcessInput() {
 	if (desiredVelocityXZ.x == 0.0f && desiredVelocityXZ.z == 0.0f) {
 		// 減速
 		const float deceleration = isJump ? kAirDeceleration_ : kGroundDeceleration_;
-		deltaSpeed = deceleration * FpsCounter::gameDeltaTime;
+		deltaSpeed = deceleration * FpsCounter::GetGameDeltaTime();
 	} else {
 		// 加速
 		const float acceleration = isJump ? kAirAcceleration_ : kGroundAcceleration_;
-		deltaSpeed = acceleration * FpsCounter::gameDeltaTime;
+		deltaSpeed = acceleration * FpsCounter::GetGameDeltaTime();
 		target = desiredVelocityXZ;
 	}
 
@@ -257,7 +257,7 @@ void PlayerAttackRushAction::Update() {
 
 	// ため時間計測
 	if (commonData_->state == PlayerState::kCharging) {
-		chargeTimer_ += FpsCounter::gameDeltaTime / kRushChargeMaxTime_;
+		chargeTimer_ += FpsCounter::GetGameDeltaTime() / kRushChargeMaxTime_;
 
 		// 予備動作時間を溜め比率で決定
 		float chargeRatio_ = std::clamp(chargeTimer_, 0.0f, 1.0f);
@@ -284,7 +284,7 @@ void PlayerAttackRushAction::Update() {
 
 	// 突進
 	if (commonData_->state == PlayerState::kAttackRush) {
-		rushTimer_ += FpsCounter::gameDeltaTime / kRushMaxTime_;
+		rushTimer_ += FpsCounter::GetGameDeltaTime() / kRushMaxTime_;
 
 		if (rushTimer_ >= 1.0f) {
 			Log("Player end attackRush");
@@ -295,7 +295,7 @@ void PlayerAttackRushAction::Update() {
 
 	// 突進硬直のクールタイム
 	if (commonData_->state == PlayerState::kStiffness) {
-		coolTime_ += FpsCounter::gameDeltaTime / kRushCooldownTime_;
+		coolTime_ += FpsCounter::GetGameDeltaTime() / kRushCooldownTime_;
 
 		if (coolTime_ >= 1.0f) {
 			commonData_->state = PlayerState::kNone;
@@ -459,9 +459,9 @@ void PlayerAttackDownAction::Update() {
 
 		if (isAttackDownPrepping_) {
 
-			attackDownPrepareTimer_ += FpsCounter::gameDeltaTime / kAttackPreDownTime_;
+			attackDownPrepareTimer_ += FpsCounter::GetGameDeltaTime() / kAttackPreDownTime_;
 
-			commonData_->velocity.y += kAttackDownPrepareRise_ * FpsCounter::gameDeltaTime;
+			commonData_->velocity.y += kAttackDownPrepareRise_ * FpsCounter::GetGameDeltaTime();
 
 			if (attackDownPrepareTimer_ >= 1.0f) {
 				isAttackDownPrepping_ = false;
@@ -469,7 +469,7 @@ void PlayerAttackDownAction::Update() {
 
 		} else {
 			// 下への加速度
-			commonData_->velocity.y += kAttackDownAcceleration_ * FpsCounter::gameDeltaTime;
+			commonData_->velocity.y += kAttackDownAcceleration_ * FpsCounter::GetGameDeltaTime();
 
 			// 落下エフェクトを再生
 			commonData_->effectManager_->StartDownAttackEffect(commonData_->transform.translate, true);

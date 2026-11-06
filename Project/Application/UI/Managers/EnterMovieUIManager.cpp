@@ -56,7 +56,7 @@ void EnterMovieUIManager::Update() {
 		return;
 
 	case Phase::kIn:
-		timer_ += FpsCounter::deltaTime / inTime_;
+		timer_ += FpsCounter::GetDeltaTime() / inTime_;
 		if (timer_ >= 1.0f) {
 			timer_ = 0.0f;
 			phase_ = Phase::kHold;
@@ -68,7 +68,7 @@ void EnterMovieUIManager::Update() {
 		break;
 
 	case Phase::kHold:
-		timer_ += FpsCounter::deltaTime / holdTime_;
+		timer_ += FpsCounter::GetDeltaTime() / holdTime_;
 		ApplyAnimation(1.0f, 1.0f);
 		if (timer_ >= 1.0f) {
 			timer_ = 0.0f;
@@ -77,7 +77,7 @@ void EnterMovieUIManager::Update() {
 		break;
 
 	case Phase::kOut:
-		timer_ += FpsCounter::deltaTime / outTime_;
+		timer_ += FpsCounter::GetDeltaTime() / outTime_;
 		if (timer_ >= 1.0f) {
 			Stop();
 			return;

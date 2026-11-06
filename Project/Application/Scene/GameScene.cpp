@@ -152,7 +152,7 @@ void GameScene::InputRegisterCommand() {
 	inputCommand_->RegisterCommand("MoveRight", { KeyBinding{ DIK_D },PadStickBinding{ PadSide::kLeft, {1.0f,0.0f} }, PadButtonBinding{ XINPUT_GAMEPAD_DPAD_RIGHT } });
 	// ジャンプコマンドを登録する
 	inputCommand_->RegisterCommand("Jump", { KeyBinding{ DIK_SPACE, PressType::kTrigger },PadButtonBinding{ XINPUT_GAMEPAD_A, PressType::kTrigger } });
-	
+
 	// カメラ操作のコマンドを登録する
 	inputCommand_->RegisterCommand("CameraMoveLeft", { KeyBinding{ DIK_LEFT },PadStickBinding{ PadSide::kRight, {-1.0f,0.0f} } });
 	inputCommand_->RegisterCommand("CameraMoveRight", { KeyBinding{ DIK_RIGHT },PadStickBinding{ PadSide::kRight, {1.0f,0.0f} } });

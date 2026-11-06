@@ -23,6 +23,9 @@ GamePhaseManager::GamePhaseManager(GameEngine::InputCommand* inputCommand, Playe
 	commonData_.inputCommand = inputCommand;
 	commonData_.timeController_ = &timeController_;
 
+	// プレイヤーの攻撃時のヒットストップに使う
+	player->SetTimeController(&timeController_);
+
 	phases_[ScenePhase::kTitle] = std::make_unique<TitlePhase>(commonData_, cameraController, titleUIManager, player);
 	phases_[ScenePhase::kTutorial] = std::make_unique<TutorialPhase>(commonData_, cameraController, player, bossEnemy, playUIManager, enterMovieUIManager);
 	phases_[ScenePhase::kPlay] = std::make_unique<PlayPhase>(commonData_, player, bossEnemy, playUIManager, cameraController);
@@ -78,7 +81,7 @@ void GamePhaseManager::Update() {
 	}
 
 	if (isResetActive_) {
-		timer_ += FpsCounter::deltaTime / maxTime_;
+		timer_ += FpsCounter::GetDeltaTime() / maxTime_;
 
 		float t = 0.0f;
 		if (timer_ <= 0.5f) {

@@ -29,7 +29,7 @@ void BossStateIn::Update() {
 	if (!stateCommonData_.isBreakEgg) { return; }
 
 	if (delayBreakEgg_) {
-		timer_ += FpsCounter::gameDeltaTime / delayMaxTime_;
+		timer_ += FpsCounter::GetGameDeltaTime() / delayMaxTime_;
 
 		if (timer_ >= 1.0f) {
 			timer_ = 0.0f;
@@ -42,7 +42,7 @@ void BossStateIn::Update() {
 	if (delayBreakEgg_) { return; }
 
 	if (isMove_) {
-		timer_ += FpsCounter::gameDeltaTime / maxInTime_;
+		timer_ += FpsCounter::GetGameDeltaTime() / maxInTime_;
 
 		// 上昇
 		float riseY = Lerp(0.0f, moveHeight_, timer_);
@@ -67,7 +67,7 @@ void BossStateIn::Update() {
 		}
 	} else {
 		// 待機タイマー
-		timer_ += FpsCounter::gameDeltaTime / maxWaitTime_;
+		timer_ += FpsCounter::GetGameDeltaTime() / maxWaitTime_;
 
 		if (timer_ >= 1.0f) {
 			stateCommonData_.bossStateRequest = BossState::kBattle;

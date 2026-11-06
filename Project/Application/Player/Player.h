@@ -12,6 +12,7 @@
 
 // 前方宣言
 class PlayerEffectManager;
+class TimeController;
 
 class Player : public GameEngine::IGameObject {
 public:
@@ -44,6 +45,11 @@ public:
 	// カメラのワールド行列を取得
 	void SetCamera(CameraController* camera) {
 		camera_ = camera;
+	}
+
+	// ヒットストップに使う時間管理を設定
+	void SetTimeController(TimeController* timeController) {
+		timeController_ = timeController;
 	}
 
 	// 現在のHpを取得
@@ -95,6 +101,8 @@ private:
 	GameEngine::Model* model_ = nullptr;
 	// カメラ機能
 	CameraController* camera_ = nullptr;
+	// 時間管理
+	TimeController* timeController_ = nullptr;
 
 	// ワールド行列
 	GameEngine::WorldTransform worldTransform_;
@@ -124,6 +132,9 @@ private:
 	float attackVibrationIntensity_ = 0.3f;
 	// 敵に攻撃した時の振動する時間
 	float attackVibrationDuration_ = 0.25f;
+
+	// 敵に攻撃した時のヒットストップの時間（攻撃の強さ1段階あたり、秒）
+	float hitStopDuration_ = 0.05f;
 
 	// 歩きエフェクトを出す最低の速さ
 	float moveEffectMinSpeed_ = 2.0f;

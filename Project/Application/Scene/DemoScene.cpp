@@ -47,7 +47,7 @@ void DemoScene::Initialize() {
 void DemoScene::Update() {
 	debugParame_.ApplyIfDirty();
 
-	timer_ += FpsCounter::deltaTime / maxTime_;
+	timer_ += FpsCounter::GetDeltaTime() / maxTime_;
 
 	//text_->color_.w = Lerp(0.0f, 1.0f, timer_, easeCurve_);
 

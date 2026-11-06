@@ -30,7 +30,7 @@ void ShockFloor::Initialize() {
 
 void ShockFloor::Update() {
 
-	timer_ += FpsCounter::gameDeltaTime / maxTime_;
+	timer_ += FpsCounter::GetGameDeltaTime() / maxTime_;
 
 	modelComponent_.materialData_->dissolveThreshold = Lerp(0.0f, 1.0f, timer_, EaseType::kEaseInQuad);
 

@@ -88,7 +88,7 @@ PlayerEffectManager::PlayerEffectManager(GameEngine::GameObjectManager* objectMa
 void PlayerEffectManager::Update() {
 
 	if (timer_ <= 1.0f) {
-		timer_ += FpsCounter::deltaTime / 0.3f;
+		timer_ += FpsCounter::GetDeltaTime() / 0.3f;
 		if (timer_ >= 1.0f) {
 			landingEffect_->SetIsLoop(false);
 			if (blastEffect_->IsLoop()) {
@@ -98,7 +98,7 @@ void PlayerEffectManager::Update() {
 	}
 
 	if (afterTimer_ <= 1.0f) {
-		afterTimer_ += FpsCounter::deltaTime / 0.8f;
+		afterTimer_ += FpsCounter::GetDeltaTime() / 0.8f;
 		if (afterTimer_ >= 1.0f) {
 			if (afterEffect_->IsLoop()) {
 				afterEffect_->SetIsLoop(false);

@@ -10,6 +10,7 @@
 #include "Application/Enemy/BossEnemy.h"
 #include "Application/Stage/Wall.h"
 #include "Application/Stage/Floor.h"
+#include "Application/Utils/TimeController.h"
 using namespace GameEngine;
 
 Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model, GameEngine::AnimationManager* animationManager, PlayerEffectManager* effectManager) {
@@ -48,6 +49,11 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model,
 		int index = 0;
 		debugParame_->Register("AttackVibrationIntensity", attackVibrationIntensity_, index++, subGroup);
 		debugParame_->Register("AttackVibrationDuration", attackVibrationDuration_, index++, subGroup);
+	}
+	{
+		std::string subGroup = "HitStop";
+		int index = 0;
+		debugParame_->Register("HitStopDuration", hitStopDuration_, index++, subGroup);
 	}
 	{
 		std::string subGroup = "Effect";
@@ -141,7 +147,7 @@ void Player::Update() {
 	ApplyClamp();
 
 	// 移動を適応
-	worldTransform_.transform_.translate += commonData_.velocity * FpsCounter::gameDeltaTime;
+	worldTransform_.transform_.translate += commonData_.velocity * FpsCounter::GetGameDeltaTime();
 
 	// 角度を更新
 	UpdateRotation();
@@ -203,7 +209,7 @@ void Player::UpdateRotation() {
 
 		// 最短経路で角度補間をして現在の角度を求める
 		float kRotationLerpSpeed_ = 10.0f;
-		float maxStep = kRotationLerpSpeed_ * FpsCounter::gameDeltaTime;
+		float maxStep = kRotationLerpSpeed_ * FpsCounter::GetGameDeltaTime();
 		commonData_.currentYaw = Math::LerpShortAngle(commonData_.currentYaw, targetYaw, maxStep);
 
 		// ヨー角をワールドトランスフォームに反映
@@ -366,6 +372,11 @@ void Player::StartHitEffect(Vector3 pos) {
 
 	// 攻撃の強さに応じてコントローラーを振動させる
 	StartVibration(attackVibrationIntensity_ * static_cast<float>(powerLevel), attackVibrationDuration_);
+
+	// 攻撃の強さに応じてヒットストップする
+	if (timeController_) {
+		timeController_->StartStopTime(hitStopDuration_ * static_cast<float>(powerLevel));
+	}
 }
 
 void Player::StartVibration(float intensity, float duration) {
@@ -382,7 +393,7 @@ void Player::StartVibration(float intensity, float duration) {
 void Player::UpdateVibration() {
 	if (vibrationTimer_ <= 0.0f) { return; }
 
-	vibrationTimer_ -= FpsCounter::deltaTime;
+	vibrationTimer_ -= FpsCounter::GetDeltaTime();
 	if (vibrationTimer_ <= 0.0f) {
 		StopVibration();
 	}

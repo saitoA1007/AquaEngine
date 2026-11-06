@@ -101,7 +101,7 @@ void Floor::Update() {
 
 	// 壊れてから一定時間で元に戻す
 	if (isBroken_ && !destructObject_.IsReassembling()) {
-		respawnTimer_ += FpsCounter::gameDeltaTime / respawnTime_;
+		respawnTimer_ += FpsCounter::GetGameDeltaTime() / respawnTime_;
 		if (respawnTimer_ >= 1.0f) {
 			isBroken_ = false;
 			respawnTimer_ = 0.0f;
