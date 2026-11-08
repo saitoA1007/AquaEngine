@@ -4,6 +4,7 @@
 #include "Application/UI/Widgets/HpContainer.h"
 #include "Application/UI/Widgets/ArrowUI.h"
 #include "Application/UI/Effects/LetterboxUI.h"
+#include "Application/UI/Effects/LockOnUI.h"
 
 // 前方宣言
 namespace GameEngine {
@@ -64,6 +65,11 @@ public:
 		isDrawTutorialGuide_ = isDraw;
 	}
 
+	// ロックオンUIの状態を設定
+	void SetLockOn(bool isLockOn, const GameEngine::WorldTransform* target) {
+		lockOnUI_->SetLockOn(isLockOn, target);
+	}
+
 	// 矢印の表示フラグ
 	void SetIsDrawArrowUI(bool isDraw) {
 		isDrawArrowUI_ = isDraw;
@@ -99,4 +105,7 @@ private:
 
 	// 矢印ui
 	std::unique_ptr<ArrowUI> arrowUI_;
+
+	// ロックオンUI
+	std::unique_ptr<LockOnUI> lockOnUI_;
 };

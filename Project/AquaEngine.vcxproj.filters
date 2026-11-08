@@ -339,6 +339,9 @@
     <ClCompile Include="Application\UI\Effects\DimmerUI.cpp">
       <Filter>Application\UI\Effects</Filter>
     </ClCompile>
+    <ClCompile Include="Application\UI\Effects\LockOnUI.cpp">
+      <Filter>Application\UI\Effects</Filter>
+    </ClCompile>
     <ClCompile Include="Application\UI\Effects\LetterboxUI.cpp">
       <Filter>Application\UI\Effects</Filter>
     </ClCompile>
@@ -985,6 +988,9 @@
       <Filter>Application\Stage</Filter>
     </ClInclude>
     <ClInclude Include="Application\UI\Effects\DimmerUI.h">
+      <Filter>Application\UI\Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\UI\Effects\LockOnUI.h">
       <Filter>Application\UI\Effects</Filter>
     </ClInclude>
     <ClInclude Include="Application\UI\Effects\LetterboxUI.h">

@@ -118,6 +118,8 @@ void TutorialPhase::Update() {
 		cameraController_->SetChangeState(CameraState::kEnterMovie);
 		// 黒帯を表示させる
 		playUIManager_->SetBarActive(true);
+		// 演出中はロックオンUIを表示しない
+		playUIManager_->SetLockOn(false, nullptr);
 		// プレイヤーを表示しない
 		player_->SetIsDraw(false);
 
@@ -137,6 +139,8 @@ void TutorialPhase::Update() {
 	} else {
 		// 黒帯UIを表示
 		playUIManager_->SetBarActive(cameraController_->UseLetterBoxUI());
+		// ロックオンUIを更新
+		playUIManager_->SetLockOn(cameraController_->IsLockOn(), cameraController_->GetTargetWorld());
 
 		// ポーズ画面を開く
 		if (commonData_.inputCommand->IsCommandActive("PauseAction")) {
@@ -205,6 +209,8 @@ void PlayPhase::Update() {
 
 	// 黒帯UIを表示
 	playUIManager_->SetBarActive(cameraController_->UseLetterBoxUI());
+	// ロックオンUIを更新
+	playUIManager_->SetLockOn(cameraController_->IsLockOn(), cameraController_->GetTargetWorld());
 
 	// 現在のHpを設定
 	playUIManager_->SetCurrentBossHp(bossEnemy_->GetCurrentHp());
@@ -229,6 +235,9 @@ void PlayPhase::Exit() {
 		// 計測停止
 		playTimer_.Stop();
 		commonData_.playTime_ = playTimer_.GetTimer();
+
+		// ロックオンUIを消す
+		playUIManager_->SetLockOn(false, nullptr);
 	}
 }
 

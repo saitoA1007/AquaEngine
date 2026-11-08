@@ -47,6 +47,9 @@ public:
 	// 黒帯を表示させるか
 	bool UseLetterBoxUI() const { return currentStateType_ == CameraState::kLockOn; }
 
+	// ロックオン中か
+	bool IsLockOn() const { return currentStateType_ == CameraState::kLockOn; }
+
 	/// <summary>
 	/// カメラシェイクを開始
 	/// </summary>
