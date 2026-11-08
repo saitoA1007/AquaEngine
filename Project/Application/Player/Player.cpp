@@ -183,7 +183,7 @@ void Player::Draw() {
 	if (playerStatus_.IsBlinkHidden()) { return; }
 
 	// モデル描画
-	renderQueue_->SubmitRaytracingModel(model_, worldTransform_);
+	renderQueue_->SubmitRaytracingModel(model_, worldTransform_, nullptr, animator_->GetAnimator());
 }
 
 void Player::UpdateRotation() {
