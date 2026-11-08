@@ -14,7 +14,7 @@ using namespace GameEngine;
 GamePhaseManager::GamePhaseManager(GameEngine::InputCommand* inputCommand, Player* player, BossEnemy* bossEnemy,
 	TitleUIManager* titleUIManager, PlayUIManager* playUIManager, GameOverUIManager* gameOverUIManager, ClearUIManager* clearUIManager,
 	PauseUIManager* pauseUIManager,CameraController* cameraController, GameEngine::Dissolve* dissolve, StageManager* stageManager,
-	EnterMovieUIManager* enterMovieUIManager) {
+	EnterMovieUIManager* enterMovieUIManager, OptionUIManager* optionUIManager) {
 
 	dissolve_ = dissolve;
 
@@ -32,7 +32,7 @@ GamePhaseManager::GamePhaseManager(GameEngine::InputCommand* inputCommand, Playe
 	phases_[ScenePhase::kGameOver] = std::make_unique<GameOverPhase>(commonData_, gameOverUIManager);
 	phases_[ScenePhase::kClear] = std::make_unique<ClearPhase>(commonData_, clearUIManager);
 	phases_[ScenePhase::kPause] = std::make_unique<PausePhase>(commonData_, pauseUIManager);
-	phases_[ScenePhase::kOption] = std::make_unique<OptionPhase>(commonData_);
+	phases_[ScenePhase::kOption] = std::make_unique<OptionPhase>(commonData_, optionUIManager, cameraController);
 
 	player_ = player;
 	bossEnemy_ = bossEnemy;

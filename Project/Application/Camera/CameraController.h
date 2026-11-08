@@ -50,6 +50,12 @@ public:
 	// ロックオン中か
 	bool IsLockOn() const { return currentStateType_ == CameraState::kLockOn; }
 
+	// 視点操作の反転設定
+	void SetInvertX(bool isInvert) { isInvertX_ = isInvert; }
+	void SetInvertY(bool isInvert) { isInvertY_ = isInvert; }
+	bool IsInvertX() const { return isInvertX_; }
+	bool IsInvertY() const { return isInvertY_; }
+
 	/// <summary>
 	/// カメラシェイクを開始
 	/// </summary>
@@ -79,6 +85,10 @@ private:
 	float currentFov_ = 0.45f;
 
 	float targetFov_ = 0.45f;
+
+	// 視点操作の反転
+	bool isInvertX_ = false;
+	bool isInvertY_ = false;
 
 	// 外部からのカメラの遷移切り替え
 	std::optional<CameraState> requestState = std::nullopt;

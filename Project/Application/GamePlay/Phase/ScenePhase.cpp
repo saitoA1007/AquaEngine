@@ -7,10 +7,13 @@
 #include "Application/UI/Managers/ClearUIManager.h"
 #include "Application/UI/Managers/PauseUIManager.h"
 #include "Application/UI/Managers/EnterMovieUIManager.h"
+#include "Application/UI/Managers/OptionUIManager.h"
 #include "Application/Player/Player.h"
 #include "Application/Enemy/BossEnemy.h"
 #include "Application/Camera/CameraController.h"
 #include "Application/Utils/TimeController.h"
+#include "AudioManager.h"
+#include "FPSCounter.h"
 
 //=============================================================
 // タイトル
@@ -46,6 +49,12 @@ void TitlePhase::Update() {
 		titleUIManager_->SetIsDraw(false);
 	}
 
+	// オプションを開く(ゲーム開始の演出中は開かない)
+	if (titleUIManager_->IsDraw() && commonData_.inputCommand->IsCommandActive("OptionOpen")) {
+		commonData_.requestPhase = ScenePhase::kOption;
+		return;
+	}
+
 	// タイトル文字のフェードが終わればチュートリアルシーンに移行
 	if (!titleUIManager_->IsDraw() && !titleUIManager_->IsActiveFadeOut()) {
 		commonData_.requestPhase = ScenePhase::kTutorial;
@@ -53,8 +62,11 @@ void TitlePhase::Update() {
 }
 
 void TitlePhase::Exit() {
-	// UIを有効
+	// UIを無効
 	titleUIManager_->SetActive(false);
+
+	// オプションへ行く場合はタイトルの状態を保つ
+	if (commonData_.requestPhase == ScenePhase::kOption) { return; }
 
 	// フォローカメラに変更
 	cameraController_->SetChangeState(CameraState::kFollow);
@@ -251,6 +263,13 @@ PausePhase::PausePhase(PhaseCommonData& commonData, PauseUIManager* pauseUIManag
 }
 
 void PausePhase::Enter() {
+	// オプションから戻ってきた時以外は、戻り先のフェーズを保存する
+	if (ScenePhase::kOption != commonData_.GetPrePhase()) {
+		returnPhase_ = commonData_.GetPrePhase();
+		selectNum_ = 0;
+		pauseUIManager_->SetType(PauseUIManager::SelectType::kBack);
+	}
+
 	pauseUIManager_->SetActive(true);
 	pauseUIManager_->Initialize();
 	// 入りのアニメーション
@@ -274,7 +293,7 @@ void PausePhase::Update() {
 
 		if (commonData_.inputCommand->IsCommandActive("SelectDown")) {
 
-			if (selectNum_ <= 1) {
+			if (selectNum_ < static_cast<int32_t>(PauseUIManager::SelectType::kMaxCount) - 1) {
 				selectNum_++;
 			}
 			pauseUIManager_->SetType(static_cast<PauseUIManager::SelectType>(selectNum_));
@@ -286,6 +305,9 @@ void PausePhase::Update() {
 			if (PauseUIManager::SelectType::kRetry == pauseUIManager_->GetType()) {
 				// やり直す
 				commonData_.requestPhase = ScenePhase::kTutorial;
+			} else if (PauseUIManager::SelectType::kOption == pauseUIManager_->GetType()) {
+				// オプションを開く
+				commonData_.requestPhase = ScenePhase::kOption;
 			} else if (PauseUIManager::SelectType::kBackTitle == pauseUIManager_->GetType()) {
 				// タイトルへ戻る
 				commonData_.requestPhase = ScenePhase::kTitle;
@@ -311,8 +333,8 @@ void PausePhase::Update() {
 			if (!pauseUIManager_->IsAnimation()) {
 
 				if (PauseUIManager::SelectType::kBack == pauseUIManager_->GetType()) {
-					// 前のフェーズへ戻る
-					commonData_.requestPhase = commonData_.GetPrePhase();
+					// ポーズを開く前のフェーズへ戻る
+					commonData_.requestPhase = returnPhase_;
 				}
 			}
 		}
@@ -320,7 +342,10 @@ void PausePhase::Update() {
 }
 
 void PausePhase::Exit() {
-	commonData_.timeController_->Reset();
+	// オプションへ行く場合は時間を止めたままにする
+	if (commonData_.requestPhase != ScenePhase::kOption) {
+		commonData_.timeController_->Reset();
+	}
 	pauseUIManager_->SetActive(false);
 }
 
@@ -418,20 +443,161 @@ void ClearPhase::Exit() {
 // オプション
 //===========================================
 
-OptionPhase::OptionPhase(PhaseCommonData& commonData) : IScenePhase(commonData) {
+OptionPhase::OptionPhase(PhaseCommonData& commonData, OptionUIManager* optionUIManager, CameraController* cameraController) : IScenePhase(commonData) {
 
-	
+	optionUIManager_ = optionUIManager;
+	optionUIManager_->SetActive(false);
+
+	cameraController_ = cameraController;
+
+	// SEの音量確認用の音
+	seCheckHandle_ = GameEngine::AudioManager::GetInstance().GetHandleByName("se.mp3");
+
+	// 初期設定を反映
+	ApplySettings();
 }
 
 void OptionPhase::Enter() {
-	
+	// 戻り先を保存
+	returnPhase_ = commonData_.GetPrePhase();
+
+	selectNum_ = 0;
+	upInput_ = {};
+	downInput_ = {};
+	leftInput_ = {};
+	rightInput_ = {};
+
+	// UIを有効化
+	optionUIManager_->SetActive(true);
+	optionUIManager_->Initialize();
+	ApplySettings();
 }
 
 void OptionPhase::Update() {
 
-	
+	// ポーズから開いた場合は時間を止めたままにする
+	if (ScenePhase::kPause == returnPhase_) {
+		commonData_.timeController_->StartStopTime(3600.0f);
+	}
+
+	constexpr int32_t kItemCount = static_cast<int32_t>(static_cast<uint32_t>(OptionUIManager::Item::kMaxCount));
+
+	// 項目の選択
+	if (IsRepeatInput("OptionUp", upInput_)) {
+		selectNum_ = (selectNum_ + kItemCount - 1) % kItemCount;
+	}
+	if (IsRepeatInput("OptionDown", downInput_)) {
+		selectNum_ = (selectNum_ + 1) % kItemCount;
+	}
+	optionUIManager_->SetSelectItem(static_cast<OptionUIManager::Item>(selectNum_));
+
+	// 値の変更
+	if (IsRepeatInput("OptionLeft", leftInput_)) {
+		ChangeValue(-1);
+	}
+	if (IsRepeatInput("OptionRight", rightInput_)) {
+		ChangeValue(1);
+	}
+
+	// 決定
+	bool isBack = false;
+	if (commonData_.inputCommand->IsCommandActive("Decision")) {
+		if (OptionUIManager::Item::kBack == optionUIManager_->GetSelectItem()) {
+			isBack = true;
+		} else if (selectNum_ >= static_cast<int32_t>(OptionUIManager::Item::kCameraX)) {
+			// 反転設定は決定でも切り替えられる
+			ChangeValue(1);
+		}
+	}
+
+	// 戻る
+	if (commonData_.inputCommand->IsCommandActive("Cancel") ||
+		commonData_.inputCommand->IsCommandActive("OptionOpen") ||
+		commonData_.inputCommand->IsCommandActive("PauseAction")) {
+		isBack = true;
+	}
+
+	if (isBack) {
+		commonData_.requestPhase = returnPhase_;
+	}
 }
 
 void OptionPhase::Exit() {
+	// UIを無効化
+	optionUIManager_->SetActive(false);
 
+	// ポーズ以外に戻る場合は時間を戻す
+	if (ScenePhase::kPause != returnPhase_) {
+		commonData_.timeController_->Reset();
+	}
+}
+
+bool OptionPhase::IsRepeatInput(const std::string& commandName, RepeatInput& state) {
+	bool isPush = commonData_.inputCommand->IsCommandActive(commandName);
+
+	bool result = false;
+	if (isPush) {
+		if (!state.isPrePush) {
+			// 押した瞬間
+			result = true;
+			state.timer = kRepeatDelay_;
+		} else {
+			// 押し続けている間は一定間隔で受け付ける
+			state.timer -= GameEngine::FpsCounter::GetDeltaTime();
+			if (state.timer <= 0.0f) {
+				result = true;
+				state.timer += kRepeatInterval_;
+			}
+		}
+	}
+	state.isPrePush = isPush;
+	return result;
+}
+
+void OptionPhase::ChangeValue(int32_t dir) {
+
+	switch (static_cast<OptionUIManager::Item>(selectNum_)) {
+	case OptionUIManager::Item::kBgmVolume:
+		settings_.bgmVolumeLevel = std::clamp(settings_.bgmVolumeLevel + dir, 0, OptionSettings::kMaxVolumeLevel);
+		break;
+
+	case OptionUIManager::Item::kSeVolume:
+	{
+		int32_t pre = settings_.seVolumeLevel;
+		settings_.seVolumeLevel = std::clamp(settings_.seVolumeLevel + dir, 0, OptionSettings::kMaxVolumeLevel);
+		if (pre != settings_.seVolumeLevel) {
+			ApplySettings();
+			// 変更後の音量を確認できるように鳴らす
+			GameEngine::AudioManager::GetInstance().Play(seCheckHandle_, 1.0f, false, "SE");
+		}
+		break;
+	}
+
+	case OptionUIManager::Item::kCameraX:
+		settings_.isInvertCameraX = !settings_.isInvertCameraX;
+		break;
+
+	case OptionUIManager::Item::kCameraY:
+		settings_.isInvertCameraY = !settings_.isInvertCameraY;
+		break;
+
+	default:
+		break;
+	}
+
+	ApplySettings();
+}
+
+void OptionPhase::ApplySettings() {
+	// 音量
+	auto& audio = GameEngine::AudioManager::GetInstance();
+	audio.SetGroupVolume("BGM", OptionSettings::ToVolume(settings_.bgmVolumeLevel));
+	audio.SetGroupVolume("SE", OptionSettings::ToVolume(settings_.seVolumeLevel));
+
+	// 視点操作
+	cameraController_->SetInvertX(settings_.isInvertCameraX);
+	cameraController_->SetInvertY(settings_.isInvertCameraY);
+
+	// UI
+	optionUIManager_->SetSettings(settings_);
 }

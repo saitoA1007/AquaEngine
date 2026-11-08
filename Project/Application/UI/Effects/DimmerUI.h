@@ -1,6 +1,7 @@
 #pragma once
 #include "IGameObject.h"
 #include "Sprite.h"
+#include "Text.h"
 #include "DebugParameter.h"
 
 class DimmerUI : public GameEngine::IGameObject {
@@ -43,6 +44,14 @@ public:
 		sprite_.textureHandle_ = texture;
 	}
 
+	/// <summary>
+	/// 画像の代わりに文字で表示する
+	/// </summary>
+	/// <param name="font">フォント</param>
+	/// <param name="str">表示する文字列</param>
+	/// <param name="size">文字の大きさ</param>
+	void SetText(const GameEngine::Font* font, const std::string& str, float size);
+
 	// アニメーションさせる
 	void Play() {
 		if (!isPlay_) {
@@ -81,4 +90,7 @@ private:
 	
 	// 背景のフレーム
 	std::unique_ptr<GameEngine::Sprite> frameSprite_;
+
+	// 画像の代わりに表示する文字
+	std::unique_ptr<GameEngine::Text> text_;
 };

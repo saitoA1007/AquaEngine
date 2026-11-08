@@ -1,6 +1,7 @@
 #pragma once
 #include "Application/GamePlay/IScenePhase.h"
 #include "Application/Utils/Timer.h"
+#include "Application/GamePlay/OptionSettings.h"
 
 // 前方宣言
 class Player;
@@ -12,6 +13,7 @@ class GameOverUIManager;
 class ClearUIManager;
 class PauseUIManager;
 class EnterMovieUIManager;
+class OptionUIManager;
 
 // タイトル
 class TitlePhase : public IScenePhase {
@@ -110,6 +112,9 @@ private:
     PauseUIManager* pauseUIManager_ = nullptr;
 
     int32_t selectNum_ = 0;
+
+    // ポーズを閉じた時に戻るフェーズ
+    ScenePhase returnPhase_ = ScenePhase::kPlay;
 };
 
 // ゲームオーバーシーン
@@ -151,7 +156,14 @@ private:
 // オプション
 class OptionPhase : public IScenePhase {
 public:
-    OptionPhase(PhaseCommonData& commonData);
+    // 押し続けた時に一定間隔で入力を受け付ける
+    struct RepeatInput {
+        bool isPrePush = false;
+        float timer = 0.0f;
+    };
+
+public:
+    OptionPhase(PhaseCommonData& commonData, OptionUIManager* optionUIManager, CameraController* cameraController);
     ~OptionPhase() = default;
 
     void Enter() override;
@@ -161,5 +173,39 @@ public:
     void Exit() override;
 
 private:
+    OptionUIManager* optionUIManager_ = nullptr;
+    CameraController* cameraController_ = nullptr;
 
+    // 設定
+    OptionSettings settings_;
+
+    // 戻り先のフェーズ
+    ScenePhase returnPhase_ = ScenePhase::kTitle;
+
+    // 選択中の項目
+    int32_t selectNum_ = 0;
+
+    // 上下左右の入力状態
+    RepeatInput upInput_;
+    RepeatInput downInput_;
+    RepeatInput leftInput_;
+    RepeatInput rightInput_;
+
+    // 押し続けてからリピートが始まるまでの時間
+    float kRepeatDelay_ = 0.4f;
+    // リピートの間隔
+    float kRepeatInterval_ = 0.1f;
+
+    // SEの確認用の音
+    uint32_t seCheckHandle_ = 0;
+
+private:
+    // 押した瞬間、または押し続けている間一定間隔でtrueを返す
+    bool IsRepeatInput(const std::string& commandName, RepeatInput& state);
+
+    // 選択中の項目の値を変更する
+    void ChangeValue(int32_t dir);
+
+    // 設定を音量、カメラ、UIに反映する
+    void ApplySettings();
 };

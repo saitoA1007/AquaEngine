@@ -357,6 +357,9 @@
     <ClCompile Include="Application\UI\Managers\PauseUIManager.cpp">
       <Filter>Application\UI\Managers</Filter>
     </ClCompile>
+    <ClCompile Include="Application\UI\Managers\OptionUIManager.cpp">
+      <Filter>Application\UI\Managers</Filter>
+    </ClCompile>
     <ClCompile Include="Application\UI\Managers\PlayUIManager.cpp">
       <Filter>Application\UI\Managers</Filter>
     </ClCompile>
@@ -930,6 +933,9 @@
     <ClInclude Include="Application\GamePlay\IScenePhase.h">
       <Filter>Application\GamePlay</Filter>
     </ClInclude>
+    <ClInclude Include="Application\GamePlay\OptionSettings.h">
+      <Filter>Application\GamePlay</Filter>
+    </ClInclude>
     <ClInclude Include="Application\GamePlay\Phase\ScenePhase.h">
       <Filter>Application\GamePlay\Phase</Filter>
     </ClInclude>
@@ -1006,6 +1012,9 @@
       <Filter>Application\UI\Managers</Filter>
     </ClInclude>
     <ClInclude Include="Application\UI\Managers\PauseUIManager.h">
+      <Filter>Application\UI\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\UI\Managers\OptionUIManager.h">
       <Filter>Application\UI\Managers</Filter>
     </ClInclude>
     <ClInclude Include="Application\UI\Managers\PlayUIManager.h">

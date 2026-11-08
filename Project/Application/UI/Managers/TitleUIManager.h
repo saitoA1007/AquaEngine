@@ -2,10 +2,12 @@
 #include "IGameObject.h"
 #include "DebugParameter.h"
 #include "Sprite.h"
+#include "Text.h"
 
 // 前方宣言
 namespace GameEngine {
 	class TextureManager;
+	class FontManager;
 }
 
 /// <summary>
@@ -13,7 +15,7 @@ namespace GameEngine {
 /// </summary>
 class TitleUIManager : public GameEngine::IGameObject {
 public:
-	TitleUIManager(GameEngine::TextureManager* textureManager);
+	TitleUIManager(GameEngine::TextureManager* textureManager, GameEngine::FontManager* fontManager);
 	~TitleUIManager() = default;
 
 	// 初期化処理
@@ -34,6 +36,7 @@ public:
 		if (isDraw_) {
 			titleTextSprite_.color_.w = 1.0f;
 			buttonTextSprite_.color_.w = 1.0f;
+			optionGuideText_->color_.w = 1.0f;
 		} else {
 			//　フェードアウトして非表示にする
 			isActiveFadeOut_ = true;
@@ -52,6 +55,9 @@ private:
 
 	// ボタンUI
 	GameEngine::Sprite buttonTextSprite_;
+
+	// オプションの操作説明
+	std::unique_ptr<GameEngine::Text> optionGuideText_;
 
 	bool isDraw_ = true;
 	bool isActiveFadeOut_ = false;

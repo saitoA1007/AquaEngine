@@ -72,6 +72,14 @@ void FollowCameraState::Update(float dt60) {
 		input.y -= 1.0f;
 	}
 
+	// オプションの設定に応じて操作方向を反転する
+	if (controller_->IsInvertX()) {
+		input.x = -input.x;
+	}
+	if (controller_->IsInvertY()) {
+		input.y = -input.y;
+	}
+
 	// 入力し続けた時間に応じて速くする
 	float targetRotateSpeed = CalcHoldRotateSpeed(input.x, kRotateSpeed_, holdX_);
 	float targetRotateSpeedY = CalcHoldRotateSpeed(input.y, kRotateSpeedY_, holdY_);

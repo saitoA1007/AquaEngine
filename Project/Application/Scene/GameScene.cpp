@@ -22,6 +22,8 @@ using namespace GameEngine;
 #include "Application/UI/Managers/ClearUIManager.h"
 #include "Application/UI/Managers/PauseUIManager.h"
 #include "Application/UI/Managers/EnterMovieUIManager.h"
+#include "Application/UI/Managers/OptionUIManager.h"
+#include "AudioManager.h"
 
 GameScene::~GameScene() {
 }
@@ -29,6 +31,10 @@ GameScene::~GameScene() {
 GameScene::GameScene() {
 	// 入力コマンド設定s
 	InputRegisterCommand();
+
+	// 音量グループを登録
+	AudioManager::GetInstance().RegisterGroup("BGM");
+	AudioManager::GetInstance().RegisterGroup("SE");
 
 	// 背景を設定
 	uint32_t skyboxGH = textureManager_->GetHandleByName("starrySky.dds");
@@ -85,7 +91,7 @@ GameScene::GameScene() {
 	gameObjectManager_->AddObject<ParticleBehavior>("BgDriftSnowParticle", 160, textureManager_, planeModel);
 
 	// タイトル中のUI
-	auto* titleUIManager = gameObjectManager_->AddObject<TitleUIManager>(textureManager_);
+	auto* titleUIManager = gameObjectManager_->AddObject<TitleUIManager>(textureManager_, fontManager_);
 	// プレイ中のUI
 	auto* playUIManager = gameObjectManager_->AddObject<PlayUIManager>(textureManager_, planeModel);
 	// ゲームオーバーのUI
@@ -93,9 +99,11 @@ GameScene::GameScene() {
 	// クリアのUI
 	auto* clearUIManager = gameObjectManager_->AddObject<ClearUIManager>(textureManager_);
 	// ポーズのUI
-	auto* pauseUIManager = gameObjectManager_->AddObject<PauseUIManager>(textureManager_);
+	auto* pauseUIManager = gameObjectManager_->AddObject<PauseUIManager>(textureManager_, fontManager_);
 	// 入りのムービーのUI
 	auto* enterMovieUIManager = gameObjectManager_->AddObject<EnterMovieUIManager>(fontManager_, textureManager_);
+	// オプションのUI
+	auto* optionUIManager = gameObjectManager_->AddObject<OptionUIManager>(textureManager_, fontManager_);
 
 	// 遷移する用のテクスチャを設定
 	Dissolve* dissolve = postEffectManager_->GetPostEffect<Dissolve>("Dissolve");
@@ -103,7 +111,7 @@ GameScene::GameScene() {
 
 	// シーンフェーズを管理
 	gameObjectManager_->AddObject<GamePhaseManager>(inputCommand_, player, bossEnemy, titleUIManager, playUIManager, gameOverUIManager, clearUIManager,
-		pauseUIManager, cameraController_, dissolve, stageManager, enterMovieUIManager);
+		pauseUIManager, cameraController_, dissolve, stageManager, enterMovieUIManager, optionUIManager);
 
 	// ライトを設定
 	auto* light = renderQueue_->GetLightManager();
@@ -144,6 +152,15 @@ void GameScene::InputRegisterCommand() {
 	inputCommand_->RegisterCommand("SkipMovie", { KeyBinding{ DIK_SPACE, PressType::kTrigger },PadButtonBinding{ XINPUT_GAMEPAD_A, PressType::kTrigger } });
 	inputCommand_->RegisterCommand("SelectUp", { KeyBinding{ DIK_W, PressType::kTrigger },PadStickBinding{ PadSide::kLeft, {0.0f,1.0f} }, PadButtonBinding{ XINPUT_GAMEPAD_DPAD_UP, PressType::kTrigger } });
 	inputCommand_->RegisterCommand("SelectDown", { KeyBinding{ DIK_S, PressType::kTrigger },PadStickBinding{ PadSide::kLeft, {0.0f,-1.0f} }, PadButtonBinding{ XINPUT_GAMEPAD_DPAD_DOWN, PressType::kTrigger } });
+
+	// オプション
+	inputCommand_->RegisterCommand("OptionOpen", { KeyBinding{ DIK_TAB, PressType::kTrigger },PadButtonBinding{ XINPUT_GAMEPAD_BACK, PressType::kTrigger } });
+	inputCommand_->RegisterCommand("Cancel", { KeyBinding{ DIK_BACK, PressType::kTrigger },PadButtonBinding{ XINPUT_GAMEPAD_B, PressType::kTrigger } });
+	// オプションの項目操作
+	inputCommand_->RegisterCommand("OptionUp", { KeyBinding{ DIK_W },KeyBinding{ DIK_UP },PadStickBinding{ PadSide::kLeft, {0.0f,1.0f}, 0.5f }, PadButtonBinding{ XINPUT_GAMEPAD_DPAD_UP } });
+	inputCommand_->RegisterCommand("OptionDown", { KeyBinding{ DIK_S },KeyBinding{ DIK_DOWN },PadStickBinding{ PadSide::kLeft, {0.0f,-1.0f}, 0.5f }, PadButtonBinding{ XINPUT_GAMEPAD_DPAD_DOWN } });
+	inputCommand_->RegisterCommand("OptionLeft", { KeyBinding{ DIK_A },KeyBinding{ DIK_LEFT },PadStickBinding{ PadSide::kLeft, {-1.0f,0.0f}, 0.5f }, PadButtonBinding{ XINPUT_GAMEPAD_DPAD_LEFT } });
+	inputCommand_->RegisterCommand("OptionRight", { KeyBinding{ DIK_D },KeyBinding{ DIK_RIGHT },PadStickBinding{ PadSide::kLeft, {1.0f,0.0f}, 0.5f }, PadButtonBinding{ XINPUT_GAMEPAD_DPAD_RIGHT } });
 
 	// 移動の入力コマンドを登録する
 	inputCommand_->RegisterCommand("MoveUp", { KeyBinding{ DIK_W },PadStickBinding{ PadSide::kLeft, {0.0f,1.0f} }, PadButtonBinding{ XINPUT_GAMEPAD_DPAD_UP } });

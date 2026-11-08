@@ -228,6 +228,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\UI\Widgets\HpContainer.cpp" />
     <ClCompile Include="Application\UI\Effects\LetterboxUI.cpp" />
     <ClCompile Include="Application\UI\Managers\PauseUIManager.cpp" />
+    <ClCompile Include="Application\UI\Managers\OptionUIManager.cpp" />
     <ClCompile Include="Application\UI\Managers\PlayUIManager.cpp" />
     <ClCompile Include="Application\UI\Widgets\TimeUI.cpp" />
     <ClCompile Include="Application\UI\Managers\TitleUIManager.cpp" />
@@ -648,6 +649,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Enemy\State\BossStateOut.h" />
     <ClInclude Include="Application\GamePlay\GamePhaseManager.h" />
     <ClInclude Include="Application\GamePlay\IScenePhase.h" />
+    <ClInclude Include="Application\GamePlay\OptionSettings.h" />
     <ClInclude Include="Application\GamePlay\Phase\ScenePhase.h" />
     <ClInclude Include="Application\Player\Effect\PlayerHitAttackEffect.h" />
     <ClInclude Include="Application\Player\Effect\ShockFloor.h" />
@@ -677,6 +679,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\UI\Widgets\HpContainer.h" />
     <ClInclude Include="Application\UI\Effects\LetterboxUI.h" />
     <ClInclude Include="Application\UI\Managers\PauseUIManager.h" />
+    <ClInclude Include="Application\UI\Managers\OptionUIManager.h" />
     <ClInclude Include="Application\UI\Managers\PlayUIManager.h" />
     <ClInclude Include="Application\UI\Widgets\TimeUI.h" />
     <ClInclude Include="Application\UI\Managers\TitleUIManager.h" />

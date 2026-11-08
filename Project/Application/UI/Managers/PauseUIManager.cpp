@@ -1,11 +1,21 @@
 #include "pch.h"
 #include "PauseUIManager.h"
 #include "TextureManager.h"
+#include "FontManager.h"
 #include "EasingManager.h"
 #include "FPSCounter.h"
 using namespace GameEngine;
 
-PauseUIManager::PauseUIManager(GameEngine::TextureManager* textureManager) {
+namespace {
+	// 選択項目の画面外の位置
+	constexpr float kHideX = -256.0f;
+	// 選択中の位置
+	constexpr float kSelectX = 128.0f;
+	// 非選択の位置
+	constexpr float kNormalX = 96.0f;
+}
+
+PauseUIManager::PauseUIManager(GameEngine::TextureManager* textureManager, GameEngine::FontManager* fontManager) {
 
 	// ポーズ
 	uint32_t pauseTextGH = textureManager->GetHandleByName("pauseText.png");
@@ -25,6 +35,8 @@ PauseUIManager::PauseUIManager(GameEngine::TextureManager* textureManager) {
 	backUI_ = std::make_unique<DimmerUI>("BackUI", debugParame_.get(), true);
 	// リトライ
 	retryUI_ = std::make_unique<DimmerUI>("RetryUI", debugParame_.get(),true);
+	// オプション
+	optionUI_ = std::make_unique<DimmerUI>("OptionUI", debugParame_.get(), true);
 	// タイトルへ
 	backTitleUI_ = std::make_unique<DimmerUI>("BackTitleUI", debugParame_.get(),true);
 
@@ -37,6 +49,11 @@ PauseUIManager::PauseUIManager(GameEngine::TextureManager* textureManager) {
 	backUI_->SetTexture(backTextGH);
 	retryUI_->SetTexture(retryTextGH);
 	backTitleUI_->SetTexture(backTitleTextGH);
+	// オプションは画像が無いので文字で表示
+	optionUI_->SetText(fontManager->GetFont("Gisshiri"), "オプション", 44.0f);
+
+	// SelectTypeの順番で並べる
+	selectUIs_ = { backUI_.get(), retryUI_.get(), optionUI_.get(), backTitleUI_.get() };
 }
 
 void PauseUIManager::Initialize() {
@@ -45,9 +62,9 @@ void PauseUIManager::Initialize() {
 	// 初期化位置
 	frameSprite_.position_.x = -384.0f;
 	pauseTextSprite_.position_.x = -384.0f;
-	backUI_->world_.transform_.translate.x = -256.0f;
-	retryUI_->world_.transform_.translate.x = -256.0f;
-	backTitleUI_->world_.transform_.translate.x = -256.0f;
+	for (DimmerUI* ui : selectUIs_) {
+		ui->world_.transform_.translate.x = kHideX;
+	}
 }
 
 void PauseUIManager::Update() {
@@ -58,34 +75,19 @@ void PauseUIManager::Update() {
 
 		Animation();
 	} else {
-		switch (type_)
-		{
-		case PauseUIManager::SelectType::kBack:
-			backUI_->world_.transform_.translate.x = 128.0f;
-			retryUI_->world_.transform_.translate.x = 96.0f;
-			backTitleUI_->world_.transform_.translate.x = 96.0f;
-			break;
-
-		case PauseUIManager::SelectType::kRetry:
-			backUI_->world_.transform_.translate.x = 96.0f;
-			retryUI_->world_.transform_.translate.x = 128.0f;
-			backTitleUI_->world_.transform_.translate.x = 96.0f;
-			break;
-
-		case PauseUIManager::SelectType::kBackTitle:
-			backUI_->world_.transform_.translate.x = 96.0f;
-			retryUI_->world_.transform_.translate.x = 96.0f;
-			backTitleUI_->world_.transform_.translate.x = 128.0f;
-			break;
+		// 選択中の項目だけ前に出す
+		for (size_t i = 0; i < selectUIs_.size(); ++i) {
+			bool isSelect = (static_cast<SelectType>(i) == type_);
+			selectUIs_[i]->world_.transform_.translate.x = isSelect ? kSelectX : kNormalX;
 		}
 	}
 
 	bgSprite_.Update();
 	frameSprite_.Update();
 	playGuideSprite_.Update();
-	backUI_->Update();
-	retryUI_->Update();
-	backTitleUI_->Update();
+	for (DimmerUI* ui : selectUIs_) {
+		ui->Update();
+	}
 	pauseTextSprite_.Update();
 }
 
@@ -95,9 +97,9 @@ void PauseUIManager::Draw() {
 	renderQueue_->SubmitSprite(&frameSprite_);
 	renderQueue_->SubmitSprite(&playGuideSprite_);
 	renderQueue_->SubmitSprite(&pauseTextSprite_);
-	backUI_->Draw();
-	retryUI_->Draw();
-	backTitleUI_->Draw();
+	for (DimmerUI* ui : selectUIs_) {
+		ui->Draw();
+	}
 }
 
 void PauseUIManager::Animation() {
@@ -123,11 +125,12 @@ void PauseUIManager::Animation() {
 			float localT = timer_ / 0.9f;
 			pauseTextSprite_.position_.x = Lerp(-384.0f, 192.0f, localT, EaseType::kEaseOutQuad);
 		}
-		
+
 		// 選択テキストの移動
-		backUI_->world_.transform_.translate.x = Lerp(-256.0f, 128.0f, timer_, EaseType::kEaseInQuad);
-		retryUI_->world_.transform_.translate.x = Lerp(-256.0f, 96.0f, timer_, EaseType::kEaseInQuad);
-		backTitleUI_->world_.transform_.translate.x = Lerp(-256.0f, 96.0f, timer_, EaseType::kEaseInQuad);
+		for (size_t i = 0; i < selectUIs_.size(); ++i) {
+			float targetX = (static_cast<SelectType>(i) == type_) ? kSelectX : kNormalX;
+			selectUIs_[i]->world_.transform_.translate.x = Lerp(kHideX, targetX, timer_, EaseType::kEaseInQuad);
+		}
 
 		// 操作説明の表示
 		playGuideSprite_.color_.w = Lerp(0.0f, 1.0f, timer_, EaseType::kEaseInQuad);
@@ -135,9 +138,9 @@ void PauseUIManager::Animation() {
 		if (timer_ >= 1.0f) {
 			frameSprite_.position_.x = 0.0f;
 			pauseTextSprite_.position_.x = 192.0f;
-			backUI_->world_.transform_.translate.x = 128.0f;
-			retryUI_->world_.transform_.translate.x = 96.0f;
-			backTitleUI_->world_.transform_.translate.x = 96.0f;
+			for (size_t i = 0; i < selectUIs_.size(); ++i) {
+				selectUIs_[i]->world_.transform_.translate.x = (static_cast<SelectType>(i) == type_) ? kSelectX : kNormalX;
+			}
 			playGuideSprite_.color_.w = 1.0f;
 			isAnimation_ = false;
 		}
@@ -161,9 +164,9 @@ void PauseUIManager::Animation() {
 		if (timer_ <= 0.8f) {
 			float localT = timer_ / 0.8f;
 			// 選択テキストの移動
-			backUI_->world_.transform_.translate.x = Lerp(96.0f, -256.0f, localT, EaseType::kEaseOutQuad);
-			retryUI_->world_.transform_.translate.x = Lerp(96.0f, -256.0f, localT, EaseType::kEaseOutQuad);
-			backTitleUI_->world_.transform_.translate.x = Lerp(96.0f, -256.0f, localT, EaseType::kEaseOutQuad);
+			for (DimmerUI* ui : selectUIs_) {
+				ui->world_.transform_.translate.x = Lerp(kNormalX, kHideX, localT, EaseType::kEaseOutQuad);
+			}
 
 			// 操作説明の表示
 			playGuideSprite_.color_.w = Lerp(1.0f, 0.0f, localT, EaseType::kEaseOutQuad);
@@ -171,9 +174,9 @@ void PauseUIManager::Animation() {
 
 		if (timer_ >= 1.0f) {
 			playGuideSprite_.color_.w = 0.0f;
-			backUI_->world_.transform_.translate.x = -256.0f;
-			retryUI_->world_.transform_.translate.x = -256.0f;
-			backTitleUI_->world_.transform_.translate.x = -256.0f;
+			for (DimmerUI* ui : selectUIs_) {
+				ui->world_.transform_.translate.x = kHideX;
+			}
 			frameSprite_.position_.x = -384.0f;
 			isAnimation_ = false;
 		}

@@ -14,7 +14,7 @@
                 ],
                 "Translate": [
                     128.0,
-                    624.0,
+                    600.0,
                     0.0
                 ]
             },
@@ -85,7 +85,7 @@
                 ],
                 "Translate": [
                     128.0,
-                    400.0,
+                    330.0,
                     0.0
                 ]
             },
@@ -192,6 +192,77 @@
                 720.0
             ]
         },
+        "OptionUI": {
+            "BaseWorldWorldTransform": {
+                "Rotate": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "Scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Translate": [
+                    128.0,
+                    510.0,
+                    0.0
+                ]
+            },
+            "FrameSprite": {
+                "AnchorPoint": [
+                    0.5,
+                    0.5
+                ],
+                "Color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "MeshSize": [
+                    1.0,
+                    1.0
+                ],
+                "Position": [
+                    0.0,
+                    0.0
+                ],
+                "Rotate": 0.0,
+                "Scale": [
+                    256.0,
+                    70.0
+                ]
+            },
+            "MaxTime": 1.0,
+            "ScaleRatio": 0.75,
+            "TextSprite": {
+                "AnchorPoint": [
+                    0.5,
+                    0.5
+                ],
+                "Color": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "MeshSize": [
+                    1.0,
+                    1.0
+                ],
+                "Position": [
+                    0.0,
+                    0.0
+                ],
+                "Rotate": 0.0,
+                "Scale": [
+                    90.0,
+                    40.0
+                ]
+            }
+        },
         "PauseTextSprite": {
             "AnchorPoint": [
                 0.5,
@@ -256,7 +327,7 @@
                 ],
                 "Translate": [
                     128.0,
-                    510.0,
+                    420.0,
                     0.0
                 ]
             },

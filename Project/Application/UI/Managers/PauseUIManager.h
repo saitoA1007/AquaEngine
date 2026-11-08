@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 #include "IGameObject.h"
 #include "DebugParameter.h"
 #include "Sprite.h"
@@ -7,6 +8,7 @@
 // 前方宣言
 namespace GameEngine {
 	class TextureManager;
+	class FontManager;
 }
 
 /// <summary>
@@ -19,6 +21,7 @@ public:
 	enum class SelectType {
 		kBack,      // 戻る
 		kRetry,     // やり直す
+		kOption,    // オプション
 		kBackTitle, // タイトルに戻る
 
 		kMaxCount
@@ -31,7 +34,7 @@ public:
 	};
 
 public:
-	PauseUIManager(GameEngine::TextureManager* textureManager);
+	PauseUIManager(GameEngine::TextureManager* textureManager, GameEngine::FontManager* fontManager);
 	~PauseUIManager() = default;
 
 	// 初期化処理
@@ -84,8 +87,14 @@ private:
 	// やり直す
 	std::unique_ptr<DimmerUI> retryUI_;
 
+	// オプション
+	std::unique_ptr<DimmerUI> optionUI_;
+
 	// タイトルへ戻る
 	std::unique_ptr<DimmerUI> backTitleUI_;
+
+	// 選択項目のUI
+	std::array<DimmerUI*, static_cast<size_t>(SelectType::kMaxCount)> selectUIs_{};
 
 	// 選択中のタイプ
 	SelectType type_ = SelectType::kBack;
