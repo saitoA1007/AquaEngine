@@ -115,3 +115,21 @@ Material* Model::GetMaterial(const std::string& name) const {
 	return nullptr;
 }
 
+void Model::MergeAABB(const AABB& aabb) {
+	if (!hasAABB_) {
+		localAABB_ = aabb;
+		hasAABB_ = true;
+	} else {
+		localAABB_.min.x = std::min(localAABB_.min.x, aabb.min.x);
+		localAABB_.min.y = std::min(localAABB_.min.y, aabb.min.y);
+		localAABB_.min.z = std::min(localAABB_.min.z, aabb.min.z);
+		localAABB_.max.x = std::max(localAABB_.max.x, aabb.max.x);
+		localAABB_.max.y = std::max(localAABB_.max.y, aabb.max.y);
+		localAABB_.max.z = std::max(localAABB_.max.z, aabb.max.z);
+	}
+	modelSize_ = {
+		localAABB_.max.x - localAABB_.min.x,
+		localAABB_.max.y - localAABB_.min.y,
+		localAABB_.max.z - localAABB_.min.z,
+	};
+}

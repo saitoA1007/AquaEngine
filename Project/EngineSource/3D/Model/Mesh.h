@@ -3,6 +3,7 @@
 #include "IndexBuffer.h"
 #include "VertexData.h"
 #include "BLAS.h"
+#include "Geometry.h"
 
 namespace GameEngine {
 
@@ -86,13 +87,27 @@ namespace GameEngine {
 		// blasを取得
 		BLAS* GetBLAS() const { return blas_.get(); }
 
+		// ローカル空間でのAABBを取得
+		const AABB& GetLocalAABB() const { return localAABB_; }
+
 	private:
 		VertexBuffer<VertexData> vertexBuffer_;
+
+		// ローカル空間でのAABB
+		AABB localAABB_ = { {0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
 		IndexBuffer indexBuffer_;
 
 		// blas
 		std::unique_ptr<BLAS> blas_;
 
 		std::string materialName_ = "default";
+
+	private:
+
+		/// <summary>
+		/// 頂点バッファを作成し、同時にローカルAABBを計算する
+		/// </summary>
+		/// <param name="vertices"></param>
+		void CreateVertexBuffer(const std::vector<VertexData>& vertices);
 	};
 }
