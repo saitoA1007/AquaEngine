@@ -341,13 +341,7 @@ void SceneRenderManager::RasterizeExecute() {
         // 半透明描画コマンドを解放
         if (hasTranslucent) {
             auto& translucentList = translucentDrawQueueList[passName];
-        
-            // カメラの距離でソートをおこなう
-            // std::sort(translucentList.begin(), translucentList.end(),
-            //     [](const DrawRequest& a, const DrawRequest& b) {
-            //         return a.sortKey > b.sortKey;
-            //     });
-        
+       
             for (const auto& request : translucentList) {
                 // 描画前処理
                 PreDraw(renderQueue_->Get3dPsoName(request.type));
@@ -356,20 +350,6 @@ void SceneRenderManager::RasterizeExecute() {
             }
         }
 
-        // 2D描画コマンドを解放
-        //if (has2d) {
-        //    for (auto& [layer, psoMap] : draw2dQueueList[passName]) {
-        //        for (auto& [psoName, requests] : psoMap) {
-        //            if (requests.empty()) { continue; }
-        //            // 描画前処理
-        //            PreDraw(psoName);
-        //            for (const auto& request : requests) {
-        //                // 描画コマンド解放
-        //                Execute2dRequest(request);
-        //            }
-        //        }
-        //    }
-        //}
         renderPassController_->PostPass(passName);
     }
 
