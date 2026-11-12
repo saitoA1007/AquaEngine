@@ -53,6 +53,9 @@ namespace GameEngine {
 		// この個体を動かすアニメーターを設定
 		void SetAnimator(Animator* animator) { animator_ = animator; }
 
+		// 使用しているモデルを取得
+		const Model* GetModel() const { return model_; }
+
 	public:
 
 		// モデルが持つワールド行列
