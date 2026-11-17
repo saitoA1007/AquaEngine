@@ -3,7 +3,6 @@
 #include "Transform.h"
 #include "TransformationMatrix.h"
 #include "AnimationData.h"
-#include "ConstantBuffer.h"
 
 namespace GameEngine {
 
@@ -66,8 +65,10 @@ namespace GameEngine {
 		/// <param name="VPMatrix"></param>
 		void SetWVPMatrix(const Matrix4x4& localMatrix);
 
-		// リソースのアドレスを取得
-		D3D12_GPU_VIRTUAL_ADDRESS GetGpuVirtualAddress() const { return constBuffer_.GetGpuVirtualAddress(); }
+		/// <summary>
+		/// GPUに送る行列を取得する。描画側がバインドの直前にフレーム用の領域へ書き込む
+		/// </summary>
+		const TransformationMatrix& GetGpuData() const { return gpuData_; }
 
 	public:
 
@@ -79,10 +80,8 @@ namespace GameEngine {
 		WorldTransform(const WorldTransform&) = delete;
 		WorldTransform& operator=(const WorldTransform&) = delete;
 
-		ConstantBuffer<TransformationMatrix> constBuffer_;
-
-		// リソース
-		TransformationMatrix* transformationMatrixData_ = nullptr;
+		// GPUに送る行列。描画側が描画のたびにフレーム用の領域へ書き込む
+		TransformationMatrix gpuData_{};
 
 		Matrix4x4 worldMatrix_;
 

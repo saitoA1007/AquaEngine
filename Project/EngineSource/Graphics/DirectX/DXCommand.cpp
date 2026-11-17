@@ -1,6 +1,7 @@
 #include "pch.h"
 #include"DXCommand.h"
 #include<cassert>
+#include<string>
 #include"LogManager.h"
 #include"Debug/DebugName.h"
 
@@ -16,19 +17,21 @@ void DXCommand::Initialize(ID3D12Device* device) {
     // コマンドキューの生成がうまくいかなかったので起動できない
     assert(SUCCEEDED(hr));
 
-    // コマンドアロケータを生成する
-    hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator_));
-    // コマンドアロケータの生成がうまくいかなかったので起動できない
-    assert(SUCCEEDED(hr));
+    // コマンドアロケータをフレームスロットの数だけ生成する
+    for (uint32_t i = 0; i < kFrameCount; ++i) {
+        hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocators_[i]));
+        // コマンドアロケータの生成がうまくいかなかったので起動できない
+        assert(SUCCEEDED(hr));
+        SetDebugName(commandAllocators_[i].Get(), ("MainCommandAllocator[" + std::to_string(i) + "]").c_str());
+    }
 
-    // コマンドリストを生成する
-    hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator_.Get(), nullptr, IID_PPV_ARGS(&commandList_));
+    // コマンドリストを生成する。最初のフレームはスロット0のアロケータで記録する
+    hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocators_[0].Get(), nullptr, IID_PPV_ARGS(&commandList_));
     // コマンドリストを生成がうまくいかなかったので起動できない
     assert(SUCCEEDED(hr));
 
     // PIX上で識別できるように名前を付ける
     SetDebugName(commandQueue_.Get(), "MainCommandQueue");
-    SetDebugName(commandAllocator_.Get(), "MainCommandAllocator");
     SetDebugName(commandList_.Get(), "MainCommandList");
 
     LogManager::GetInstance().Log("End　Create CommandList");
@@ -40,16 +43,22 @@ void DXCommand::Close() {
     assert(SUCCEEDED(hr));
 }
 
-void DXCommand::Execute() {
+void DXCommand::Execute(ID3D12CommandList* preCommandList) {
+    // 先に実行するコマンドがあれば別のExecuteで実行する
+    if (preCommandList != nullptr) {
+        commandQueue_->ExecuteCommandLists(1, &preCommandList);
+    }
+
     // GPUにコマンドリストの実行を行わせる
     ID3D12CommandList* commandLists[] = { commandList_.Get() };
     commandQueue_->ExecuteCommandLists(1, commandLists);
 }
 
-void DXCommand::Reset() {
+void DXCommand::Reset(uint32_t frameIndex) {
     // 次のフレーム用にコマンドリストを準備
-    HRESULT hr = commandAllocator_->Reset();
+    ID3D12CommandAllocator* allocator = commandAllocators_[frameIndex].Get();
+    HRESULT hr = allocator->Reset();
     assert(SUCCEEDED(hr));
-    hr = commandList_->Reset(commandAllocator_.Get(), nullptr);
+    hr = commandList_->Reset(allocator, nullptr);
     assert(SUCCEEDED(hr));
 }

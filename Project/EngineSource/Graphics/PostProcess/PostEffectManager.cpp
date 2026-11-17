@@ -190,7 +190,7 @@ void PostEffectManager::RebuildOrder() {
 void PostEffectManager::BuildExecuteSteps() {
     executeSteps_.clear();
 
-    // 出力ピンID → ステップ添字
+    // 出力ピンID -> ステップ添字
     std::unordered_map<int, int> pinToStep;
     for (int nodeId : executeOrder_) {
         PostEffectNode* node = graph_.FindNode(nodeId);
@@ -240,7 +240,8 @@ int PostEffectManager::FrameResources::AcquireSlot() {
 
 void PostEffectManager::FrameResources::Release(int idx) {
     Resource& r = resources_[idx];
-    if (--r.refCount == 0 && r.poolSlot >= 0) { slotBusy_[r.poolSlot] = false; }
+    r.refCount--;
+    if (r.refCount == 0 && r.poolSlot >= 0) { slotBusy_[r.poolSlot] = false; }
 }
 
 bool PostEffectManager::SaveGraph(const std::string& filePath) {

@@ -8,16 +8,18 @@
 #include "Animator.h"
 #include "DebugRenderer.h"
 #include "SpriteRenderer.h"
+#include "FrameUploader.h"
 using namespace GameEngine;
 
 void SceneRenderManager::Initialize(ID3D12GraphicsCommandList4* commandList, SrvManager* srvManager, PSOManager* psoManager, RenderPassController* renderPassController,
-	RaytracingPipeline* raytracingPipeline, BufferRefManager* bufferRefManager, RenderQueue* renderQueue) {
+	RaytracingPipeline* raytracingPipeline, BufferRefManager* bufferRefManager, RenderQueue* renderQueue, FrameUploader* frameUploader) {
     commandList_ = commandList;
     renderPassController_ = renderPassController;
     raytracingPipeline_ = raytracingPipeline;
     srvManager_ = srvManager;
     bufferRefManager_ = bufferRefManager;
 	renderQueue_ = renderQueue;
+    frameUploader_ = frameUploader;
 
     // 描画パスと実行順を設定
     CreateRenderPasses();
@@ -42,6 +44,13 @@ void SceneRenderManager::Begin() {
 void SceneRenderManager::Execute() {
     // 更新
     renderQueue_->Update();
+
+    // カメラはフレームで1回だけ、フレーム用の領域へ書き込む
+    const CameraForGPU* camera = &renderQueue_->GetCameraData();
+    if (renderQueue_->GetUseDebugCamera() && renderQueue_->GetDebugCameraData() != nullptr) {
+        camera = renderQueue_->GetDebugCameraData();
+    }
+    cameraAddress_ = frameUploader_->UploadConstant(*camera);
 
     // レイトレーシング描画コマンドを解放
     RaytracingExecute();
@@ -153,14 +162,10 @@ void SceneRenderManager::CreateRenderPasses() {
 
 void SceneRenderManager::PreDraw(const std::string& psoName) {
     if (psoName == "ShadowMap") {
-        ModelRenderer::SetCamera(renderQueue_->GetLightResource()->GetResource());
+        ModelRenderer::SetCamera(renderQueue_->GetLightResource()->GetGpuVirtualAddress());
     } else {
-        if (renderQueue_->GetUseDebugCamera()) {
-            // デバック用のカメラを設定
-            ModelRenderer::SetCamera(renderQueue_->GetDebugCameraResource()->GetResource());
-        } else {
-            ModelRenderer::SetCamera(renderQueue_->GetCameraResource()->GetResource());
-        }
+        // デバックカメラかメインカメラかはExecuteの最初に選んである
+        ModelRenderer::SetCamera(cameraAddress_);
     }
 
     // 前回と同じPSOなら切り替え不要
@@ -271,11 +276,7 @@ void SceneRenderManager::DrawRaytracing() {
         sizeof(indices) / sizeof(uint32_t), &indices, 0);
     // カメラのセット
     UINT cameraParam = static_cast<UINT>(RaytracingRootParam::kCamera);
-    if (renderQueue_->GetUseDebugCamera()) {
-        commandList_->SetComputeRootConstantBufferView(cameraParam, renderQueue_->GetDebugCameraResource()->GetGpuVirtualAddress());
-    } else {
-        commandList_->SetComputeRootConstantBufferView(cameraParam, renderQueue_->GetCameraResource()->GetGpuVirtualAddress());
-    }
+    commandList_->SetComputeRootConstantBufferView(cameraParam, cameraAddress_);
     // ライトのセット
     commandList_->SetComputeRootConstantBufferView(static_cast<UINT>(RaytracingRootParam::kLight), renderQueue_->GetLightResource()->GetGpuVirtualAddress());
 
@@ -444,7 +445,7 @@ void SceneRenderManager::RaytracingExecute() {
     }
 
     // tlasを更新する
-    tlas_.Update(commandList_, raytracingDrawQueueList);
+    tlas_.Update(commandList_, raytracingDrawQueueList, *frameUploader_);
 
     // UAVに状態を変更
     renderPassController_->SwitchToUAV("RaytracingPass");

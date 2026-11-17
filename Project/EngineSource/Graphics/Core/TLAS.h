@@ -6,6 +6,9 @@
 
 namespace GameEngine {
 
+	// 前方宣言
+	class FrameUploader;
+
 	// レイのフィルタリングに使うインスタンスマスク
 	enum class RayInstanceMask {
 		kRayMaskOpaque = 0x01, // 不透明。影レイを完全に遮る
@@ -22,7 +25,7 @@ namespace GameEngine {
 		uint32_t instanceMask = static_cast<uint32_t>(RayInstanceMask::kRayMaskOpaque); // レイキャスト時のフィルタリング用マスク
 	};
 
-	class TLAS :public SrvResource {
+	class TLAS : public SrvResource {
 	public:
 		TLAS() = default;
 		~TLAS();
@@ -32,8 +35,13 @@ namespace GameEngine {
 		/// </summary>
 		void Create(ID3D12GraphicsCommandList4* cmdList, const uint32_t& initialCapacity);
 
-		// 更新
-		void Update(ID3D12GraphicsCommandList4* cmdList, const std::vector<TLASInstanceData>& instances);
+		/// <summary>
+		/// 更新
+		/// </summary>
+		/// <param name="cmdList"></param>
+		/// <param name="instances"></param>
+		/// <param name="uploader"></param>
+		void Update(ID3D12GraphicsCommandList4* cmdList, const std::vector<TLASInstanceData>& instances, FrameUploader& uploader);
 
 		// SRVインデックスの取得
 		uint32_t GetSrvIndex() const { return srvIndex_; }
@@ -46,10 +54,6 @@ namespace GameEngine {
 
 		// 現在確保している容量
 		uint32_t maxInstanceCount_ = 0;
-
-		// インスタンス情報をGPUに送るためのバッファ
-		Microsoft::WRL::ComPtr<ID3D12Resource> instanceBuffer_;
-		D3D12_RAYTRACING_INSTANCE_DESC* instanceDescs_ = nullptr;
 
 		// 作業リソース
 		Microsoft::WRL::ComPtr<ID3D12Resource> scratchBuffer_;

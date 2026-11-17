@@ -15,12 +15,13 @@ namespace GameEngine {
 	class PSOManager;
 	class BufferRefManager;
 	class RaytracingPipeline;
+	class FrameUploader;
 
 	class SceneRenderManager {
 	public:
 
 		void Initialize(ID3D12GraphicsCommandList4* commandList, SrvManager* srvManager, PSOManager* psoManager, RenderPassController* renderPassController,
-			RaytracingPipeline* raytracingPipeline, BufferRefManager* bufferRefManager, RenderQueue* renderQueue);
+			RaytracingPipeline* raytracingPipeline, BufferRefManager* bufferRefManager, RenderQueue* renderQueue, FrameUploader* frameUploader);
 
 		// フレーム開始前処理
 		void Begin();
@@ -35,6 +36,8 @@ namespace GameEngine {
 		SrvManager* srvManager_ = nullptr;
 		BufferRefManager* bufferRefManager_ = nullptr;
 		RenderQueue* renderQueue_ = nullptr;
+		// フレームごとのアップロード領域。カメラ定数とTLASのインスタンス情報を書き込む
+		FrameUploader* frameUploader_ = nullptr;
 
 		// 破片の描画に使用するコマンドルートシグネチャ。後で配置の変更をする
 		ID3D12CommandSignature* fractureCommandSignature_ = nullptr;
@@ -66,6 +69,9 @@ namespace GameEngine {
 
 		// 描画の有効状態
 		bool enableDrawRaytracing_ = false;
+
+		// このフレームで使うカメラ定数のGPUアドレス。Executeの最初にフレーム用の領域へ書き込む
+		D3D12_GPU_VIRTUAL_ADDRESS cameraAddress_ = 0;
 		bool enableDrawRasterize_ = false;
 		bool enableDrawRasterizeTranslucent_ = false;
 

@@ -2,7 +2,7 @@
 #include "Vector3.h"
 #include "Matrix4x4.h"
 #include "TransformationMatrix.h"
-#include "ConstantBuffer.h"
+#include <d3d12.h>
 #include "InPut.h"
 
 namespace GameEngine {
@@ -54,8 +54,8 @@ namespace GameEngine {
 		/// <returns></returns>
 		Matrix4x4 LookAt(const Vector3& eye, const Vector3& center, const Vector3& up);
 
-		ID3D12Resource* GetResource() const { return constBuffer_.GetResource(); }
-		ConstantBuffer<CameraForGPU>* GetConstantBuffer() { return &constBuffer_; }
+		// GPUに送るカメラのデータを取得する。描画時にフレーム用の領域へ書き込んで使う
+		const CameraForGPU& GetGpuData() const { return gpuData_; }
 
 		/// <summary>
 		/// 入力を受け付けるかを設定
@@ -99,8 +99,7 @@ namespace GameEngine {
 		// ターゲットを動かす速度
 		static inline const float kTargetSpeed = 0.5f;
 
-		// GPUにカメラの位置を送る用のリソース
-		ConstantBuffer<CameraForGPU> constBuffer_;
-		CameraForGPU* cameraForGPU_ = nullptr;
+		// GPUに送るカメラのデータ
+		CameraForGPU gpuData_{};
 	};
 }

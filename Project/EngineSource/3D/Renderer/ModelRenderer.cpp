@@ -1,20 +1,23 @@
 #include "pch.h"
 #include "ModelRenderer.h"
 #include <cassert>
+#include "FrameUploader.h"
 
 using namespace GameEngine;
 
 ID3D12GraphicsCommandList* ModelRenderer::commandList_ = nullptr;
-ID3D12Resource* ModelRenderer::cameraResource_ = nullptr;
+D3D12_GPU_VIRTUAL_ADDRESS ModelRenderer::cameraAddress_ = 0;
 SrvManager* ModelRenderer::srvManager_ = nullptr;
+FrameUploader* ModelRenderer::frameUploader_ = nullptr;
 
-void ModelRenderer::StaticInitialize(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
+void ModelRenderer::StaticInitialize(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager, FrameUploader* frameUploader) {
 	commandList_ = commandList;
 	srvManager_ = srvManager;
+	frameUploader_ = frameUploader;
 }
 
-void ModelRenderer::SetCamera(ID3D12Resource* cameraResource) {
-	cameraResource_ = cameraResource;
+void ModelRenderer::SetCamera(D3D12_GPU_VIRTUAL_ADDRESS cameraAddress) {
+	cameraAddress_ = cameraAddress;
 }
 
 void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, const GpuResource* material, const Matrix4x4* localMatrix) {
@@ -41,9 +44,9 @@ void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, con
 		} else {
 			commandList_->SetGraphicsRootConstantBufferView(0, material->GetGpuVirtualAddress());
 		}
-		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetGpuVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(1, frameUploader_->UploadConstant(worldTransform.GetGpuData()));
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
-		commandList_->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(3, cameraAddress_);
 
 		if (meshes[i]->GetTotalIndices() != 0) {
 			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), 1, 0, 0, 0);
@@ -75,9 +78,9 @@ void ModelRenderer::Draw(const Model* model, WorldTransform& worldTransform, Gpu
 		} else {
 			commandList_->SetGraphicsRootConstantBufferView(0, material->GetGpuVirtualAddress());
 		}
-		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetGpuVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(1, frameUploader_->UploadConstant(worldTransform.GetGpuData()));
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
-		commandList_->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(3, cameraAddress_);
 		commandList_->SetGraphicsRootConstantBufferView(4, lightGroupResource->GetGpuVirtualAddress());
 		if (meshes[i]->GetTotalIndices() != 0) {
 			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), 1, 0, 0, 0);
@@ -118,7 +121,7 @@ void ModelRenderer::DrawInstancing(const Model* model, const uint32_t& numInstan
 
 		commandList_->SetGraphicsRootDescriptorTable(1, worldTransforms.GetInstancingSrvGPU());
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
-		commandList_->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(3, cameraAddress_);
 
 		if (meshes[i]->GetTotalIndices() != 0) {
 			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), numInstance, 0, 0, 0);
@@ -147,7 +150,7 @@ void ModelRenderer::DrawWboitInstancing(const Model* model, const uint32_t& numI
 		commandList_->IASetIndexBuffer(&meshes[i]->GetIndexBufferView());
 		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		commandList_->SetGraphicsRootConstantBufferView(0, cameraResource_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(0, cameraAddress_);
 		commandList_->SetGraphicsRootDescriptorTable(1, worldTransforms.GetInstancingSrvGPU());
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 		commandList_->SetGraphicsRootConstantBufferView(3, wboit->GetGpuVirtualAddress());
@@ -202,7 +205,7 @@ void ModelRenderer::DrawFracture(const Model* model, FractureInstance& fractureI
 	for (auto& [groupName, chunks] : model->GetFractureChunks()) {
 		PackedGeometryBuffer* buffer = model->GetFractureBuffers().at(groupName).get();
 
-		// スロット0: 破片の頂点 / スロット1: インスタンス番号
+		// 破片の頂点とインスタンス番号
 		D3D12_VERTEX_BUFFER_VIEW vbViews[2] = { buffer->GetVertexBufferView(), fractureInstance.GetInstanceIndexBufferView() };
 		auto ibView = buffer->GetIndexBufferView();
 		commandList_->IASetVertexBuffers(0, 2, vbViews);
@@ -219,7 +222,7 @@ void ModelRenderer::DrawFracture(const Model* model, FractureInstance& fractureI
 
 		commandList_->SetGraphicsRootDescriptorTable(1, fractureInstance.GetInstancingSrvGPU());
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
-		commandList_->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(3, cameraAddress_);
 		commandList_->SetGraphicsRootConstantBufferView(4, lightGroupResource->GetGpuVirtualAddress());
 
 		commandList_->ExecuteIndirect(
@@ -235,7 +238,7 @@ void ModelRenderer::DrawRuntimeCutFragments(FractureInstance& fractureInstance, 
 
 	assert(fractureInstance.HasRuntimeGeometry() && "ランタイムカットで構築されたFractureInstanceではありません");
 
-	// スロット0: 破片の頂点 / スロット1: インスタンス番号
+	// 破片の頂点とインスタンス番号
 	D3D12_VERTEX_BUFFER_VIEW vbViews[2] = { fractureInstance.GetRuntimeVertexBufferView(), fractureInstance.GetInstanceIndexBufferView() };
 	commandList_->IASetVertexBuffers(0, 2, vbViews);
 	commandList_->IASetIndexBuffer(&fractureInstance.GetRuntimeIndexBufferView());
@@ -244,7 +247,7 @@ void ModelRenderer::DrawRuntimeCutFragments(FractureInstance& fractureInstance, 
 	commandList_->SetGraphicsRootConstantBufferView(0, material->GetGpuVirtualAddress());
 	commandList_->SetGraphicsRootDescriptorTable(1, fractureInstance.GetInstancingSrvGPU());
 	commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
-	commandList_->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(3, cameraAddress_);
 	commandList_->SetGraphicsRootConstantBufferView(4, lightGroupResource->GetGpuVirtualAddress());
 
 	commandList_->ExecuteIndirect(
@@ -282,11 +285,11 @@ void ModelRenderer::DrawAnimation(const Model* model, WorldTransform& worldTrans
 		} else {
 			commandList_->SetGraphicsRootConstantBufferView(0, material->GetGpuVirtualAddress());
 		}
-		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetGpuVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(1, frameUploader_->UploadConstant(worldTransform.GetGpuData()));
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
 
 		commandList_->SetGraphicsRootDescriptorTable(3, skinCluster->wellBuffer.GetSrvGpuHandle());
-		commandList_->SetGraphicsRootConstantBufferView(4, cameraResource_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(4, cameraAddress_);
 
 		commandList_->SetGraphicsRootConstantBufferView(5, lightGroupResource->GetGpuVirtualAddress());
 		commandList_->SetGraphicsRootDescriptorTable(6, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
@@ -308,8 +311,8 @@ void ModelRenderer::DrawGrid(const Model* model, WorldTransform& worldTransform)
 	commandList_->IASetVertexBuffers(0, 1, &meshes[0]->GetVertexBufferView());
 	commandList_->IASetIndexBuffer(&meshes[0]->GetIndexBufferView());
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	commandList_->SetGraphicsRootConstantBufferView(0, worldTransform.GetGpuVirtualAddress());
-	commandList_->SetGraphicsRootConstantBufferView(1, cameraResource_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(0, frameUploader_->UploadConstant(worldTransform.GetGpuData()));
+	commandList_->SetGraphicsRootConstantBufferView(1, cameraAddress_);
 	commandList_->DrawIndexedInstanced(meshes[0]->GetTotalIndices(), 1, 0, 0, 0);
 }
 
@@ -318,7 +321,7 @@ void ModelRenderer::DrawDebugLine(const D3D12_VERTEX_BUFFER_VIEW& vertexView, co
 	// 頂点バッファを設定
 	commandList_->IASetVertexBuffers(0, 1, &vertexView);
 	commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
-	commandList_->SetGraphicsRootConstantBufferView(0, cameraResource_->GetGPUVirtualAddress());
+	commandList_->SetGraphicsRootConstantBufferView(0, cameraAddress_);
 	commandList_->DrawInstanced(totalVertices, 1, 0, 0);
 }
 
@@ -345,8 +348,8 @@ void ModelRenderer::DrawSkybox(const Model* model, WorldTransform& worldTransfor
 			commandList_->SetGraphicsRootConstantBufferView(0, material->GetGpuVirtualAddress());
 		}
 		commandList_->SetGraphicsRootDescriptorTable(2, srvManager_->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
-		commandList_->SetGraphicsRootConstantBufferView(1, worldTransform.GetGpuVirtualAddress());
-		commandList_->SetGraphicsRootConstantBufferView(3, cameraResource_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(1, frameUploader_->UploadConstant(worldTransform.GetGpuData()));
+		commandList_->SetGraphicsRootConstantBufferView(3, cameraAddress_);
 
 		if (meshes[i]->GetTotalIndices() != 0) {
 			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), 1, 0, 0, 0);
@@ -370,8 +373,8 @@ void ModelRenderer::DrawShadowMap(const Model* model, WorldTransform& worldTrans
 		commandList_->IASetIndexBuffer(&meshes[i]->GetIndexBufferView());
 		commandList_->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		commandList_->SetGraphicsRootConstantBufferView(0, worldTransform.GetGpuVirtualAddress());
-		commandList_->SetGraphicsRootConstantBufferView(1, cameraResource_->GetGPUVirtualAddress());
+		commandList_->SetGraphicsRootConstantBufferView(0, frameUploader_->UploadConstant(worldTransform.GetGpuData()));
+		commandList_->SetGraphicsRootConstantBufferView(1, cameraAddress_);
 
 		if (meshes[i]->GetTotalIndices() != 0) {
 			commandList_->DrawIndexedInstanced(meshes[i]->GetTotalIndices(), 1, 0, 0, 0);

@@ -2,8 +2,12 @@
 #include"DXSwapChain.h"
 #include<cassert>
 #include"LogManager.h"
+#include"FrameContext.h"
 
 using namespace GameEngine;
+
+// ImGuiはスワップチェーンの枚数を処理中のフレーム数として使うため、フレーム数以上の枚数が必要
+static_assert(kFrameCount <= 2, "kFrameCountを増やす場合はスワップチェーンとDXRenderTargetの枚数も増やすこと");
 
 void DXSwapChain::Initialize(HWND hwnd, uint32_t width, uint32_t height, IDXGIFactory7* dxgiFactory, ID3D12CommandQueue* commandQueue) {
 

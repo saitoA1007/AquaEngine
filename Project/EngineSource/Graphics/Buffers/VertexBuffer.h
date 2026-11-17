@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
+#include <memory>
 #include "SrvResource.h"
+#include "DynamicBuffer.h"
 #include "CreateBufferResource.h"
 #include "ResourceGarbageCollector.h"
 
@@ -14,11 +16,11 @@ namespace GameEngine {
 	public:
 		~VertexBuffer() {
 			if (isCreated_) {
-				// マッピングを解除する
-				if (vertexData_) {
+				// マッピングを解除する(動的バッファはシャドウメモリなので不要)
+				if (vertexData_ && !dynamic_) {
 					resource_->Unmap(0, nullptr);
-					vertexData_ = nullptr;
 				}
+				vertexData_ = nullptr;
 				// SRV,UAVインデックス解放
 				if (srvManager_) {
 					srvManager_->ReleaseIndex(srvIndex_);
@@ -66,6 +68,54 @@ namespace GameEngine {
 			device_->CreateShaderResourceView(resource_.Get(), &srvDesc, srvCpuHandle_);
 
 			isCreated_ = true;
+		}
+
+		/// <summary>
+		/// CPUが毎フレーム書き換える頂点バッファを作成する
+		/// </summary>
+		void CreateDynamic(const std::vector<T>& vertices) {
+			// 頂点数を取得
+			totalVertices_ = static_cast<uint32_t>(vertices.size());
+
+			dynamic_ = CreateDynamicBuffer(sizeof(T) * totalVertices_);
+			resource_ = dynamic_->GetResourcePtr();
+
+			// GPUのアドレスは固定なのでビューも固定
+			vertexBufferView_.BufferLocation = resource_->GetGPUVirtualAddress();
+			vertexBufferView_.SizeInBytes = sizeof(T) * totalVertices_;
+			vertexBufferView_.StrideInBytes = sizeof(T);
+
+			// 頂点データをコピー
+			std::span<T> data = dynamic_->GetData<T>();
+			vertexData_ = data.data();
+			std::ranges::copy(vertices, data.begin());
+
+			/// SRVの作成
+			srvIndex_ = srvManager_->AllocateSrvIndex(SrvHeapType::Buffer);
+
+			D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+			srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+			srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+			srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+			srvDesc.Buffer.FirstElement = 0;
+			srvDesc.Buffer.NumElements = totalVertices_;
+			srvDesc.Buffer.StructureByteStride = sizeof(T);
+			srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+
+			srvCpuHandle_ = srvManager_->GetCPUHandle(srvIndex_);
+			srvGpuHandle_ = static_cast<CD3DX12_GPU_DESCRIPTOR_HANDLE>(srvManager_->GetGPUHandle(srvIndex_));
+			device_->CreateShaderResourceView(resource_.Get(), &srvDesc, srvCpuHandle_);
+
+			isCreated_ = true;
+		}
+
+		/// <summary>
+		/// 動的バッファで、GPUへ転送する頂点数を先頭から制限する
+		/// </summary>
+		void SetUploadVertexCount(uint32_t count) {
+			if (dynamic_) {
+				dynamic_->SetUploadSize(sizeof(T) * static_cast<size_t>(count));
+			}
 		}
 
 		void Create(ID3D12GraphicsCommandList4* cmdList, const std::vector<T>& vertices) {
@@ -250,6 +300,9 @@ namespace GameEngine {
 		}
 
 	private:
+		// CreateDynamicで作成した時のCPUが毎フレーム書き換えるバッファ
+		std::shared_ptr<DynamicBuffer> dynamic_;
+
 		// 頂点バッファビュー
 		D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
 		// メッシュデータ

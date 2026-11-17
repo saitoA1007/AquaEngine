@@ -346,6 +346,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Graphics\Core\BufferRefManager.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\SceneRenderManager.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\TLAS.cpp" />
+    <ClCompile Include="EngineSource\Graphics\Core\FrameUploader.cpp" />
+    <ClCompile Include="EngineSource\Graphics\Core\DynamicBufferRegistry.cpp" />
+    <ClCompile Include="EngineSource\Graphics\Buffers\DynamicBuffer.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\RenderQueue.cpp" />
     <ClCompile Include="EngineSource\3D\Transform\WorldTransform.cpp" />
     <ClCompile Include="EngineSource\3D\Transform\WorldTransforms.cpp" />
@@ -821,6 +824,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Graphics\Core\DXC.h" />
     <ClInclude Include="EngineSource\Core\FPSCounter.h" />
     <ClInclude Include="EngineSource\Graphics\Core\ResourceGarbageCollector.h" />
+    <ClInclude Include="EngineSource\Graphics\Core\FrameUploader.h" />
+    <ClInclude Include="EngineSource\Graphics\Core\DynamicBufferRegistry.h" />
+    <ClInclude Include="EngineSource\Graphics\Buffers\DynamicBuffer.h" />
+    <ClInclude Include="EngineSource\Graphics\DirectX\FrameContext.h" />
     <ClInclude Include="EngineSource\Graphics\Debug\DebugName.h" />
     <ClInclude Include="EngineSource\Graphics\Debug\PixCapture.h" />
     <ClInclude Include="EngineSource\Graphics\Debug\PixMarker.h" />

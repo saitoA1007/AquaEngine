@@ -18,16 +18,13 @@ void Camera::Initialize(const Transform& transform, int kClientWidth, int kClien
 	VPMatrix_ = viewMatrix_ * projectionMatrix_;
 
 
-	// 定数バッファの作成
-	constBuffer_.Create();
-	cameraForGPU_ = constBuffer_.GetData();
 	// 単位行列を書き込んでおく
-	cameraForGPU_->worldPosition = GetWorldPosition();
-	cameraForGPU_->vpMatrix = Matrix4x4::MakeIdentity();
-	cameraForGPU_->mtxViewInv = Matrix4x4::MakeIdentity();
-	cameraForGPU_->mtxProjInv = Matrix4x4::MakeIdentity();
-	cameraForGPU_->viewMatrix = Matrix4x4::MakeIdentity();
-	cameraForGPU_->projectionMatrix = Matrix4x4::MakeIdentity();
+	gpuData_.worldPosition = GetWorldPosition();
+	gpuData_.vpMatrix = Matrix4x4::MakeIdentity();
+	gpuData_.mtxViewInv = Matrix4x4::MakeIdentity();
+	gpuData_.mtxProjInv = Matrix4x4::MakeIdentity();
+	gpuData_.viewMatrix = Matrix4x4::MakeIdentity();
+	gpuData_.projectionMatrix = Matrix4x4::MakeIdentity();
 }
 
 void Camera::Update() {
@@ -35,28 +32,24 @@ void Camera::Update() {
 	viewMatrix_ = Matrix4x4::Inverse(worldMatrix_);
 	VPMatrix_ = viewMatrix_ * projectionMatrix_;
 
-	if (cameraForGPU_) {
-		cameraForGPU_->worldPosition = GetWorldPosition();
-		cameraForGPU_->vpMatrix = VPMatrix_;
-		cameraForGPU_->mtxViewInv = worldMatrix_;
-		cameraForGPU_->mtxProjInv = Matrix4x4::Inverse(projectionMatrix_);
-		cameraForGPU_->viewMatrix = viewMatrix_;
-		cameraForGPU_->projectionMatrix = projectionMatrix_;
-	}	
+	gpuData_.worldPosition = GetWorldPosition();
+	gpuData_.vpMatrix = VPMatrix_;
+	gpuData_.mtxViewInv = worldMatrix_;
+	gpuData_.mtxProjInv = Matrix4x4::Inverse(projectionMatrix_);
+	gpuData_.viewMatrix = viewMatrix_;
+	gpuData_.projectionMatrix = projectionMatrix_;
 }
 
 void Camera::UpdateFromWorldMatrix() {
 	viewMatrix_ = Matrix4x4::Inverse(worldMatrix_);
 	VPMatrix_ = viewMatrix_ * projectionMatrix_;
 
-	if (cameraForGPU_) {
-		cameraForGPU_->worldPosition = GetWorldPosition();
-		cameraForGPU_->vpMatrix = VPMatrix_;
-		cameraForGPU_->mtxViewInv = worldMatrix_;
-		cameraForGPU_->mtxProjInv = Matrix4x4::Inverse(projectionMatrix_);
-		cameraForGPU_->viewMatrix = viewMatrix_;
-		cameraForGPU_->projectionMatrix = projectionMatrix_;
-	}
+	gpuData_.worldPosition = GetWorldPosition();
+	gpuData_.vpMatrix = VPMatrix_;
+	gpuData_.mtxViewInv = worldMatrix_;
+	gpuData_.mtxProjInv = Matrix4x4::Inverse(projectionMatrix_);
+	gpuData_.viewMatrix = viewMatrix_;
+	gpuData_.projectionMatrix = projectionMatrix_;
 }
 
 Matrix4x4 Camera::MakeWVPMatrix(Matrix4x4 worldMatrix) {
@@ -89,12 +82,10 @@ void Camera::SetCamera(const Camera& camera) {
 	viewMatrix_ = camera.GetViewMatrix();
 	VPMatrix_ = camera.GetVPMatrix();
 
-	if (cameraForGPU_) {
-		cameraForGPU_->worldPosition = camera.GetWorldPosition();
-		cameraForGPU_->vpMatrix = VPMatrix_;
-		cameraForGPU_->mtxViewInv = worldMatrix_;
-		cameraForGPU_->mtxProjInv = Matrix4x4::Inverse(camera.GetProjectionMatrix());
-		cameraForGPU_->viewMatrix = camera.GetViewMatrix();
-		cameraForGPU_->projectionMatrix = camera.GetProjectionMatrix();
-	}
+	gpuData_.worldPosition = camera.GetWorldPosition();
+	gpuData_.vpMatrix = VPMatrix_;
+	gpuData_.mtxViewInv = worldMatrix_;
+	gpuData_.mtxProjInv = Matrix4x4::Inverse(camera.GetProjectionMatrix());
+	gpuData_.viewMatrix = camera.GetViewMatrix();
+	gpuData_.projectionMatrix = camera.GetProjectionMatrix();
 }

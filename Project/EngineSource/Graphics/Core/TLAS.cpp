@@ -3,17 +3,19 @@
 #include <algorithm>
 #include "CreateBufferResource.h"
 #include "ResourceGarbageCollector.h"
+#include "FrameUploader.h"
 using namespace GameEngine;
+
+namespace {
+    // D3D12_RAYTRACING_INSTANCE_DESCの配置アライメント
+    constexpr size_t kInstanceDescAlignment = 16;
+}
 
 TLAS::~TLAS() {
     if (isCreated_) {
         // GPU側の実行が完了してから破棄させる
         if (resource_) {
             ResourceGarbageCollector::GetInstance().Add(resource_);
-        }
-        if (instanceBuffer_) {
-            instanceBuffer_->Unmap(0, nullptr);
-            ResourceGarbageCollector::GetInstance().Add(instanceBuffer_);
         }
         if (scratchBuffer_) {
             ResourceGarbageCollector::GetInstance().Add(scratchBuffer_);
@@ -38,13 +40,8 @@ void TLAS::Create(ID3D12GraphicsCommandList4* cmdList, const uint32_t& initialCa
 
 void TLAS::AllocateBuffers(uint32_t capacity) {
     maxInstanceCount_ = capacity;
-    uint64_t instanceBufferSize = sizeof(D3D12_RAYTRACING_INSTANCE_DESC) * maxInstanceCount_;
 
     // GPU側の実行が完了してから破棄
-    if (instanceBuffer_) {
-        instanceBuffer_->Unmap(0, nullptr);
-        ResourceGarbageCollector::GetInstance().Add(instanceBuffer_);
-    }
     if (resource_) {
         ResourceGarbageCollector::GetInstance().Add(resource_);
     }
@@ -52,21 +49,10 @@ void TLAS::AllocateBuffers(uint32_t capacity) {
         ResourceGarbageCollector::GetInstance().Add(scratchBuffer_);
     }
 
-    // GPUに送るためのリソースを作成
-    instanceBuffer_ = CreateBufferResource(
-        device_, instanceBufferSize,
-        D3D12_HEAP_TYPE_UPLOAD,
-        D3D12_RESOURCE_STATE_GENERIC_READ,
-        D3D12_RESOURCE_FLAG_NONE
-    );
-
-    // インスタンス情報をD3D12の構造体にマッピングして書き込む
-    instanceBuffer_->Map(0, nullptr, reinterpret_cast<void**>(&instanceDescs_));
-
-    // ビルドの入力設定
+    // ビルドの入力設定。インスタンス情報は毎フレームのUpdateでフレーム用のアップロード領域に書き込む
     inputs_.Type = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL;
     inputs_.DescsLayout = D3D12_ELEMENTS_LAYOUT_ARRAY;
-    inputs_.InstanceDescs = instanceBuffer_->GetGPUVirtualAddress();
+    inputs_.InstanceDescs = 0;
     inputs_.NumDescs = maxInstanceCount_;
     // PERFORM_UPDATEによるリフィットを行うためにはALLOW_UPDATEを立てておく必要がある
     inputs_.Flags = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_PREFER_FAST_TRACE
@@ -116,7 +102,7 @@ void TLAS::EnsureCapacity(uint32_t requiredCount) {
     CreateSrv();
 }
 
-void TLAS::Update(ID3D12GraphicsCommandList4* cmdList, const std::vector<TLASInstanceData>& instances) {
+void TLAS::Update(ID3D12GraphicsCommandList4* cmdList, const std::vector<TLASInstanceData>& instances, FrameUploader& uploader) {
     uint32_t activeCount = static_cast<uint32_t>(instances.size());
 
     // 0であれば早期リターン
@@ -125,27 +111,32 @@ void TLAS::Update(ID3D12GraphicsCommandList4* cmdList, const std::vector<TLASIns
     // 容量が足りなければ作り直す
     EnsureCapacity(activeCount);
 
+    // インスタンス情報はフレームごとのアップロード領域に書き込む
+    UploadArray<D3D12_RAYTRACING_INSTANCE_DESC> upload =
+        uploader.AllocateArray<D3D12_RAYTRACING_INSTANCE_DESC>(activeCount, kInstanceDescAlignment);
+    std::span<D3D12_RAYTRACING_INSTANCE_DESC> instanceDescs = upload.data;
+
     // 有効なインスタンスの状態を書き込む
     for (uint32_t i = 0; i < activeCount; ++i) {
-        instanceDescs_[i].InstanceID = instances[i].instanceID;
-        instanceDescs_[i].InstanceContributionToHitGroupIndex = instances[i].hitGroupIndexOffset;
-        instanceDescs_[i].Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
+        instanceDescs[i].InstanceID = instances[i].instanceID;
+        instanceDescs[i].InstanceContributionToHitGroupIndex = instances[i].hitGroupIndexOffset;
+        instanceDescs[i].Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
 
         // Transform行列のコピー
-        std::memcpy(instanceDescs_[i].Transform, instances[i].transform, sizeof(float) * 12);
+        std::memcpy(instanceDescs[i].Transform, instances[i].transform, sizeof(float) * 12);
 
         // 対象となるBLASのGPUアドレスを指定
-        instanceDescs_[i].AccelerationStructure = instances[i].blas->GetGpuVirtualAddress();
+        instanceDescs[i].AccelerationStructure = instances[i].blas->GetGpuVirtualAddress();
 
         // レイキャスト時のフィルタリング
-        instanceDescs_[i].InstanceMask = instances[i].instanceMask;
+        instanceDescs[i].InstanceMask = instances[i].instanceMask;
     }
 
     // 有効数でビルドを構築
     inputs_.NumDescs = activeCount;
+    inputs_.InstanceDescs = upload.gpuAddress;
 
-    // 前フレームとインスタンス数が同じであればトポロジが変わっていないためPERFORM_UPDATEを行い、異なる場合はフルビルドを行う。
-    // 一定回数で必ずフルビルドに戻す
+    // 前フレームとインスタンス数が同じであればトポロジが変わっていないためPERFORM_UPDATEを行い、異なる場合はフルビルドを行う
     bool canRefit = (activeCount == previousInstanceCount_) && (consecutiveRefitCount_ < kMaxConsecutiveRefits_);
 
     D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC buildDesc{};

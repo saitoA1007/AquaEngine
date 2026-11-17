@@ -20,16 +20,13 @@ void DebugCamera::Initialize(const Vector3& translate,int width, int height) {
 	projectionMatrix_ = Matrix4x4::MakePerspectiveFovMatrix(0.45f, static_cast<float>(width) / static_cast<float>(height), 0.1f, 200.0f);
 	rotateMatrix_ = LookAt(translate_, targetPos_, { 0.0f,1.0f,0.0f });
 
-	// 定数バッファの作成
-	constBuffer_.Create();
-	cameraForGPU_ = constBuffer_.GetData();
 	// 単位行列を書き込んでおく
-	cameraForGPU_->worldPosition = translate_;
-	cameraForGPU_->vpMatrix = Matrix4x4::MakeIdentity();
-	cameraForGPU_->mtxViewInv = Matrix4x4::MakeIdentity();
-	cameraForGPU_->mtxProjInv = Matrix4x4::MakeIdentity();
-	cameraForGPU_->viewMatrix = Matrix4x4::MakeIdentity();
-	cameraForGPU_->projectionMatrix = Matrix4x4::MakeIdentity();
+	gpuData_.worldPosition = translate_;
+	gpuData_.vpMatrix = Matrix4x4::MakeIdentity();
+	gpuData_.mtxViewInv = Matrix4x4::MakeIdentity();
+	gpuData_.mtxProjInv = Matrix4x4::MakeIdentity();
+	gpuData_.viewMatrix = Matrix4x4::MakeIdentity();
+	gpuData_.projectionMatrix = Matrix4x4::MakeIdentity();
 
 	// 球面座標系で移動
 	translate_.x = targetPos_.x + distance_ * std::sinf(mouseMove_.y) * std::sinf(mouseMove_.x);
@@ -44,7 +41,7 @@ void DebugCamera::Initialize(const Vector3& translate,int width, int height) {
 	worldMatrix_.m[3][2] = translate_.z;
 
 	//worldMatrix_ = MakeTranslateMatrix(translate_);
-	cameraForGPU_->worldPosition = GetWorldPosition();
+	gpuData_.worldPosition = GetWorldPosition();
 	// カメラの変更した内容を適用する処理
 	viewMatrix_ = Matrix4x4::Inverse(worldMatrix_);
 }
@@ -112,14 +109,14 @@ void DebugCamera::Update() {
 	worldMatrix_.m[3][1] = translate_.y;
 	worldMatrix_.m[3][2] = translate_.z;
 
-	cameraForGPU_->worldPosition = GetWorldPosition();
+	gpuData_.worldPosition = GetWorldPosition();
 	// カメラの変更した内容を適用する処理
 	viewMatrix_ = Matrix4x4::Inverse(worldMatrix_);
-	cameraForGPU_->vpMatrix = GetVPMatrix();
-	cameraForGPU_->mtxViewInv = worldMatrix_;
-	cameraForGPU_->mtxProjInv = Matrix4x4::Inverse(projectionMatrix_);
-	cameraForGPU_->viewMatrix = viewMatrix_;
-	cameraForGPU_->projectionMatrix = projectionMatrix_;
+	gpuData_.vpMatrix = GetVPMatrix();
+	gpuData_.mtxViewInv = worldMatrix_;
+	gpuData_.mtxProjInv = Matrix4x4::Inverse(projectionMatrix_);
+	gpuData_.viewMatrix = viewMatrix_;
+	gpuData_.projectionMatrix = projectionMatrix_;
 
 	// 初期位置にリセットする
 	if (canOperate && input_->PushKey(DIK_G) && input_->PushKey(DIK_LCONTROL)) {

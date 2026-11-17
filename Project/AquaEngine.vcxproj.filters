@@ -678,6 +678,15 @@
     <ClCompile Include="EngineSource\Graphics\Core\SceneRenderManager.cpp">
       <Filter>EngineSource\Graphics\Core</Filter>
     </ClCompile>
+    <ClCompile Include="EngineSource\Graphics\Core\FrameUploader.cpp">
+      <Filter>EngineSource\Graphics\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Graphics\Core\DynamicBufferRegistry.cpp">
+      <Filter>EngineSource\Graphics\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Graphics\Buffers\DynamicBuffer.cpp">
+      <Filter>EngineSource\Graphics\Buffers</Filter>
+    </ClCompile>
     <ClCompile Include="EngineSource\Graphics\Core\TLAS.cpp">
       <Filter>EngineSource\Graphics\Core</Filter>
     </ClCompile>
@@ -1424,6 +1433,18 @@
     </ClInclude>
     <ClInclude Include="EngineSource\Graphics\Core\RenderQueue.h">
       <Filter>EngineSource\Graphics\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\Core\FrameUploader.h">
+      <Filter>EngineSource\Graphics\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\Core\DynamicBufferRegistry.h">
+      <Filter>EngineSource\Graphics\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\Buffers\DynamicBuffer.h">
+      <Filter>EngineSource\Graphics\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\DirectX\FrameContext.h">
+      <Filter>EngineSource\Graphics\DirectX</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Graphics\Core\ResourceGarbageCollector.h">
       <Filter>EngineSource\Graphics\Core</Filter>

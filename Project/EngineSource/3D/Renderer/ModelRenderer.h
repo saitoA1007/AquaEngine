@@ -11,6 +11,8 @@
 
 namespace GameEngine {
 
+	class FrameUploader;
+
 	class ModelRenderer {
 	public:
 		ModelRenderer() = default;
@@ -20,14 +22,14 @@ namespace GameEngine {
 		/// 静的初期化
 		/// </summary>
 		/// <param name="commandList"></param>
-		static void StaticInitialize(ID3D12GraphicsCommandList* commandList,SrvManager* srvManager);
+		/// <param name="frameUploader">WorldTransformの行列を描画ごとに書き込むアップロード領域</param>
+		static void StaticInitialize(ID3D12GraphicsCommandList* commandList,SrvManager* srvManager, FrameUploader* frameUploader);
 
 		/// <summary>
 		/// カメラを設定する
 		/// </summary>
-		/// <param name="vpMatrix"></param>
-		/// <param name="cameraResource"></param>
-		static void SetCamera(ID3D12Resource* cameraResource);
+		/// <param name="cameraAddress">カメラ定数のGPUアドレス。このフレームの中でだけ有効なもの</param>
+		static void SetCamera(D3D12_GPU_VIRTUAL_ADDRESS cameraAddress);
 
 	public:
 
@@ -123,7 +125,10 @@ namespace GameEngine {
 		// srv
 		static SrvManager* srvManager_;
 
-		// カメラリソース
-		static ID3D12Resource* cameraResource_;
+		// カメラ定数のGPUアドレス
+		static D3D12_GPU_VIRTUAL_ADDRESS cameraAddress_;
+
+		// フレームごとのアップロード領域
+		static FrameUploader* frameUploader_;
 	};
 }

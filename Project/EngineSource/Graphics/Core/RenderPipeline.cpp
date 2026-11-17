@@ -98,10 +98,13 @@ void RenderPipeline::EndFrame(ImGuiManager* imGuiManager) {
     // フレーム全体のPIXイベントを閉じる
     PixEndEvent(graphicsDevice_->GetCommandList());
 
+    // このフレームでCPUが書き込んだ定数バッファなどをGPU側へ転送するコマンドを取得
+    ID3D12CommandList* uploadCommandList = graphicsDevice_->RecordUploads();
+
     // コマンドリストの内容を確定させる。すべてのコマンドを積んでからcloseにすること
     graphicsDevice_->CloseCommandList();
-    // GPUにコマンドリストの実行を行わせる
-    graphicsDevice_->ExecuteCommand();
+    // GPUにコマンドリストの実行を行わせる。転送を先に実行する
+    graphicsDevice_->ExecuteCommand(uploadCommandList);
 
     // GPUとOSに画面の交換を行うように通知する
     graphicsDevice_->Present();
@@ -112,8 +115,8 @@ void RenderPipeline::EndFrame(ImGuiManager* imGuiManager) {
     // Presentが終わったフレームを1枚としてカウントし、必要ならキャプチャを確定させる
     PixCapture::GetInstance().EndFrame();
 
-    // GPUを待つ
-    graphicsDevice_->WaitForGPU();
+    // 次のフレームスロットへ進む
+    graphicsDevice_->MoveToNextFrame();
 
     // 次のフレーム用にコマンドリストを準備
     graphicsDevice_->ResetCommandList();

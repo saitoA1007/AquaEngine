@@ -7,6 +7,9 @@
 #include "DXFence.h"
 #include "DXDebugger.h"
 #include "DXViewportState.h"
+#include "FrameContext.h"
+#include "FrameUploader.h"
+#include "DynamicBufferRegistry.h"
 
 #include "RtvManager.h"
 #include "SrvManager.h"
@@ -17,7 +20,7 @@ namespace GameEngine {
     class GraphicsDevice {
     public:
         GraphicsDevice() = default;
-        ~GraphicsDevice() = default;
+        ~GraphicsDevice();
 
         /// <summary>
         /// 初期化
@@ -41,15 +44,22 @@ namespace GameEngine {
         /// <summary>
         /// コマンドを実行
         /// </summary>
-        void ExecuteCommand();
+        /// <param name="preCommandList">メインより先に実行するアップロード用コマンドリスト。無ければnullptr</param>
+        void ExecuteCommand(ID3D12CommandList* preCommandList = nullptr);
 
         /// <summary>
-        /// コマンドリストをリセット
+        /// 現在のフレームの終わりをSignalし、次のフレームスロットへ進む。
+        /// 次のスロットを前回使ったフレームのGPU実行完了のみを待つ
+        /// </summary>
+        void MoveToNextFrame();
+
+        /// <summary>
+        /// 現在のフレームスロットのアロケータでコマンドリストをリセット
         /// </summary>
         void ResetCommandList();
 
         /// <summary>
-        /// GPUの処理完了を待機
+        /// GPUの全処理の完了を待機。終了処理やリソースの作り直しで使う
         /// </summary>
         void WaitForGPU();
 
@@ -57,6 +67,12 @@ namespace GameEngine {
         /// 画面を提示(Present)
         /// </summary>
         void Present();
+
+        /// <summary>
+        /// このフレームでCPUが書き込んだDynamicBufferをGPU側へ転送するコマンドを記録する
+        /// </summary>
+        /// <returns>メインより先に実行するコマンドリスト。転送するものが無ければnullptr</returns>
+        ID3D12CommandList* RecordUploads();
 
     public:
         ID3D12Device5* GetDevice() const { return device_->GetDevice(); }
@@ -87,6 +103,12 @@ namespace GameEngine {
 
         DsvManager* GetDsvManager() { return dsvManager_.get(); }
 
+        // フレームごとのアップロード領域
+        FrameUploader* GetFrameUploader() { return frameUploader_.get(); }
+
+        // DynamicBufferの登録先。所有権は渡さない
+        std::weak_ptr<DynamicBufferRegistry> GetDynamicBufferRegistry() const { return dynamicBufferRegistry_; }
+
     private:
         GraphicsDevice(const GraphicsDevice&) = delete;
         GraphicsDevice& operator=(const GraphicsDevice&) = delete;
@@ -99,6 +121,9 @@ namespace GameEngine {
         std::unique_ptr<DXFence> fence_;
         std::unique_ptr<DXViewportState> viewportState_;
 
+        // 各フレームスロットの終わりにSignalしたフェンス値
+        uint64_t frameFenceValues_[kFrameCount] = {};
+
         // rtvを管理する機能
         std::unique_ptr<RtvManager> rtvManager_;
 
@@ -107,6 +132,12 @@ namespace GameEngine {
 
         // dsvを管理する機能
         std::unique_ptr<DsvManager> dsvManager_;
+
+        // フレームごとのアップロード領域
+        std::unique_ptr<FrameUploader> frameUploader_;
+
+        // DynamicBufferの登録先
+        std::shared_ptr<DynamicBufferRegistry> dynamicBufferRegistry_;
 
 #ifdef _DEBUG
         std::unique_ptr<DXDebugger> debugger_;
