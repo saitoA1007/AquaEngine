@@ -20,7 +20,7 @@ ViewOptionsBar::ViewOptionsBar(Input* input, RenderQueue* renderQueue, DebugRend
 	// 描画機能
 	renderQueue_ = renderQueue;
 	// デバックカメラを設定
-	renderQueue_->SetDebugCamera(debugCamera_->GetConstantBuffer());
+	renderQueue_->SetDebugCamera(&debugCamera_->GetGpuData());
 	// デバック描画機能
 	debugRenderer_ = debugRenderer;
 }

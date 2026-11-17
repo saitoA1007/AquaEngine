@@ -119,7 +119,8 @@ void Sprite::CreateMesh() {
 	vertices[2].texcoord = { rightTex,bottomTex };
 	vertices[3].texcoord = { rightTex,topTex };
 
-	vertexBuffer_.Create(vertices);
+	// サイズやUVの変更で頂点を書き換えるため動的バッファにする
+	vertexBuffer_.CreateDynamic(vertices);
 
 	// データを取得
 	vertexData_ = vertexBuffer_.GetVertexData();

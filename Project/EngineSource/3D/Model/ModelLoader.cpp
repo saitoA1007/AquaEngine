@@ -761,7 +761,6 @@ void ModelLoader::BuildFractureAdjacency(ModelData& modelData, float threshold) 
 	}
 
 	// グループごとの高さレンジから、最下層のチャンクを地面に固定されたアンカーとしてマークする
-	// （事前分割チャンクの底面はギザギザなので、絶対値のしきい値ではなく全高に対する割合で判定する）
 	struct HeightRange {
 		float minY = FLT_MAX;
 		float maxY = -FLT_MAX;

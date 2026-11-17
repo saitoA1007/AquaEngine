@@ -219,6 +219,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Stage\StageManager.cpp" />
     <ClCompile Include="Application\Stage\Wall.cpp" />
     <ClCompile Include="Application\UI\Effects\DimmerUI.cpp" />
+    <ClCompile Include="Application\UI\Effects\LockOnUI.cpp" />
     <ClCompile Include="Application\UI\Managers\ClearUIManager.cpp" />
     <ClCompile Include="Application\UI\Managers\GameOverUIManager.cpp" />
     <ClCompile Include="Application\UI\Managers\EnterMovieUIManager.cpp" />
@@ -227,6 +228,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\UI\Widgets\HpContainer.cpp" />
     <ClCompile Include="Application\UI\Effects\LetterboxUI.cpp" />
     <ClCompile Include="Application\UI\Managers\PauseUIManager.cpp" />
+    <ClCompile Include="Application\UI\Managers\OptionUIManager.cpp" />
     <ClCompile Include="Application\UI\Managers\PlayUIManager.cpp" />
     <ClCompile Include="Application\UI\Widgets\TimeUI.cpp" />
     <ClCompile Include="Application\UI\Managers\TitleUIManager.cpp" />
@@ -344,6 +346,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Graphics\Core\BufferRefManager.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\SceneRenderManager.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\TLAS.cpp" />
+    <ClCompile Include="EngineSource\Graphics\Core\FrameUploader.cpp" />
+    <ClCompile Include="EngineSource\Graphics\Core\DynamicBufferRegistry.cpp" />
+    <ClCompile Include="EngineSource\Graphics\Buffers\DynamicBuffer.cpp" />
     <ClCompile Include="EngineSource\Graphics\Core\RenderQueue.cpp" />
     <ClCompile Include="EngineSource\3D\Transform\WorldTransform.cpp" />
     <ClCompile Include="EngineSource\3D\Transform\WorldTransforms.cpp" />
@@ -647,6 +652,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Enemy\State\BossStateOut.h" />
     <ClInclude Include="Application\GamePlay\GamePhaseManager.h" />
     <ClInclude Include="Application\GamePlay\IScenePhase.h" />
+    <ClInclude Include="Application\GamePlay\OptionSettings.h" />
     <ClInclude Include="Application\GamePlay\Phase\ScenePhase.h" />
     <ClInclude Include="Application\Player\Effect\PlayerHitAttackEffect.h" />
     <ClInclude Include="Application\Player\Effect\ShockFloor.h" />
@@ -667,6 +673,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Stage\StageManager.h" />
     <ClInclude Include="Application\Stage\Wall.h" />
     <ClInclude Include="Application\UI\Effects\DimmerUI.h" />
+    <ClInclude Include="Application\UI\Effects\LockOnUI.h" />
     <ClInclude Include="Application\UI\Managers\ClearUIManager.h" />
     <ClInclude Include="Application\UI\Managers\GameOverUIManager.h" />
     <ClInclude Include="Application\UI\Managers\EnterMovieUIManager.h" />
@@ -675,6 +682,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\UI\Widgets\HpContainer.h" />
     <ClInclude Include="Application\UI\Effects\LetterboxUI.h" />
     <ClInclude Include="Application\UI\Managers\PauseUIManager.h" />
+    <ClInclude Include="Application\UI\Managers\OptionUIManager.h" />
     <ClInclude Include="Application\UI\Managers\PlayUIManager.h" />
     <ClInclude Include="Application\UI\Widgets\TimeUI.h" />
     <ClInclude Include="Application\UI\Managers\TitleUIManager.h" />
@@ -816,6 +824,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Graphics\Core\DXC.h" />
     <ClInclude Include="EngineSource\Core\FPSCounter.h" />
     <ClInclude Include="EngineSource\Graphics\Core\ResourceGarbageCollector.h" />
+    <ClInclude Include="EngineSource\Graphics\Core\FrameUploader.h" />
+    <ClInclude Include="EngineSource\Graphics\Core\DynamicBufferRegistry.h" />
+    <ClInclude Include="EngineSource\Graphics\Buffers\DynamicBuffer.h" />
+    <ClInclude Include="EngineSource\Graphics\DirectX\FrameContext.h" />
     <ClInclude Include="EngineSource\Graphics\Debug\DebugName.h" />
     <ClInclude Include="EngineSource\Graphics\Debug\PixCapture.h" />
     <ClInclude Include="EngineSource\Graphics\Debug\PixMarker.h" />

@@ -339,6 +339,9 @@
     <ClCompile Include="Application\UI\Effects\DimmerUI.cpp">
       <Filter>Application\UI\Effects</Filter>
     </ClCompile>
+    <ClCompile Include="Application\UI\Effects\LockOnUI.cpp">
+      <Filter>Application\UI\Effects</Filter>
+    </ClCompile>
     <ClCompile Include="Application\UI\Effects\LetterboxUI.cpp">
       <Filter>Application\UI\Effects</Filter>
     </ClCompile>
@@ -352,6 +355,9 @@
       <Filter>Application\UI\Managers</Filter>
     </ClCompile>
     <ClCompile Include="Application\UI\Managers\PauseUIManager.cpp">
+      <Filter>Application\UI\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Application\UI\Managers\OptionUIManager.cpp">
       <Filter>Application\UI\Managers</Filter>
     </ClCompile>
     <ClCompile Include="Application\UI\Managers\PlayUIManager.cpp">
@@ -672,6 +678,15 @@
     <ClCompile Include="EngineSource\Graphics\Core\SceneRenderManager.cpp">
       <Filter>EngineSource\Graphics\Core</Filter>
     </ClCompile>
+    <ClCompile Include="EngineSource\Graphics\Core\FrameUploader.cpp">
+      <Filter>EngineSource\Graphics\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Graphics\Core\DynamicBufferRegistry.cpp">
+      <Filter>EngineSource\Graphics\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSource\Graphics\Buffers\DynamicBuffer.cpp">
+      <Filter>EngineSource\Graphics\Buffers</Filter>
+    </ClCompile>
     <ClCompile Include="EngineSource\Graphics\Core\TLAS.cpp">
       <Filter>EngineSource\Graphics\Core</Filter>
     </ClCompile>
@@ -927,6 +942,9 @@
     <ClInclude Include="Application\GamePlay\IScenePhase.h">
       <Filter>Application\GamePlay</Filter>
     </ClInclude>
+    <ClInclude Include="Application\GamePlay\OptionSettings.h">
+      <Filter>Application\GamePlay</Filter>
+    </ClInclude>
     <ClInclude Include="Application\GamePlay\Phase\ScenePhase.h">
       <Filter>Application\GamePlay\Phase</Filter>
     </ClInclude>
@@ -987,6 +1005,9 @@
     <ClInclude Include="Application\UI\Effects\DimmerUI.h">
       <Filter>Application\UI\Effects</Filter>
     </ClInclude>
+    <ClInclude Include="Application\UI\Effects\LockOnUI.h">
+      <Filter>Application\UI\Effects</Filter>
+    </ClInclude>
     <ClInclude Include="Application\UI\Effects\LetterboxUI.h">
       <Filter>Application\UI\Effects</Filter>
     </ClInclude>
@@ -1000,6 +1021,9 @@
       <Filter>Application\UI\Managers</Filter>
     </ClInclude>
     <ClInclude Include="Application\UI\Managers\PauseUIManager.h">
+      <Filter>Application\UI\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\UI\Managers\OptionUIManager.h">
       <Filter>Application\UI\Managers</Filter>
     </ClInclude>
     <ClInclude Include="Application\UI\Managers\PlayUIManager.h">
@@ -1409,6 +1433,18 @@
     </ClInclude>
     <ClInclude Include="EngineSource\Graphics\Core\RenderQueue.h">
       <Filter>EngineSource\Graphics\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\Core\FrameUploader.h">
+      <Filter>EngineSource\Graphics\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\Core\DynamicBufferRegistry.h">
+      <Filter>EngineSource\Graphics\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\Buffers\DynamicBuffer.h">
+      <Filter>EngineSource\Graphics\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\DirectX\FrameContext.h">
+      <Filter>EngineSource\Graphics\DirectX</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Graphics\Core\ResourceGarbageCollector.h">
       <Filter>EngineSource\Graphics\Core</Filter>

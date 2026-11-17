@@ -40,6 +40,9 @@ public:
 	// 現在のアニメーションタイプ
 	BossAnimationType GetCurrentType() const { return currentType_; }
 
+	// 描画で個体の姿勢を参照するためのアニメーターを取得
+	GameEngine::Animator* GetAnimator() { return &animator_; }
+
 private:
 	// アニメーション再生クラス
 	GameEngine::Animator animator_;

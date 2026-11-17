@@ -7,7 +7,12 @@ namespace GameEngine {
 	class BLAS : public GpuResource {
 	public:
 		BLAS() = default;
-		~BLAS() = default;
+		~BLAS() {
+			// GPUが参照し終わってから破棄する
+			if (scratchBuffer_) {
+				ResourceGarbageCollector::GetInstance().Add(std::move(scratchBuffer_));
+			}
+		}
 
 		/// <summary>
 		/// BLASを作成する

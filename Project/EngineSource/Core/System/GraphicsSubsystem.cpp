@@ -40,7 +40,7 @@ void GraphicsSubsystem::Initialize() {
     dxc_->Initialize();
 
     // GPUリソースの静的初期化
-    GpuResource::StaticInitialize(graphicsDevice_->GetDevice());
+    GpuResource::StaticInitialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetDynamicBufferRegistry());
     SrvResource::StaticInitialize(graphicsDevice_->GetSrvManager());
 
     // バッファのアクセスデータ管理機能の初期化
@@ -87,7 +87,7 @@ void GraphicsSubsystem::Initialize() {
     // シーン描画の管理
     sceneRenderManager_ = std::make_unique<SceneRenderManager>();
     sceneRenderManager_->Initialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager(), psoManager_.get(),
-        renderPassController_.get(), raytracingPipeline_.get(), bufferRefManager_.get(),renderQueue_.get());
+        renderPassController_.get(), raytracingPipeline_.get(), bufferRefManager_.get(),renderQueue_.get(), graphicsDevice_->GetFrameUploader());
 
     // ポストエフェクトマネージャーの初期化
     postEffectManager_ = std::make_unique<PostEffectManager>();
@@ -109,7 +109,7 @@ void GraphicsSubsystem::Initialize() {
     // Rendererの静的初期化
     Sprite::StaticInitialize(windowsApp->kWindowWidth, windowsApp->kWindowHeight);
     SpriteRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager());
-    ModelRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager());
+    ModelRenderer::StaticInitialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager(), graphicsDevice_->GetFrameUploader());
     // アニメーション用の静的初期化
     Animator::StaticInitialize(graphicsDevice_->GetCommandList(), psoManager_.get());
     // Csパーティクル用
@@ -125,6 +125,8 @@ void GraphicsSubsystem::InitializePSO() {
 }
 
 void GraphicsSubsystem::Finalize() {
+    // 実行中のフレームが使っているリソースを破棄しないよう、GPUの完了を待つ
+    graphicsDevice_->WaitForGPU();
     imGuiManager_->Finalize();
 }
 

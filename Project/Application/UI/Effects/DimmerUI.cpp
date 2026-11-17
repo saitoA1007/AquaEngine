@@ -59,6 +59,10 @@ void DimmerUI::Update() {
 	// 更新
 	world_.UpdateTransformMatrix();
 	sprite_.Update();
+	if (text_) {
+		text_->color_ = sprite_.color_;
+		text_->Update();
+	}
 	if (isFrameActive_) {
 		frameSprite_->Update();
 	}
@@ -72,5 +76,16 @@ void DimmerUI::Draw() {
 	}
 
 	// 描画
-	renderQueue_->SubmitSprite(&sprite_);
+	if (text_) {
+		renderQueue_->SubmitText(text_.get());
+	} else {
+		renderQueue_->SubmitSprite(&sprite_);
+	}
+}
+
+void DimmerUI::SetText(const GameEngine::Font* font, const std::string& str, float size) {
+	text_ = std::make_unique<Text>(font, str);
+	text_->anchorPoint_ = { 0.5f,0.5f };
+	text_->scale_ = { size,size };
+	text_->SetParent(&world_);
 }

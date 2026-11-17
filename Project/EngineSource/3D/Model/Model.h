@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <unordered_map>
+#include <algorithm>
 
 #include "Mesh.h"
 #include "Material.h"
@@ -24,6 +25,8 @@ namespace GameEngine {
 
 		// メッシュを追加
 		void AddMesh(std::unique_ptr<Mesh> mesh) {
+			// モデル全体の寸法を更新
+			MergeAABB(mesh->GetLocalAABB());
 			meshes_.push_back(std::move(mesh));
 		}
 
@@ -41,6 +44,10 @@ namespace GameEngine {
 
 		// 破壊オブジェクトのグループを追加する
 		void AddFractureGroup(const std::string& groupName, std::unique_ptr<PackedGeometryBuffer> buffer, std::vector<FractureChunkEntry> chunks) {
+			// 破壊チャンクもモデル全体の寸法に含める
+			for (const auto& chunk : chunks) {
+				MergeAABB(chunk.info.aabb);
+			}
 			fractureBuffers_[groupName] = std::move(buffer);
 			fractureChunks_[groupName] = std::move(chunks);
 		}
@@ -195,6 +202,16 @@ namespace GameEngine {
 
 		// モデルの寸法
 		const Vector3& GetModelSize() const { return modelSize_; }
+		// モデルのローカル空間でのAABB
+		const AABB& GetLocalAABB() const { return localAABB_; }
+		// モデルのローカル空間での中心
+		Vector3 GetModelCenter() const {
+			return {
+				(localAABB_.min.x + localAABB_.max.x) * 0.5f,
+				(localAABB_.min.y + localAABB_.max.y) * 0.5f,
+				(localAABB_.min.z + localAABB_.max.z) * 0.5f,
+			};
+		}
 
 		// 破壊グループのPackedGeometryBufferを取得
 		const std::unordered_map<std::string, std::unique_ptr<PackedGeometryBuffer>>& GetFractureBuffers() const { return fractureBuffers_; }
@@ -223,6 +240,9 @@ namespace GameEngine {
 
 		// モデル自体の寸法
 		Vector3 modelSize_ = {0.0f,0.0f,0.0f};
+		// モデル全体のローカルAABB
+		AABB localAABB_ = { {0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+		bool hasAABB_ = false;
 
 		// Nodeのローカル行列を保持しておく変数
 		Node node_;
@@ -231,5 +251,10 @@ namespace GameEngine {
 		bool isSkeleton_ = false;
 		// モデルの名前
 		std::string modelName_ = "NoName";
+
+	private:
+
+		// AABBをモデル全体のAABBに統合し、寸法を更新する
+		void MergeAABB(const AABB& aabb);
 	};
 }

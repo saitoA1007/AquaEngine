@@ -1,5 +1,7 @@
 #pragma once
+#include <memory>
 #include "SrvResource.h"
+#include "DynamicBuffer.h"
 #include "CreateBufferResource.h"
 #include "ResourceGarbageCollector.h"
 
@@ -11,13 +13,11 @@ namespace GameEngine {
 	template <typename T>
 	class StructuredBuffer : public SrvResource {
 	public:
+		StructuredBuffer() = default;
+
 		~StructuredBuffer() {
 			if (isCreated_) {
-				// Unmap
-				if (data_) {
-					resource_->Unmap(0, nullptr);
-					data_ = nullptr;
-				}
+				data_ = nullptr;
 				// srvの解放
 				if (srvManager_) {
 					srvManager_->ReleaseIndex(srvIndex_);
@@ -37,9 +37,10 @@ namespace GameEngine {
 
 			numElements_ = numElements;
 
-			// リソースを作成
-			resource_ = CreateBufferResource(device_, sizeof(T) * numElements_);
-			resource_->Map(0, nullptr, reinterpret_cast<void**>(&data_));
+			// CPUが書き込み、フレーム末尾にGPUへ転送されるバッファを作成
+			dynamic_ = CreateDynamicBuffer(sizeof(T) * numElements_);
+			resource_ = dynamic_->GetResourcePtr();
+			data_ = dynamic_->GetData<T>().data();
 
 			// SRVのインデックスを取得
 			srvIndex_ = srvManager_->AllocateSrvIndex(type);
@@ -67,9 +68,10 @@ namespace GameEngine {
 			// 4バイト境界に切り上げたサイズを計算
 			uint32_t bufferSize = ((sizeof(T) * numElements) + 3) & ~3;
 
-			// リソースを作成
-			resource_ = CreateBufferResource(device_, bufferSize);
-			resource_->Map(0, nullptr, reinterpret_cast<void**>(&data_));
+			// CPUが書き込み、フレーム末尾にGPUへ転送されるバッファを作成
+			dynamic_ = CreateDynamicBuffer(bufferSize);
+			resource_ = dynamic_->GetResourcePtr();
+			data_ = dynamic_->GetData<T>().data();
 
 			// SRVのインデックスを取得
 			srvIndex_ = srvManager_->AllocateSrvIndex(type);
@@ -228,11 +230,7 @@ namespace GameEngine {
 		// 解放する。
 		void Release() {
 			if (!isCreated_) { return; }
-			// Unmap
-			if (data_) {
-				resource_->Unmap(0, nullptr);
-				data_ = nullptr;
-			}
+			data_ = nullptr;
 			// srvの解放
 			if (srvManager_) {
 				srvManager_->ReleaseIndex(srvIndex_);
@@ -240,7 +238,9 @@ namespace GameEngine {
 					srvManager_->ReleaseIndex(uavIndex_);
 				}
 			}
-			resource_.Reset();
+			// GPUが参照し終わってから破棄する
+			ResourceGarbageCollector::GetInstance().Add(std::move(resource_));
+			dynamic_.reset();
 			numElements_ = 0;
 			enableUAV_ = false;
 			isSrvState_ = false;
@@ -283,6 +283,9 @@ namespace GameEngine {
 
 	private:
 		bool isCreated_ = false;
+
+		// CPUが書き込むバッファの実体
+		std::shared_ptr<DynamicBuffer> dynamic_;
 
 		T* data_ = nullptr;
 		uint32_t numElements_ = 0;

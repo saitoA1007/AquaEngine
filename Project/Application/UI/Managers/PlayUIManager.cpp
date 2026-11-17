@@ -13,6 +13,7 @@ PlayUIManager::PlayUIManager(GameEngine::TextureManager* textureManager, GameEng
 	uint32_t tutorial1GH = textureManager->GetHandleByName("Tutorial_02.png");
 	uint32_t tutorial2GH = textureManager->GetHandleByName("Tutorial_03.png");
 	uint32_t arrowGH = textureManager->GetHandleByName("arrow.png");
+	uint32_t lockOnGH = textureManager->GetHandleByName("lockOn.png");
 
 	// チュートリアルの表示文字
 	tutorialTextSprites_.resize(3);
@@ -52,6 +53,9 @@ PlayUIManager::PlayUIManager(GameEngine::TextureManager* textureManager, GameEng
 
 	// 矢印
 	arrowUI_ = std::make_unique<ArrowUI>("ArrowUI", arrowGH, planeModel);
+
+	// ロックオンUI
+	lockOnUI_ = std::make_unique<LockOnUI>("LockOnUI", lockOnGH);
 }
 
 void PlayUIManager::Initialize() {
@@ -59,6 +63,7 @@ void PlayUIManager::Initialize() {
 	playerHpUI_->Initialize();
 	letterBoxUI_->Initialize();
 	arrowUI_->Initialize();
+	lockOnUI_->Initialize();
 
 	// 更新して適応させる
 	Update();
@@ -77,6 +82,7 @@ void PlayUIManager::Update() {
 	playerHpUI_->Update();
 	letterBoxUI_->Update();
 	arrowUI_->Update();
+	lockOnUI_->Update();
 
 	for (auto& sprite : tutorialTextSprites_) {
 		sprite.Update();
@@ -91,6 +97,9 @@ void PlayUIManager::Draw() {
 	if (isDrawArrowUI_) {
 		arrowUI_->Draw();
 	}
+
+	// ロックオンUI
+	lockOnUI_->Draw();
 
 	if (isDrawGamePlayUI_) {
 		// ボスHpを描画

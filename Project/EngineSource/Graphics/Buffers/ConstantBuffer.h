@@ -1,6 +1,7 @@
 #pragma once
+#include <memory>
 #include "GpuResource.h"
-#include "CreateBufferResource.h"
+#include "DynamicBuffer.h"
 
 namespace GameEngine {
 
@@ -10,41 +11,39 @@ namespace GameEngine {
 	template <typename T>
 	class ConstantBuffer : public GpuResource {
 	public:
-		~ConstantBuffer() {
-			// デストラクタで自動的にUnmapを実行
-			if (data_) {
-				resource_->Unmap(0, nullptr);
-				data_ = nullptr;
-			}
+		ConstantBuffer() = default;
+
+		~ConstantBuffer() override {
+			Release();
 		}
 
 		void Create() {
-			resource_ = CreateBufferResource(device_, sizeof(T));
-
-			// データを書き込むためのポインタを取得し、保持し続ける
-			resource_->Map(0, nullptr, reinterpret_cast<void**>(&data_));
+			Create(1);
 		}
 
 		void Create(uint32_t num) {
-			resource_ = CreateBufferResource(device_, sizeof(T) * num);
+			Release();
+
+			buffer_ = CreateDynamicBuffer(sizeof(T) * num);
+			resource_ = buffer_->GetResourcePtr();
 
 			// データを書き込むためのポインタを取得し、保持し続ける
-			resource_->Map(0, nullptr, reinterpret_cast<void**>(&data_));
+			data_ = buffer_->GetData<T>().data();
 		}
 
 		// 解放
 		void Release() {
-			if (data_) {
-				resource_->Unmap(0, nullptr);
-				data_ = nullptr;
-			}
+			data_ = nullptr;
 			resource_.Reset();
+			buffer_.reset();
 		}
 
 		// データを取得する
 		T* GetData() const { return data_; }
 
 	private:
+		// CPU書き込みとGPU転送を管理
+		std::shared_ptr<DynamicBuffer> buffer_;
 		// データのポインタ
 		T* data_ = nullptr;
 	};

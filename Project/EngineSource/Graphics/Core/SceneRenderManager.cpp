@@ -5,18 +5,21 @@
 #include "raytracingPipeline.h"
 #include "BufferRefManager.h"
 #include "ModelRenderer.h"
+#include "Animator.h"
 #include "DebugRenderer.h"
 #include "SpriteRenderer.h"
+#include "FrameUploader.h"
 using namespace GameEngine;
 
 void SceneRenderManager::Initialize(ID3D12GraphicsCommandList4* commandList, SrvManager* srvManager, PSOManager* psoManager, RenderPassController* renderPassController,
-	RaytracingPipeline* raytracingPipeline, BufferRefManager* bufferRefManager, RenderQueue* renderQueue) {
+	RaytracingPipeline* raytracingPipeline, BufferRefManager* bufferRefManager, RenderQueue* renderQueue, FrameUploader* frameUploader) {
     commandList_ = commandList;
     renderPassController_ = renderPassController;
     raytracingPipeline_ = raytracingPipeline;
     srvManager_ = srvManager;
     bufferRefManager_ = bufferRefManager;
 	renderQueue_ = renderQueue;
+    frameUploader_ = frameUploader;
 
     // 描画パスと実行順を設定
     CreateRenderPasses();
@@ -41,6 +44,13 @@ void SceneRenderManager::Begin() {
 void SceneRenderManager::Execute() {
     // 更新
     renderQueue_->Update();
+
+    // カメラはフレームで1回だけ、フレーム用の領域へ書き込む
+    const CameraForGPU* camera = &renderQueue_->GetCameraData();
+    if (renderQueue_->GetUseDebugCamera() && renderQueue_->GetDebugCameraData() != nullptr) {
+        camera = renderQueue_->GetDebugCameraData();
+    }
+    cameraAddress_ = frameUploader_->UploadConstant(*camera);
 
     // レイトレーシング描画コマンドを解放
     RaytracingExecute();
@@ -152,14 +162,10 @@ void SceneRenderManager::CreateRenderPasses() {
 
 void SceneRenderManager::PreDraw(const std::string& psoName) {
     if (psoName == "ShadowMap") {
-        ModelRenderer::SetCamera(renderQueue_->GetLightResource()->GetResource());
+        ModelRenderer::SetCamera(renderQueue_->GetLightResource()->GetGpuVirtualAddress());
     } else {
-        if (renderQueue_->GetUseDebugCamera()) {
-            // デバック用のカメラを設定
-            ModelRenderer::SetCamera(renderQueue_->GetDebugCameraResource()->GetResource());
-        } else {
-            ModelRenderer::SetCamera(renderQueue_->GetCameraResource()->GetResource());
-        }
+        // デバックカメラかメインカメラかはExecuteの最初に選んである
+        ModelRenderer::SetCamera(cameraAddress_);
     }
 
     // 前回と同じPSOなら切り替え不要
@@ -179,7 +185,9 @@ void SceneRenderManager::Execute3dRequest(const Draw3dRequest& request) {
     case Draw3dType::Default:
     case Draw3dType::DefaultAdd:
         ModelRenderer::DrawLight(renderQueue_->GetLightResource());
-        ModelRenderer::Draw(request.model, *request.worldTransform, request.material);
+        // 個体ごとのノードアニメーションがあればその行列を使う
+        ModelRenderer::Draw(request.model, *request.worldTransform, request.material,
+            request.animator ? &request.animator->GetRootLocalMatrix() : nullptr);
         break;
 
     case Draw3dType::Instancing:
@@ -196,7 +204,8 @@ void SceneRenderManager::Execute3dRequest(const Draw3dRequest& request) {
         break;
 
     case Draw3dType::Animation:
-        ModelRenderer::DrawAnimation(request.model, *request.worldTransform, renderQueue_->GetLightResource(), request.material);
+        ModelRenderer::DrawAnimation(request.model, *request.worldTransform, renderQueue_->GetLightResource(), request.material,
+            request.animator ? request.animator->GetSkinCluster() : nullptr);
         break;
 
     case Draw3dType::Skybox:
@@ -216,7 +225,7 @@ void SceneRenderManager::Execute3dRequest(const Draw3dRequest& request) {
         break;
 
     case Draw3dType::Fracture:
-        ModelRenderer::DrawFracture(request.model, *request.fractureInstance, fractureCommandSignature_, renderQueue_->GetLightResource());
+        ModelRenderer::DrawFracture(request.model, *request.fractureInstance, fractureCommandSignature_, renderQueue_->GetLightResource(), request.material);
         break;
 
     case Draw3dType::RuntimeCutFragments:
@@ -267,11 +276,7 @@ void SceneRenderManager::DrawRaytracing() {
         sizeof(indices) / sizeof(uint32_t), &indices, 0);
     // カメラのセット
     UINT cameraParam = static_cast<UINT>(RaytracingRootParam::kCamera);
-    if (renderQueue_->GetUseDebugCamera()) {
-        commandList_->SetComputeRootConstantBufferView(cameraParam, renderQueue_->GetDebugCameraResource()->GetGpuVirtualAddress());
-    } else {
-        commandList_->SetComputeRootConstantBufferView(cameraParam, renderQueue_->GetCameraResource()->GetGpuVirtualAddress());
-    }
+    commandList_->SetComputeRootConstantBufferView(cameraParam, cameraAddress_);
     // ライトのセット
     commandList_->SetComputeRootConstantBufferView(static_cast<UINT>(RaytracingRootParam::kLight), renderQueue_->GetLightResource()->GetGpuVirtualAddress());
 
@@ -337,13 +342,7 @@ void SceneRenderManager::RasterizeExecute() {
         // 半透明描画コマンドを解放
         if (hasTranslucent) {
             auto& translucentList = translucentDrawQueueList[passName];
-        
-            // カメラの距離でソートをおこなう
-            // std::sort(translucentList.begin(), translucentList.end(),
-            //     [](const DrawRequest& a, const DrawRequest& b) {
-            //         return a.sortKey > b.sortKey;
-            //     });
-        
+       
             for (const auto& request : translucentList) {
                 // 描画前処理
                 PreDraw(renderQueue_->Get3dPsoName(request.type));
@@ -352,20 +351,6 @@ void SceneRenderManager::RasterizeExecute() {
             }
         }
 
-        // 2D描画コマンドを解放
-        //if (has2d) {
-        //    for (auto& [layer, psoMap] : draw2dQueueList[passName]) {
-        //        for (auto& [psoName, requests] : psoMap) {
-        //            if (requests.empty()) { continue; }
-        //            // 描画前処理
-        //            PreDraw(psoName);
-        //            for (const auto& request : requests) {
-        //                // 描画コマンド解放
-        //                Execute2dRequest(request);
-        //            }
-        //        }
-        //    }
-        //}
         renderPassController_->PostPass(passName);
     }
 
@@ -460,7 +445,7 @@ void SceneRenderManager::RaytracingExecute() {
     }
 
     // tlasを更新する
-    tlas_.Update(commandList_, raytracingDrawQueueList);
+    tlas_.Update(commandList_, raytracingDrawQueueList, *frameUploader_);
 
     // UAVに状態を変更
     renderPassController_->SwitchToUAV("RaytracingPass");

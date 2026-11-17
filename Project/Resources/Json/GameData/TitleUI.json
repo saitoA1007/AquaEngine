@@ -25,6 +25,22 @@
                 76.0
             ]
         },
+        "OptionGuide": {
+            "OptionGuideColor": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "OptionGuidePos": [
+                640.0,
+                660.0
+            ],
+            "OptionGuideScale": [
+                30.479999542236328,
+                28.559999465942383
+            ]
+        },
         "SceneName": "Game",
         "TitleTextSprite": {
             "AnchorPoint": [

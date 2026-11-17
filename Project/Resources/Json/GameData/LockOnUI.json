@@ -1,0 +1,24 @@
+{
+    "LockOnUI": {
+        "ArrowSize": [
+            32.0,
+            32.0
+        ],
+        "Color": [
+            1.0,
+            0.0,
+            0.0,
+            1.0
+        ],
+        "EnterRadiusRate": 3.0,
+        "EnterTime": 0.25,
+        "LoopTime": 0.800000011920929,
+        "MaxRadius": 56.0,
+        "MaxScale": 1.100000023841858,
+        "MinRadius": 40.0,
+        "MinScale": 0.800000011920929,
+        "SceneName": "Game",
+        "StartAngleDeg": 45.0,
+        "TargetOffsetY": 2.0
+    }
+}

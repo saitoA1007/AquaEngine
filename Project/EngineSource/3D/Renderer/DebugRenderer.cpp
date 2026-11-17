@@ -8,9 +8,9 @@ using namespace GameEngine;
 DebugRenderer::DebugRenderer() {
     Clear();
 
-    // 大きな頂点バッファを事前に確保
+    // 大きな頂点バッファを事前に確保。毎フレーム書き換えるので動的バッファにする
     std::vector<VertexPosColor> vertices(maxVertices_);
-    vertexBuffer_.Create(vertices);
+    vertexBuffer_.CreateDynamic(vertices);
     vertexData_ = vertexBuffer_.GetVertexData();
 }
 
@@ -243,6 +243,7 @@ void DebugRenderer::Update() {
     // 何も無ければ描画する頂点を0にして早期リターン
     if (!isEnabled_ || lines_.empty()) {
         totalVertices_ = 0;
+        vertexBuffer_.SetUploadVertexCount(0);
         return;
     }
     // すべての線の頂点データを1つのバッファにまとめる
@@ -277,4 +278,7 @@ void DebugRenderer::Update() {
     if (totalVertices_ > maxVertices_) {
         totalVertices_ = maxVertices_;
     }
+
+    // 使う頂点の分だけGPUへ転送する
+    vertexBuffer_.SetUploadVertexCount(totalVertices_);
 }

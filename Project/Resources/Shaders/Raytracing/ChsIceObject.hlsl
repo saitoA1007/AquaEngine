@@ -117,12 +117,15 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
     // 視線ベクトル
     float3 viewDir = normalize(gCamera.worldPosition.xyz - worldPosition);
        
+    // 2回目以降のバウンスでは細部が見えないため、重い表現を省く
+    bool lowQuality = IsLowQualityBounce(payload.recursive);
+
     float2 parallaxUV = transformedUV.xy;
     // 視線ベクトルをオブジェクト空間へ戻す
     float3x3 worldToObjectRot = (float3x3) WorldToObject4x3();
     float3 localViewDir = normalize(mul(viewDir, worldToObjectRot));
     // ハイトマップがあればUVをオフセットする
-    if (material.heightTextureHandle != 0)
+    if (!lowQuality && material.heightTextureHandle != 0)
     {
         // オブジェクト空間のTBNで接空間へ変換
         float3 N = normalize(vtx.normal);
@@ -137,7 +140,7 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
     }
     
     float3 bubbleColor = float3(0.0f, 0.0f, 0.0f);
-    if (material.bubbleMaxDepth > 0.0001f)
+    if (!lowQuality && material.bubbleMaxDepth > 0.0001f)
     {
         // 屈折方向を計算
         float3 localNormalForRefract = vtx.normal; // 表面法線
@@ -189,7 +192,7 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
     }
 
     // 粗い表面
-    if (material.dissolveThreshold > 0.0f)
+    if (!lowQuality && material.dissolveThreshold > 0.0f)
     {
         float mask = FBMNoise(vtx.position.xyz * 2.0f, 1);
         if (mask <= material.dissolveThreshold)
@@ -218,7 +221,7 @@ void MainIceObjectCHS(inout Payload payload, MyAttribute attrib)
 
     float3 lightDir = normalize(-gDirectionalLight.direction);
     // 影を取る
-    float shadowFactor = ComputeShadowFactor(worldPosition, lightDir);
+    float shadowFactor = lowQuality ? 1.0f : ComputeShadowFactor(worldPosition, lightDir);
 
     float3 iceColor = material.color.rgb * textureColor.rgb;
     payload.color = IceBSDF(

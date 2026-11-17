@@ -55,8 +55,9 @@ namespace GameEngine {
             cameraPtr_ = camera;
         }
 
-        void SetDebugCamera(GpuResource* cameraResource) {
-            debugCameraResource_ = cameraResource;  
+        // デバックカメラのデータを設定する。描画時にフレーム用の領域へ書き込んで使う
+        void SetDebugCamera(const CameraForGPU* cameraData) {
+            debugCameraData_ = cameraData;
         }
 
         void SetUseDebugCamera(const bool& useDebugCamera,const Matrix4x4& vpMatrix4x4, const Matrix4x4& worldMatrix) {
@@ -85,14 +86,14 @@ namespace GameEngine {
 
         const bool& GetUseDebugCamera() const { return useDebugCamera_; }
 
-        // カメラリソースを取得
-        GpuResource* GetCameraResource() { return mainCamera_.GetConstantBuffer(); }
+        // カメラのデータを取得
+        const CameraForGPU& GetCameraData() const { return mainCamera_.GetGpuData(); }
 
         // カメラを取得
         Camera& GetMainCamera() { return mainCamera_; }
 
-        // デバックカメラリソースを取得
-        GpuResource* GetDebugCameraResource() { return debugCameraResource_; }
+        // デバックカメラのデータを取得
+        const CameraForGPU* GetDebugCameraData() const { return debugCameraData_; }
 
         // ライトリソースを取得
         GpuResource* GetLightResource() { return lightManager_.GetConstantBuffer(); }
@@ -134,7 +135,7 @@ namespace GameEngine {
         void SubmitParticleCS(const Model* model, uint32_t numInstances, SrvResource* particle, const float& alpha = 1.0f, const std::string& passName = "DefaultPass");
 
         /// スケルタルアニメーション
-        void SubmitAnimation(const Model* model, WorldTransform& worldTransform, const float& alpha = 1.0f, const GpuResource* material = nullptr, const std::string& passName = "DefaultPass");
+        void SubmitAnimation(const Model* model, WorldTransform& worldTransform, const float& alpha = 1.0f, const GpuResource* material = nullptr, const std::string& passName = "DefaultPass", const Animator* animator = nullptr);
 
         /// スカイボックス
         void SubmitSkybox(const Model* model, WorldTransform& worldTransform, const GpuResource* material = nullptr, const std::string& passName = "DefaultPass");
@@ -149,7 +150,7 @@ namespace GameEngine {
         void SubmitDebugLine(const DebugRenderer* debugRenderer, const std::string& passName = "DefaultPass");
 
         // レイトレーシングでのモデル
-        void SubmitRaytracingModel(Model* model, WorldTransform& worldTransform, std::vector<RefBuffer>* customRefBuffer = {});
+        void SubmitRaytracingModel(Model* model, WorldTransform& worldTransform, std::vector<RefBuffer>* customRefBuffer = {}, Animator* animator = nullptr);
 
         // 破片の描画
         void SubmitFracture(const Model* model, FractureInstance& fractureInstance, const float& alpha = 1.0f, const GpuResource* material = nullptr, const std::string& passName = "DefaultPass");
@@ -203,7 +204,7 @@ namespace GameEngine {
         // カメラリソース
         Camera mainCamera_;
         Camera* cameraPtr_ = nullptr;
-        GpuResource* debugCameraResource_ = nullptr;
+        const CameraForGPU* debugCameraData_ = nullptr;
         // ライトリソース
         LightManager lightManager_;
         // 平行光源

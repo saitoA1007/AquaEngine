@@ -36,6 +36,7 @@ BossEnemy::BossEnemy(GameEngine::Model* model, GameEngine::Model* eggModel, Game
 
 	// アニメーション
 	animator_ = std::make_unique<BossAnimator>(model, animationManager);
+	modelComponent_.SetAnimator(animator_->GetAnimator());
 
 	// パラメータ機能
 	debugParame_ = std::make_unique<DebugParameter>("BossEnemy");

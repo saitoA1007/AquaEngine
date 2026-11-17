@@ -2,6 +2,7 @@
 #include "Mesh.h"
 #include <cassert>
 #include <numbers>
+#include <algorithm>
 
 using namespace GameEngine;
 
@@ -21,7 +22,7 @@ void Mesh::CreateTrianglePlaneMesh() {
 	vertices[2].normal = { 0.0f, 0.0f, -1.0f };
 
 	// 頂点データを作成
-	vertexBuffer_.Create(vertices);
+	CreateVertexBuffer(vertices);
 }
 
 void Mesh::CreateGridPlaneMesh(const Vector2& size) {
@@ -51,7 +52,7 @@ void Mesh::CreateGridPlaneMesh(const Vector2& size) {
 	// インデックスデータを作成
 	indexBuffer_.Create(indices);
 	// 頂点データを作成
-	vertexBuffer_.Create(vertices);
+	CreateVertexBuffer(vertices);
 }
 
 void Mesh::CreatePlaneMesh(const Vector2& size) {
@@ -91,7 +92,7 @@ void Mesh::CreatePlaneMesh(const Vector2& size) {
 	// インデックスデータを作成
 	indexBuffer_.Create(indices);
 	// 頂点データを作成
-	vertexBuffer_.Create(vertices);
+	CreateVertexBuffer(vertices);
 }
 
 void Mesh::CreateSphereMesh(uint32_t subdivision) {
@@ -131,7 +132,7 @@ void Mesh::CreateSphereMesh(uint32_t subdivision) {
 	// インデックスデータを作成
 	indexBuffer_.Create(indices);
 	// 頂点データを作成
-	vertexBuffer_.Create(vertices);
+	CreateVertexBuffer(vertices);
 }
 
 void Mesh::CreateRingMesh(uint32_t ringDivide, float outerRadius, float innerRadius) {
@@ -193,7 +194,7 @@ void Mesh::CreateRingMesh(uint32_t ringDivide, float outerRadius, float innerRad
 	// インデックスデータを作成
 	indexBuffer_.Create(indices);
 	// 頂点データを作成
-	vertexBuffer_.Create(vertices);
+	CreateVertexBuffer(vertices);
 }
 
 void Mesh::CreateCylinder(uint32_t cylinderDivide, float topRadius, float bottomRadius, float height) {
@@ -265,7 +266,7 @@ void Mesh::CreateCylinder(uint32_t cylinderDivide, float topRadius, float bottom
 	// インデックスデータを作成
 	indexBuffer_.Create(indices);
 	// 頂点データを作成
-	vertexBuffer_.Create(vertices);
+	CreateVertexBuffer(vertices);
 }
 
 void Mesh::CreateModelMesh(ModelData modelData, const uint32_t& index) {
@@ -279,10 +280,31 @@ void Mesh::CreateModelMesh(ModelData modelData, const uint32_t& index) {
 	// インデックスデータを作成
 	indexBuffer_.Create(meshData.indices);
 	// 頂点データを作成
-	vertexBuffer_.Create(meshData.vertices);
+	CreateVertexBuffer(meshData.vertices);
 }
 
 void Mesh::CreateBLAS(ID3D12GraphicsCommandList4* cmdList, const bool& isUpdate) {
 	blas_ = std::make_unique<BLAS>();
 	blas_->Create(cmdList, GetVertexBufferView(), GetIndexBufferView(), GetTotalVertices(), GetTotalIndices(), isUpdate);
+}
+
+void Mesh::CreateVertexBuffer(const std::vector<VertexData>& vertices) {
+
+	// ローカルAABBを計算
+	if (!vertices.empty()) {
+		const Vector4& first = vertices[0].position;
+		localAABB_.min = { first.x, first.y, first.z };
+		localAABB_.max = localAABB_.min;
+		for (const auto& vertex : vertices) {
+			localAABB_.min.x = std::min(localAABB_.min.x, vertex.position.x);
+			localAABB_.min.y = std::min(localAABB_.min.y, vertex.position.y);
+			localAABB_.min.z = std::min(localAABB_.min.z, vertex.position.z);
+			localAABB_.max.x = std::max(localAABB_.max.x, vertex.position.x);
+			localAABB_.max.y = std::max(localAABB_.max.y, vertex.position.y);
+			localAABB_.max.z = std::max(localAABB_.max.z, vertex.position.z);
+		}
+	}
+
+	// 頂点データを作成
+	vertexBuffer_.Create(vertices);
 }

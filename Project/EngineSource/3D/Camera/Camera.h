@@ -3,7 +3,7 @@
 #include "Vector3.h"
 #include "Transform.h"
 #include "TransformationMatrix.h"
-#include "ConstantBuffer.h"
+#include <d3d12.h>
 
 namespace GameEngine {
 
@@ -72,9 +72,7 @@ namespace GameEngine {
 		/// <param name="VPMatrix"></param>
 		void SetVPMatrix(Matrix4x4 VPMatrix) { 
 			VPMatrix_ = VPMatrix;
-			if (cameraForGPU_) {
-				cameraForGPU_->vpMatrix = VPMatrix;
-			}
+			gpuData_.vpMatrix = VPMatrix;
 		}
 
 		/// <summary>
@@ -96,8 +94,8 @@ namespace GameEngine {
 		/// <param name="camera">別のカメラ</param>
 		void SetCamera(const Camera& camera);
 
-		ID3D12Resource* GetResource() const { return constBuffer_.GetResource(); }
-		ConstantBuffer<CameraForGPU>* GetConstantBuffer() { return &constBuffer_; }
+		// GPUに送るカメラのデータを取得する。描画時にフレーム用の領域へ書き込んで使う
+		const CameraForGPU& GetGpuData() const { return gpuData_; }
 	public:
 
 		// カメラのトランスフォーム
@@ -114,8 +112,7 @@ namespace GameEngine {
 		Matrix4x4 VPMatrix_;
 		Matrix4x4 WVPMatrix_;
 
-		// カメラのリソース
-		ConstantBuffer<CameraForGPU> constBuffer_;
-		CameraForGPU* cameraForGPU_ = nullptr;
+		// GPUに送るカメラのデータ
+		CameraForGPU gpuData_{};
 	};
 }

@@ -3,6 +3,7 @@
 #include "DescriptorHandle.h"
 #include "DescriptorHeap.h"
 #include <cassert>
+#include "ResourceGarbageCollector.h"
 
 using namespace GameEngine;
 
@@ -55,6 +56,11 @@ uint32_t SrvManager::AllocateSrvIndex(SrvHeapType srvHeapType) {
 }
 
 void SrvManager::ReleaseIndex(uint32_t index) {
+	// GPUが前のフレームでこのディスクリプタを参照している可能性があるため、 実行完了後にフリーリストへ戻す
+	ResourceGarbageCollector::GetInstance().AddDeferred([this, index]() { ReleaseIndexImmediate(index); });
+}
+
+void SrvManager::ReleaseIndexImmediate(uint32_t index) {
 	// インデックスがどのタイプか検索
 	auto it = indexTypeMap_.find(index);
 	if (it != indexTypeMap_.end()) {

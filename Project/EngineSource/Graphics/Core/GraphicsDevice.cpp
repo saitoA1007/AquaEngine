@@ -135,6 +135,13 @@ void GraphicsDevice::Initialize(HWND hwnd, uint32_t width, uint32_t height) {
     // フェンスを取得
     ResourceGarbageCollector::GetInstance().SetFence(fence_.get());
 
+    // フレームごとのアップロード領域を生成
+    FrameContext::SetFrameIndex(0);
+    frameUploader_ = std::make_unique<FrameUploader>();
+    frameUploader_->Initialize(device_->GetDevice());
+    dynamicBufferRegistry_ = std::make_shared<DynamicBufferRegistry>();
+    dynamicBufferRegistry_->Initialize(device_->GetDevice());
+
     // ビューポート、シザー矩形を生成
     viewportState_ = std::make_unique<DXViewportState>();
     viewportState_->Initialize(width, height);
@@ -161,12 +168,47 @@ void GraphicsDevice::CloseCommandList() {
     command_->Close();
 }
 
-void GraphicsDevice::ExecuteCommand() {
-    command_->Execute();
+GraphicsDevice::~GraphicsDevice() {
+    if (fence_ && command_) {
+        // GPUの処理がすべて終わってから破棄する
+        WaitForGPU();
+
+        // 遅延破棄を全て実行し、以降は即時破棄にする
+        ResourceGarbageCollector::GetInstance().FlushAll();
+        ResourceGarbageCollector::GetInstance().SetFence(nullptr);
+
+        // アップロード領域と転送用コマンドを破棄する
+        dynamicBufferRegistry_.reset();
+        frameUploader_.reset();
+    }
+}
+
+void GraphicsDevice::ExecuteCommand(ID3D12CommandList* preCommandList) {
+    command_->Execute(preCommandList);
+}
+
+void GraphicsDevice::MoveToNextFrame() {
+    // 今のフレームのコマンドの終わりをSignalする
+    uint32_t frameIndex = FrameContext::GetFrameIndex();
+    frameFenceValues_[frameIndex] = fence_->Signal(command_->GetQueue());
+
+    // 次のスロットへ進む
+    frameIndex = (frameIndex + 1) % kFrameCount;
+    FrameContext::SetFrameIndex(frameIndex);
+
+    // 次のスロットを前回使ったフレームのGPU実行完了を待つ。
+    fence_->WaitForValue(frameFenceValues_[frameIndex]);
+
+    // このスロットのアップロード領域を使い直す
+    frameUploader_->BeginFrame(frameIndex);
+}
+
+ID3D12CommandList* GraphicsDevice::RecordUploads() {
+    return dynamicBufferRegistry_->RecordUploads(*frameUploader_);
 }
 
 void GraphicsDevice::ResetCommandList() {
-    command_->Reset();
+    command_->Reset(FrameContext::GetFrameIndex());
 }
 
 void GraphicsDevice::WaitForGPU() {

@@ -157,6 +157,21 @@ inline bool checkRecursiveLimit(inout Payload payload)
     return false;
 }
 
+// この再帰段数以降のバウンスは簡易計算にする
+static const int LOW_QUALITY_RECURSIVE = 2;
+
+// 2回目以降のバウンスかどうか。反射・屈折先の像は細部が見えないため処理を省く
+inline bool IsLowQualityBounce(int recursive)
+{
+    return recursive >= LOW_QUALITY_RECURSIVE;
+}
+
+// レイを飛ばす代わりに背景のキューブマップから色を取得する
+inline float3 SampleEnvironment(float3 direction)
+{
+    return GetBackgroundTexture().SampleLevel(gSampler, direction, 0.0).rgb;
+}
+
 // 反射関数
 float3 Reflection(float3 worldPosition, float3 worldNormal, int recursive)
 {
@@ -252,9 +267,10 @@ bool ShootShadowRay(float3 origin, float3 direction, uint rayMask = RAY_MASK_ALL
     ShadowPayload payload;
     payload.isHit = true;
 
-    RAY_FLAG flags = RAY_FLAG_NONE;
-    //flags |= RAY_FLAG_FORCE_OPAQUE;
-    flags |= RAY_FLAG_SKIP_CLOSEST_HIT_SHADER;
+    // 影は遮蔽物の有無だけ分かればよいので、最初のヒットで探索を打ち切る
+    RAY_FLAG flags = RAY_FLAG_ACCEPT_FIRST_HIT_AND_END_SEARCH
+                   | RAY_FLAG_FORCE_OPAQUE
+                   | RAY_FLAG_SKIP_CLOSEST_HIT_SHADER;
 
     TraceRay(
         GetScene(),
@@ -378,24 +394,40 @@ float3 IceBSDF(float3 worldPos, float3 worldNormal, int recursive, float ior, fl
         return Reflection(worldPos, N, recursive) * transmittance;
     }
 
-    // 屈折レイ発射 
-    RayDesc refractRay;
-    refractRay.Origin = worldPos;
-    refractRay.Direction = refracted;
-    refractRay.TMin = 0.001f;
-    refractRay.TMax = 100000.0f;
+    // 2回目以降のバウンスでは寄与の大きい方だけレイを飛ばし、もう片方は背景で代用する
+    bool lowQuality = IsLowQualityBounce(recursive);
+    bool traceRefract = !lowQuality || F <= 0.5f;
+    bool traceReflect = !lowQuality || F > 0.5f;
 
-    Payload refractPayload;
-    refractPayload.color = float3(0.0f, 0.0f, 0.0f);
-    refractPayload.recursive = recursive;
-    refractPayload.depth = 0.0f;
-    TraceRay(GetScene(), RAY_FLAG_NONE, 0xFF, 0, 1, 0, refractRay, refractPayload);
+    // 屈折
+    float3 refractRadiance;
+    if (traceRefract)
+    {
+        RayDesc refractRay;
+        refractRay.Origin = worldPos;
+        refractRay.Direction = refracted;
+        refractRay.TMin = 0.001f;
+        refractRay.TMax = 100000.0f;
+
+        Payload refractPayload;
+        refractPayload.color = float3(0.0f, 0.0f, 0.0f);
+        refractPayload.recursive = recursive;
+        refractPayload.depth = 0.0f;
+        TraceRay(GetScene(), RAY_FLAG_NONE, 0xFF, 0, 1, 0, refractRay, refractPayload);
+        refractRadiance = refractPayload.color;
+    }
+    else
+    {
+        refractRadiance = SampleEnvironment(refracted);
+    }
 
     // 透過光にBeer-Lambert吸収とiceColorティントを適用
-    float3 refractColor = refractPayload.color * transmittance * iceColor;
+    float3 refractColor = refractRadiance * transmittance * iceColor;
 
-    // 反射レイ発射
-    float3 reflectColor = Reflection(worldPos, N, recursive);
+    // 反射
+    float3 reflectColor = traceReflect
+        ? Reflection(worldPos, N, recursive)
+        : SampleEnvironment(reflect(worldRayDir, N));
 
     // 近似SSS。影の中では消える
     float3 sssContrib = float3(0.0f, 0.0f, 0.0f);

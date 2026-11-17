@@ -34,6 +34,11 @@ namespace GameEngine {
 		void ReleaseIndex(uint32_t index);
 
 		/// <summary>
+		/// GPUが参照していない場合、インデックスを即座にフリーリストへ戻す
+		/// </summary>
+		void ReleaseIndexImmediate(uint32_t index);
+
+		/// <summary>
 		/// 指定インデックスのCPUディスクリプタハンドルを取得
 		/// </summary>
 		D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle(uint32_t index) const;

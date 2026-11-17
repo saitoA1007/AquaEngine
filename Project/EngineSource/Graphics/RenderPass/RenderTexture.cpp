@@ -9,6 +9,11 @@ RtvManager* RenderTexture::rtvManager_ = nullptr;
 DsvManager* RenderTexture::dsvManager_ = nullptr;
 
 RenderTexture::~RenderTexture() {
+	// 深度リソースはGPUが参照し終わってから破棄する
+	if (depthResource_) {
+		ResourceGarbageCollector::GetInstance().Add(std::move(depthResource_));
+	}
+
 	// カラーRTのデスクリプタ解放
 	if (mode_ != RenderTextureMode::DsvOnly) {
 		// RTVインデックス解放

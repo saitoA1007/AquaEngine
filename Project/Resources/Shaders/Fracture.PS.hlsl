@@ -49,23 +49,27 @@ PixelShaderOutput main(VertexShaderOutput input)
 {
     PixelShaderOutput output;
     float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
-    float4 textureColor = gTexture[0].Sample(gSampler, transformedUV.xy);
+    float4 textureColor = gTexture[gMaterial.textureHandle].Sample(gSampler, transformedUV.xy);
     output.color = gMaterial.color * textureColor * input.color;
     
-    float3 worldNormal = normalize(input.normal);
-    // 視線ベクトル
-    float3 viewDir = normalize(gCamera.worldPosition.xyz - input.worldPosition);
-    float3 albedoColor = gMaterial.color.rgb * textureColor.rgb;
-    
-    // ライト
-    float3 lightDir = normalize(-gDirectionalLight.direction);
-    float3 lightColor = gDirectionalLight.color.xyz * gDirectionalLight.intensity;
-    
-    // 平行光源
-    float3 directLight = CalculateBRDF(albedoColor, worldNormal, viewDir, lightDir, lightColor, gMaterial.roughness, gMaterial.metallic);
-    
-    // オブジェクトの色を取得
-    output.color.rgb = directLight;
+    // ライティングが有効な場合のみ光の計算を行う
+    if (gMaterial.enableLighting != 0)
+    {
+        float3 worldNormal = normalize(input.normal);
+        // 視線ベクトル
+        float3 viewDir = normalize(gCamera.worldPosition.xyz - input.worldPosition);
+        float3 albedoColor = gMaterial.color.rgb * textureColor.rgb;
+
+        // ライト
+        float3 lightDir = normalize(-gDirectionalLight.direction);
+        float3 lightColor = gDirectionalLight.color.xyz * gDirectionalLight.intensity;
+
+        // 平行光源
+        float3 directLight = CalculateBRDF(albedoColor, worldNormal, viewDir, lightDir, lightColor, gMaterial.roughness, gMaterial.metallic);
+
+        // オブジェクトの色を取得
+        output.color.rgb = directLight;
+    }
     
     // 極小アルファは完全透明として処理しない
     clip(output.color.a - 0.01f);

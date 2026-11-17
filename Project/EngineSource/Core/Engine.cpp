@@ -193,6 +193,10 @@ void Engine::PostDraw() {
 }
 
 void Engine::Finalize() {
+    // 実行中のフレームが使っているリソースを破棄しないよう、GPUの完了を待ってから終了処理を行う
+    if (graphics_ && graphics_->GetGraphicsDevice()) {
+        graphics_->GetGraphicsDevice()->WaitForGPU();
+    }
     subsystemRegistry_.FinalizeAll();
 }
 
