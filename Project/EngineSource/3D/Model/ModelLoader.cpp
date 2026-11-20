@@ -461,7 +461,8 @@ ModelData ModelLoader::LoadModelFile(const std::string& directoryPath, const std
 	// ファイルを読み込み
 	Assimp::Importer importer;
 	std::string filePath = directoryPath + "/" + filename + "/" + objFilename;
-	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_Triangulate | aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+	// 法線を持たないモデルに対応するため、法線がない場合はフラット法線を生成する
+	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_FlipWindingOrder | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 	assert(scene && scene->HasMeshes()); // メッシュがないのは対応しない
 
 	// アニメーションデータの確認をする
@@ -525,7 +526,11 @@ ModelData ModelLoader::LoadModelFile(const std::string& directoryPath, const std
 	// Mesh解析
 	for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex) {
 		aiMesh* mesh = scene->mMeshes[meshIndex];
-		assert(mesh->HasNormals()); // 法線がないMeshは今回は非対応
+		// 法線を生成できなかったMeshはスキップする
+		if (!mesh->HasNormals()) {
+			LogManager::GetInstance().Log(objFilename + " : Skip mesh without normals : " + mesh->mName.C_Str());
+			continue;
+		}
 
 		// 最初に頂点分メモリを確保する
 		MeshData meshData;
