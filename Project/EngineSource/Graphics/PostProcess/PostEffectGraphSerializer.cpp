@@ -35,9 +35,26 @@ bool PostEffectGraphSerializer::Save(const std::string& filePath, const PostEffe
         n["pos"] = nlohmann::json::array({ node.pos.x, node.pos.y });
 
         switch (node.kind) {
-        case PostEffectNodeKind::kScene:
+        case PostEffectNodeKind::kScene: {
             n["kind"] = kKindScene;
+            // シーン描画の設定
+            const RtaoSettings& rtao = graph.sceneRtao;
+            n["rtao"] = {
+                {"enabled", rtao.enabled},
+                {"sampleCount", rtao.sampleCount},
+                {"radius", rtao.radius},
+                {"strength", rtao.strength},
+                {"ambientIntensity", rtao.ambientIntensity},
+                {"debugView", rtao.debugView},
+                {"historyClamp", rtao.historyClamp},
+                {"clampGamma", rtao.clampGamma},
+            };
+            n["textureLod"] = {
+                {"enabled", graph.sceneTextureLod.enabled},
+                {"bias", graph.sceneTextureLod.bias},
+            };
             break;
+        }
         case PostEffectNodeKind::kUI:
             n["kind"] = kKindUI;
             break;

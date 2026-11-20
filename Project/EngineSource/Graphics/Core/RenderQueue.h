@@ -86,6 +86,10 @@ namespace GameEngine {
 
         const bool& GetUseDebugCamera() const { return useDebugCamera_; }
 
+        // レイトレーシングをRayQueryで行うか
+        void SetUseRayQuery(bool useRayQuery) { useRayQuery_ = useRayQuery; }
+        bool GetUseRayQuery() const { return useRayQuery_; }
+
         // カメラのデータを取得
         const CameraForGPU& GetCameraData() const { return mainCamera_.GetGpuData(); }
 
@@ -219,5 +223,8 @@ namespace GameEngine {
 
         // デバックカメラを使用するか
         bool useDebugCamera_ = false;
+
+        // レイトレーシングをRayQueryで行うか
+        bool useRayQuery_ = true;
     };
 }

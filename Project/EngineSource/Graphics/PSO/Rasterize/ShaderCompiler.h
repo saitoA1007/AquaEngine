@@ -36,9 +36,9 @@ namespace GameEngine {
 
 		// コンパイルタイプ
 		std::wstring compileTypes[static_cast<size_t>(Type::Count)] = {
-			L"vs_6_5",
-			L"ps_6_5",
-			L"cs_6_5"
+			L"vs_6_6",
+			L"ps_6_6",
+			L"cs_6_6",
 		};
 
 		// csoファイルのディレクトリパス

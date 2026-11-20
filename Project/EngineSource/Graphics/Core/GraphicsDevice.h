@@ -77,6 +77,9 @@ namespace GameEngine {
     public:
         ID3D12Device5* GetDevice() const { return device_->GetDevice(); }
 
+        // RayQueryが使用出来るか
+        bool IsRayQuerySupported() const { return device_->IsRayQuerySupported(); }
+
         ID3D12GraphicsCommandList4* GetCommandList() const { return command_->GetCommandList(); }
 
         IDXGISwapChain4* GetSwapChain() const { return swapChain_->GetSwapChain(); }

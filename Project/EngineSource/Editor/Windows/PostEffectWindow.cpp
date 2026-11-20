@@ -164,6 +164,11 @@ void PostEffectWindow::DrawInspector(PostEffectGraph& graph) {
     ImGui::Text("%s", node->name.c_str());
     ImGui::Separator();
 
+    if (node->kind == PostEffectNodeKind::kScene) {
+        DrawSceneSettings(graph.sceneRtao, graph.sceneTextureLod);
+        return;
+    }
+
     if (node->kind != PostEffectNodeKind::kEffect) {
         ImGui::TextDisabled("No parameter");
         return;
@@ -184,6 +189,54 @@ void PostEffectWindow::DrawInspector(PostEffectGraph& graph) {
     node->effect->DrawParamUI();
     ImGui::PopItemWidth();
     ImGui::EndDisabled();
+}
+
+void PostEffectWindow::DrawSceneSettings(RtaoSettings& rtao, TextureLodSettings& textureLod) {
+    ImGui::TextDisabled("Scene render settings");
+
+    ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.6f);
+    if (ImGui::CollapsingHeader("RTAO", ImGuiTreeNodeFlags_DefaultOpen)) {
+        ImGui::TextDisabled("RayQuery only");
+        ImGui::Checkbox("Enabled", &rtao.enabled);
+
+        ImGui::BeginDisabled(!rtao.enabled);
+        int sampleCount = static_cast<int>(rtao.sampleCount);
+        if (ImGui::SliderInt("Samples", &sampleCount, 1, 8)) {
+            rtao.sampleCount = static_cast<uint32_t>(sampleCount);
+        }
+        ImGui::SliderFloat("Radius", &rtao.radius, 0.1f, 5.0f);
+        ImGui::SliderFloat("Strength", &rtao.strength, 0.0f, 1.0f);
+        ImGui::Checkbox("Debug view", &rtao.debugView);
+
+        // 物体が動いたときの残像対策
+        ImGui::Checkbox("History clamp", &rtao.historyClamp);
+        ImGui::BeginDisabled(!rtao.historyClamp);
+        ImGui::SliderFloat("Clamp gamma", &rtao.clampGamma, 0.5f, 4.0f);
+        if (ImGui::IsItemHovered()) {
+            ImGui::SetTooltip("Smaller: less ghosting, more noise");
+        }
+        ImGui::EndDisabled();
+        ImGui::EndDisabled();
+
+        // 環境光はAOが無効でも使われる
+        ImGui::SliderFloat("Ambient", &rtao.ambientIntensity, 0.0f, 2.0f);
+
+        if (ImGui::Button("Reset RTAO")) { rtao = RtaoSettings{}; }
+    }
+
+    // レイトレーシングでのテクスチャのミップレベル
+    if (ImGui::CollapsingHeader("Texture LOD", ImGuiTreeNodeFlags_DefaultOpen)) {
+        ImGui::TextDisabled("RayQuery only");
+        ImGui::Checkbox("Enabled##TexLod", &textureLod.enabled);
+        ImGui::BeginDisabled(!textureLod.enabled);
+        ImGui::SliderFloat("Bias", &textureLod.bias, -2.0f, 2.0f);
+        if (ImGui::IsItemHovered()) {
+            ImGui::SetTooltip("Positive: blurrier / Negative: sharper");
+        }
+        ImGui::EndDisabled();
+        if (ImGui::Button("Reset Texture LOD")) { textureLod = TextureLodSettings{}; }
+    }
+    ImGui::PopItemWidth();
 }
 
 void PostEffectWindow::DrawNodes(PostEffectGraph& graph) {
@@ -235,6 +288,12 @@ void PostEffectWindow::DrawNode(PostEffectGraph& graph, PostEffectNode& node) {
     for (size_t i = 1; i < node.inputs.size(); ++i) {
         const Pin& pin = node.inputs[i];
         nb.InputPin(ned::PinId(pin.id), pin.name, NodeUI::PinIconType::Data, NodeUI::PinTypeColor(pin.pinType), graph.IsPinLinked(pin.id));
+    }
+
+    // Sceneノードはシーン描画の設定
+    if (node.kind == PostEffectNodeKind::kScene) {
+        nb.BeginContent();
+        ImGui::Checkbox("RTAO", &graph.sceneRtao.enabled);
     }
 
     // パラメータ

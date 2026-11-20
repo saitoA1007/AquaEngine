@@ -8,6 +8,8 @@
 #include "RenderPass/RenderPassController.h"
 #include "RenderQueue.h"
 #include "TLAS.h"
+#include "RtaoSettings.h"
+#include "TextureLodSettings.h"
 
 namespace GameEngine {
 
@@ -15,13 +17,14 @@ namespace GameEngine {
 	class PSOManager;
 	class BufferRefManager;
 	class RaytracingPipeline;
+	class RayQueryPipeline;
 	class FrameUploader;
 
 	class SceneRenderManager {
 	public:
 
 		void Initialize(ID3D12GraphicsCommandList4* commandList, SrvManager* srvManager, PSOManager* psoManager, RenderPassController* renderPassController,
-			RaytracingPipeline* raytracingPipeline, BufferRefManager* bufferRefManager, RenderQueue* renderQueue, FrameUploader* frameUploader);
+			RaytracingPipeline* raytracingPipeline, RayQueryPipeline* rayQueryPipeline, BufferRefManager* bufferRefManager, RenderQueue* renderQueue, FrameUploader* frameUploader);
 
 		// フレーム開始前処理
 		void Begin();
@@ -29,14 +32,24 @@ namespace GameEngine {
 		// 描画コマンドを解放する
 		void Execute();
 
+		// レイトレーシングをRayQueryでおこなうか
+		void SetUseRayQuery(bool useRayQuery);
+		bool GetUseRayQuery() const { return useRayQuery_; }
+
+		// RTAOの設定
+		void SetRtaoSettings(const RtaoSettings& settings) { rtaoSettings_ = settings; }
+		// テクスチャのLODの設定
+		void SetTextureLodSettings(const TextureLodSettings& settings) { textureLodSettings_ = settings; }
+
 	private:
 		ID3D12GraphicsCommandList4* commandList_ = nullptr;
 		RenderPassController* renderPassController_ = nullptr;
 		RaytracingPipeline* raytracingPipeline_ = nullptr;
+		RayQueryPipeline* rayQueryPipeline_ = nullptr;
 		SrvManager* srvManager_ = nullptr;
 		BufferRefManager* bufferRefManager_ = nullptr;
 		RenderQueue* renderQueue_ = nullptr;
-		// フレームごとのアップロード領域。カメラ定数とTLASのインスタンス情報を書き込む
+		// フレームごとのアップロード領域
 		FrameUploader* frameUploader_ = nullptr;
 
 		// 破片の描画に使用するコマンドルートシグネチャ。後で配置の変更をする
@@ -75,6 +88,13 @@ namespace GameEngine {
 		bool enableDrawRasterize_ = false;
 		bool enableDrawRasterizeTranslucent_ = false;
 
+		// RayQueryで描画するか
+		bool useRayQuery_ = false;
+		// RTAOの設定
+		RtaoSettings rtaoSettings_;
+		// テクスチャのLODの設定
+		TextureLodSettings textureLodSettings_;
+
 	private:
 
 		// パスの実行順を登録
@@ -107,6 +127,9 @@ namespace GameEngine {
 
 		// レイトレーシングの描画
 		void DrawRaytracing();
+
+		// RayQueryによるレイトレーシングの描画
+		void DrawRayQuery();
 
 		// ラスタライズの描画コマンドを解放
 		void RasterizeExecute();

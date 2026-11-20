@@ -135,6 +135,7 @@ void TLAS::Update(ID3D12GraphicsCommandList4* cmdList, const std::vector<TLASIns
     // 有効数でビルドを構築
     inputs_.NumDescs = activeCount;
     inputs_.InstanceDescs = upload.gpuAddress;
+    instanceDescAddress_ = upload.gpuAddress;
 
     // 前フレームとインスタンス数が同じであればトポロジが変わっていないためPERFORM_UPDATEを行い、異なる場合はフルビルドを行う
     bool canRefit = (activeCount == previousInstanceCount_) && (consecutiveRefitCount_ < kMaxConsecutiveRefits_);

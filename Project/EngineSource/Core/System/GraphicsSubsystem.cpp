@@ -53,9 +53,6 @@ void GraphicsSubsystem::Initialize() {
     {
         ScopedTimer t("PSO");
 
-        // PSO作成
-        //InitializePSO();
-
         { ScopedTimer t1("CopyPSO"); InitializePSO(); }
 
         // PSO管理機能の作成
@@ -63,13 +60,16 @@ void GraphicsSubsystem::Initialize() {
         psoManager_->Initialize(graphicsDevice_->GetDevice(), dxc_.get());
         { ScopedTimer t2("DefaultLoadPSO"); psoManager_->DefaultLoadPSO(); }
         { ScopedTimer t3("PostEffectPSO");  psoManager_->DefaultLoadPostEffectPSO(); }
-        //psoManager_->DefaultLoadPSO();
-        //psoManager_->DefaultLoadPostEffectPSO();
         
         ScopedTimer t4("Raytracing");
         // レイトレーシング用のパイプライン
         raytracingPipeline_ = std::make_unique<RaytracingPipeline>();
         raytracingPipeline_->Initialize(graphicsDevice_->GetDevice(), graphicsDevice_->GetSrvManager(), dxc_.get());
+
+        // RayQueryによるレイトレーシング用のパイプライン
+        psoManager_->DefaultLoadRayQueryPSO();
+        rayQueryPipeline_ = std::make_unique<RayQueryPipeline>();
+        rayQueryPipeline_->Initialize(graphicsDevice_->GetDevice(), psoManager_.get(), 1280, 720);
     }
 
     // レンダーテクスチャ機能を生成
@@ -87,7 +87,7 @@ void GraphicsSubsystem::Initialize() {
     // シーン描画の管理
     sceneRenderManager_ = std::make_unique<SceneRenderManager>();
     sceneRenderManager_->Initialize(graphicsDevice_->GetCommandList(), graphicsDevice_->GetSrvManager(), psoManager_.get(),
-        renderPassController_.get(), raytracingPipeline_.get(), bufferRefManager_.get(),renderQueue_.get(), graphicsDevice_->GetFrameUploader());
+        renderPassController_.get(), raytracingPipeline_.get(), rayQueryPipeline_.get(), bufferRefManager_.get(),renderQueue_.get(), graphicsDevice_->GetFrameUploader());
 
     // ポストエフェクトマネージャーの初期化
     postEffectManager_ = std::make_unique<PostEffectManager>();

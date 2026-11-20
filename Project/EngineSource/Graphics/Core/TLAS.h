@@ -45,6 +45,9 @@ namespace GameEngine {
 
 		// SRVインデックスの取得
 		uint32_t GetSrvIndex() const { return srvIndex_; }
+
+		// このフレームのインスタンス情報のGPUアドレス
+		D3D12_GPU_VIRTUAL_ADDRESS GetInstanceDescAddress() const { return instanceDescAddress_; }
 		const CD3DX12_GPU_DESCRIPTOR_HANDLE& GetSrvHandleGPU() const { return srvHandleGPU_; }
 	
 	private:
@@ -77,6 +80,9 @@ namespace GameEngine {
 		CD3DX12_GPU_DESCRIPTOR_HANDLE srvHandleGPU_;
 
 		bool isCreated_ = false;
+
+		// このフレームのインスタンス情報のGPUアドレス
+		D3D12_GPU_VIRTUAL_ADDRESS instanceDescAddress_ = 0;
 
 	private:
 

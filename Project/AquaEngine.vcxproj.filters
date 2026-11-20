@@ -309,7 +309,7 @@
     <ClCompile Include="Application\Player\Effect\ShockWave.cpp">
       <Filter>Application\Player\Effect</Filter>
     </ClCompile>
-    <ClCompile Include="Application\Scene\DemoScene.cpp">
+    <ClCompile Include="Application\Scene\AODemoScene.cpp">
       <Filter>Application\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Application\Scene\GameScene.cpp">
@@ -747,6 +747,9 @@
     <ClCompile Include="EngineSource\Graphics\PSO\Core\RaytracingPipeline.cpp">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
     </ClCompile>
+    <ClCompile Include="EngineSource\Graphics\PSO\Core\RayQueryPipeline.cpp">
+      <Filter>EngineSource\Graphics\PSO\Core</Filter>
+    </ClCompile>
     <ClCompile Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.cpp">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
     </ClCompile>
@@ -874,6 +877,7 @@
       <Filter>Externals\imgui</Filter>
     </ClCompile>
     <ClCompile Include="EngineSource\Common\ParallelFor.cpp" />
+    <ClCompile Include="Application\Scene\IceDemoScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application\CollisionConfig.h">
@@ -972,7 +976,7 @@
     <ClInclude Include="Application\Player\Effect\ShockWave.h">
       <Filter>Application\Player\Effect</Filter>
     </ClInclude>
-    <ClInclude Include="Application\Scene\DemoScene.h">
+    <ClInclude Include="Application\Scene\AODemoScene.h">
       <Filter>Application\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Application\Scene\GameScene.h">
@@ -1530,6 +1534,15 @@
     <ClInclude Include="EngineSource\Graphics\PSO\Core\RaytracingPipeline.h">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
     </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\PSO\Core\RayQueryPipeline.h">
+      <Filter>EngineSource\Graphics\PSO\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\Core\RtaoSettings.h">
+      <Filter>EngineSource\Graphics\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\Core\TextureLodSettings.h">
+      <Filter>EngineSource\Graphics\Core</Filter>
+    </ClInclude>
     <ClInclude Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.h">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
     </ClInclude>
@@ -1702,6 +1715,7 @@
       <Filter>Externals\imgui</Filter>
     </ClInclude>
     <ClInclude Include="EngineSource\Common\ParallelFor.h" />
+    <ClInclude Include="Application\Scene\IceDemoScene.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\CS\ParticleUpdate.CS.hlsl" />

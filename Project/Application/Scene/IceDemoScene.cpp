@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "DemoScene.h"
+#include "IceDemoScene.h"
 #include "ImguiManager.h"
 #include "PostProcess/PostEffectData.h"
 #include "FPSCounter.h"
@@ -10,9 +10,9 @@
 #include "Application/Demo/TestFructure.h"
 using namespace GameEngine;
 
-DemoScene::~DemoScene() {}
+IceDemoScene::~IceDemoScene() {}
 
-DemoScene::DemoScene() {
+IceDemoScene::IceDemoScene() {
 
 	// 操作方法を登録
 	inputCommand_->RegisterCommand("MoveLeft", { KeyBinding{ DIK_A },PadStickBinding{ PadSide::kLeft, {-1.0f,0.0f} }, PadButtonBinding{ XINPUT_GAMEPAD_DPAD_LEFT } });
@@ -27,7 +27,7 @@ DemoScene::DemoScene() {
 	mainCamera_->Update();
 
 	debugParame_.Register("EaseCurve", easeCurve_);
-	debugParame_.Register("MaxTime", maxTime_,1);
+	debugParame_.Register("MaxTime", maxTime_, 1);
 	debugParame_.Apply();
 
 	// 背景画像を設定
@@ -40,11 +40,11 @@ DemoScene::DemoScene() {
 	gameObjectManager_->AddObject<FructureDemo>("FructureDemo", inputCommand_, testModel_);
 }
 
-void DemoScene::Initialize() {
+void IceDemoScene::Initialize() {
 
 }
 
-void DemoScene::Update() {
+void IceDemoScene::Update() {
 	debugParame_.ApplyIfDirty();
 
 	timer_ += FpsCounter::GetDeltaTime() / maxTime_;
@@ -67,7 +67,7 @@ void DemoScene::Update() {
 	DebugUpdate();
 }
 
-void DemoScene::DebugUpdate() {
+void IceDemoScene::DebugUpdate() {
 #ifdef USE_IMGUI
 	auto* light = renderQueue_->GetLightManager();
 
@@ -85,7 +85,7 @@ void DemoScene::DebugUpdate() {
 #endif
 }
 
-void DemoScene::Draw() {
+void IceDemoScene::Draw() {
 
 	// 描画に使用するカメラを設定
 	renderQueue_->SetCamera(mainCamera_.get());

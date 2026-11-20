@@ -37,6 +37,9 @@ void ViewOptionsBar::Run() {
 		if (ImGui::BeginMenu("View")) {
 			ImGui::Checkbox("isDebugView", &isDebugView_);
 			ImGui::Checkbox("isDebugDraw", &isDebugDraw_);
+			ImGui::Separator();
+			// レイトレーシングの方式
+			ImGui::Checkbox("useRayQuery", &useRayQuery_);
 			ImGui::EndMenu();
 		}
 		ImGui::EndMainMenuBar();
@@ -62,4 +65,7 @@ void ViewOptionsBar::Run() {
 	}
 
 	debugRenderer_->SetEnabled(isDebugDraw_);
+
+	// レイトレーシングの方式を設定
+	renderQueue_->SetUseRayQuery(useRayQuery_);
 }

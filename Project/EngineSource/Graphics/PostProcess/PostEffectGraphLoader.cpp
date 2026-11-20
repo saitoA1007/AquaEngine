@@ -16,6 +16,28 @@ namespace {
             node.pos.y = p[1].get<float>();
         }
     }
+
+    // Sceneノードのシーン描画の設定
+    void ReadSceneSettings(const nlohmann::json& n, RtaoSettings& rtao) {
+        if (!n.contains("rtao") || !n["rtao"].is_object()) { return; }
+        const auto& r = n["rtao"];
+        rtao.enabled = r.value("enabled", rtao.enabled);
+        rtao.sampleCount = r.value("sampleCount", rtao.sampleCount);
+        rtao.radius = r.value("radius", rtao.radius);
+        rtao.strength = r.value("strength", rtao.strength);
+        rtao.ambientIntensity = r.value("ambientIntensity", rtao.ambientIntensity);
+        rtao.debugView = r.value("debugView", rtao.debugView);
+        rtao.historyClamp = r.value("historyClamp", rtao.historyClamp);
+        rtao.clampGamma = r.value("clampGamma", rtao.clampGamma);
+    }
+
+    // Sceneノードのテクスチャのミップレベルの設定
+    void ReadTextureLodSettings(const nlohmann::json& n, TextureLodSettings& lod) {
+        if (!n.contains("textureLod") || !n["textureLod"].is_object()) { return; }
+        const auto& t = n["textureLod"];
+        lod.enabled = t.value("enabled", lod.enabled);
+        lod.bias = t.value("bias", lod.bias);
+    }
 }
 
 bool PostEffectGraphLoader::Run(const nlohmann::json& root) {
@@ -54,6 +76,8 @@ PostEffectNode* PostEffectGraphLoader::LoadNode(const nlohmann::json& n) {
     if (kind == kKindScene) {
         if (hasScene_) { return nullptr; }
         hasScene_ = true;
+        ReadSceneSettings(n, out_.graph.sceneRtao);
+        ReadTextureLodSettings(n, out_.graph.sceneTextureLod);
         return out_.graph.AddSceneNode();
     }
     if (kind == kKindUI) {

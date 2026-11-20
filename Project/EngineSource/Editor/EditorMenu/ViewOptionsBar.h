@@ -25,6 +25,9 @@ namespace GameEngine {
 		// デバック描画を表示
 		bool isDebugDraw_ = true;
 
+		// レイトレーシングをRayQueryでおこなう
+		bool useRayQuery_ = true;
+
 		// 描画コマンド
 		RenderQueue* renderQueue_ = nullptr;
 		// デバック描画機能
