@@ -9,6 +9,43 @@ namespace {
 	DXGI_FORMAT SelectCompressFormat(const DirectX::TexMetadata& meta, bool isSRGB) {
 		return isSRGB ? DXGI_FORMAT_BC7_UNORM_SRGB : DXGI_FORMAT_BC7_UNORM;
 	}
+
+	/// <summary>
+	/// WICで読み込んだ画像のフォーマットを、isSRGBに合わせてsRGB/リニアに設定する
+	/// sRGB情報を持たないPNGがリニアとして読まれ、BC7_UNORM_SRGB圧縮時にsRGB変換が二重にかかるのを防ぐ
+	/// </summary>
+	HRESULT ApplyColorSpace(DirectX::ScratchImage& image, bool isSRGB) {
+		const DXGI_FORMAT format = image.GetMetadata().format;
+
+		if (!isSRGB) {
+			// データテクスチャはリニアとして扱う
+			const DXGI_FORMAT linear = DirectX::MakeLinear(format);
+			if (linear != format) {
+				image.OverrideFormat(linear);
+			}
+			return S_OK;
+		}
+
+		if (DirectX::IsSRGB(format)) {
+			return S_OK;
+		}
+
+		// 値はそのままでsRGBフォーマットとして扱う
+		const DXGI_FORMAT srgb = DirectX::MakeSRGB(format);
+		if (srgb != format) {
+			image.OverrideFormat(srgb);
+			return S_OK;
+		}
+
+		// sRGB版がないフォーマット(16bit PNGなど)は、値を変えずにR8G8B8A8_UNORM_SRGBへ変換する
+		DirectX::ScratchImage converted{};
+		HRESULT hr = DirectX::Convert(image.GetImages(), image.GetImageCount(), image.GetMetadata(),
+			DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, DirectX::TEX_FILTER_DEFAULT | DirectX::TEX_FILTER_SRGB, DirectX::TEX_THRESHOLD_DEFAULT, converted);
+		if (SUCCEEDED(hr)) {
+			image = std::move(converted);
+		}
+		return hr;
+	}
 }
 
 [[nodiscard]]
@@ -21,9 +58,11 @@ DirectX::ScratchImage TextureLoader::LoadFromFile(const std::string& filePath, b
 		// .ddsの場合
 		hr = DirectX::LoadFromDDSFile(filePathW.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, image);
 	} else {
-		// データテクスチャはガンマ補正をかけずにそのまま読み込む
-		DirectX::WIC_FLAGS wicFlags = isSRGB ? DirectX::WIC_FLAGS_FORCE_SRGB : DirectX::WIC_FLAGS_IGNORE_SRGB;
-		hr = DirectX::LoadFromWICFile(filePathW.c_str(), wicFlags, nullptr, image);
+		// 画素値はそのまま読み込み、sRGB/リニアはisSRGBで決める
+		hr = DirectX::LoadFromWICFile(filePathW.c_str(), DirectX::WIC_FLAGS_IGNORE_SRGB, nullptr, image);
+		if (SUCCEEDED(hr)) {
+			hr = ApplyColorSpace(image, isSRGB);
+		}
 	}
 	assert(SUCCEEDED(hr));
 
@@ -64,11 +103,13 @@ DirectX::ScratchImage TextureLoader::LoadFromFileCached(const std::string& fileP
 
 	// 変換処理
 	DirectX::ScratchImage image{};
+	// 画素値はそのまま読み込み、sRGB/リニアはisSRGBで決める
 	HRESULT hr = DirectX::LoadFromWICFile(
-		ConvertString(filePath).c_str(),
-		isSRGB ? DirectX::WIC_FLAGS_FORCE_SRGB : DirectX::WIC_FLAGS_IGNORE_SRGB,
-		nullptr, image);
-	if (FAILED(hr)) { 
+		ConvertString(filePath).c_str(), DirectX::WIC_FLAGS_IGNORE_SRGB, nullptr, image);
+	if (SUCCEEDED(hr)) {
+		hr = ApplyColorSpace(image, isSRGB);
+	}
+	if (FAILED(hr)) {
 		assert(false);
 		return {}; 
 	}

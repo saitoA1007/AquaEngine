@@ -54,7 +54,7 @@ TestScene::TestScene() {
 	terrainModel_->SetDefaultTextureHandle(grassGH);
 	terrainWorld_.Initialize({ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,-4.0f,0.0f} });
 
-	uint32_t normalGH = textureManager_->GetHandleByName("testNormal.png");
+	uint32_t normalGH = textureManager_->GetHandleByName("testNormal_nrm.png");
 	terrainModel_->SetDefaultNormalTexture(normalGH);
 
 	// エフェクト用モデル

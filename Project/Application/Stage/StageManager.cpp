@@ -19,10 +19,10 @@ StageManager::StageManager(GameEngine::GameObjectManager* objectManager, GameEng
 	wallModel->SetDefaultIOR(1.31f);
 
 	// 地面用の画像を取得
-	uint32_t iceNormalGH = textureManager->GetHandleByName("stone_tiles_02_nor_gl_1k.png");
+	uint32_t iceNormalGH = textureManager->GetHandleByName("stone_tiles_02_nor_gl_1k_nrm.png");
 	uint32_t iceHeightGH = textureManager->GetHandleByName("stone_tiles_02_disp_1k.png");
 	uint32_t terrainGH = textureManager->GetHandleByName("iceGrass.png");
-	uint32_t terrainNormalGH = textureManager->GetHandleByName("aerial_grass_rock_nor_gl_1k.png");
+	uint32_t terrainNormalGH = textureManager->GetHandleByName("aerial_grass_rock_nor_gl_1k_nrm.png");
 
 	// 床モデルを生成
 	floor_ = objectManager_->AddObject<Floor>(floorModel, floorFractureModel, iceNormalGH, iceHeightGH, terrainGH, terrainNormalGH);

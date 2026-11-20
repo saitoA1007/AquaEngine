@@ -469,6 +469,9 @@ void SceneRenderManager::RaytracingExecute() {
     } else {
         // 描画するものがなければ早期リターン
         enableDrawRaytracing_ = false;
+        // FogなどのポストエフェクトがSRVとして参照するため、UAV状態のまま残さずSRV状態にしておく
+        renderPassController_->PostPass("RaytracingPass");
+        renderPassController_->PostPass("RaytracingPassDepth");
         return;
     }
 

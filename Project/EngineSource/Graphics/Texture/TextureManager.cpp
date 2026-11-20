@@ -2,8 +2,34 @@
 #include "TextureManager.h"
 #include <format>
 #include <filesystem>
+#include <algorithm>
+#include <cctype>
 #include "LogManager.h"
 using namespace GameEngine;
+
+bool TextureManager::IsDataTexture(const std::string& filePath) {
+	std::string stem = std::filesystem::path(filePath).stem().string();
+	std::transform(stem.begin(), stem.end(), stem.begin(),
+		[](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+
+	static constexpr const char* kKeywords[] = {
+		"_bump", "_normal", "_nrm", "_ddn", "_spec", "_rough",
+		"_metal", "_ao", "_mask", "_height", "_disp",
+	};
+	for (const char* keyword : kKeywords) {
+		if (stem.find(keyword) != std::string::npos) {
+			return true;
+		}
+	}
+	return false;
+}
+
+bool TextureManager::IsImageFile(const std::filesystem::path& path) {
+	std::string ext = path.extension().string();
+	std::transform(ext.begin(), ext.end(), ext.begin(),
+		[](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+	return ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".bmp" || ext == ".dds";
+}
 
 void TextureManager::Initialize(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
 	commandList_ = commandList;
@@ -35,7 +61,8 @@ void TextureManager::RegisterTexture(const std::string& fileName) {
 
 	// 登録する
 	auto texture = std::make_unique<Texture>();
-	texture->Create(fileName, commandList_);
+	// 法線マップなどのデータテクスチャはsRGB変換をかけずに読み込む
+	texture->Create(fileName, commandList_, !IsDataTexture(fileName));
 	textures_[textureName] = std::move(texture);
 }
 
@@ -75,7 +102,7 @@ void TextureManager::LoadAllTexture() {
 			continue;
 		}
 		// 画像を登録、ロードする
-		if (it->is_regular_file()) {
+		if (it->is_regular_file() && IsImageFile(it->path())) {
 			// 登録
 			RegisterTexture(it->path().string());
 		}
@@ -103,7 +130,7 @@ void TextureManager::LoadDebugAllTexture() {
 			continue;
 		}
 		// 画像を登録、ロードする
-		if (it->is_regular_file()) {
+		if (it->is_regular_file() && IsImageFile(it->path())) {
 			// 登録
 			RegisterTexture(it->path().string());
 		}

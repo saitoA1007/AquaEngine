@@ -1,5 +1,6 @@
 #pragma once
 #include <unordered_map>
+#include <filesystem>
 #include "Texture.h"
 #include "SrvManager.h"
 
@@ -59,6 +60,17 @@ namespace GameEngine {
 		/// </summary>
 		/// <returns></returns>
 		std::vector<std::string> GetRegisteredTextureNames() const;
+
+		/// <summary>
+		/// ファイル名から法線マップなどのデータテクスチャ(リニアで扱う)かを判定する
+		/// ※ Resources/Textures/ConvertToDDS.bat のキーワードと合わせる
+		/// </summary>
+		static bool IsDataTexture(const std::string& filePath);
+
+		/// <summary>
+		/// 読み込み対象の画像ファイルかを拡張子で判定する
+		/// </summary>
+		static bool IsImageFile(const std::filesystem::path& path);
 
 	private:
 		TextureManager(const TextureManager&) = delete;
