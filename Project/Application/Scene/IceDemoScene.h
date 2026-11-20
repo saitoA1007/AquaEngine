@@ -15,10 +15,10 @@
 
 #include "Application/Scene/Transition/Fade.h"
 
-class DemoScene : public GameEngine::IScene {
+class IceDemoScene : public GameEngine::IScene {
 public:
-	DemoScene();
-	~DemoScene();
+	IceDemoScene();
+	~IceDemoScene();
 
 	/// <summary>
 	/// 初期化
@@ -60,7 +60,7 @@ private: // シーン機能
 
 	// メインカメラ
 	std::unique_ptr<GameEngine::Camera> mainCamera_;
-	
+
 	float intensity_ = 0.8f;
 	Vector3 dir_ = { 0.0f,-1.0f,0.0f };
 	Vector4 lightColor_ = { 1.0f,1.0f,1.0f,1.0f };

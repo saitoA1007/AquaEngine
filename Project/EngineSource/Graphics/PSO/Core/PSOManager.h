@@ -112,6 +112,11 @@ namespace GameEngine {
 		void DefaultLoadPostEffectPSO();
 
 		/// <summary>
+		/// RayQueryで使用するPSOを作成
+		/// </summary>
+		void DefaultLoadRayQueryPSO();
+
+		/// <summary>
 		/// コマンドシグネチャを手動登録する
 		/// </summary>
 		void RegisterCommandSignature(const std::string& name, ID3D12CommandSignature* commandSignature);

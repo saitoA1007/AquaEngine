@@ -96,6 +96,15 @@ void DXDevice::CheckRaytracingEnable() {
 
     LogManager::GetInstance().Log("Raytracing is supported");
 
+    // RayQueryはTier1.1から使用可能
+    raytracingTier_ = option.RaytracingTier;
+    if (IsRayQuerySupported()) {
+        LogManager::GetInstance().Log("RayQuery is supported (DXR Tier1.1)");
+    } else {
+        LogManager::GetInstance().Log("RayQuery is not supported (DXR Tier1.0)");
+        assert(false && "RayQuery is not supported (DXR Tier1.0)");
+    }
+
     // ShaderModel6.6以上が使用出来るか確認
     D3D12_FEATURE_DATA_SHADER_MODEL shaderModel = { D3D_SHADER_MODEL_6_6 };
     hr = device_->CheckFeatureSupport(D3D12_FEATURE_SHADER_MODEL, &shaderModel, sizeof(shaderModel));

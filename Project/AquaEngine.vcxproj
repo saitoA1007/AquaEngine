@@ -207,11 +207,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Player\PlayerAnimator.cpp" />
     <ClCompile Include="Application\Player\PlayerEffectManager.cpp" />
     <ClCompile Include="Application\Scene\GameScene.cpp" />
-    <ClCompile Include="Application\Scene\TestScene.cpp" />
-    <ClCompile Include="Application\Scene\DemoScene.cpp">
+    <ClCompile Include="Application\Scene\IceDemoScene.cpp">
       <SubType>
       </SubType>
     </ClCompile>
+    <ClCompile Include="Application\Scene\TestScene.cpp" />
+    <ClCompile Include="Application\Scene\AODemoScene.cpp" />
     <ClCompile Include="Application\Scene\Transition\Fade.cpp" />
     <ClCompile Include="Application\Stage\BgIceRock.cpp" />
     <ClCompile Include="Application\Stage\BgRockField.cpp" />
@@ -377,6 +378,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\RayLibShaderCompiler.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Core\RaytracingPipeline.cpp" />
+    <ClCompile Include="EngineSource\Graphics\PSO\Core\RayQueryPipeline.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\ShaderTableBuilder.cpp" />
     <ClCompile Include="EngineSource\Graphics\PSO\Raytracing\StateObjectBuilder.cpp" />
     <ClCompile Include="EngineSource\Graphics\Resources\BufferRefResource.cpp" />
@@ -663,9 +665,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Player\PlayerAnimator.h" />
     <ClInclude Include="Application\Player\PlayerEffectManager.h" />
     <ClInclude Include="Application\Scene\GameScene.h" />
+    <ClInclude Include="Application\Scene\IceDemoScene.h" />
     <ClInclude Include="Application\Scene\Register\SetUpScenes.h" />
     <ClInclude Include="Application\Scene\TestScene.h" />
-    <ClInclude Include="Application\Scene\DemoScene.h" />
+    <ClInclude Include="Application\Scene\AODemoScene.h" />
     <ClInclude Include="Application\Scene\Transition\Fade.h" />
     <ClInclude Include="Application\Stage\BgIceRock.h" />
     <ClInclude Include="Application\Stage\BgRockField.h" />
@@ -839,6 +842,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\RayLibShaderCompiler.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Core\RaytracingPipeline.h" />
+    <ClInclude Include="EngineSource\Graphics\PSO\Core\RayQueryPipeline.h" />
+    <ClInclude Include="EngineSource\Graphics\Core\RtaoSettings.h" />
+    <ClInclude Include="EngineSource\Graphics\Core\TextureLodSettings.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderRecord.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderTable.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderTableBuilder.h" />

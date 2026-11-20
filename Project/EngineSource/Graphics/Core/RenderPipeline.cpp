@@ -50,6 +50,9 @@ void RenderPipeline::EndFrame(ImGuiManager* imGuiManager) {
 
     {
         PIX_SCOPED_EVENT(graphicsDevice_->GetCommandList(), PixColor::Scene, "SceneRender");
+        // ポストエフェクトグラフのSceneノードで調整したシーン描画の設定を渡す
+        sceneRenderManager_->SetRtaoSettings(postEffectManager_->GetGraph().sceneRtao);
+        sceneRenderManager_->SetTextureLodSettings(postEffectManager_->GetGraph().sceneTextureLod);
         // シーン描画を実行
         sceneRenderManager_->Execute();
     }

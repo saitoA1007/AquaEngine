@@ -15,10 +15,16 @@ namespace GameEngine {
 		ID3D12Device5* GetDevice() const { return device_.Get(); }
 		IDXGIFactory7* GetFactory() const { return dxgiFactory_.Get(); }
 
+		// RayQueryが使用出来るか
+		bool IsRayQuerySupported() const { return raytracingTier_ >= D3D12_RAYTRACING_TIER_1_1; }
+
 	private:
 
 		Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory_;
 		Microsoft::WRL::ComPtr<ID3D12Device5> device_;
+
+		// 対応しているレイトレーシングのTier
+		D3D12_RAYTRACING_TIER raytracingTier_ = D3D12_RAYTRACING_TIER_NOT_SUPPORTED;
 
 	private:
 

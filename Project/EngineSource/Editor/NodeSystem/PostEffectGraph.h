@@ -6,6 +6,8 @@
 #include "MaterialGraph.h"
 #include "PostProcess/IPostEffect.h"
 #include "Vector2.h"
+#include "RtaoSettings.h"
+#include "TextureLodSettings.h"
 
 namespace GameEngine {
 
@@ -29,6 +31,10 @@ namespace GameEngine {
         std::vector<Link> links;
         int nextId = 1;
         bool dirty = true;             // 変更されたら実行順を再計算する
+
+        // Sceneノードで調整するシーン描画の設定
+        RtaoSettings sceneRtao;
+        TextureLodSettings sceneTextureLod;
 
         int GetNextId() { return nextId++; }
 

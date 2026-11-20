@@ -49,6 +49,11 @@ namespace GameEngine {
 		void AddCBVParameter(uint32_t shaderRegister, D3D12_SHADER_VISIBILITY visibility, uint32_t space = 0);
 
 		/// <summary>
+		/// ルートSRVを追加
+		/// </summary>
+		void AddRootSRVParameter(uint32_t shaderRegister, D3D12_SHADER_VISIBILITY visibility, uint32_t space = 0);
+
+		/// <summary>
 		/// srvを追加する
 		/// </summary>
 		/// <param name="shaderRegister">レジスタ番号</param>

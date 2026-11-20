@@ -3,6 +3,7 @@
 #include <cassert>
 #include "PSO/Core/PSOManager.h"
 #include "raytracingPipeline.h"
+#include "RayQueryPipeline.h"
 #include "BufferRefManager.h"
 #include "ModelRenderer.h"
 #include "Animator.h"
@@ -12,10 +13,13 @@
 using namespace GameEngine;
 
 void SceneRenderManager::Initialize(ID3D12GraphicsCommandList4* commandList, SrvManager* srvManager, PSOManager* psoManager, RenderPassController* renderPassController,
-	RaytracingPipeline* raytracingPipeline, BufferRefManager* bufferRefManager, RenderQueue* renderQueue, FrameUploader* frameUploader) {
+	RaytracingPipeline* raytracingPipeline, RayQueryPipeline* rayQueryPipeline, BufferRefManager* bufferRefManager, RenderQueue* renderQueue, FrameUploader* frameUploader) {
     commandList_ = commandList;
     renderPassController_ = renderPassController;
     raytracingPipeline_ = raytracingPipeline;
+    rayQueryPipeline_ = rayQueryPipeline;
+    // 対応していればRayQueryを使う
+    SetUseRayQuery(true);
     srvManager_ = srvManager;
     bufferRefManager_ = bufferRefManager;
 	renderQueue_ = renderQueue;
@@ -263,7 +267,31 @@ void SceneRenderManager::Execute2dRequest(const Draw2dRequest& request) {
     }
 }
 
+void SceneRenderManager::SetUseRayQuery(bool useRayQuery) {
+    useRayQuery_ = useRayQuery;
+}
+
+void SceneRenderManager::DrawRayQuery() {
+    RayQueryFrameParams params{};
+    params.tlasSrvIndex = tlas_.GetSrvIndex();
+    params.instanceDescAddress = tlas_.GetInstanceDescAddress();
+    params.bufferRefSrvIndex = bufferRefManager_->GetSrvIndex();
+    params.outputUavIndex = renderPassController_->GetUavIndex("RaytracingPass");
+    params.depthOutputUavIndex = renderPassController_->GetUavIndex("RaytracingPassDepth");
+    params.skyboxSrvIndex = renderQueue_->GetSkyboxTexture();
+    params.cameraAddress = cameraAddress_;
+    params.lightAddress = renderQueue_->GetLightResource()->GetGpuVirtualAddress();
+    rayQueryPipeline_->SetRtaoSettings(rtaoSettings_);
+    rayQueryPipeline_->SetTextureLodSettings(textureLodSettings_);
+    rayQueryPipeline_->Execute(commandList_, params);
+}
+
 void SceneRenderManager::DrawRaytracing() {
+    if (useRayQuery_) {
+        DrawRayQuery();
+        return;
+    }
+
     commandList_->SetComputeRootSignature(raytracingPipeline_->GetGlobalRootSignature());
     // シェーダー側でResourceDescriptorHeapから取得するリソースのインデックス
     RaytracingGlobalIndices indices{};
@@ -444,6 +472,9 @@ void SceneRenderManager::RaytracingExecute() {
         return;
     }
 
+    // RayQueryとDXRの切り替えを反映する
+    SetUseRayQuery(renderQueue_->GetUseRayQuery());
+
     // tlasを更新する
     tlas_.Update(commandList_, raytracingDrawQueueList, *frameUploader_);
 
@@ -468,8 +499,7 @@ void SceneRenderManager::Draw2dExecute() {
 
     auto draw2dQueueList = renderQueue_->GetDraw2dQueue();
 
-    // UIは専用のパスに描き、ポストエフェクトのUIComposite で合成する。
-    // 透明でクリアし、2DのPSOのアルファ設定で乗算済みアルファとして書き込まれる
+    // UIは専用のパスに描き、ポストエフェクトのUIComposite で合成する
     renderPassController_->PrePass(uiPassName_);
     renderPassController_->ClearRenderPass(uiPassName_);
     currentPsoName_.clear();

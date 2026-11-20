@@ -59,6 +59,8 @@ namespace GameEngine {
 		void DrawToolbar();
 
 		void DrawInspector(PostEffectGraph& graph);
+		// Sceneノードのシーン描画の設定
+		void DrawSceneSettings(RtaoSettings& rtao, TextureLodSettings& textureLod);
 		void UpdateSelection();
 
 		void DrawNodes(PostEffectGraph& graph);

@@ -3,6 +3,7 @@
 #include "LogManager.h"
 #include <cassert>
 #include "FractureInstance.h"
+#include "RayQueryPipeline.h"
 
 using namespace GameEngine;
 
@@ -871,4 +872,56 @@ void PSOManager::DefaultLoadPostEffectPSO() {
     rsDepthCopyBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_PIXEL);
     rsDepthCopyBuilder.CreateRootSignature();
     RegisterPSO("DepthCopy", defaultPostEffect, &rsDepthCopyBuilder, &inputLayoutBuilder);
+}
+
+void PSOManager::DefaultLoadRayQueryPSO() {
+
+    LogManager::GetInstance().Log("Loading RayQuery PSOs");
+
+    // 全パス共通のルートシグネチャ。リソースはヒープのインデックスで直接参照する
+    RootSignatureBuilder rootSigBuilder;
+    rootSigBuilder.Initialize(device_);
+    rootSigBuilder.Add32BitConstantsParameter(sizeof(RayQueryIndices) / sizeof(uint32_t), 2, D3D12_SHADER_VISIBILITY_ALL); // ヒープのインデックス
+    rootSigBuilder.AddCBVParameter(0, D3D12_SHADER_VISIBILITY_ALL); // camera
+    rootSigBuilder.AddCBVParameter(1, D3D12_SHADER_VISIBILITY_ALL); // light
+    rootSigBuilder.AddRootSRVParameter(0, D3D12_SHADER_VISIBILITY_ALL); // TLASのインスタンス情報
+    rootSigBuilder.AddSampler(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_SHADER_VISIBILITY_ALL);
+    rootSigBuilder.CreateRootSignature(D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED);
+
+    // コンピュートPSO
+    struct RayQueryShader {
+        const char* name;
+        const wchar_t* path;
+    };
+    const RayQueryShader shaders[] = {
+        { RayQueryPsoName::kReset,      L"Resources/Shaders/RayQuery/RQReset.CS.hlsl" },
+        { RayQueryPsoName::kTrace,      L"Resources/Shaders/RayQuery/RQTrace.CS.hlsl" },
+        { RayQueryPsoName::kBuildArgs,  L"Resources/Shaders/RayQuery/RQBuildArgs.CS.hlsl" },
+        { RayQueryPsoName::kAOTrace,    L"Resources/Shaders/RayQuery/RQAOTrace.CS.hlsl" },
+        { RayQueryPsoName::kAOTemporal, L"Resources/Shaders/RayQuery/RQAOTemporal.CS.hlsl" },
+        { RayQueryPsoName::kAOBlur,     L"Resources/Shaders/RayQuery/RQAOBlur.CS.hlsl" },
+        // マテリアルごとのシェーディング
+        { RayQueryPsoName::kShade[static_cast<size_t>(RayQueryMaterial::kDefault)], L"Resources/Shaders/RayQuery/RQShadeDefault.CS.hlsl" },
+        { RayQueryPsoName::kShade[static_cast<size_t>(RayQueryMaterial::kIce)],     L"Resources/Shaders/RayQuery/RQShadeIce.CS.hlsl" },
+    };
+    for (const RayQueryShader& shader : shaders) {
+        CreatePSOData data;
+        data.rootSigName = RayQueryPsoName::kRootSignature;
+        data.csPath = shader.path;
+        RegisterComputePSO(shader.name, data, &rootSigBuilder);
+    }
+
+    // マテリアルごとのDispatch引数をGPUで作るため、Dispatchだけを行うコマンドシグネチャ
+    D3D12_INDIRECT_ARGUMENT_DESC argumentDesc{};
+    argumentDesc.Type = D3D12_INDIRECT_ARGUMENT_TYPE_DISPATCH;
+    D3D12_COMMAND_SIGNATURE_DESC sigDesc{};
+    sigDesc.ByteStride = sizeof(D3D12_DISPATCH_ARGUMENTS);
+    sigDesc.NumArgumentDescs = 1;
+    sigDesc.pArgumentDescs = &argumentDesc;
+    Microsoft::WRL::ComPtr<ID3D12CommandSignature> dispatchSignature;
+    HRESULT hr = device_->CreateCommandSignature(&sigDesc, nullptr, IID_PPV_ARGS(&dispatchSignature));
+    assert(SUCCEEDED(hr));
+    RegisterCommandSignature(RayQueryPsoName::kDispatchSignature, dispatchSignature.Get());
+
+    LogManager::GetInstance().Log("RayQuery PSOs loaded");
 }
