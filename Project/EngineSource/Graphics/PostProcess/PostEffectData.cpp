@@ -90,8 +90,9 @@ void RadialBlur::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvMan
 HighLumMask::HighLumMask() {
     // 作成
     buffer_.Create();
-    // 標準偏差
-    buffer_.GetData()->highLumMask = 0.8f;
+    // HDRなので1.0を超える所から光らせる
+    buffer_.GetData()->highLumMask = 1.0f;
+    buffer_.GetData()->softKnee = 0.5f;
 
     isActive_ = true;
 }
@@ -104,15 +105,21 @@ void HighLumMask::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvMa
 
 void HighLumMask::DrawParamUI() {
 #ifdef USE_IMGUI
-    ImGui::SliderFloat("Threshold", &buffer_.GetData()->highLumMask, 0.0f, 1.0f);
-#endif 
+    ImGui::DragFloat("Threshold", &buffer_.GetData()->highLumMask, 0.01f, 0.0f, 10.0f);
+    ImGui::SliderFloat("SoftKnee", &buffer_.GetData()->softKnee, 0.0f, 1.0f);
+#endif
 }
 
-void HighLumMask::SaveParams(nlohmann::json& j) { j["highLumMask"] = buffer_.GetData()->highLumMask; }
+void HighLumMask::SaveParams(nlohmann::json& j) {
+    auto* d = buffer_.GetData();
+    j["highLumMask"] = d->highLumMask;
+    j["softKnee"] = d->softKnee;
+}
 void HighLumMask::LoadParams(const nlohmann::json& j) {
     if (!j.is_object()) { return; }
     auto* d = buffer_.GetData();
     d->highLumMask = j.value("highLumMask", d->highLumMask);
+    d->softKnee = j.value("softKnee", d->softKnee);
 }
 
 GaussVertical::GaussVertical() {
@@ -198,6 +205,33 @@ void Bloom::LoadParams(const nlohmann::json& j) {
     if (!j.is_object()) { return; }
     auto* d = buffer_.GetData();
     d->intensity = j.value("intensity", d->intensity);
+}
+
+ToneMapping::ToneMapping() {
+    // 作成
+    buffer_.Create();
+    buffer_.GetData()->exposure = 0.0f;
+
+    isActive_ = true;
+}
+
+void ToneMapping::Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) {
+    commandList->SetGraphicsRootDescriptorTable(0, srvManager->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart());
+    commandList->SetGraphicsRootConstantBufferView(1, buffer_.GetGpuVirtualAddress());
+    commandList->DrawInstanced(3, 1, 0, 0);
+}
+
+void ToneMapping::DrawParamUI() {
+#ifdef USE_IMGUI
+    ImGui::DragFloat("Exposure", &buffer_.GetData()->exposure, 0.01f, -10.0f, 10.0f);
+#endif
+}
+
+void ToneMapping::SaveParams(nlohmann::json& j) { j["exposure"] = buffer_.GetData()->exposure; }
+void ToneMapping::LoadParams(const nlohmann::json& j) {
+    if (!j.is_object()) { return; }
+    auto* d = buffer_.GetData();
+    d->exposure = j.value("exposure", d->exposure);
 }
 
 Dissolve::Dissolve() {

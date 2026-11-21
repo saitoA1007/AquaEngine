@@ -315,7 +315,7 @@ void PSOManager::CreatePSO(const std::string& psoName, const CreatePSOData& psoD
     psoDesc.DepthStencilState = depthStencilDesc;
     psoDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
     psoDesc.NumRenderTargets = 1;
-    psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    psoDesc.RTVFormats[0] = kSceneColorFormat;
     psoDesc.SampleDesc.Count = 1;
     psoDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
     // 描画タイプ
@@ -809,6 +809,10 @@ void PSOManager::DefaultLoadPostEffectPSO() {
     // 合成
     defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/Bloom.PS.hlsl";
     RegisterPSO("Bloom", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
+
+    // トーンマッピング
+    defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/ToneMapping.PS.hlsl";
+    RegisterPSO("ToneMapping", defaultPostEffect, &rootSigBuilder, &inputLayoutBuilder);
 
     // ディゾルブ
     defaultPostEffect.psPath = L"Resources/Shaders/PostEffect/Dissolve/Dissolve.PS.hlsl";

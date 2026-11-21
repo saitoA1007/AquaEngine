@@ -916,6 +916,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Graphics\DirectX\DXViewportState.h" />
     <ClInclude Include="EngineSource\Graphics\DirectX\Memory\DsvManager.h" />
     <ClInclude Include="EngineSource\Graphics\RenderPass\RenderTexture.h" />
+    <ClInclude Include="EngineSource\Graphics\RenderPass\RenderFormat.h" />
     <ClInclude Include="EngineSource\Graphics\RenderPass\RenderTextureManager.h" />
     <ClInclude Include="EngineSource\Graphics\DirectX\Memory\RtvManager.h" />
     <ClInclude Include="EngineSource\Graphics\DirectX\Memory\SrvManager.h" />

@@ -81,8 +81,9 @@ namespace GameEngine {
     class HighLumMask : public IPostEffect {
         struct HighLumMaskData {
             uint32_t textureHandle;
-            float highLumMask; // マスク範囲
-            float padding[2];
+            float highLumMask; // 閾値
+            float softKnee; // 閾値付近をなめらかにする幅
+            float padding;
         };
 
     public:
@@ -204,6 +205,39 @@ namespace GameEngine {
 
     private:
         ConstantBuffer<BloomData> buffer_;
+    };
+
+    // Khronos PBR Neutralのトーンマッピング
+    class ToneMapping : public IPostEffect {
+        struct ToneMappingData {
+            uint32_t textureHandle;
+            float exposure;
+            float pad[2];
+        };
+
+    public:
+        ToneMapping();
+
+        void Draw(ID3D12GraphicsCommandList* commandList, SrvManager* srvManager) override;
+
+        void SetPassIndex(const uint32_t& index) override {
+            buffer_.GetData()->textureHandle = index;
+        }
+
+        void SetExposure(float exposure) {
+            buffer_.GetData()->exposure = exposure;
+        }
+
+        // パラメータを操作
+        void DrawParamUI() override;
+
+        // パラメータの保存
+        void SaveParams(nlohmann::json& j) override;
+        // パラメータの読み込み
+        void LoadParams(const nlohmann::json& j) override;
+
+    private:
+        ConstantBuffer<ToneMappingData> buffer_;
     };
 
     // ディゾルブ

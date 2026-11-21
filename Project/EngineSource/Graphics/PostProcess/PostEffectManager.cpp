@@ -22,6 +22,7 @@ void PostEffectManager::Initialize(ID3D12GraphicsCommandList* commandList, SrvMa
     registry_.RegisterType<GaussVertical>("GaussVertical", psoManager);
     registry_.RegisterType<GaussHorizontal>("GaussHorizontal", psoManager);
     registry_.RegisterType<Bloom>("Bloom", psoManager);
+    registry_.RegisterType<ToneMapping>("ToneMapping", psoManager);
     registry_.RegisterType<Dissolve>("Dissolve", psoManager);
     registry_.RegisterType<UIComposite>("UIComposite", psoManager);
     registry_.RegisterType<Fog>("Fog", psoManager);
@@ -157,18 +158,20 @@ void PostEffectManager::BuildDefaultGraph() {
     auto* gaussV = CreateEffectNode("GaussVertical");
     auto* gaussH = CreateEffectNode("GaussHorizontal");
     auto* bloom = CreateEffectNode("Bloom");
+    auto* toneMapping = CreateEffectNode("ToneMapping");
     auto* grading = CreateEffectNode("ColorGrading");
     auto* uiComposite = CreateEffectNode("UIComposite");
     auto* dissolve = CreateEffectNode("Dissolve");
 
-    // Scene → Fog → HighLum → GaussV → GaussH → Bloom(Blur) → Grading → UIComposite(+UI) → Dissolve → Output
+    // Scene → Fog → HighLum → GaussV → GaussH → Bloom(Blur) → ToneMapping → Grading → UIComposite(+UI) → Dissolve → Output
     graph_.AddLink(scene->output.id, fog->inputs[0].id);
     graph_.AddLink(fog->output.id, highLum->inputs[0].id);
     graph_.AddLink(highLum->output.id, gaussV->inputs[0].id);
     graph_.AddLink(gaussV->output.id, gaussH->inputs[0].id);
     graph_.AddLink(gaussH->output.id, bloom->inputs[0].id);   // Blur
     graph_.AddLink(fog->output.id, bloom->inputs[1].id);   // 元の画像
-    graph_.AddLink(bloom->output.id, grading->inputs[0].id);
+    graph_.AddLink(bloom->output.id, toneMapping->inputs[0].id);
+    graph_.AddLink(toneMapping->output.id, grading->inputs[0].id);
     graph_.AddLink(grading->output.id, uiComposite->inputs[0].id);
     graph_.AddLink(ui->output.id, uiComposite->inputs[1].id);  // UI
     graph_.AddLink(uiComposite->output.id, dissolve->inputs[0].id);

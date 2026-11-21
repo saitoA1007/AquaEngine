@@ -16,6 +16,7 @@
 #include "DescriptorCounts.h"
 
 #include "DrawPSOData.h"
+#include "RenderPass/RenderFormat.h"
 
 #include <json.hpp>
 
@@ -39,7 +40,7 @@ namespace GameEngine {
 			D3D12_COMPARISON_FUNC depthFunc = D3D12_COMPARISON_FUNC::D3D12_COMPARISON_FUNC_LESS_EQUAL;
 			D3D12_PRIMITIVE_TOPOLOGY_TYPE primitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE; // 描画タイプ
 			uint32_t numRenderTargets = 1;
-			std::vector<DXGI_FORMAT> rtvFormats = { DXGI_FORMAT_R8G8B8A8_UNORM_SRGB };
+			std::vector<DXGI_FORMAT> rtvFormats = { kSceneColorFormat };
 		};
 
 		// パイプラインのデータ

@@ -33,6 +33,11 @@
         {
             "from": 16,
             "slot": 0,
+            "to": 33
+        },
+        {
+            "from": 33,
+            "slot": 0,
             "to": 20
         },
         {
@@ -83,7 +88,7 @@
             "id": 3,
             "kind": "UI",
             "pos": [
-                1096.0,
+                1464.0,
                 620.0
             ]
         },
@@ -91,7 +96,7 @@
             "id": 5,
             "kind": "Output",
             "pos": [
-                2072.0,
+                2440.0,
                 252.0
             ]
         },
@@ -101,7 +106,8 @@
             "kind": "Effect",
             "name": "HighLumMask",
             "params": {
-                "highLumMask": 0.800000011920929
+                "highLumMask": 0.800000011920929,
+                "softKnee": 0.5
             },
             "passName": "HighLumMaskPass",
             "pos": [
@@ -172,7 +178,7 @@
             },
             "passName": "",
             "pos": [
-                1080.0,
+                1448.0,
                 244.0
             ],
             "type": "ColorGrading"
@@ -187,7 +193,7 @@
             },
             "passName": "",
             "pos": [
-                1784.0,
+                2152.0,
                 244.0
             ],
             "type": "Dissolve"
@@ -200,7 +206,7 @@
             "params": {},
             "passName": "",
             "pos": [
-                1496.0,
+                1864.0,
                 244.0
             ],
             "type": "UIComposite"
@@ -227,6 +233,21 @@
                 276.0
             ],
             "type": "Fog"
+        },
+        {
+            "active": true,
+            "id": 33,
+            "kind": "Effect",
+            "name": "ToneMapping",
+            "params": {
+                "exposure": 0.0
+            },
+            "passName": "",
+            "pos": [
+                1128.0,
+                244.0
+            ],
+            "type": "ToneMapping"
         }
     ],
     "version": 1

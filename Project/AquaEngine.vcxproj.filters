@@ -1585,6 +1585,9 @@
     <ClInclude Include="EngineSource\Graphics\RenderPass\RenderTexture.h">
       <Filter>EngineSource\Graphics\RenderPass</Filter>
     </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\RenderPass\RenderFormat.h">
+      <Filter>EngineSource\Graphics\RenderPass</Filter>
+    </ClInclude>
     <ClInclude Include="EngineSource\Graphics\RenderPass\RenderTextureManager.h">
       <Filter>EngineSource\Graphics\RenderPass</Filter>
     </ClInclude>
