@@ -26,9 +26,20 @@ TitlePhase::TitlePhase(PhaseCommonData& commonData, CameraController* cameraCont
 	titleUIManager_ = titleUIManager;
 
 	player_ = player;
+
+	// タイトルBGM
+	titleBgmSH_ = GameEngine::AudioManager::GetInstance().GetHandleByName("Title_BGM.mp3");
 }
 
 void TitlePhase::Enter() {
+	auto& audio = GameEngine::AudioManager::GetInstance();
+	// ポーズからタイトルへ戻った場合などにゲームBGMが残らないように止める
+	audio.Stop(audio.GetHandleByName("Game_BGM.mp3"));
+	// タイトルBGMを再生
+	if (!audio.IsPlay(titleBgmSH_)) {
+		audio.Play(titleBgmSH_, 1.0f, true, "BGM");
+	}
+
 	// UIを有効
 	titleUIManager_->SetActive(true);
 	// 初期化
@@ -70,6 +81,9 @@ void TitlePhase::Exit() {
 
 	// オプションへ行く場合はタイトルの状態を保つ
 	if (commonData_.requestPhase == ScenePhase::kOption) { return; }
+
+	// タイトルBGMを止める
+	GameEngine::AudioManager::GetInstance().Stop(titleBgmSH_);
 
 	// フォローカメラに変更
 	cameraController_->SetChangeState(CameraState::kFollow);
@@ -123,6 +137,10 @@ void TutorialPhase::Enter() {
 		isPlayBossName_ = false;
 		enterMovieUIManager_->Initialize();
 	}
+
+	// ポーズからやり直した場合にゲームBGMが残らないように止める
+	auto& audio = GameEngine::AudioManager::GetInstance();
+	audio.Stop(audio.GetHandleByName("Game_BGM.mp3"));
 }
 
 void TutorialPhase::Update() {
@@ -206,9 +224,18 @@ PlayPhase::PlayPhase(PhaseCommonData& commonData, Player* player, BossEnemy* bos
 	playUIManager_ = playUIManager;
 	// カメラ管理を取得
 	cameraController_ = cameraController;
+
+	// ゲームBGM
+	gameBgmSH_ = GameEngine::AudioManager::GetInstance().GetHandleByName("Game_BGM.mp3");
 }
 
 void PlayPhase::Enter() {
+	// ゲームBGMを再生
+	auto& audio = GameEngine::AudioManager::GetInstance();
+	if (!audio.IsPlay(gameBgmSH_)) {
+		audio.Play(gameBgmSH_, 1.0f, true, "BGM");
+	}
+
 
 	if (ScenePhase::kPause != commonData_.GetPrePhase()) {
 		// リセット
@@ -265,6 +292,9 @@ void PlayPhase::Exit() {
 
 		// ロックオンUIを消す
 		playUIManager_->SetLockOn(false, nullptr);
+
+		// ゲームBGMを止める
+		GameEngine::AudioManager::GetInstance().Stop(gameBgmSH_);
 	}
 }
 
@@ -424,9 +454,17 @@ ClearPhase::ClearPhase(PhaseCommonData& commonData, ClearUIManager* clearUIManag
 
 	clearUIManager_ = clearUIManager;
 	clearUIManager_->SetActive(false);
+
+	// クリア時の音
+	fanfareSH_ = GameEngine::AudioManager::GetInstance().GetHandleByName("fanfare.mp3");
+	// 戻る音
+	backSH_ = GameEngine::AudioManager::GetInstance().GetHandleByName("back.mp3");
 }
 
 void ClearPhase::Enter() {
+	// クリア時の音を再生
+	GameEngine::AudioManager::GetInstance().Play(fanfareSH_, 1.0f, false, "SE");
+
 	// UIを有効化
 	clearUIManager_->SetActive(true);
 	// 初期化
@@ -442,6 +480,8 @@ void ClearPhase::Update() {
 
 	// 決定
 	if (commonData_.inputCommand->IsCommandActive("Decision")) {
+		// 戻る音を再生
+		GameEngine::AudioManager::GetInstance().Play(backSH_, 1.0f, false, "SE");
 		// リセットする
 		commonData_.resetScene = true;
 		// タイトルへ戻る
@@ -452,6 +492,9 @@ void ClearPhase::Update() {
 void ClearPhase::Exit() {
 	// UIを無効化
 	clearUIManager_->SetActive(false);
+
+	// クリア時の音が鳴り続けていれば止める
+	GameEngine::AudioManager::GetInstance().Stop(fanfareSH_);
 }
 
 //===========================================

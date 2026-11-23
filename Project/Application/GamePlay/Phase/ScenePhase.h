@@ -33,6 +33,9 @@ private:
     TitleUIManager* titleUIManager_ = nullptr;
 
     Player* player_ = nullptr;
+
+    // タイトルBGM
+    uint32_t titleBgmSH_ = 0;
 };
 
 // チュートリアル
@@ -65,6 +68,9 @@ private:
     EnterMovieUIManager* enterMovieUIManager_ = nullptr;
     // ボスの名前を表示したか
     bool isPlayBossName_ = false;
+
+    // タイトルBGM(ムービーに入るまで鳴らす)
+    uint32_t titleBgmSH_ = 0;
 };
 
 // プレイ
@@ -94,6 +100,9 @@ private:
 
     // プレイ時間を計測
     Timer playTimer_;
+
+    // ゲームBGM
+    uint32_t gameBgmSH_ = 0;
 };
 
 // ポーズシーン
@@ -150,7 +159,11 @@ public:
 private:
     ClearUIManager* clearUIManager_ = nullptr;
 
+    // クリア時の音
+    uint32_t fanfareSH_ = 0;
 
+    // 戻る時の音
+    uint32_t backSH_ = 0;
 };
 
 // オプション
