@@ -38,6 +38,11 @@ void BossRushAttackAction::Initialize() {
 	float diffAngle = Math::GetAngleDiff(startAngle_, tmpEndAngle);
 	// 最後の角度
 	endAngle_ = startAngle_ + diffAngle;
+	angle_ = startAngle_;
+
+	// 回り込む距離(円弧の長さ)から移動時間を求める
+	float moveDistance = std::fabs(diffAngle) * commonData_.stageRadius;
+	rotateMoveMaxTime_ = std::max(moveDistance / rotateMoveSpeed_, rotateMoveMinTime_);
 
 	// 突進の位置を取得
 	startRushPos_ = playerDir * commonData_.stageRadius;
@@ -72,7 +77,8 @@ void BossRushAttackAction::RegisterParameter(GameEngine::DebugParameter* param) 
 	std::string subGroup = "RushAttack";
 	int index = 0;
 
-	param->Register("RotateMoveMaxTime", rotateMoveMaxTime_, index++, subGroup);
+	param->Register("RotateMoveSpeed", rotateMoveSpeed_, index++, subGroup);
+	param->Register("RotateMoveMinTime", rotateMoveMinTime_, index++, subGroup);
 	param->Register("RushMaxTime", rushMaxTime_, index++, subGroup);
 	param->Register("RushDistanceRatio", rushDistanceRatio_, index++, subGroup);
 }

@@ -23,8 +23,11 @@ public:
     void RegisterParameter(GameEngine::DebugParameter* param) override;
 
 private:
-    // 回転移動時間
-    float rotateMoveMaxTime_ = 2.0f;
+    // 回転移動の速度
+    float rotateMoveSpeed_ = 30.0f;
+
+    // 回転移動の最小時間
+    float rotateMoveMinTime_ = 0.5f;
 
     // 突進する時間
     float rushMaxTime_ = 2.0f;
@@ -40,6 +43,9 @@ private:
     float startAngle_ = 0.0f;
     float endAngle_ = 0.0f;
     float angle_ = 0.0f;
+
+    // 回転移動時間
+    float rotateMoveMaxTime_ = 1.0f;
 
     // 突進の位置
     Vector3 startRushPos_;
