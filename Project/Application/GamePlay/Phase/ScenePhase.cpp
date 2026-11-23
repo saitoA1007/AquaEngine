@@ -39,6 +39,9 @@ void TitlePhase::Enter() {
 
 	// プレイヤーの無効化
 	player_->SetActive(false);
+
+	// 戦闘開始まではダメージ判定を無効
+	player_->SetIsDamageEnabled(false);
 }
 
 void TitlePhase::Update() {
@@ -112,6 +115,9 @@ void TutorialPhase::Enter() {
 	playUIManager_->SetIsDrawPlayGuide(true);
 	playUIManager_->SetIsDrawArrowUI(true);
 
+	// 戦闘開始まではダメージ判定を無効
+	player_->SetIsDamageEnabled(false);
+
 	// ポーズから戻った時以外は、ボスの名前を表示し直せるようにする
 	if (ScenePhase::kPause != commonData_.GetPrePhase()) {
 		isPlayBossName_ = false;
@@ -174,6 +180,12 @@ void TutorialPhase::Exit() {
 		playUIManager_->SetIsDrawArrowUI(false);
 		// プレイヤーを表示
 		player_->SetIsDraw(true);
+		// 登場シーン後のプレイヤーの初期位置
+		if (commonData_.requestPhase == ScenePhase::kPlay) {
+			player_->SetPlayerPos(Vector3(0.0f, 2.0f, -10.0f));
+			// ムービー直後はダメージを受けないようにする
+			player_->StartAfterMovieInvincible();
+		}
 		// ボスの名前を消す
 		enterMovieUIManager_->Stop();
 		// フォローカメラに変更
@@ -204,6 +216,9 @@ void PlayPhase::Enter() {
 	}
 	// 計測開始
 	playTimer_.Start();
+
+	// 戦闘開始なのでダメージ判定を有効
+	player_->SetIsDamageEnabled(true);
 
 	// Hpを設定
 	playUIManager_->SetCurrentBossHp(bossEnemy_->GetCurrentHp());

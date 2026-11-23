@@ -60,6 +60,11 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model,
 		int index = 0;
 		debugParame_->Register("MoveEffectMinSpeed", moveEffectMinSpeed_, index++, subGroup);
 	}
+	{
+		std::string subGroup = "Invincible";
+		int index = 0;
+		debugParame_->Register("AfterMovieInvincibleTime", afterMovieInvincibleTime_, index++, subGroup);
+	}
 	debugParame_->Apply();
 
 	// 当たり判定の設定
@@ -108,6 +113,12 @@ void Player::Initialize() {
 
 	isDraw_ = true;
 
+	// 無敵時間をリセット
+	invincibleTimer_ = 0.0f;
+
+	// 戦闘開始まではダメージ判定を無効
+	isDamageEnabled_ = false;
+
 	// 各アクションの状態をリセット
 	for (IPlayerAction* action : actions_) {
 		action->Reset();
@@ -129,6 +140,11 @@ void Player::Initialize() {
 void Player::Update() {
 	// 値の適応
 	debugParame_->ApplyIfDirty();
+
+	// 無敵時間の更新
+	if (invincibleTimer_ > 0.0f) {
+		invincibleTimer_ -= FpsCounter::GetGameDeltaTime();
+	}
 
 	// カメベクトルを更新
 	moveAction_.UpdateCameraBasis(camera_->GetWorldMatrix());
@@ -346,8 +362,14 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 }
 
 void Player::TakeDamage(int32_t damage) {
+	// ダメージ判定が無効な間はダメージを受けない
+	if (!isDamageEnabled_) { return; }
+
 	// 壁に衝突して上昇している間はダメージを受けない
 	if (bounceAction_.IsBounceRising()) { return; }
+
+	// ムービー直後などの無敵時間中はダメージを受けない
+	if (invincibleTimer_ > 0.0f) { return; }
 
 	// 無敵時間中は何もしない
 	if (!playerStatus_.TakeDamage(damage)) { return; }

@@ -42,6 +42,16 @@ public:
 	/// <returns></returns>
 	Vector3 GetPlayerPos() { return worldTransform_.GetWorldPosition(); }
 
+	/// <summary>
+	/// プレイヤーの位置を設定
+	/// </summary>
+	/// <param name="pos">設定する位置</param>
+	void SetPlayerPos(const Vector3& pos) {
+		worldTransform_.transform_.translate = pos;
+		commonData_.velocity = { 0.0f,0.0f,0.0f };
+		collider_.SetWorldPosition(worldTransform_.transform_.translate);
+	}
+
 	// カメラのワールド行列を取得
 	void SetCamera(CameraController* camera) {
 		camera_ = camera;
@@ -76,6 +86,16 @@ public:
 	// 描画の有効を設定
 	void SetIsDraw(bool isDraw) {
 		isDraw_ = isDraw;
+	}
+
+	// ダメージ判定の有効を設定
+	void SetIsDamageEnabled(bool isEnabled) {
+		isDamageEnabled_ = isEnabled;
+	}
+
+	// ムービー終了直後の無敵時間を開始
+	void StartAfterMovieInvincible() {
+		invincibleTimer_ = afterMovieInvincibleTime_;
 	}
 
 	// ヒットエフェクトを開始
@@ -119,6 +139,9 @@ private:
 	// 表示フラグ
 	bool isDraw_ = true;
 
+	// ダメージ判定の有効フラグ(タイトルから戦闘開始までは無効)
+	bool isDamageEnabled_ = false;
+
 	// 敵に攻撃した時の揺れの強さ
 	float attackShakeIntensity_ = 0.3f;
 	// 敵に攻撃した時の揺れる時間
@@ -138,6 +161,11 @@ private:
 
 	// 歩きエフェクトを出す最低の速さ
 	float moveEffectMinSpeed_ = 2.0f;
+
+	// ムービー終了直後の無敵時間
+	float afterMovieInvincibleTime_ = 2.0f;
+	// 無敵時間の残り時間
+	float invincibleTimer_ = 0.0f;
 
 	// 振動の残り時間
 	float vibrationTimer_ = 0.0f;
