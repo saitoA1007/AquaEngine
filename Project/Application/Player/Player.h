@@ -98,6 +98,9 @@ public:
 		invincibleTimer_ = afterMovieInvincibleTime_;
 	}
 
+	// 出ている全てのエフェクトを消す
+	void ClearAllEffects();
+
 	// ヒットエフェクトを開始
 	void StartHitEffect(Vector3 pos);
 

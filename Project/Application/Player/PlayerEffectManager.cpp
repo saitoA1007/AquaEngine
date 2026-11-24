@@ -239,6 +239,38 @@ void PlayerEffectManager::StartRushEffect(const Matrix4x4& parentMatrix, bool is
 	isRushEffectActive_ = isActive;
 }
 
+void PlayerEffectManager::ClearAllEffects() {
+	// ヒットエフェクト
+	for (auto& effect : playerHitAttackEffects_) {
+		effect->StopImmediate();
+	}
+	playerHitAttackEffect_->SetActive(false);
+
+	// 落下エフェクト
+	downAttackEffect_->StopImmediate();
+
+	// 突進エフェクト
+	if (rushAttackEffect_) {
+		rushAttackEffect_->StopImmediate();
+	}
+	isRushEffectActive_ = false;
+
+	// ダメージを受けた時のエフェクト
+	if (hitEffect_) {
+		hitEffect_->StopImmediate();
+	}
+
+	// パーティクルの発生を止めて、出ているものを消す
+	for (ParticleBehavior* particle : { blastEffect_, afterEffect_, landingEffect_, moveEffect_, chargeEffect_ }) {
+		particle->SetIsLoop(false);
+		particle->Clear();
+	}
+
+	// 時間経過で発生を止める処理も終わらせる
+	timer_ = 1.0f;
+	afterTimer_ = 1.0f;
+}
+
 void PlayerEffectManager::StartDamageEffect(Vector3 pos) {
 	if (!hitEffect_) { return; }
 	// 再生中でも最初から再生し直す

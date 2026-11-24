@@ -383,6 +383,13 @@ void Player::TakeDamage(int32_t damage) {
 	}
 }
 
+void Player::ClearAllEffects() {
+	// エフェクトを全て消す
+	effectManager_->ClearAllEffects();
+	// 振動も止める
+	StopVibration();
+}
+
 void Player::StartHitEffect(Vector3 pos) {
 	uint32_t powerLevel = playerAttackDownAction_.GetPowerLevel();
 	effectManager_->StartHitEffect(pos, powerLevel);

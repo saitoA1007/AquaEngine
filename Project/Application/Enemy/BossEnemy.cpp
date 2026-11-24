@@ -125,6 +125,15 @@ void BossEnemy::SkipEnterMovie() {
 	}
 }
 
+void BossEnemy::StartDefeatMovie() {
+	stateCommonData_.isStartDefeatMovie = true;
+
+	// 出ている遠距離攻撃の演出を全て消す
+	if (rangedAttackManager_) {
+		rangedAttackManager_->Reset();
+	}
+}
+
 void BossEnemy::Update() {
 	// 値の適応
 	debugParame_->ApplyIfDirty();

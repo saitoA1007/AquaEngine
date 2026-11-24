@@ -51,6 +51,9 @@ public:
 	// ダメージを受けた時のエフェクト
 	void StartDamageEffect(Vector3 pos);
 
+	// 出ている全てのエフェクトを即座に消す
+	void ClearAllEffects();
+
 private:
 	GameEngine::GameObjectManager* objectManager_ = nullptr;
 	GameEngine::EffectsManager* effectsManager_ = nullptr;

@@ -485,6 +485,8 @@ void ClearMoviePhase::Update() {
 			// プレイヤーを止めて表示しない
 			player_->SetActive(false);
 			player_->SetIsDraw(false);
+			// プレイヤーの演出を全て消す
+			player_->ClearAllEffects();
 
 			// 撃破ムービーのカメラに変更
 			cameraController_->SetChangeState(CameraState::kClearMovie);
