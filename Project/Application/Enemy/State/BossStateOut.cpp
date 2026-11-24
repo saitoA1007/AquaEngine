@@ -2,6 +2,7 @@
 #include "BossStateOut.h"
 #include "FPSCounter.h"
 #include "EasingManager.h"
+#include "AudioManager.h"
 using namespace GameEngine;
 
 BossStateOut::BossStateOut(BossStateCommonData& commonData) : stateCommonData_(commonData) {
@@ -17,6 +18,9 @@ BossStateOut::BossStateOut(BossStateCommonData& commonData) : stateCommonData_(c
 	stateCommonData_.debugParame->Register("SwayWeithX", swayWeithX_, index++, subGroup);
 	stateCommonData_.debugParame->Register("SwayWeithZ", swayWeithZ_, index++, subGroup);
 	stateCommonData_.debugParame->Register("CycleHeight", cycleHeight_, index++, subGroup);
+
+	// 音声取得
+	bossDieSH_ = AudioManager::GetInstance().GetHandleByName("BossDie.mp3");
 }
 
 void BossStateOut::Enter() {
@@ -24,6 +28,9 @@ void BossStateOut::Enter() {
 	phase_ = Phase::kWait;
 	timer_ = 0.0f;
 	stateCommonData_.isDefeatMovieEnd = false;
+
+	// 死亡した音
+	AudioManager::GetInstance().Play(bossDieSH_, 1.0f, false, "SE");
 }
 
 void BossStateOut::StartMovie() {

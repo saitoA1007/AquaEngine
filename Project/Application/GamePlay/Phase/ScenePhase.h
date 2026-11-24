@@ -175,6 +175,9 @@ private:
     ScreenFadeUIManager* screenFadeUIManager_ = nullptr;
 
     Step step_ = Step::kFadeIn;
+
+    // クリア時の音
+    uint32_t fanfareSH_ = 0;
 };
 
 // クリア
@@ -191,9 +194,6 @@ public:
 
 private:
     ClearUIManager* clearUIManager_ = nullptr;
-
-    // クリア時の音
-    uint32_t fanfareSH_ = 0;
 
     // 戻る時の音
     uint32_t backSH_ = 0;

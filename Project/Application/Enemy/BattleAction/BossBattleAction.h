@@ -55,6 +55,9 @@ private:
 
     float timer_ = 0.0f;
 
+    // 突進音
+    uint32_t rushSH_ = 0;
+
 private:
 
     void RotateMove();
@@ -206,6 +209,9 @@ private:
 
     float maxTime_ = 1.0f;
 
+    // 叫ぶ音
+    uint32_t screamSH_ = 0;
+
 private:
     float timer_ = 0.0f;
 
@@ -249,6 +255,9 @@ private:
     Vector3 endRotDir_;
 
     State state_ = State::kIn;
+
+    // ブレス音
+    uint32_t iceBreathSH_ = 0;
 };
 
 // リセットアクション
@@ -302,12 +311,3 @@ private:
 
     State state_ = State::kIn;
 };
-
-/// ヘルパー関数
-namespace {
-    // 角度からXZ平面上の位置を求める
-    Vector3 GetXZFromAngle(float angle, float radius, float posY);
-
-    // ベクトルをXZ平面上で回転させる
-    Vector3 RotateVectorXZ(Vector3 dir,float angle);
-}

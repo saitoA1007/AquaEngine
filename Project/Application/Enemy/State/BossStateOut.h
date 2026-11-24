@@ -53,6 +53,9 @@ private:
 
 	Phase phase_ = Phase::kWait;
 
+	// 撃破音
+	uint32_t bossDieSH_ = 0;
+
 private:
 	// 撃破ムービーを開始する
 	void StartMovie();

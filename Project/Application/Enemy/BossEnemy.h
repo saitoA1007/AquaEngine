@@ -114,6 +114,9 @@ private:
 	// 遠距離攻撃管理
 	BossRangedAttackManager* rangedAttackManager_ = nullptr;
 
+	// 音声
+	uint32_t eggClackSH_ = 0;
+	uint32_t bossDamagedSH_ = 0;
 private:
 
 	// 現在の当たり判定の半径を取得

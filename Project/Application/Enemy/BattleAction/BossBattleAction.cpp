@@ -9,14 +9,50 @@
 #include "Application/Enemy/BossAnimator.h"
 #include "DebugParameter.h"
 #include "Application/Enemy/BossRangedAttackManager.h"
+#include "AudioManager.h"
 using namespace GameEngine;
+
+// ヘルパー関数
+namespace {
+	// SEを一回鳴らす
+	void PlayBossSE(const uint32_t handle) {
+		AudioManager::GetInstance().Play(handle, 1.0f, false, "SE");
+	}
+
+	// 移動中の音をループで鳴らす
+	void StartBossMoveSound() {
+		auto& audio = AudioManager::GetInstance();
+		uint32_t handle = audio.GetHandleByName("BossMove.mp3");
+		if (!audio.IsPlay(handle)) {
+			audio.Play(handle, 1.0f, true, "SE");
+		}
+	}
+
+	// 移動中の音を止める
+	void StopBossMoveSound() {
+		auto& audio = AudioManager::GetInstance();
+		audio.Stop(audio.GetHandleByName("BossMove.mp3"));
+	}
+
+	// 角度からXZ平面上の位置を求める
+	Vector3 GetXZFromAngle(float angle, float radius, float posY) {
+		return  Vector3(std::cosf(angle) * radius, posY, std::sinf(angle) * radius);
+	}
+
+	// ベクトルをXZ平面上で回転させる
+	Vector3 RotateVectorXZ(Vector3 dir, float angle) {
+		float cos = std::cosf(angle);
+		float sin = std::sinf(angle);
+		return Vector3(dir.x * cos - dir.z * sin, 0.0f, dir.x * sin + dir.z * cos);
+	}
+}
 
 //=============================================================
 // 突進攻撃
 //=============================================================
 
 BossRushAttackAction::BossRushAttackAction(BossBattleStateCommonData& commonData) : IBossBattleAction(commonData) {
-
+	rushSH_ = AudioManager::GetInstance().GetHandleByName("Rush.mp3");
 }
 
 void BossRushAttackAction::Initialize() {
@@ -118,6 +154,9 @@ void BossRushAttackAction::RotateMove() {
 	if (timer_ >= 1.0f) {
 		state_ = State::kRush;
 		timer_ = 0.0f;
+
+		// 突進の音
+		PlayBossSE(rushSH_);
 
 		// プレイヤーの位置から突進する位置を求める
 		Vector3 targetDir = *commonData_.playerPos - commonData_.transform.translate;
@@ -259,6 +298,9 @@ void BossCrossMoveAction::Initialize() {
 	finalRotDir_ = endRotDir_ * -1.0f;
 
 	commonData_.animator->StartAnimation(BossAnimationType::kMove, "基本移動");
+
+	// 移動中の音
+	StartBossMoveSound();
 }
 
 void BossCrossMoveAction::Update() {
@@ -309,7 +351,8 @@ void BossCrossMoveAction::Update() {
 }
 
 void BossCrossMoveAction::Finalize() {
-
+	// 移動中の音を止める
+	StopBossMoveSound();
 }
 
 void BossCrossMoveAction::RegisterParameter(GameEngine::DebugParameter* param) {
@@ -372,6 +415,9 @@ void RotateMoveAction::Initialize() {
 	finalRotDir_ = Vector3::Normalize(prePos * -1.0f);
 
 	commonData_.animator->StartAnimation(BossAnimationType::kMove, "基本移動");
+
+	// 移動中の音
+	StartBossMoveSound();
 }
 
 void RotateMoveAction::Update() {
@@ -436,7 +482,8 @@ void RotateMoveAction::Update() {
 }
 
 void RotateMoveAction::Finalize() {
-
+	// 移動中の音を止める
+	StopBossMoveSound();
 }
 
 void RotateMoveAction::RegisterParameter(GameEngine::DebugParameter* param) {
@@ -454,7 +501,7 @@ void RotateMoveAction::RegisterParameter(GameEngine::DebugParameter* param) {
 //==========================================================================
 
 IceFallAttackAction::IceFallAttackAction(BossBattleStateCommonData& commonData) : IBossBattleAction(commonData) {
-
+	screamSH_ = AudioManager::GetInstance().GetHandleByName("Scream.mp3");
 }
 
 void IceFallAttackAction::Initialize() {
@@ -466,6 +513,9 @@ void IceFallAttackAction::Initialize() {
 
 	// 半径を求める
 	float radius = commonData_.stageRadius * rangeRadiusRatio_;
+
+	// 叫ぶ音
+	PlayBossSE(screamSH_);
 
 	// 氷柱攻撃
 	commonData_.rangedAttackManager->StartIceFall(radius, minDistance_, iceFallNum_, iceFallMaxNum_, maxIter_);
@@ -501,7 +551,7 @@ void IceFallAttackAction::RegisterParameter(GameEngine::DebugParameter* param) {
 //==========================================================================
 
 WindAttackAction::WindAttackAction(BossBattleStateCommonData& commonData) : IBossBattleAction(commonData) {
-
+	iceBreathSH_ = AudioManager::GetInstance().GetHandleByName("IceBreath.mp3");
 }
 
 void WindAttackAction::Initialize() {
@@ -549,6 +599,8 @@ void WindAttackAction::Update() {
 			endDir.Normalize();
 			// 風の演出
 			commonData_.rangedAttackManager->StartWind(commonData_.transform.translate, startDir, endDir, mainMaxTime_);
+			// 風攻撃の音
+			PlayBossSE(iceBreathSH_);
 		}
 		break;
 	}
@@ -664,6 +716,9 @@ void ResetAction::Initialize() {
 	}
 
 	commonData_.animator->StartAnimation(BossAnimationType::kMove, "基本移動");
+
+	// 移動中の音
+	StartBossMoveSound();
 }
 
 void ResetAction::Update() {
@@ -719,7 +774,8 @@ void ResetAction::Update() {
 }
 
 void ResetAction::Finalize() {
-
+	// 移動中の音を止める
+	StopBossMoveSound();
 }
 
 void ResetAction::RegisterParameter(GameEngine::DebugParameter* param) {
@@ -729,20 +785,3 @@ void ResetAction::RegisterParameter(GameEngine::DebugParameter* param) {
 	param->Register("MoveSpeed", moveSpeed_, index++, subGroup);
 	param->Register("RotateSpeed", rotateSpeed_, index++, subGroup);
 }
-
-// ヘルパー関数
-namespace {
-
-	Vector3 GetXZFromAngle(float angle, float radius, float posY) {
-		return  Vector3(std::cosf(angle) * radius, posY, std::sinf(angle) * radius);
-	}
-
-	Vector3 RotateVectorXZ(Vector3 dir, float angle) {
-		float cos = std::cosf(angle);
-		float sin = std::sinf(angle);
-		return Vector3(dir.x * cos - dir.z * sin, 0.0f, dir.x * sin + dir.z * cos );
-	}
-}
-
-
-

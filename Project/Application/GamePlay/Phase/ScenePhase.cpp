@@ -16,6 +16,8 @@
 #include "AudioManager.h"
 #include "FPSCounter.h"
 
+using namespace GameEngine;
+
 //=============================================================
 // タイトル
 //=============================================================
@@ -457,6 +459,9 @@ ClearMoviePhase::ClearMoviePhase(PhaseCommonData& commonData, Player* player, Bo
 	playUIManager_ = playUIManager;
 	cameraController_ = cameraController;
 	screenFadeUIManager_ = screenFadeUIManager;
+
+	// 音声取得
+	fanfareSH_ = AudioManager::GetInstance().GetHandleByName("fanfare.mp3");
 }
 
 void ClearMoviePhase::Enter() {
@@ -494,6 +499,9 @@ void ClearMoviePhase::Update() {
 			// ボスの撃破ムービーを開始
 			bossEnemy_->StartDefeatMovie();
 
+			// 撃破アニメーションに合わせてクリア時の音を鳴らす
+			AudioManager::GetInstance().Play(fanfareSH_, 1.0f, false, "SE");
+
 			// 白を消していく
 			screenFadeUIManager_->StartFadeOut();
 			step_ = Step::kMovie;
@@ -523,16 +531,11 @@ ClearPhase::ClearPhase(PhaseCommonData& commonData, ClearUIManager* clearUIManag
 	clearUIManager_ = clearUIManager;
 	clearUIManager_->SetActive(false);
 
-	// クリア時の音
-	fanfareSH_ = GameEngine::AudioManager::GetInstance().GetHandleByName("fanfare.mp3");
 	// 戻る音
 	backSH_ = GameEngine::AudioManager::GetInstance().GetHandleByName("back.mp3");
 }
 
 void ClearPhase::Enter() {
-	// クリア時の音を再生
-	GameEngine::AudioManager::GetInstance().Play(fanfareSH_, 1.0f, false, "SE");
-
 	// UIを有効化
 	clearUIManager_->SetActive(true);
 	// 初期化
@@ -560,9 +563,6 @@ void ClearPhase::Update() {
 void ClearPhase::Exit() {
 	// UIを無効化
 	clearUIManager_->SetActive(false);
-
-	// クリア時の音が鳴り続けていれば止める
-	GameEngine::AudioManager::GetInstance().Stop(fanfareSH_);
 }
 
 //===========================================

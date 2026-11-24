@@ -9,6 +9,7 @@
 #include "Application/CollisionConfig.h"
 #include "Application/Player/Player.h"
 #include "BossRangedAttackManager.h"
+#include "AudioManager.h"
 
 using namespace GameEngine;
 
@@ -86,6 +87,10 @@ BossEnemy::BossEnemy(GameEngine::Model* model, GameEngine::Model* eggModel, Game
 	});
 
 	debugParame_->Apply();
+
+	// 音声取得
+	eggClackSH_ = AudioManager::GetInstance().GetHandleByName("Egg_Clack.mp3");
+	bossDamagedSH_ = AudioManager::GetInstance().GetHandleByName("BossDamaged.mp3");
 }
 
 void BossEnemy::Initialize() {
@@ -193,6 +198,10 @@ void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRes
 		// 卵の破壊フラグを有効
 		if (player != nullptr) {
 			if (player->GetCurrentState() == PlayerState::kAttackDown) {
+				// 卵が割れた瞬間に音を鳴らす
+				if (!stateCommonData_.isBreakEgg) {
+					AudioManager::GetInstance().Play(eggClackSH_, 1.0f, false, "SE");
+				}
 				stateCommonData_.isBreakEgg = true;
 			}
 		}
@@ -205,6 +214,10 @@ void BossEnemy::OnCollisionEnter([[maybe_unused]] const GameEngine::CollisionRes
 				stateCommonData_.hp_ -= static_cast<int32_t>(damage);
 				// ヒット時の演出
 				player->StartHitEffect(stateCommonData_.worldTransform->transform_.translate + Vector3(0.0f,10.0f,0.0f));
+				// 戦闘中にダメージを受けた音
+				if (bossState_ == BossState::kBattle) {
+					AudioManager::GetInstance().Play(bossDamagedSH_, 1.0f, false, "SE");
+				}
 			}
 		}
 	}
