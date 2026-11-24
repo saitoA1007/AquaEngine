@@ -23,6 +23,7 @@ using namespace GameEngine;
 #include "Application/UI/Managers/PauseUIManager.h"
 #include "Application/UI/Managers/EnterMovieUIManager.h"
 #include "Application/UI/Managers/OptionUIManager.h"
+#include "Application/UI/Managers/ScreenFadeUIManager.h"
 #include "AudioManager.h"
 
 GameScene::~GameScene() {
@@ -104,6 +105,8 @@ GameScene::GameScene() {
 	auto* enterMovieUIManager = gameObjectManager_->AddObject<EnterMovieUIManager>(fontManager_, textureManager_);
 	// オプションのUI
 	auto* optionUIManager = gameObjectManager_->AddObject<OptionUIManager>(textureManager_, fontManager_);
+	// 画面遷移用の白いスプライト
+	auto* screenFadeUIManager = gameObjectManager_->AddObject<ScreenFadeUIManager>();
 
 	// 遷移する用のテクスチャを設定
 	Dissolve* dissolve = postEffectManager_->GetPostEffect<Dissolve>("Dissolve");
@@ -111,7 +114,7 @@ GameScene::GameScene() {
 
 	// シーンフェーズを管理
 	gameObjectManager_->AddObject<GamePhaseManager>(inputCommand_, player, bossEnemy, titleUIManager, playUIManager, gameOverUIManager, clearUIManager,
-		pauseUIManager, cameraController_, dissolve, stageManager, enterMovieUIManager, optionUIManager);
+		pauseUIManager, cameraController_, dissolve, stageManager, enterMovieUIManager, optionUIManager, screenFadeUIManager);
 
 	// ライトを設定
 	auto* light = renderQueue_->GetLightManager();

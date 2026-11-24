@@ -5,6 +5,7 @@ class BossStateOut : public IBossState {
 public:
 
 	enum class Phase {
+		kWait,
 		kIn,
 		kFade
 	};
@@ -38,7 +39,6 @@ private:
 	float FadeMaxTime_ = 2.0f;
 
 	bool isSet_ = false;
-	bool isActive_ = false;
 
 	// 高さ
 	float startPosY_ = 0.0f;
@@ -51,5 +51,9 @@ private:
 	float swayWeithZ_ = 5.0f;
 	float cycleHeight_ = 2.0f;
 
-	Phase phase_ = Phase::kIn;
+	Phase phase_ = Phase::kWait;
+
+private:
+	// 撃破ムービーを開始する
+	void StartMovie();
 };

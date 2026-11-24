@@ -8,6 +8,7 @@
 #include "Application/UI/Managers/PauseUIManager.h"
 #include "Application/UI/Managers/EnterMovieUIManager.h"
 #include "Application/UI/Managers/OptionUIManager.h"
+#include "Application/UI/Managers/ScreenFadeUIManager.h"
 #include "Application/Player/Player.h"
 #include "Application/Enemy/BossEnemy.h"
 #include "Application/Camera/CameraController.h"
@@ -270,13 +271,11 @@ void PlayPhase::Update() {
 	playUIManager_->SetCurrentBossHp(bossEnemy_->GetCurrentHp());
 	playUIManager_->SetCurrentPlayerHp(player_->GetCurrentHp());
 
-	// ボスが撃破されればクリアへ移行
 	if (bossEnemy_->GetCurrentHp() <= 0) {
-		commonData_.requestPhase = ScenePhase::kClear;
-	}
-
-	// プレイヤーが撃破されればゲームオーバーへ移行
-	if (player_->GetCurrentHp() <= 0) {
+		// ボスが撃破されれば撃破ムービーへ移行
+		commonData_.requestPhase = ScenePhase::kClearMovie;
+	} else if (player_->GetCurrentHp() <= 0) {
+		// プレイヤーが撃破されればゲームオーバーへ移行
 		commonData_.requestPhase = ScenePhase::kGameOver;
 	}
 
@@ -444,6 +443,73 @@ void GameOverPhase::Update() {
 void GameOverPhase::Exit() {
 	// UIを無効化
 	gameOverUIManager_->SetActive(false);
+}
+
+//===========================================
+// 撃破ムービー
+//===========================================
+
+ClearMoviePhase::ClearMoviePhase(PhaseCommonData& commonData, Player* player, BossEnemy* bossEnemy, PlayUIManager* playUIManager,
+	CameraController* cameraController, ScreenFadeUIManager* screenFadeUIManager) : IScenePhase(commonData) {
+
+	player_ = player;
+	bossEnemy_ = bossEnemy;
+	playUIManager_ = playUIManager;
+	cameraController_ = cameraController;
+	screenFadeUIManager_ = screenFadeUIManager;
+}
+
+void ClearMoviePhase::Enter() {
+	step_ = Step::kFadeIn;
+
+	// ムービー中はダメージを受けない
+	player_->SetIsDamageEnabled(false);
+
+	// 白で画面を覆い始める
+	screenFadeUIManager_->StartFadeIn();
+}
+
+void ClearMoviePhase::Update() {
+
+	switch (step_) {
+	case Step::kFadeIn:
+		// 画面を白で覆いきったらムービーに切り替える
+		if (screenFadeUIManager_->IsFull()) {
+			// プレイ中のUIを消す
+			playUIManager_->SetIsDrawGamePlayUI(false);
+			playUIManager_->SetIsDrawPlayGuide(false);
+			playUIManager_->SetLockOn(false, nullptr);
+			// 黒帯を表示
+			playUIManager_->SetBarActive(true);
+
+			// プレイヤーを止めて表示しない
+			player_->SetActive(false);
+			player_->SetIsDraw(false);
+
+			// 撃破ムービーのカメラに変更
+			cameraController_->SetChangeState(CameraState::kClearMovie);
+
+			// ボスの撃破ムービーを開始
+			bossEnemy_->StartDefeatMovie();
+
+			// 白を消していく
+			screenFadeUIManager_->StartFadeOut();
+			step_ = Step::kMovie;
+		}
+		break;
+
+	case Step::kMovie:
+		// ムービーが終わればクリアUIを表示する
+		if (bossEnemy_->IsDefeatMovieEnd()) {
+			commonData_.requestPhase = ScenePhase::kClear;
+		}
+		break;
+	}
+}
+
+void ClearMoviePhase::Exit() {
+	// 黒帯を消す
+	playUIManager_->SetBarActive(false);
 }
 
 //===========================================

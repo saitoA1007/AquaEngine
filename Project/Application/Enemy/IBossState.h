@@ -25,6 +25,11 @@ struct BossStateCommonData {
 	// 入りの演出で叫び始めたか
 	bool isScream = false;
 
+	// 撃破ムービーを開始するか
+	bool isStartDefeatMovie = false;
+	// 撃破ムービーが終わったか
+	bool isDefeatMovieEnd = false;
+
 	// hp
 	int32_t hp_ = 1;
 

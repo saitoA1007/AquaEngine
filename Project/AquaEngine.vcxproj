@@ -223,6 +223,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\UI\Effects\LockOnUI.cpp" />
     <ClCompile Include="Application\UI\Managers\ClearUIManager.cpp" />
     <ClCompile Include="Application\UI\Managers\GameOverUIManager.cpp" />
+    <ClCompile Include="Application\UI\Managers\ScreenFadeUIManager.cpp" />
     <ClCompile Include="Application\UI\Managers\EnterMovieUIManager.cpp" />
     <ClCompile Include="Application\UI\Widgets\ArrowUI.cpp" />
     <ClCompile Include="Application\UI\Widgets\HpBarUI.cpp" />
@@ -679,6 +680,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\UI\Effects\LockOnUI.h" />
     <ClInclude Include="Application\UI\Managers\ClearUIManager.h" />
     <ClInclude Include="Application\UI\Managers\GameOverUIManager.h" />
+    <ClInclude Include="Application\UI\Managers\ScreenFadeUIManager.h" />
     <ClInclude Include="Application\UI\Managers\EnterMovieUIManager.h" />
     <ClInclude Include="Application\UI\Widgets\ArrowUI.h" />
     <ClInclude Include="Application\UI\Widgets\HpBarUI.h" />

@@ -4,6 +4,7 @@
 #include "Application/Enemy/BossEnemy.h"
 #include "Application/UI/Managers/PlayUIManager.h"
 #include "Application/Stage/StageManager.h"
+#include "Application/UI/Managers/ScreenFadeUIManager.h"
 #include "FPSCounter.h"
 #include "EasingManager.h"
 // 各フェーズ
@@ -14,7 +15,7 @@ using namespace GameEngine;
 GamePhaseManager::GamePhaseManager(GameEngine::InputCommand* inputCommand, Player* player, BossEnemy* bossEnemy,
 	TitleUIManager* titleUIManager, PlayUIManager* playUIManager, GameOverUIManager* gameOverUIManager, ClearUIManager* clearUIManager,
 	PauseUIManager* pauseUIManager,CameraController* cameraController, GameEngine::Dissolve* dissolve, StageManager* stageManager,
-	EnterMovieUIManager* enterMovieUIManager, OptionUIManager* optionUIManager) {
+	EnterMovieUIManager* enterMovieUIManager, OptionUIManager* optionUIManager, ScreenFadeUIManager* screenFadeUIManager) {
 
 	dissolve_ = dissolve;
 
@@ -30,6 +31,7 @@ GamePhaseManager::GamePhaseManager(GameEngine::InputCommand* inputCommand, Playe
 	phases_[ScenePhase::kTutorial] = std::make_unique<TutorialPhase>(commonData_, cameraController, player, bossEnemy, playUIManager, enterMovieUIManager);
 	phases_[ScenePhase::kPlay] = std::make_unique<PlayPhase>(commonData_, player, bossEnemy, playUIManager, cameraController);
 	phases_[ScenePhase::kGameOver] = std::make_unique<GameOverPhase>(commonData_, gameOverUIManager);
+	phases_[ScenePhase::kClearMovie] = std::make_unique<ClearMoviePhase>(commonData_, player, bossEnemy, playUIManager, cameraController, screenFadeUIManager);
 	phases_[ScenePhase::kClear] = std::make_unique<ClearPhase>(commonData_, clearUIManager);
 	phases_[ScenePhase::kPause] = std::make_unique<PausePhase>(commonData_, pauseUIManager);
 	phases_[ScenePhase::kOption] = std::make_unique<OptionPhase>(commonData_, optionUIManager, cameraController);
@@ -38,6 +40,7 @@ GamePhaseManager::GamePhaseManager(GameEngine::InputCommand* inputCommand, Playe
 	bossEnemy_ = bossEnemy;
 	playUIManager_ = playUIManager;
 	stageManager_ = stageManager;
+	screenFadeUIManager_ = screenFadeUIManager;
 }
 
 void GamePhaseManager::Initialize() {
@@ -121,4 +124,5 @@ void GamePhaseManager::SceneReset() {
 	bossEnemy_->Initialize();
 	playUIManager_->Initialize();
 	stageManager_->Reset();
+	screenFadeUIManager_->Initialize();
 }

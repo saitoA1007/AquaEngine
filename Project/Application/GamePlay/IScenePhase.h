@@ -16,6 +16,7 @@ enum class ScenePhase {
     kClear,    // クリア
     kPause,    // ポーズ
     kOption,   // オプション
+    kClearMovie, // 撃破ムービー
 
     kMaxCount
 };

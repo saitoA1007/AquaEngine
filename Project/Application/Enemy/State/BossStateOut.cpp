@@ -20,19 +20,36 @@ BossStateOut::BossStateOut(BossStateCommonData& commonData) : stateCommonData_(c
 }
 
 void BossStateOut::Enter() {
+	// 画面が白で覆われてからムービーを開始するので、それまでは待機する
+	phase_ = Phase::kWait;
+	timer_ = 0.0f;
+	stateCommonData_.isDefeatMovieEnd = false;
+}
 
+void BossStateOut::StartMovie() {
 	// 初期位置
 	stateCommonData_.worldTransform->transform_.translate = { 0.0f,2.0f,0.0f };
 	stateCommonData_.worldTransform->transform_.rotate = { 0.0f,3.2f,0.0f };
 
 	phase_ = Phase::kIn;
 	timer_ = 0.0f;
+
+	// 撃破のアニメーションに切り替える
+	stateCommonData_.animator->StartAnimation(BossAnimationType::kDeath, "アーマチュア", false);
 }
 
 void BossStateOut::Update() {
 
 	switch (phase_)
 	{
+	case BossStateOut::Phase::kWait:
+		// 撃破ムービーの開始が要求されたら開始する
+		if (stateCommonData_.isStartDefeatMovie) {
+			stateCommonData_.isStartDefeatMovie = false;
+			StartMovie();
+		}
+		break;
+
 	case BossStateOut::Phase::kIn: {
 		timer_ += FpsCounter::GetGameDeltaTime() / InmaxTime_;
 
@@ -76,8 +93,9 @@ void BossStateOut::Update() {
 		timer_ += FpsCounter::GetGameDeltaTime() / FadeMaxTime_;
 
 		if (timer_ >= 1.0f) {
-			// ボスの全ての処理が終了
-			isActive_ = false;
+			// ボスの全ての処理が終了したので撃破ムービーの終了を知らせる
+			timer_ = 1.0f;
+			stateCommonData_.isDefeatMovieEnd = true;
 		}
 		break;
 	}

@@ -136,9 +136,12 @@ public:
 	void Update(float dt60) override;
 
 private:
-
-private:
-
+	// カメラの位置
+	Vector3 kPosition_ = { 0.0f,10.0f,-35.0f };
+	// ボスの位置からの注視点の高さ
+	float kTargetOffsetY_ = 6.0f;
+	// Fov
+	float kFov_ = 0.6f;
 };
 
 // タイトルカメラ

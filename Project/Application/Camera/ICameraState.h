@@ -31,6 +31,9 @@ struct CameraCommonData {
 	// 注視点との距離を保ったまま位置を補間するか
 	bool keepDistance = false;
 
+	// 切り替えた瞬間に補間せず理想の位置へ移動するか
+	bool snapOnEnter = false;
+
 	// カメラの遷移切り替え
 	std::optional<CameraState> requestState = std::nullopt;
 };

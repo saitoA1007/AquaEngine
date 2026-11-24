@@ -98,6 +98,10 @@ void BossEnemy::Initialize() {
 	stateCommonData_.isBreakEgg = false;
 	stateCommonData_.isDrawEgg = true;
 
+	// 撃破ムービーの状態をリセット
+	stateCommonData_.isStartDefeatMovie = false;
+	stateCommonData_.isDefeatMovieEnd = false;
+
 	// 出ている遠距離攻撃を全て止める
 	if (rangedAttackManager_) {
 		rangedAttackManager_->Reset();

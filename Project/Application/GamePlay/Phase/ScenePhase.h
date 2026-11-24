@@ -14,6 +14,7 @@ class ClearUIManager;
 class PauseUIManager;
 class EnterMovieUIManager;
 class OptionUIManager;
+class ScreenFadeUIManager;
 
 // タイトル
 class TitlePhase : public IScenePhase {
@@ -142,6 +143,38 @@ private:
     GameOverUIManager* gameOverUIManager_ = nullptr;
 
 
+};
+
+// 撃破ムービー
+class ClearMoviePhase : public IScenePhase {
+public:
+    // ムービーの段階
+    enum class Step {
+        kFadeIn,  // 白で画面を覆う
+        kMovie,   // 撃破ムービーを流す
+    };
+
+public:
+    ClearMoviePhase(PhaseCommonData& commonData, Player* player, BossEnemy* bossEnemy, PlayUIManager* playUIManager,
+        CameraController* cameraController, ScreenFadeUIManager* screenFadeUIManager);
+    ~ClearMoviePhase() = default;
+
+    void Enter() override;
+
+    void Update() override;
+
+    void Exit() override;
+
+private:
+    Player* player_ = nullptr;
+    BossEnemy* bossEnemy_ = nullptr;
+    PlayUIManager* playUIManager_ = nullptr;
+    CameraController* cameraController_ = nullptr;
+
+    // 画面遷移用の白いスプライト
+    ScreenFadeUIManager* screenFadeUIManager_ = nullptr;
+
+    Step step_ = Step::kFadeIn;
 };
 
 // クリア

@@ -21,13 +21,14 @@ class PauseUIManager;
 class StageManager;
 class EnterMovieUIManager;
 class OptionUIManager;
+class ScreenFadeUIManager;
 
 class GamePhaseManager : public GameEngine::IGameObject {
 public:
 	GamePhaseManager(GameEngine::InputCommand* inputCommand, Player* player, BossEnemy* bossEnemy,
 		TitleUIManager* titleUIManager, PlayUIManager* playUIManager, GameOverUIManager* gameOverUIManager, ClearUIManager* clearUIManager,
 		PauseUIManager* pauseUIManager,CameraController* cameraController, GameEngine::Dissolve* dissolve, StageManager* stageManager,
-		EnterMovieUIManager* enterMovieUIManager, OptionUIManager* optionUIManager);
+		EnterMovieUIManager* enterMovieUIManager, OptionUIManager* optionUIManager, ScreenFadeUIManager* screenFadeUIManager);
 	~GamePhaseManager() = default;
 
 	void Initialize() override;
@@ -57,6 +58,7 @@ private:
 	BossEnemy* bossEnemy_ = nullptr;
 	PlayUIManager* playUIManager_ = nullptr;
 	StageManager* stageManager_ = nullptr;
+	ScreenFadeUIManager* screenFadeUIManager_ = nullptr;
 
 private:
 

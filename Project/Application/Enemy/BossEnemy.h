@@ -62,6 +62,12 @@ public:
 	// 入りの演出を飛ばす
 	void SkipEnterMovie();
 
+	// 撃破ムービーを開始する
+	void StartDefeatMovie() { stateCommonData_.isStartDefeatMovie = true; }
+
+	// 撃破ムービーが終わったか
+	bool IsDefeatMovieEnd() const { return stateCommonData_.isDefeatMovieEnd; }
+
 	// プレイヤーを設定
 	void SetPlayer(const Player* player) { player_ = player; }
 

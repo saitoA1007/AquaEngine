@@ -56,12 +56,13 @@ void CameraController::Update() {
 	float dt60 = FpsCounter::GetDeltaTime() * FpsCounter::GetMaxFrameCount();
 	
 	// カメラを切り替える
-	CameraCommonData& common = currentState_->GetCommonData();
+	CameraCommonData& preCommon = currentState_->GetCommonData();
 
 	// 内部からの切り替え
-	if (common.requestState.has_value()) {
-		ChangeState(common.requestState.value());
-		common.requestState = std::nullopt;
+	if (preCommon.requestState.has_value()) {
+		CameraState next = preCommon.requestState.value();
+		preCommon.requestState = std::nullopt;
+		ChangeState(next);
 	}
 	// 外部からの切り替え
 	if (requestState.has_value()) {
@@ -71,7 +72,18 @@ void CameraController::Update() {
 
 	// 更新
 	currentState_->Update(dt60);
-	
+
+	// 切り替え後の状態のデータを使う
+	CameraCommonData& common = currentState_->GetCommonData();
+
+	// 切り替えた直後に補間しない状態であれば、理想の位置へそのまま移動する
+	if (isSnapRequest_) {
+		isSnapRequest_ = false;
+		position_ = common.idealPosition;
+		currentTarget_ = common.idealTarget;
+		currentFov_ = common.targetFov;
+	}
+
 	// 補間
 	float actualTargetLerp = 1.0f - std::powf(1.0f - common.targetLerpRate, dt60);
 	float actualPositionLerp = 1.0f - std::powf(1.0f - common.positionLerpRate, dt60);
@@ -121,6 +133,9 @@ void CameraController::ChangeState(CameraState next) {
 	currentStateType_ = next;
 	currentState_ = states_[currentStateType_].get();
 	currentState_->Enter();
+
+	// 補間せずに切り替える状態か
+	isSnapRequest_ = currentState_->GetCommonData().snapOnEnter;
 }
 
 void CameraController::StartShake(float intensity, float duration) {

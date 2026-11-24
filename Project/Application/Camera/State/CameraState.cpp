@@ -270,7 +270,12 @@ ClearMovieCameraState::ClearMovieCameraState(CameraController* controller, GameE
 	int index = 0;
 	param->Register("PositionLerpRate", commonData_.positionLerpRate, index++, subGroup);
 	param->Register("TargetLerpRate", commonData_.targetLerpRate, index++, subGroup);
-	
+	param->Register("Position", kPosition_, index++, subGroup);
+	param->Register("TargetOffsetY", kTargetOffsetY_, index++, subGroup);
+	param->Register("Fov", kFov_, index++, subGroup);
+
+	// 画面が白で覆われている間に切り替えるので、補間せずに移動する
+	commonData_.snapOnEnter = true;
 }
 
 void ClearMovieCameraState::Enter() {
@@ -278,7 +283,12 @@ void ClearMovieCameraState::Enter() {
 }
 
 void ClearMovieCameraState::Update(float dt60) {
-
+	// 固定位置から撃破されたボスを映す
+	Vector3 enemyPos = controller_->GetTargetWorld()->transform_.translate;
+	commonData_.idealTarget = enemyPos;
+	commonData_.idealTarget.y += kTargetOffsetY_;
+	commonData_.idealPosition = kPosition_;
+	commonData_.targetFov = kFov_;
 }
 
 //================================================================================

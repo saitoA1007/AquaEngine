@@ -351,6 +351,9 @@
     <ClCompile Include="Application\UI\Managers\GameOverUIManager.cpp">
       <Filter>Application\UI\Managers</Filter>
     </ClCompile>
+    <ClCompile Include="Application\UI\Managers\ScreenFadeUIManager.cpp">
+      <Filter>Application\UI\Managers</Filter>
+    </ClCompile>
     <ClCompile Include="Application\UI\Managers\EnterMovieUIManager.cpp">
       <Filter>Application\UI\Managers</Filter>
     </ClCompile>
@@ -1019,6 +1022,9 @@
       <Filter>Application\UI\Managers</Filter>
     </ClInclude>
     <ClInclude Include="Application\UI\Managers\GameOverUIManager.h">
+      <Filter>Application\UI\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\UI\Managers\ScreenFadeUIManager.h">
       <Filter>Application\UI\Managers</Filter>
     </ClInclude>
     <ClInclude Include="Application\UI\Managers\EnterMovieUIManager.h">

@@ -98,6 +98,9 @@ private:
 	ICameraState* currentState_ = nullptr;
 	CameraState currentStateType_ = CameraState::kFollow;
 
+	// 切り替え直後に補間せず理想の位置へ移動するか
+	bool isSnapRequest_ = false;
+
 	// カメラシェイク
 	float shakeIntensity_ = 0.0f;
 	float shakeDuration_ = 0.0f;
