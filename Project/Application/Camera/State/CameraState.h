@@ -55,6 +55,9 @@ private:
 	HoldInput holdX_;
 	HoldInput holdY_;
 
+	// ロックオンをオンにした時の音
+	uint32_t lockOnInSH_ = 0;
+
 private:
 	// 入力し続けた時間に応じた目標回転速度を求める
 	float CalcHoldRotateSpeed(float inputDir, float baseSpeed, HoldInput& hold);
@@ -83,6 +86,9 @@ private:
 	float lockOnTargetOffsetY_ = 6.0f;
 	// 旋回速度
 	float lockOnRotateRate_ = 0.06f;
+
+	// ロックオンをオフにした時の音
+	uint32_t lockOnOutSH_ = 0;
 };
 
 // 入りのムービーカメラ

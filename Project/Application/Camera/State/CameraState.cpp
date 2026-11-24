@@ -4,6 +4,7 @@
 #include "EasingManager.h"
 #include "FPSCounter.h"
 #include "DebugParameter.h"
+#include "AudioManager.h"
 using namespace GameEngine;
 
 //======================================================================
@@ -29,6 +30,9 @@ FollowCameraState::FollowCameraState(CameraController* controller, GameEngine::D
 
 	// 回り込む時にプレイヤーとの距離を保つ
 	commonData_.keepDistance = true;
+
+	// ロックオンをオンにした時の音
+	lockOnInSH_ = AudioManager::GetInstance().GetHandleByName("LockOnCamera_In.mp3");
 }
 
 void FollowCameraState::Enter() {
@@ -47,6 +51,8 @@ void FollowCameraState::Update(float dt60) {
 	// カメラの切り替え処理
 	if (controller_->GetInputCommand()->IsCommandActive("CameraLockOn")) {
 		commonData_.requestState = CameraState::kLockOn;
+		// ロックオンをオンにした音
+		AudioManager::GetInstance().Play(lockOnInSH_, 1.0f, false, "SE");
 	}
 
 	Vector2& rotateMove = controller_->GetRotateMove();
@@ -142,6 +148,9 @@ LockOnCameraState::LockOnCameraState(CameraController* controller, GameEngine::D
 	param->Register("LockOnFarFov", kLockOnFarFov_, index++, subGroup);
 	param->Register("LockOnFovMinDist", kLockOnFovMinDist_, index++, subGroup);
 	param->Register("LockOnFovMaxDist", kLockOnFovMaxDist_, index++, subGroup);
+
+	// ロックオンをオフにした時の音
+	lockOnOutSH_ = AudioManager::GetInstance().GetHandleByName("LockOnCamera_Out.mp3");
 }
 
 void LockOnCameraState::Update(float dt60) {
@@ -149,6 +158,8 @@ void LockOnCameraState::Update(float dt60) {
 	// カメラの切り替え処理
 	if (controller_->GetInputCommand()->IsCommandActive("CameraLockOn")) {
 		commonData_.requestState = CameraState::kFollow;
+		// ロックオンをオフにした音
+		AudioManager::GetInstance().Play(lockOnOutSH_, 1.0f, false, "SE");
 	}
 
 	Vector2& rotateMove = controller_->GetRotateMove();
