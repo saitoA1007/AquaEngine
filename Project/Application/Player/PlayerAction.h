@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include "IPlayerAction.h"
 
 // プレイヤーの状態
@@ -19,6 +20,13 @@ public:
 		if (isCoolActive_) { return false; }
 		currentHp_ -= damage;
 		isCoolActive_ = true;
+		return true;
+	}
+
+	// 回復する
+	bool Heal(int32_t amount) {
+		if (currentHp_ <= 0 || currentHp_ >= maxHp_) { return false; }
+		currentHp_ = std::min(currentHp_ + amount, maxHp_);
 		return true;
 	}
 

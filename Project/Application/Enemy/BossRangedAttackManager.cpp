@@ -4,11 +4,13 @@
 #include <algorithm>
 #include "RandomGenerator.h"
 #include "Application/Enemy/RangedAttack/IceFall.h"
+#include "Application/Enemy/RangedAttack/HealingHeart.h"
+#include "Application/Player/Player.h"
 #include "ParticleBehavior.h"
 using namespace GameEngine;
 
 BossRangedAttackManager::BossRangedAttackManager(GameEngine::GameObjectManager* objectManager, GameEngine::Model* iceFallModel, GameEngine::Model* iceFallFractureModel,
-	GameEngine::TextureManager* textureManager, GameEngine::Model* windModel, GameEngine::Model* rushModel) {
+	GameEngine::TextureManager* textureManager, GameEngine::Model* windModel, GameEngine::Model* rushModel, GameEngine::Model* heartModel) {
 
 	objectManager_ = objectManager;
 
@@ -29,9 +31,37 @@ BossRangedAttackManager::BossRangedAttackManager(GameEngine::GameObjectManager* 
 
     // 氷柱をあらかじめ確保しておく
     iceFalls_.reserve(6);
+    hearts_.reserve(6);
     for (int i = 0; i < 6; ++i) {
         iceFalls_.push_back(objectManager_->AddObject<IceFall>(iceFallModel_, iceFallFractureModel_, Vector3(0.0f,0.0f,0.0f), currentIceFallNum_));
+
+        // 氷柱の中に入れるハート
+        hearts_.push_back(objectManager_->AddObject<HealingHeart>(heartModel));
+        iceFalls_.back()->SetHeart(hearts_.back());
     }
+
+    // パラメータ機能
+    debugParame_ = std::make_unique<DebugParameter>("BossRangedAttack");
+    int index = 0;
+    debugParame_->Register("HeartChance", heartChance_, index++, "Heart");
+    debugParame_->Register("HeartMaxNumPerAttack", heartMaxNumPerAttack_, index++, "Heart");
+    debugParame_->Apply();
+}
+
+void BossRangedAttackManager::Update() {
+    debugParame_->ApplyIfDirty();
+}
+
+bool BossRangedAttackManager::ShouldPutHeart(int32_t putCount) const {
+    // プレイヤーのHpが減っていなければ入れない
+    if (player_ == nullptr) { return false; }
+    if (player_->GetCurrentHp() >= player_->GetMaxHp()) { return false; }
+
+    // 1回の攻撃で入れる数の上限
+    if (putCount >= heartMaxNumPerAttack_) { return false; }
+
+    // 確率で入れる
+    return RandomGenerator::Get(0.0f, 1.0f) < heartChance_;
 }
 
 void BossRangedAttackManager::StartIceFall(float rangeRadius, float minDistance, int iceFallNum, int iceFallMaxNum, int maxIter) {
@@ -79,6 +109,7 @@ void BossRangedAttackManager::StartIceFall(float rangeRadius, float minDistance,
 
     // 求めた位置に、待機中の氷柱を出現させる
     size_t poolIndex = 0;
+    int32_t heartCount = 0;
     for (const Vector2& point : points) {
 
         // 待機中の氷柱を探す
@@ -88,7 +119,12 @@ void BossRangedAttackManager::StartIceFall(float rangeRadius, float minDistance,
         // 全て使用中
         if (poolIndex >= iceFalls_.size()) { break; }
 
-        iceFalls_[poolIndex]->Start(Vector3(point.x, 0.0f, point.y));
+        // 確率でハートを入れる
+        bool withHeart = iceFalls_[poolIndex]->CanPutHeart() && ShouldPutHeart(heartCount);
+        if (withHeart) {
+            heartCount++;
+        }
+        iceFalls_[poolIndex]->Start(Vector3(point.x, 0.0f, point.y), withHeart);
         poolIndex++;
     }
 }

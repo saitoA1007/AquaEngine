@@ -62,8 +62,13 @@ GameScene::GameScene() {
 	windModel->SetDefaultColor({ 1.0f,1.0f,1.0f,1.0f });
 	auto* rushModel = modelManager_->GetNameByModel("rushWave.obj");
 	rushModel->SetDefaultIsEnableLight(false);
+	// 氷柱の中に入れる回復用のハート
+	auto* heartModel = modelManager_->GetNameByModel("heart.gltf");
+	heartModel->SetDefaultIsEnableLight(true);
 	auto* bossRangedAttackManager = gameObjectManager_->AddObject<BossRangedAttackManager>(gameObjectManager_, iceFallModel, iceFallFractureModel,
-		textureManager_, windModel, rushModel);
+		textureManager_, windModel, rushModel, heartModel);
+	// プレイヤーのHpが減っている時にハートを入れる
+	bossRangedAttackManager->SetPlayer(player);
 
 	// 敵
 	auto* enemyModel = modelManager_->GetNameByModel("BossBird.gltf");

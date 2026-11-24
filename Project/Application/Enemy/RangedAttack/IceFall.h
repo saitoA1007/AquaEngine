@@ -6,6 +6,8 @@
 #include "Collider.h"
 #include "DestructibleObject.h"
 
+class HealingHeart;
+
 class IceFall : public GameEngine::IGameObject {
 public:
 	IceFall(GameEngine::Model* model, GameEngine::Model* fractureModel, Vector3 pos, int32_t& iceFallCurrentNum);
@@ -32,8 +34,14 @@ public:
 	// 破壊されているか
 	bool IsBreak() const { return isBreak_; }
 
-	// 出現させる
-	void Start(Vector3 pos);
+	// 出現させる。withHeartがtrueの時は中にハートを入れる
+	void Start(Vector3 pos, bool withHeart = false);
+
+	// 中に入れるハートを設定
+	void SetHeart(HealingHeart* heart) { heart_ = heart; }
+
+	// ハートを入れられるか(前のハートが残っていないか)
+	bool CanPutHeart() const;
 
 	// 出現中の氷柱を消して待機状態に戻す
 	void Stop();
@@ -41,9 +49,6 @@ public:
 private:
 	// パラメータ機能
 	std::unique_ptr<GameEngine::DebugParameter> debugParame_;
-
-	// モデル
-	//GameEngine::ModelComponent modelComponent_;
 
 	// 氷のマテリアル
 	GameEngine::IceMaterial iceMaterial_;
@@ -65,6 +70,11 @@ private:
 	bool isEnterMoveActive_ = false;
 
 	bool isBreak_ = false;
+
+	// 中に入れる回復用のハート
+	HealingHeart* heart_ = nullptr;
+	// 今回の出現でハートが入っているか
+	bool hasHeart_ = false;
 
 private:
 

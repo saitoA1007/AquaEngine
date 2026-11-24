@@ -7,6 +7,8 @@
 #include "Model.h"
 #include "Application/CollisionConfig.h"
 #include "Application/Enemy/RangedAttack/IceFall.h"
+#include "Application/Enemy/RangedAttack/HealingHeart.h"
+#include "AudioManager.h"
 #include "Application/Enemy/BossEnemy.h"
 #include "Application/Stage/Wall.h"
 #include "Application/Stage/Floor.h"
@@ -93,6 +95,9 @@ Player::Player(GameEngine::InputCommand* inputCommand, GameEngine::Model* model,
 	for (IPlayerAction* action : actions_) {
 		action->Initialize(&commonData_, inputCommand);
 	}
+
+	// 音を取得
+	recoverSH_ = AudioManager::GetInstance().GetHandleByName("Recover.mp3");
 }
 
 Player::~Player() {
@@ -268,6 +273,20 @@ void Player::OnCollisionStay(const GameEngine::CollisionResult& result) {
 	bool isFloor = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kGround));
 	bool isIceFall = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kIceFall));
 	bool isWind = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kWind));
+	bool isHeart = (result.userData.typeID == static_cast<uint32_t>(CollisionTypeID::kHeart));
+
+	// 回復用のハートに触れたら回復する
+	if (isHeart) {
+		HealingHeart* heart = result.userData.As<HealingHeart>();
+		// Hpが減っている時だけ取る
+		if (heart != nullptr && playerStatus_.GetCurrentHp() < playerStatus_.GetMaxHp()) {
+			if (heart->Collect()) {
+				playerStatus_.Heal(1);
+				// 回復の音
+				AudioManager::GetInstance().Play(recoverSH_, 1.0f, false, "SE");
+			}
+		}
+	}
 
 	// 床の衝突
 	if (isFloor) {

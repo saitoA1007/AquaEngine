@@ -2,6 +2,7 @@
 #include "BossStateBattle.h"
 #include "RandomGenerator.h"
 #include "LogManager.h"
+#include "AudioManager.h"
 #include "Application/Enemy/BattleAction/BossBattleAction.h"
 
 using namespace GameEngine;
@@ -52,11 +53,49 @@ BossStateBattle::BossStateBattle(BossStateCommonData& commonData, Vector3* playe
 	for (auto& [key,state] : battleStatesTable_) {
 		state->RegisterParameter(stateCommonData_.debugParame);
 	}
+
+	// 音
+	auto& audio = AudioManager::GetInstance();
+	moveSH_ = audio.GetHandleByName("BossMove.mp3");
+	// 突進・氷柱攻撃・風攻撃の固有の音
+	actionSHs_ = {
+		audio.GetHandleByName("Rush.mp3"),
+		audio.GetHandleByName("Scream.mp3"),
+		audio.GetHandleByName("IceBreath.mp3"),
+	};
 }
 
 void BossStateBattle::Enter() {
 	currentBattleState_ = BossBattleState::kResetMove;
 	battleStatesTable_[currentBattleState_]->Initialize();
+
+	// 戦闘中は移動音を鳴らす
+	UpdateMoveSound();
+}
+
+void BossStateBattle::UpdateMoveSound() {
+	auto& audio = AudioManager::GetInstance();
+
+	// 行動固有の音が鳴っているか
+	bool isActionSoundPlaying = false;
+	for (uint32_t handle : actionSHs_) {
+		if (audio.IsPlay(handle)) {
+			isActionSoundPlaying = true;
+			break;
+		}
+	}
+
+	if (isActionSoundPlaying) {
+		// 固有の音が鳴っている間は移動音を止める
+		if (audio.IsPlay(moveSH_)) {
+			audio.Stop(moveSH_);
+		}
+	} else {
+		// それ以外は移動音をループで鳴らす
+		if (!audio.IsPlay(moveSH_)) {
+			audio.Play(moveSH_, 1.0f, true, "SE");
+		}
+	}
 }
 
 void BossStateBattle::Update() {
@@ -88,6 +127,9 @@ void BossStateBattle::Update() {
 	// 指定した状態による更新処理
 	battleStatesTable_[currentBattleState_]->Update();
 
+	// 移動音の更新
+	UpdateMoveSound();
+
 	// 更新
 	stateCommonData_.worldTransform->transform_ = battleStateCommonData_.transform;
 }
@@ -95,6 +137,9 @@ void BossStateBattle::Update() {
 void BossStateBattle::Exit() {
 	// 実行中の行動の終了処理をおこなう
 	battleStatesTable_[currentBattleState_]->Finalize();
+
+	// 戦闘が終わったら移動音を止める
+	AudioManager::GetInstance().Stop(moveSH_);
 }
 
 BossBattleState BossStateBattle::SelectWeightedBattleState() {

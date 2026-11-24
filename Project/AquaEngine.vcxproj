@@ -192,6 +192,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Application\Enemy\BossAnimator.cpp" />
     <ClCompile Include="Application\Enemy\BossEnemy.cpp" />
     <ClCompile Include="Application\Enemy\BossRangedAttackManager.cpp" />
+    <ClCompile Include="Application\Enemy\RangedAttack\HealingHeart.cpp" />
     <ClCompile Include="Application\Enemy\RangedAttack\IceFall.cpp" />
     <ClCompile Include="Application\Enemy\RangedAttack\WindAttack.cpp" />
     <ClCompile Include="Application\Enemy\State\BossStateBattle.cpp" />
@@ -648,6 +649,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Application\Enemy\BossEnemy.h" />
     <ClInclude Include="Application\Enemy\BossRangedAttackManager.h" />
     <ClInclude Include="Application\Enemy\IBossState.h" />
+    <ClInclude Include="Application\Enemy\RangedAttack\HealingHeart.h" />
     <ClInclude Include="Application\Enemy\RangedAttack\IceFall.h" />
     <ClInclude Include="Application\Enemy\RangedAttack\WindAttack.h" />
     <ClInclude Include="Application\Enemy\State\BossStateBattle.h" />

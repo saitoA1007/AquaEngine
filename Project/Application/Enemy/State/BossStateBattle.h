@@ -50,7 +50,15 @@ private:
 	// 遷移するために使用するリスト
 	std::vector<BehaviorWeight> lotteryList_;
 
+	// 移動音
+	uint32_t moveSH_ = 0;
+	// 行動固有の音(鳴っている間は移動音を止める)
+	std::vector<uint32_t> actionSHs_;
+
 private:
+
+	// 行動固有の音が鳴っていない時だけ移動音を鳴らす
+	void UpdateMoveSound();
 
 	/// <summary>
 	/// 次の攻撃行動を取得する

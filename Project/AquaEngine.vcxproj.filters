@@ -267,6 +267,9 @@
     <ClCompile Include="Application\Enemy\BattleAction\BossBattleAction.cpp">
       <Filter>Application\Enemy\BattleAction</Filter>
     </ClCompile>
+    <ClCompile Include="Application\Enemy\RangedAttack\HealingHeart.cpp">
+      <Filter>Application\Enemy\RangedAttack</Filter>
+    </ClCompile>
     <ClCompile Include="Application\Enemy\RangedAttack\IceFall.cpp">
       <Filter>Application\Enemy\RangedAttack</Filter>
     </ClCompile>
@@ -927,6 +930,9 @@
     </ClInclude>
     <ClInclude Include="Application\Enemy\BattleAction\IBossBattleAction.h">
       <Filter>Application\Enemy\BattleAction</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Enemy\RangedAttack\HealingHeart.h">
+      <Filter>Application\Enemy\RangedAttack</Filter>
     </ClInclude>
     <ClInclude Include="Application\Enemy\RangedAttack\IceFall.h">
       <Filter>Application\Enemy\RangedAttack</Filter>

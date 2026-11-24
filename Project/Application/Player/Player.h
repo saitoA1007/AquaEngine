@@ -142,7 +142,7 @@ private:
 	// 表示フラグ
 	bool isDraw_ = true;
 
-	// ダメージ判定の有効フラグ(タイトルから戦闘開始までは無効)
+	// ダメージ判定の有効フラグ
 	bool isDamageEnabled_ = false;
 
 	// 敵に攻撃した時の揺れの強さ
@@ -159,7 +159,7 @@ private:
 	// 敵に攻撃した時の振動する時間
 	float attackVibrationDuration_ = 0.25f;
 
-	// 敵に攻撃した時のヒットストップの時間（攻撃の強さ1段階あたり、秒）
+	// 敵に攻撃した時のヒットストップの時間
 	float hitStopDuration_ = 0.05f;
 
 	// 歩きエフェクトを出す最低の速さ
@@ -174,6 +174,9 @@ private:
 	float vibrationTimer_ = 0.0f;
 	// 現在の振動の強さ
 	float vibrationIntensity_ = 0.0f;
+
+	// 回復の音
+	uint32_t recoverSH_ = 0;
 
 private: 
 	// プレイヤー

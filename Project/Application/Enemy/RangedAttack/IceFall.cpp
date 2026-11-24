@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "IceFall.h"
+#include "HealingHeart.h"
 #include "Application/CollisionConfig.h"
 #include "FPSCounter.h"
 #include "EasingManager.h"
@@ -74,6 +75,11 @@ void IceFall::Update() {
 	// 破片の更新処理
 	destructibleObject_.Update();
 
+	// 中のハートを氷柱に合わせて動かす
+	if (hasHeart_ && heart_ && !isBreak_) {
+		heart_->SetIcePosition(destructibleObject_.worldTransform_.transform_.translate);
+	}
+
 	if (isBreak_) {
 		timer_ += FpsCounter::GetGameDeltaTime() / breakDisappearTime_;
 	
@@ -115,9 +121,15 @@ void IceFall::Break(const Vector3& hitPos, const Vector3& hitDir) {
 
 	// 大きなダメージを与えて全体を砕く
 	destructibleObject_.ApplyDamage(hitPos, hitDir, breakDamage_, breakCraterRadius_);
+
+	// 中のハートを取れる状態にする
+	if (hasHeart_ && heart_) {
+		heart_->Release();
+	}
+	hasHeart_ = false;
 }
 
-void IceFall::Start(Vector3 pos) {
+void IceFall::Start(Vector3 pos, bool withHeart) {
 	// 現在数を増やす
 	iceFallCurrentNum_ += 1;
 
@@ -135,9 +147,26 @@ void IceFall::Start(Vector3 pos) {
 	collider_.SetWorldPosition(pos);
 	collider_.SetActive(true);
 	isActive_ = true;
+
+	// ハートを中に入れる
+	hasHeart_ = withHeart && CanPutHeart();
+	if (hasHeart_) {
+		heart_->StartInIce(destructibleObject_.worldTransform_.transform_.translate);
+	}
+}
+
+bool IceFall::CanPutHeart() const {
+	// 前回のハートが残っている間は入れない
+	return heart_ != nullptr && !heart_->IsActive();
 }
 
 void IceFall::Stop() {
+	// 氷柱が消えた後もハートは残るので、先に消す
+	if (heart_) {
+		heart_->Stop();
+	}
+	hasHeart_ = false;
+
 	if (!isActive_) { return; }
 
 	// 現在数を減らす

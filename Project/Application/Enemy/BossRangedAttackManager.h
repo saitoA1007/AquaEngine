@@ -3,6 +3,7 @@
 #include "GameObjectManager.h"
 #include "Model.h"
 #include "Application/Enemy/RangedAttack/WindAttack.h"
+#include "DebugParameter.h"
 
 // 前方宣言
 namespace GameEngine {
@@ -11,14 +12,22 @@ namespace GameEngine {
 	class ParticleBehavior;
 }
 class IceFall;
+class HealingHeart;
+class Player;
 
 class BossRangedAttackManager : public GameEngine::IGameObject {
 public:
 	BossRangedAttackManager(GameEngine::GameObjectManager* objectManager, GameEngine::Model* iceFallModel, GameEngine::Model* iceFallFractureModel,
-		GameEngine::TextureManager* textureManager, GameEngine::Model* windModel, GameEngine::Model* rushModel);
+		GameEngine::TextureManager* textureManager, GameEngine::Model* windModel, GameEngine::Model* rushModel, GameEngine::Model* heartModel);
 	~BossRangedAttackManager() = default;
+
+	// 更新処理
+	void Update() override;
 	
 public:
+
+	// ハートを入れるか判定するためにプレイヤーを設定
+	void SetPlayer(const Player* player) { player_ = player; }
 
 	/// <summary>
 	/// 氷柱攻撃
@@ -67,4 +76,22 @@ private:
 
 	// 氷柱攻撃
 	std::vector<IceFall*> iceFalls_;
+
+	// 氷柱の中に入れる回復用のハート
+	std::vector<HealingHeart*> hearts_;
+
+	// プレイヤー
+	const Player* player_ = nullptr;
+
+	// パラメータ機能
+	std::unique_ptr<GameEngine::DebugParameter> debugParame_;
+
+	// プレイヤーのHpが減っている時に、氷柱にハートが入る確率(0~1)
+	float heartChance_ = 0.3f;
+	// 1回の氷柱攻撃でハートを入れる最大の数
+	int32_t heartMaxNumPerAttack_ = 1;
+
+private:
+	// 今出す氷柱にハートを入れるか
+	bool ShouldPutHeart(int32_t putCount) const;
 };

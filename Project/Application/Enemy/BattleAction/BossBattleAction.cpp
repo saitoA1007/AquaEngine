@@ -19,21 +19,6 @@ namespace {
 		AudioManager::GetInstance().Play(handle, 1.0f, false, "SE");
 	}
 
-	// 移動中の音をループで鳴らす
-	void StartBossMoveSound() {
-		auto& audio = AudioManager::GetInstance();
-		uint32_t handle = audio.GetHandleByName("BossMove.mp3");
-		if (!audio.IsPlay(handle)) {
-			audio.Play(handle, 1.0f, true, "SE");
-		}
-	}
-
-	// 移動中の音を止める
-	void StopBossMoveSound() {
-		auto& audio = AudioManager::GetInstance();
-		audio.Stop(audio.GetHandleByName("BossMove.mp3"));
-	}
-
 	// 角度からXZ平面上の位置を求める
 	Vector3 GetXZFromAngle(float angle, float radius, float posY) {
 		return  Vector3(std::cosf(angle) * radius, posY, std::sinf(angle) * radius);
@@ -298,9 +283,6 @@ void BossCrossMoveAction::Initialize() {
 	finalRotDir_ = endRotDir_ * -1.0f;
 
 	commonData_.animator->StartAnimation(BossAnimationType::kMove, "基本移動");
-
-	// 移動中の音
-	StartBossMoveSound();
 }
 
 void BossCrossMoveAction::Update() {
@@ -351,8 +333,6 @@ void BossCrossMoveAction::Update() {
 }
 
 void BossCrossMoveAction::Finalize() {
-	// 移動中の音を止める
-	StopBossMoveSound();
 }
 
 void BossCrossMoveAction::RegisterParameter(GameEngine::DebugParameter* param) {
@@ -415,9 +395,6 @@ void RotateMoveAction::Initialize() {
 	finalRotDir_ = Vector3::Normalize(prePos * -1.0f);
 
 	commonData_.animator->StartAnimation(BossAnimationType::kMove, "基本移動");
-
-	// 移動中の音
-	StartBossMoveSound();
 }
 
 void RotateMoveAction::Update() {
@@ -482,8 +459,6 @@ void RotateMoveAction::Update() {
 }
 
 void RotateMoveAction::Finalize() {
-	// 移動中の音を止める
-	StopBossMoveSound();
 }
 
 void RotateMoveAction::RegisterParameter(GameEngine::DebugParameter* param) {
@@ -716,9 +691,6 @@ void ResetAction::Initialize() {
 	}
 
 	commonData_.animator->StartAnimation(BossAnimationType::kMove, "基本移動");
-
-	// 移動中の音
-	StartBossMoveSound();
 }
 
 void ResetAction::Update() {
@@ -774,8 +746,6 @@ void ResetAction::Update() {
 }
 
 void ResetAction::Finalize() {
-	// 移動中の音を止める
-	StopBossMoveSound();
 }
 
 void ResetAction::RegisterParameter(GameEngine::DebugParameter* param) {
