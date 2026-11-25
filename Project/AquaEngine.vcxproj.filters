@@ -315,6 +315,9 @@
     <ClCompile Include="Application\Scene\AODemoScene.cpp">
       <Filter>Application\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Application\Scene\LightingDemoScene.cpp">
+      <Filter>Application\Scene</Filter>
+    </ClCompile>
     <ClCompile Include="Application\Scene\GameScene.cpp">
       <Filter>Application\Scene</Filter>
     </ClCompile>
@@ -986,6 +989,9 @@
       <Filter>Application\Player\Effect</Filter>
     </ClInclude>
     <ClInclude Include="Application\Scene\AODemoScene.h">
+      <Filter>Application\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Application\Scene\LightingDemoScene.h">
       <Filter>Application\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Application\Scene\GameScene.h">

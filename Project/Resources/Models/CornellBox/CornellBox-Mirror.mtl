@@ -70,7 +70,7 @@ newmtl shortBox
   Ke 0 0 0
   
 #the mirror mtl
-newmtl tallBox 
+newmtl tallBox
  Ka 0.01 0.01 0.01
    Kd 0.01 0.01 0.01
    Ks 0.950 0.95 0.95

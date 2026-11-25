@@ -6,6 +6,7 @@
 #include "Application/Scene/GameScene.h"
 #include "Application/Scene/IceDemoScene.h"
 #include "Application/Scene/AODemoScene.h"
+#include "Application/Scene/LightingDemoScene.h"
 
 using namespace GameEngine;
 
@@ -21,6 +22,7 @@ void SetupScenes(SceneRegistry& factory) {
 #ifdef USE_IMGUI
     factory.RegisterScene<AODemoScene>("AODemo");
     factory.RegisterScene<IceDemoScene>("IceDemo");
+    factory.RegisterScene<LightingDemoScene>("LightingDemo");
 #endif
    
 
