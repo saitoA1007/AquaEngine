@@ -63,6 +63,13 @@ void main(uint3 id : SV_DispatchThreadID)
         return;
     }
 
+    // コースティクスだけを表示するときは、氷そのものは描かない
+    if (gIndices.causticDebugView != 0)
+    {
+        GetOutput()[pixel] = float4(0.0f, 0.0f, 0.0f, 1.0f);
+        return;
+    }
+
     // 1次レイのヒットは再帰段数1
     const int recursive = 1;
 

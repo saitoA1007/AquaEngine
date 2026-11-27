@@ -5,6 +5,7 @@
 #include <numbers>
 #include "ImguiManager.h"
 #include "FPSCounter.h"
+#include "TLAS.h"
 using namespace GameEngine;
 
 namespace {
@@ -35,6 +36,7 @@ LightingDemoScene::LightingDemoScene() {
 
 	// 部屋に置く球
 	sphereModel_ = modelManager_->GetNameByModel("sphereShade.obj");
+	cubeModel_ = modelManager_->GetNameByModel("cube.obj");
 
 	// よく使うマテリアル
 	const MaterialParam mirror = { {0.95f,0.95f,0.95f,1.0f}, 1.0f, 0.02f, 1.0f };
@@ -124,6 +126,21 @@ LightingDemoScene::LightingDemoScene() {
 		AddSphere(room, 0.25f, { -0.35f,0.25f,0.3f }, glass);
 	}
 
+	// 氷によるコースティクス。白い部屋で、氷を通って集まった光を床と壁に落とす
+	{
+		Room& room = AddRoom("CornellBox-Empty-White.obj", "Ice Caustics",
+			"Ice sphere (ball lens) and tilted ice blocks. Light refracted by the ice is gathered "
+			"by photons into bright caustics inside their shadows. Toggle in PostEffect > Scene > Caustics.");
+		const Vector4 clearIce = { 0.92f,0.97f,1.0f,1.0f };
+		const Vector4 blueIce = { 0.75f,0.9f,1.0f,1.0f };
+		// 球は凸レンズになり、影の中に光の点を作る
+		AddIce(room, sphereModel_, { 0.28f,0.28f,0.28f }, { 0.0f,0.0f,0.0f }, { 0.35f,0.28f,0.35f }, clearIce);
+		// 傾けたブロックは面ごとに光を曲げ、帯状の模様を作る
+		AddIce(room, cubeModel_, { 0.2f,0.2f,0.2f }, { 0.0f,0.6f,0.42f }, { -0.4f,0.27f,0.25f }, blueIce);
+		// 奥の背の高い柱は壁に向けて光を落とす
+		AddIce(room, cubeModel_, { 0.12f,0.45f,0.12f }, { 0.0f,0.8f,0.0f }, { 0.05f,0.45f,-0.45f }, clearIce);
+	}
+
 	cameraX_ = GetRoomX(currentRoom_);
 }
 
@@ -188,6 +205,35 @@ void LightingDemoScene::AddSphere(Room& room, float radius, const Vector3& local
 	room.objects.push_back(std::move(sphere));
 }
 
+void LightingDemoScene::AddIce(Room& room, Model* model, const Vector3& scale, const Vector3& rotate, const Vector3& localPos, const Vector4& color) {
+	// 澄んだ氷にする。削れた凹凸と気泡は使わず、屈折による光の集まり方を見やすくする
+	auto iceMaterial = std::make_unique<IceMaterial>();
+	auto* data = iceMaterial->materialData_;
+	data->color = color;
+	data->roughness = 0.05f;
+	data->dissolveThreshold = 0.0f;
+	data->bubbleMaxDepth = 0.0f;
+	data->rimIntensity = 0.3f;
+
+	auto ice = std::make_unique<ModelComponent>(model);
+	const Vector3& roomPos = room.world.transform_.translate;
+	ice->worldTransform_.Initialize({ scale, rotate,
+		{roomPos.x + localPos.x, roomPos.y + localPos.y, roomPos.z + localPos.z} });
+
+	// 氷のマテリアルとヒットグループを使い、影レイでも氷として扱う
+	const size_t meshCount = model->GetMeshes().size();
+	for (size_t i = 0; i < meshCount; ++i) {
+		const uint32_t index = static_cast<uint32_t>(i);
+		ice->SetBufferMaterial(0, iceMaterial->GetMaterialSrvIndex(), index);
+		ice->SetHitGroup(1, index);
+		ice->SetInstanceMask(static_cast<uint32_t>(RayInstanceMask::kRayMaskIce), index);
+	}
+
+	ice->Update();
+	room.objects.push_back(std::move(ice));
+	room.iceMaterials.push_back(std::move(iceMaterial));
+}
+
 float LightingDemoScene::GetRoomX(size_t index) const {
 	return -kRoomSpacing_ * static_cast<float>(index);
 }
@@ -245,8 +291,6 @@ void LightingDemoScene::DebugUpdate() {
 	// ImGuiのフォントに日本語が無いため英語で表示する
 	ImGui::Text("Room %d / %d : %s", static_cast<int>(currentRoom_) + 1, static_cast<int>(rooms_.size()), room.name.c_str());
 	ImGui::TextWrapped("%s", room.description.c_str());
-	ImGui::Separator();
-	ImGui::TextWrapped("A / D : previous / next room   W / S : zoom in / out");
 	ImGui::Separator();
 	ImGui::DragFloat3("lightDir", &lightDir_.x, 0.05f);
 	ImGui::DragFloat("lightIntensity", &lightIntensity_, 0.05f, 0.0f, 5.0f);

@@ -8,6 +8,7 @@
 #include "Vector2.h"
 #include "RtaoSettings.h"
 #include "TextureLodSettings.h"
+#include "CausticSettings.h"
 
 namespace GameEngine {
 
@@ -35,6 +36,7 @@ namespace GameEngine {
         // Sceneノードで調整するシーン描画の設定
         RtaoSettings sceneRtao;
         TextureLodSettings sceneTextureLod;
+        CausticSettings sceneCaustic;
 
         int GetNextId() { return nextId++; }
 

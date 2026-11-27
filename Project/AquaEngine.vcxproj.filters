@@ -1561,6 +1561,9 @@
     <ClInclude Include="EngineSource\Graphics\Core\TextureLodSettings.h">
       <Filter>EngineSource\Graphics\Core</Filter>
     </ClInclude>
+    <ClInclude Include="EngineSource\Graphics\Core\CausticSettings.h">
+      <Filter>EngineSource\Graphics\Core</Filter>
+    </ClInclude>
     <ClInclude Include="EngineSource\Graphics\PSO\Core\RootSignatureBuilder.h">
       <Filter>EngineSource\Graphics\PSO\Core</Filter>
     </ClInclude>

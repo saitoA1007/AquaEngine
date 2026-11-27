@@ -53,6 +53,16 @@ bool PostEffectGraphSerializer::Save(const std::string& filePath, const PostEffe
                 {"enabled", graph.sceneTextureLod.enabled},
                 {"bias", graph.sceneTextureLod.bias},
             };
+            const CausticSettings& caustic = graph.sceneCaustic;
+            n["caustic"] = {
+                {"enabled", caustic.enabled},
+                {"photonResolution", caustic.photonResolution},
+                {"emitRange", caustic.emitRange},
+                {"gatherRadius", caustic.gatherRadius},
+                {"intensity", caustic.intensity},
+                {"iceShadowDensity", caustic.iceShadowDensity},
+                {"debugView", caustic.debugView},
+            };
             break;
         }
         case PostEffectNodeKind::kUI:

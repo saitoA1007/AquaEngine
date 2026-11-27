@@ -6,6 +6,8 @@
 #include "StructuredBuffer.h"
 #include "RtaoSettings.h"
 #include "TextureLodSettings.h"
+#include "CausticSettings.h"
+#include "Vector4.h"
 
 namespace GameEngine {
 
@@ -28,6 +30,10 @@ namespace GameEngine {
 		inline constexpr const char* kAOTrace = "RQAOTrace";
 		inline constexpr const char* kAOTemporal = "RQAOTemporal";
 		inline constexpr const char* kAOBlur = "RQAOBlur";
+		inline constexpr const char* kCausticClear = "RQCausticClear";
+		inline constexpr const char* kCausticBounds = "RQCausticBounds";
+		inline constexpr const char* kCausticTrace = "RQCausticTrace";
+		inline constexpr const char* kCausticResolve = "RQCausticResolve";
 		// RayQueryMaterialの順に並べる
 		inline constexpr const char* kShade[static_cast<size_t>(RayQueryMaterial::kCount)] = {
 			"RQShadeDefault",
@@ -69,6 +75,19 @@ namespace GameEngine {
 		// テクスチャのLOD
 		uint32_t texLodEnabled;     // LODを計算するか
 		float texLodBias;           // ミップレベルに足す値
+
+		// コースティクス
+		uint32_t causticEnabled;          // コースティクスを使用するか
+		uint32_t causticBounds;           // 氷のライト空間での範囲(UAV)
+		uint32_t causticAccum;            // ピクセルごとに着地したフォトンの量(UAV)
+		uint32_t causticOutput;           // 密度推定後の照度(UAV)
+		uint32_t causticCoarseResolution; // 範囲を探すフォトンの縦横の本数
+		uint32_t causticPhotonResolution; // 氷の範囲へ撃つフォトンの縦横の本数
+		float causticEmitRange;           // 氷を探す範囲の半径
+		uint32_t causticGatherRadius;     // フォトンを集めるピクセルの半径
+		float causticIntensity;           // 明るさ
+		float causticIceShadowDensity;    // コースティクス使用時の氷の影の濃さ
+		uint32_t causticDebugView;        // コースティクスだけを表示するか
 	};
 
 	// グローバルルートシグネチャのパラメータ番号
@@ -114,6 +133,9 @@ namespace GameEngine {
 		// テクスチャのLODの設定
 		void SetTextureLodSettings(const TextureLodSettings& settings) { textureLodSettings_ = settings; }
 
+		// コースティクスの設定
+		void SetCausticSettings(const CausticSettings& settings) { causticSettings_ = settings; }
+
 	private:
 
 		// 1次レイのヒット情報
@@ -151,6 +173,12 @@ namespace GameEngine {
 		// Dispatch時のスレッドグループサイズ
 		static constexpr uint32_t kTraceGroupSize = 8;   // 8x8
 		static constexpr uint32_t kShadeGroupSize = 64;  // 64x1
+		// 氷の範囲を探すフォトンの縦横の本数
+		static constexpr uint32_t kCausticCoarseResolution = 512;
+		// 氷の範囲へ撃つフォトンの縦横の本数の上限
+		static constexpr uint32_t kMaxCausticPhotonResolution = 4096;
+		// フォトンを集めるピクセルの半径の上限
+		static constexpr uint32_t kMaxCausticGatherRadius = 16;
 
 		ID3D12Device5* device_ = nullptr;
 
@@ -166,6 +194,11 @@ namespace GameEngine {
 		ID3D12PipelineState* aoTracePso_ = nullptr;
 		ID3D12PipelineState* aoTemporalPso_ = nullptr;
 		ID3D12PipelineState* aoBlurPso_ = nullptr;
+		// コースティクス
+		ID3D12PipelineState* causticClearPso_ = nullptr;
+		ID3D12PipelineState* causticBoundsPso_ = nullptr;
+		ID3D12PipelineState* causticTracePso_ = nullptr;
+		ID3D12PipelineState* causticResolvePso_ = nullptr;
 		// マテリアルごとのシェーディングPSO
 		std::array<ID3D12PipelineState*, static_cast<size_t>(RayQueryMaterial::kCount)> shadePsos_{};
 
@@ -181,11 +214,17 @@ namespace GameEngine {
 		std::array<StructuredBuffer<RayQueryAOSample>, 2> aoHistory_;
 		StructuredBuffer<float> aoOutput_;
 		StructuredBuffer<RayQueryPrevCamera> prevCamera_;
+		// コースティクスの中間バッファ
+		StructuredBuffer<int32_t> causticBounds_;  // 氷の範囲。最小x,最小y,最大x,最大y
+		StructuredBuffer<uint32_t> causticAccum_;  // ピクセルごとのフォトンの量。RGBを固定小数で持つ
+		StructuredBuffer<Vector4> causticOutput_;  // 密度推定後の照度
 
 		// RTAOの設定
 		RtaoSettings rtaoSettings_;
 		// テクスチャのLODの設定
 		TextureLodSettings textureLodSettings_;
+		// コースティクスの設定
+		CausticSettings causticSettings_;
 
 		// フレーム番号
 		uint32_t frameIndex_ = 0;

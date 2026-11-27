@@ -17,6 +17,12 @@ void main(uint3 id : SV_DispatchThreadID)
         GetOutput()[pixel] = float4(GetAO(pixel).xxx, 1.0f);
         return;
     }
+    // デバック用にコースティクスだけを表示する
+    if (gIndices.causticDebugView != 0)
+    {
+        GetOutput()[pixel] = float4(GetCaustic(pixel), 1.0f);
+        return;
+    }
 
     // 1次レイのヒットは再帰段数1
     const int recursive = 1;
@@ -91,6 +97,8 @@ void main(uint3 id : SV_DispatchThreadID)
         // 影の中に残す光(は環境光の代わりなので、AOで遮蔽する
         color = (directLight + indirectLight) * lerp(0.5f * ao, 1.0f, shadowFactor);
         color += ambientLight;
+        // 氷で屈折して集まった光。フォトンの密度が面の向きによる減衰も含んでいる
+        color += albedoColor * lightColor * GetCaustic(pixel) * (1.0f - material.metallic);
     }
 
     GetOutput()[pixel] = float4(color, 1.0f);

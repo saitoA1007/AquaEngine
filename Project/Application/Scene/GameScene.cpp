@@ -143,6 +143,8 @@ void GameScene::Update() {
 	ImGui::Begin("test");
 	ImGui::DragFloat("LightIntensity", &light->directionalLight_->directionalLightData_.intensity, 0.01f);
 	ImGui::ColorEdit3("LightIntensity", &light->directionalLight_->directionalLightData_.color.x);
+	ImGui::DragFloat3("LightDir", &light->directionalLight_->directionalLightData_.direction.x,0.1f);
+	light->directionalLight_->directionalLightData_.direction.Normalize();
 	ImGui::End();
 #endif
 }

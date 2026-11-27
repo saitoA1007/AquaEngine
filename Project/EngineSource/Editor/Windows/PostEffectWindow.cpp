@@ -165,7 +165,7 @@ void PostEffectWindow::DrawInspector(PostEffectGraph& graph) {
     ImGui::Separator();
 
     if (node->kind == PostEffectNodeKind::kScene) {
-        DrawSceneSettings(graph.sceneRtao, graph.sceneTextureLod);
+        DrawSceneSettings(graph.sceneRtao, graph.sceneTextureLod, graph.sceneCaustic);
         return;
     }
 
@@ -191,7 +191,7 @@ void PostEffectWindow::DrawInspector(PostEffectGraph& graph) {
     ImGui::EndDisabled();
 }
 
-void PostEffectWindow::DrawSceneSettings(RtaoSettings& rtao, TextureLodSettings& textureLod) {
+void PostEffectWindow::DrawSceneSettings(RtaoSettings& rtao, TextureLodSettings& textureLod, CausticSettings& caustic) {
     ImGui::TextDisabled("Scene render settings");
 
     ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.6f);
@@ -235,6 +235,41 @@ void PostEffectWindow::DrawSceneSettings(RtaoSettings& rtao, TextureLodSettings&
         }
         ImGui::EndDisabled();
         if (ImGui::Button("Reset Texture LOD")) { textureLod = TextureLodSettings{}; }
+    }
+
+    // フォトンによる氷のコースティクス
+    if (ImGui::CollapsingHeader("Caustics", ImGuiTreeNodeFlags_DefaultOpen)) {
+        ImGui::TextDisabled("RayQuery only");
+        ImGui::Checkbox("Enabled##Caustic", &caustic.enabled);
+
+        ImGui::BeginDisabled(!caustic.enabled);
+        int photonResolution = static_cast<int>(caustic.photonResolution);
+        if (ImGui::SliderInt("Photons", &photonResolution, 128, 4096)) {
+            caustic.photonResolution = static_cast<uint32_t>(photonResolution);
+        }
+        if (ImGui::IsItemHovered()) {
+            ImGui::SetTooltip("Photons per side shot over the ice (N x N)");
+        }
+        ImGui::SliderFloat("Emit range", &caustic.emitRange, 1.0f, 128.0f);
+        if (ImGui::IsItemHovered()) {
+            ImGui::SetTooltip("Ice within this radius around the camera casts caustics");
+        }
+        int gatherRadius = static_cast<int>(caustic.gatherRadius);
+        if (ImGui::SliderInt("Gather radius", &gatherRadius, 1, 16)) {
+            caustic.gatherRadius = static_cast<uint32_t>(gatherRadius);
+        }
+        if (ImGui::IsItemHovered()) {
+            ImGui::SetTooltip("Larger: smoother but blurrier (pixels)");
+        }
+        ImGui::SliderFloat("Intensity##Caustic", &caustic.intensity, 0.0f, 4.0f);
+        ImGui::SliderFloat("Ice shadow", &caustic.iceShadowDensity, 0.0f, 1.0f);
+        if (ImGui::IsItemHovered()) {
+            ImGui::SetTooltip("Shadow density of ice. The transmitted light is carried by photons");
+        }
+        ImGui::Checkbox("Debug view##Caustic", &caustic.debugView);
+        ImGui::EndDisabled();
+
+        if (ImGui::Button("Reset Caustics")) { caustic = CausticSettings{}; }
     }
     ImGui::PopItemWidth();
 }
@@ -294,6 +329,7 @@ void PostEffectWindow::DrawNode(PostEffectGraph& graph, PostEffectNode& node) {
     if (node.kind == PostEffectNodeKind::kScene) {
         nb.BeginContent();
         ImGui::Checkbox("RTAO", &graph.sceneRtao.enabled);
+        ImGui::Checkbox("Caustics", &graph.sceneCaustic.enabled);
     }
 
     // パラメータ

@@ -10,6 +10,7 @@
 #include "TLAS.h"
 #include "RtaoSettings.h"
 #include "TextureLodSettings.h"
+#include "CausticSettings.h"
 
 namespace GameEngine {
 
@@ -40,6 +41,8 @@ namespace GameEngine {
 		void SetRtaoSettings(const RtaoSettings& settings) { rtaoSettings_ = settings; }
 		// テクスチャのLODの設定
 		void SetTextureLodSettings(const TextureLodSettings& settings) { textureLodSettings_ = settings; }
+		// コースティクスの設定
+		void SetCausticSettings(const CausticSettings& settings) { causticSettings_ = settings; }
 
 	private:
 		ID3D12GraphicsCommandList4* commandList_ = nullptr;
@@ -94,6 +97,8 @@ namespace GameEngine {
 		RtaoSettings rtaoSettings_;
 		// テクスチャのLODの設定
 		TextureLodSettings textureLodSettings_;
+		// コースティクスの設定
+		CausticSettings causticSettings_;
 
 	private:
 

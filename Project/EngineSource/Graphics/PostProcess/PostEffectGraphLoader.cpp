@@ -38,6 +38,19 @@ namespace {
         lod.enabled = t.value("enabled", lod.enabled);
         lod.bias = t.value("bias", lod.bias);
     }
+
+    // Sceneノードのコースティクスの設定
+    void ReadCausticSettings(const nlohmann::json& n, CausticSettings& caustic) {
+        if (!n.contains("caustic") || !n["caustic"].is_object()) { return; }
+        const auto& c = n["caustic"];
+        caustic.enabled = c.value("enabled", caustic.enabled);
+        caustic.photonResolution = c.value("photonResolution", caustic.photonResolution);
+        caustic.emitRange = c.value("emitRange", caustic.emitRange);
+        caustic.gatherRadius = c.value("gatherRadius", caustic.gatherRadius);
+        caustic.intensity = c.value("intensity", caustic.intensity);
+        caustic.iceShadowDensity = c.value("iceShadowDensity", caustic.iceShadowDensity);
+        caustic.debugView = c.value("debugView", caustic.debugView);
+    }
 }
 
 bool PostEffectGraphLoader::Run(const nlohmann::json& root) {
@@ -78,6 +91,7 @@ PostEffectNode* PostEffectGraphLoader::LoadNode(const nlohmann::json& n) {
         hasScene_ = true;
         ReadSceneSettings(n, out_.graph.sceneRtao);
         ReadTextureLodSettings(n, out_.graph.sceneTextureLod);
+        ReadCausticSettings(n, out_.graph.sceneCaustic);
         return out_.graph.AddSceneNode();
     }
     if (kind == kKindUI) {

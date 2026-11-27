@@ -851,6 +851,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="EngineSource\Graphics\PSO\Core\RayQueryPipeline.h" />
     <ClInclude Include="EngineSource\Graphics\Core\RtaoSettings.h" />
     <ClInclude Include="EngineSource\Graphics\Core\TextureLodSettings.h" />
+    <ClInclude Include="EngineSource\Graphics\Core\CausticSettings.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderRecord.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderTable.h" />
     <ClInclude Include="EngineSource\Graphics\PSO\Raytracing\ShaderTableBuilder.h" />

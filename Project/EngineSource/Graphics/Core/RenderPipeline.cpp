@@ -53,6 +53,7 @@ void RenderPipeline::EndFrame(ImGuiManager* imGuiManager) {
         // ポストエフェクトグラフのSceneノードで調整したシーン描画の設定を渡す
         sceneRenderManager_->SetRtaoSettings(postEffectManager_->GetGraph().sceneRtao);
         sceneRenderManager_->SetTextureLodSettings(postEffectManager_->GetGraph().sceneTextureLod);
+        sceneRenderManager_->SetCausticSettings(postEffectManager_->GetGraph().sceneCaustic);
         // シーン描画を実行
         sceneRenderManager_->Execute();
     }

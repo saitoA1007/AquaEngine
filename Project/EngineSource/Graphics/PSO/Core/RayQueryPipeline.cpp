@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "RayQueryPipeline.h"
+#include <algorithm>
 #include <cassert>
 #include "LogManager.h"
 #include "PSOManager.h"
@@ -22,6 +23,10 @@ void RayQueryPipeline::Initialize(ID3D12Device5* device, PSOManager* psoManager,
 	aoTracePso_ = psoManager->GetPSO(RayQueryPsoName::kAOTrace);
 	aoTemporalPso_ = psoManager->GetPSO(RayQueryPsoName::kAOTemporal);
 	aoBlurPso_ = psoManager->GetPSO(RayQueryPsoName::kAOBlur);
+	causticClearPso_ = psoManager->GetPSO(RayQueryPsoName::kCausticClear);
+	causticBoundsPso_ = psoManager->GetPSO(RayQueryPsoName::kCausticBounds);
+	causticTracePso_ = psoManager->GetPSO(RayQueryPsoName::kCausticTrace);
+	causticResolvePso_ = psoManager->GetPSO(RayQueryPsoName::kCausticResolve);
 	for (uint32_t i = 0; i < kMaterialCount; ++i) {
 		shadePsos_[i] = psoManager->GetPSO(RayQueryPsoName::kShade[i]);
 	}
@@ -45,6 +50,10 @@ void RayQueryPipeline::CreateBuffers() {
 	aoHistory_[1].CreateForUAV(pixelCount);
 	aoOutput_.CreateForUAV(pixelCount);
 	prevCamera_.CreateForUAV(1);
+	// コースティクス
+	causticBounds_.CreateForUAV(4);
+	causticAccum_.CreateForUAV(pixelCount * 3);
+	causticOutput_.CreateForUAV(pixelCount);
 }
 
 void RayQueryPipeline::UavBarrier(ID3D12GraphicsCommandList4* cmdList, ID3D12Resource* resource) {
@@ -85,6 +94,19 @@ void RayQueryPipeline::Execute(ID3D12GraphicsCommandList4* cmdList, const RayQue
 	indices.aoClampGamma = rtaoSettings_.clampGamma;
 	indices.texLodEnabled = textureLodSettings_.enabled ? 1 : 0;
 	indices.texLodBias = textureLodSettings_.bias;
+	// コースティクス
+	const bool causticEnabled = causticSettings_.enabled;
+	indices.causticEnabled = causticEnabled ? 1 : 0;
+	indices.causticBounds = causticBounds_.GetUAVIndex();
+	indices.causticAccum = causticAccum_.GetUAVIndex();
+	indices.causticOutput = causticOutput_.GetUAVIndex();
+	indices.causticCoarseResolution = kCausticCoarseResolution;
+	indices.causticPhotonResolution = std::clamp(causticSettings_.photonResolution, 1u, kMaxCausticPhotonResolution);
+	indices.causticEmitRange = (std::max)(causticSettings_.emitRange, 0.1f);
+	indices.causticGatherRadius = std::clamp(causticSettings_.gatherRadius, 1u, kMaxCausticGatherRadius);
+	indices.causticIntensity = causticSettings_.intensity;
+	indices.causticIceShadowDensity = std::clamp(causticSettings_.iceShadowDensity, 0.0f, 1.0f);
+	indices.causticDebugView = (causticEnabled && causticSettings_.debugView) ? 1 : 0;
 	++frameIndex_;
 
 	cmdList->SetComputeRootSignature(rootSignature_);
@@ -121,6 +143,34 @@ void RayQueryPipeline::Execute(ID3D12GraphicsCommandList4* cmdList, const RayQue
 		cmdList->SetPipelineState(aoBlurPso_);
 		cmdList->Dispatch(groupX, groupY, 1);
 		UavBarrier(cmdList, aoOutput_.GetResource());
+	}
+
+	// 氷で屈折した光をフォトンで運び、コースティクスの照度を求める
+	if (causticEnabled) {
+		const UINT pixelGroupX = (width_ + kTraceGroupSize - 1) / kTraceGroupSize;
+		const UINT pixelGroupY = (height_ + kTraceGroupSize - 1) / kTraceGroupSize;
+		const UINT coarseGroup = (kCausticCoarseResolution + kTraceGroupSize - 1) / kTraceGroupSize;
+		const UINT photonGroup = (indices.causticPhotonResolution + kTraceGroupSize - 1) / kTraceGroupSize;
+
+		// 加算先と範囲をリセット
+		cmdList->SetPipelineState(causticClearPso_);
+		cmdList->Dispatch(pixelGroupX, pixelGroupY, 1);
+		UavBarrier(cmdList, nullptr);
+
+		// 粗いフォトンで氷のある範囲を求める
+		cmdList->SetPipelineState(causticBoundsPso_);
+		cmdList->Dispatch(coarseGroup, coarseGroup, 1);
+		UavBarrier(cmdList, causticBounds_.GetResource());
+
+		// 氷の範囲へフォトンを撃ち、着地点のピクセルへ加算する
+		cmdList->SetPipelineState(causticTracePso_);
+		cmdList->Dispatch(photonGroup, photonGroup, 1);
+		UavBarrier(cmdList, causticAccum_.GetResource());
+
+		// 周囲のフォトンを集めて照度にする
+		cmdList->SetPipelineState(causticResolvePso_);
+		cmdList->Dispatch(pixelGroupX, pixelGroupY, 1);
+		UavBarrier(cmdList, causticOutput_.GetResource());
 	}
 
 	// Dispatch引数を作る

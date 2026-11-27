@@ -27,5 +27,5 @@ void SetupScenes(SceneRegistry& factory) {
    
 
     // 立ち上げ時に起動するシーン
-    factory.SetDefaultScene("Game");
+    factory.SetDefaultScene("LightingDemo");
 }

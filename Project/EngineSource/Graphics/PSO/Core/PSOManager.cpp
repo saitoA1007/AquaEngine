@@ -904,6 +904,11 @@ void PSOManager::DefaultLoadRayQueryPSO() {
         { RayQueryPsoName::kAOTrace,    L"Resources/Shaders/RayQuery/RQAOTrace.CS.hlsl" },
         { RayQueryPsoName::kAOTemporal, L"Resources/Shaders/RayQuery/RQAOTemporal.CS.hlsl" },
         { RayQueryPsoName::kAOBlur,     L"Resources/Shaders/RayQuery/RQAOBlur.CS.hlsl" },
+        // コースティクス
+        { RayQueryPsoName::kCausticClear,   L"Resources/Shaders/RayQuery/RQCausticClear.CS.hlsl" },
+        { RayQueryPsoName::kCausticBounds,  L"Resources/Shaders/RayQuery/RQCausticBounds.CS.hlsl" },
+        { RayQueryPsoName::kCausticTrace,   L"Resources/Shaders/RayQuery/RQCausticTrace.CS.hlsl" },
+        { RayQueryPsoName::kCausticResolve, L"Resources/Shaders/RayQuery/RQCausticResolve.CS.hlsl" },
         // マテリアルごとのシェーディング
         { RayQueryPsoName::kShade[static_cast<size_t>(RayQueryMaterial::kDefault)], L"Resources/Shaders/RayQuery/RQShadeDefault.CS.hlsl" },
         { RayQueryPsoName::kShade[static_cast<size_t>(RayQueryMaterial::kIce)],     L"Resources/Shaders/RayQuery/RQShadeIce.CS.hlsl" },

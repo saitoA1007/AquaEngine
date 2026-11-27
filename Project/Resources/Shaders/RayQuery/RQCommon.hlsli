@@ -85,6 +85,19 @@ struct RQIndices
     // テクスチャのLOD
     uint texLodEnabled;     // LODを計算するか
     float texLodBias;       // ミップレベルに足す値
+
+    // コースティクス
+    uint causticEnabled;          // コースティクスを使用するか
+    uint causticBounds;           // 氷のライト空間での範囲
+    uint causticAccum;            // ピクセルごとに着地したフォトンの量
+    uint causticOutput;           // 密度推定後の照度
+    uint causticCoarseResolution; // 範囲を探すフォトンの縦横の本数
+    uint causticPhotonResolution; // 氷の範囲へ撃つフォトンの縦横の本数
+    float causticEmitRange;       // 氷を探す範囲の半径
+    uint causticGatherRadius;     // フォトンを集めるピクセルの半径
+    float causticIntensity;       // 明るさ
+    float causticIceShadowDensity;// コースティクス使用時の氷の影の濃さ
+    uint causticDebugView;        // コースティクスだけを表示するか
 };
 
 // 1次レイのヒット情報
@@ -232,6 +245,9 @@ RWStructuredBuffer<RQAOSample> GetAOHistoryCurrent() { return ResourceDescriptor
 RWStructuredBuffer<RQAOSample> GetAOHistoryPrevious() { return ResourceDescriptorHeap[gIndices.aoHistoryPrevious]; }
 RWStructuredBuffer<float> GetAOOutput() { return ResourceDescriptorHeap[gIndices.aoOutput]; }
 RWStructuredBuffer<RQPrevCamera> GetPrevCamera() { return ResourceDescriptorHeap[gIndices.prevCamera]; }
+RWStructuredBuffer<int> GetCausticBounds() { return ResourceDescriptorHeap[gIndices.causticBounds]; }
+RWStructuredBuffer<uint> GetCausticAccum() { return ResourceDescriptorHeap[gIndices.causticAccum]; }
+RWStructuredBuffer<float4> GetCausticOutput() { return ResourceDescriptorHeap[gIndices.causticOutput]; }
 
 Texture2D<float4> GetTexture(uint index)
 {
@@ -347,6 +363,12 @@ bool ShadowRayHit(float3 origin, float3 direction, uint rayMask)
     return q.CommittedStatus() == COMMITTED_TRIANGLE_HIT;
 }
 
+// 氷が落とす影の濃さ。コースティクス使用時は透過光をフォトンが運ぶので濃くする
+float IceShadowDensity()
+{
+    return gIndices.causticEnabled != 0 ? gIndices.causticIceShadowDensity : ICE_SHADOW_DENSITY;
+}
+
 // 遮蔽物の種類を区別して影の透過率を求める
 float ComputeShadowFactor(float3 origin, float3 direction)
 {
@@ -358,7 +380,7 @@ float ComputeShadowFactor(float3 origin, float3 direction)
     // 氷は光を透過するため、薄い影に
     if (ShadowRayHit(origin, direction, RAY_MASK_ICE))
     {
-        return 1.0f - ICE_SHADOW_DENSITY;
+        return 1.0f - IceShadowDensity();
     }
     return 1.0f;
 }
@@ -912,6 +934,81 @@ bool FetchShadePixel(uint threadIndex, uint materialType, out uint2 pixel, out R
     pixel = uint2(packed & 0xFFFF, packed >> 16);
     hit = GetHitBuffer()[pixel.y * gIndices.width + pixel.x];
     return true;
+}
+
+// ============================================================
+// フォトンによるコースティクス
+// ============================================================
+
+// フォトンを撃ち出す面の、カメラからライト側への距離
+static const float CAUSTIC_EMIT_DISTANCE = 500.0f;
+// 1本のフォトンが氷を出入りする回数の上限
+static const int CAUSTIC_MAX_BOUNCES = 8;
+// フォトンの量を整数で加算するための倍率
+static const float CAUSTIC_FIXED_SCALE = 4096.0f;
+// 範囲が見つからなかったときの印
+static const int CAUSTIC_BOUNDS_EMPTY = 0x7FFFFFFF;
+
+// フォトンを撃ち出す面の座標系
+struct CausticFrame
+{
+    float3 dir;    // 光の進む向き
+    float3 T;      // 面の横方向
+    float3 B;      // 面の縦方向
+    float3 center; // 面の中心
+};
+
+CausticFrame MakeCausticFrame()
+{
+    CausticFrame f;
+    f.dir = normalize(gDirectionalLight.direction);
+    float3 up = abs(f.dir.y) < 0.999f ? float3(0, 1, 0) : float3(1, 0, 0);
+    f.T = normalize(cross(up, f.dir));
+    f.B = cross(f.dir, f.T);
+    // カメラからライト側へ離した位置を中心にする
+    f.center = gCamera.worldPosition.xyz - f.dir * CAUSTIC_EMIT_DISTANCE;
+    return f;
+}
+
+// 範囲探索用のフォトンの間隔
+float CausticCoarseCellSize()
+{
+    return 2.0f * gIndices.causticEmitRange / float(gIndices.causticCoarseResolution);
+}
+
+// 氷の範囲(面上の座標)。氷が無ければfalse
+bool LoadCausticRect(out float2 rectMin, out float2 rectSize)
+{
+    RWStructuredBuffer<int> bounds = GetCausticBounds();
+    int4 b = int4(bounds[0], bounds[1], bounds[2], bounds[3]);
+    rectMin = float2(0, 0);
+    rectSize = float2(0, 0);
+    if (b.x > b.z || b.y > b.w)
+    {
+        return false;
+    }
+    // 粗いフォトンの間をすり抜けた分を含めるため、1つ外側まで広げる
+    float cell = CausticCoarseCellSize();
+    rectMin = float2(b.xy - 1) * cell - gIndices.causticEmitRange;
+    rectSize = float2(b.zw - b.xy + 3) * cell;
+    return true;
+}
+
+// 1本のフォトンが受け持つ面積
+float CausticPhotonArea(float2 rectSize)
+{
+    float n = float(gIndices.causticPhotonResolution);
+    return rectSize.x * rectSize.y / (n * n);
+}
+
+// 密度推定済みのコースティクスの照度(ライトの照度を1とする)
+float3 GetCaustic(uint2 pixel)
+{
+    if (gIndices.causticEnabled == 0)
+    {
+        return float3(0, 0, 0);
+    }
+    return GetCausticOutput()[pixel.y * gIndices.width + pixel.x].rgb;
 }
 
 #endif

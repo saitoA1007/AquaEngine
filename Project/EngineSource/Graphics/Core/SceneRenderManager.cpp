@@ -283,6 +283,7 @@ void SceneRenderManager::DrawRayQuery() {
     params.lightAddress = renderQueue_->GetLightResource()->GetGpuVirtualAddress();
     rayQueryPipeline_->SetRtaoSettings(rtaoSettings_);
     rayQueryPipeline_->SetTextureLodSettings(textureLodSettings_);
+    rayQueryPipeline_->SetCausticSettings(causticSettings_);
     rayQueryPipeline_->Execute(commandList_, params);
 }
 

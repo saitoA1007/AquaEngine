@@ -9,6 +9,7 @@
 #include "Model.h"
 #include "ModelComponent.h"
 #include "WorldTransform.h"
+#include "IceMaterial.h"
 
 #include "Application/Scene/Transition/Fade.h"
 
@@ -41,6 +42,7 @@ private:
 		GameEngine::Model* model = nullptr; // コーネルボックスのモデル
 		GameEngine::WorldTransform world;   // 部屋の位置
 		std::vector<std::unique_ptr<GameEngine::ModelComponent>> objects; // 部屋に追加で置く球
+		std::vector<std::unique_ptr<GameEngine::IceMaterial>> iceMaterials; // 氷のオブジェクトが参照するマテリアル
 	};
 
 	// マテリアルの設定値
@@ -62,6 +64,9 @@ private:
 	// 部屋に球を置く。位置は部屋のローカル座標
 	void AddSphere(Room& room, float radius, const Vector3& localPos, const MaterialParam& param);
 
+	// 部屋に透明な氷を置く。位置は部屋のローカル座標
+	void AddIce(Room& room, GameEngine::Model* model, const Vector3& scale, const Vector3& rotate, const Vector3& localPos, const Vector4& color);
+
 	// 部屋の中心のx座標
 	float GetRoomX(size_t index) const;
 
@@ -72,6 +77,8 @@ private:
 
 	// 部屋に置く球のモデル
 	GameEngine::Model* sphereModel_ = nullptr;
+	// 氷のブロックに使う立方体のモデル
+	GameEngine::Model* cubeModel_ = nullptr;
 
 	// 並べた部屋
 	std::vector<std::unique_ptr<Room>> rooms_;
